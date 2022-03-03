@@ -185,7 +185,7 @@ class TXInfer {
     fun a11_new () {
         val out = all("""
             type List = </List>
-            var- ce0 files l = new List.1 <.0>
+            var l = new List.1 <.0>
             --var l = new <.1 <.0>>:List
             output std l
         """.trimIndent())
@@ -1175,14 +1175,14 @@ class TXInfer {
             {
             loop {
             {
-            var ms_12: _int
-            set ms_12 = (_3902020: _int)
+            var ms_13: _int
+            set ms_13 = (_3902020: _int)
             {
             {
             loop {
             await ((evt:- Event)?5)
-            set ms_12 = (sub @[] [ms_12,((evt:- Event)!5)])
-            if (lte @[] [ms_12,(_0: _int)])
+            set ms_13 = (sub @[] [ms_13,((evt:- Event)!5)])
+            if (lte @[] [ms_13,(_0: _int)])
             {
             break
             }
@@ -1356,19 +1356,19 @@ return
 spawn (task @[] -> _ -> _ -> _ {
 var x: _int
 {
-var tsk_14: active task @[] -> _int -> () -> _int
-set tsk_14 = spawn (f @[] (_1: _int))
-var st_14: _int
-set st_14 = (tsk_14.state)
-if (_(${D}st_14 == TASK_AWAITING): _int)
+var tsk_23: active task @[] -> _int -> () -> _int
+set tsk_23 = spawn (f @[] (_1: _int))
+var st_23: _int
+set st_23 = (tsk_23.state)
+if (_(${D}st_23 == TASK_AWAITING): _int)
 {
-await tsk_14
+await tsk_23
 }
 else
 {
 
 }
-set x = (tsk_14.ret)
+set x = (tsk_23.ret)
 }
 output std x
 }
