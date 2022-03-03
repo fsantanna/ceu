@@ -77,9 +77,9 @@ fun code_ft (tp: Type) {
                 typedef struct ${tp.toce()} {
                     Task task0;
                     union {
-                        Block* blks[${tp.xscps.second.size}];
+                        Block* blks[${tp.xscps.second!!.size}];
                         struct {
-                            ${tp.xscps.second.let { if (it.size == 0) "" else
+                            ${tp.xscps.second!!.let { if (it.size == 0) "" else
                                 it.map { "Block* ${it.scp1.id};\n" }.joinToString("") }
                             }
                         };
@@ -95,7 +95,7 @@ fun code_ft (tp: Type) {
                 typedef union {
                     _Event* evt;
                     struct {
-                        Block* blks[${tp.xscps.second.size}];
+                        Block* blks[${tp.xscps.second!!.size}];
                         ${tp.inp.pos()} arg;
                     } pars;
                 } X_${tp.toce()};
@@ -404,7 +404,7 @@ fun code_fe (e: Expr) {
                 ${ptr.pos()} $ID = malloc(sizeof(*$ID));
                 assert($ID!=NULL && "not enough memory");
                 *$ID = ${it.expr};
-                block_push(${ptr.xscp.toce(ptr)}, $ID);
+                block_push(${ptr.xscp!!.toce(ptr)}, $ID);
 
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, ID)
@@ -431,7 +431,7 @@ fun code_fe (e: Expr) {
         is Expr.Call  -> {
             val arg  = CODE.removeFirst()
             val f    = CODE.removeFirst()
-            val blks = e.xscps.first.map { it.toce(e) }.joinToString(",")
+            val blks = e.xscps.first!!.map { it.toce(e) }.joinToString(",")
             val tpf  = e.f.wtype!!.noact()
             when {
                 (e.f is Expr.Var && e.f.tk_.id=="output_std") -> {
@@ -533,7 +533,7 @@ fun code_fe (e: Expr) {
                 void func_${e.n} (Stack* stack, struct Func_${e.n}* task2, X_${e.ftp()!!.toce()} xxx) {
                     Task*             task0 = &task2->task1.task0;
                     ${e.ftp()!!.toce()}* task1 = &task2->task1;
-                    ${e.ftp()!!.xscps.second.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
+                    ${e.ftp()!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
                     assert(task0->state==TASK_UNBORN || task0->state==TASK_AWAITING);
                     switch (task0->pc) {
                         case 0: {                    

@@ -21,7 +21,7 @@ fun check_02_after_tps (s: Stmt) {
                 All_assert_tk(tp.tk, s1 == s2) {    // xsc1ps may not be available in Check_01
                     "invalid type : scope mismatch : expecting $s1, have $s2 argument(s)"
                 }
-                All_assert_tk(tp.tk, check_ctrs(tp,def.xscp1s,tp.xscps!!)) {
+                All_assert_tk(tp.tk, check_ctrs(tp,def.xscp1s.let { Pair(it.first!!,it.second!!) },tp.xscps!!)) {
                     "invalid type : scope mismatch : constraint mismatch"
                 }
             }
@@ -55,7 +55,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New -> {
-                All_assert_tk(e.tk, e.arg.type.xisrec) {
+                All_assert_tk(e.tk, (e.arg as Expr.As).type.xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
@@ -71,17 +71,17 @@ fun check_02_after_tps (s: Stmt) {
                     else -> error("impossible case")
                 }
 
-                val s1 = scp1s.first.size
-                val s2 = e.xscps.first.size
+                val s1 = scp1s.first!!.size
+                val s2 = e.xscps.first!!.size
                 All_assert_tk(e.tk, s1 == s2) {
                     "invalid call : scope mismatch : expecting $s1, have $s2 argument(s)"
                 }
-                All_assert_tk(e.tk, check_ctrs(e,Pair(scp1s.first.map { it.scp1 },scp1s.second),e.xscps!!.first)) {
+                All_assert_tk(e.tk, check_ctrs(e,Pair(scp1s.first!!.map { it.scp1 },scp1s.second!!),e.xscps.first!!)) {
                     "invalid call : scope mismatch : constraint mismatch"
                 }
 
                 val (inp2,out2) = if (func is Type.Func) {
-                    val map = scp1s.first.map { it.scp1.id }.zip(e.xscps.first).toMap()
+                    val map = scp1s.first!!.map { it.scp1.id }.zip(e.xscps.first!!).toMap()
                     Pair (
                         inp1.mapScps(false, map).clone(e,e.tk.lin,e.tk.col),
                         out1.mapScps(true,  map).clone(e,e.tk.lin,e.tk.col)

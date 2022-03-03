@@ -101,7 +101,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()"), 2))
         Lexer.lex()
         val t = Parser().type()
-        assert(t is Type.Pointer && t.xscp.scp1.id=="LOCAL")
+        assert(t is Type.Pointer && t.xscp!!.scp1.id=="LOCAL")
         //assert(e.message == "(ln 1, col 4): expected `@´ : have end of file") { e.message!! }
     }
     @Test
@@ -109,14 +109,14 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()@x"), 2))
         Lexer.lex()
         val tp = Parser().type()
-        assert(tp is Type.Pointer && tp.xscp.scp1.id=="x")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.id=="x")
     }
     @Test
     fun a09_parser_type_ptr_err2 () {
         All_restart(null, PushbackReader(StringReader("/()@LOCAL"), 2))
         Lexer.lex()
         val tp = Parser().type()
-        assert(tp is Type.Pointer && tp.xscp.scp1.id=="LOCAL")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.id=="LOCAL")
         /*
         try {
             val s = Parser().type()
@@ -185,7 +185,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("//() @a @b"), 2))
         Lexer.lex()
         val tp = Parser().type()
-        assert(tp is Type.Pointer && tp.xscp.scp1.id=="b" && tp.pln is Type.Pointer && (tp.pln as Type.Pointer).xscp.scp1.id=="a")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.id=="b" && tp.pln is Type.Pointer && (tp.pln as Type.Pointer).xscp!!.scp1.id=="a")
     }
 
     // EXPR
@@ -705,7 +705,7 @@ class TParser {
         assert (
             (s is Stmt.Set) && ((s.dst as Expr.Var).tk_.id=="f") &&
             s.src.let {
-                (it is Expr.Func) && (it.xtype.inp is Type.Unit) && it.block.body is Stmt.Return
+                (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.Return
             }
         )
     }
