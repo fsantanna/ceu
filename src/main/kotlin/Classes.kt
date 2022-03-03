@@ -50,18 +50,18 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Nat     (val tk_: Tk.Nat): Type(tk_, null, null)
     data class Tuple   (val tk_: Tk.Chr, val vec: List<Type>): Type(tk_, null, null)
     data class Union   (val tk_: Tk.Chr, val vec: List<Type>): Type(tk_, null, null)
-    data class Pointer (val tk_: Tk.Chr, val xscp: Scope?, val pln: Type): Type(tk_, null, null)
+    data class Pointer (val tk_: Tk.Chr, var xscp: Scope?, val pln: Type): Type(tk_, null, null)
     data class Active  (val tk_: Tk.Key, val tsk: Type): Type(tk_, null, null)
     data class Actives (val tk_: Tk.Key, val len: Tk.Num?, val tsk: Type): Type(tk_, null, null)
     data class Func (
         val tk_: Tk.Key,
-        val xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
+        var xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
         val inp: Type, val pub: Type?, val out: Type
     ): Type(tk_, null, null)
     data class Alias (
         val tk_: Tk.Id,
         var xisrec: Boolean,
-        val xscps: List<Scope>?,
+        var xscps: List<Scope>?,
     ): Type(tk_, null, null)
 }
 
@@ -86,17 +86,17 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class TDisc (val tk_: Tk.Num, val tup: Expr): Expr(N++, tk_, null, null, null)
     data class UDisc (val tk_: Tk.Num, val uni: Expr): Expr(N++, tk_, null, null, null)
     data class UPred (val tk_: Tk.Num, val uni: Expr): Expr(N++, tk_, null, null, null)
-    data class New   (val tk_: Tk.Key, val xscp: Scope?, val arg: Expr): Expr(N++, tk_, null, null, null)
+    data class New   (val tk_: Tk.Key, var xscp: Scope?, val arg: Expr): Expr(N++, tk_, null, null, null)
     data class Dnref (val tk_: Tk,     val ptr: Expr): Expr(N++, tk_, null, null, null)
     data class Upref (val tk_: Tk.Chr, val pln: Expr): Expr(N++, tk_, null, null, null)
-    data class Call  (val tk_: Tk, val f: Expr, val arg: Expr, val xscps: Pair<List<Scope>?,Scope?>): Expr(N++, tk_, null, null, null)
+    data class Call  (val tk_: Tk, val f: Expr, val arg: Expr, var xscps: Pair<List<Scope>?,Scope?>): Expr(N++, tk_, null, null, null)
     data class Func  (val tk_: Tk, val xtype: Type.Func?, val block: Stmt.Block) : Expr(N++, tk_, null, null, xtype)
     data class Field (val tk_: Tk.Id, val tsk: Expr): Expr(N++, tk_, null, null, null)
 }
 
 sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Nop    (val tk_: Tk) : Stmt(N++, tk_, null, null)
-    data class Var    (val tk_: Tk.Id, val xtype: Type?, val xinfer: String?) : Stmt(N++, tk_, null, null)
+    data class Var    (val tk_: Tk.Id, var xtype: Type?, val xinfer: String?) : Stmt(N++, tk_, null, null)
     data class Set    (val tk_: Tk.Chr, val dst: Expr, val src: Expr) : Stmt(N++, tk_, null, null)
     data class Native (val tk_: Tk.Nat, val istype: Boolean) : Stmt(N++, tk_, null, null)
     data class SCall  (val tk_: Tk.Key, val e: Expr.Call): Stmt(N++, tk_, null, null)
@@ -106,7 +106,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Await  (val tk_: Tk.Key, val e: Expr): Stmt(N++, tk_, null, null)
     data class Emit   (val tk_: Tk.Key, val tgt: Any, val e: Expr): Stmt(N++, tk_, null, null)
     data class Throw  (val tk_: Tk.Key): Stmt(N++, tk_, null, null)
-    data class Input  (val tk_: Tk.Key, val xtype: Type?, val dst: Expr?, val lib: Tk.Id, val arg: Expr): Stmt(N++, tk_, null, null)
+    data class Input  (val tk_: Tk.Key, var xtype: Type?, val dst: Expr?, val lib: Tk.Id, val arg: Expr): Stmt(N++, tk_, null, null)
     data class Output (val tk_: Tk.Key, val lib: Tk.Id, val arg: Expr): Stmt(N++, tk_, null, null)
     data class Seq    (val tk_: Tk, val s1: Stmt, val s2: Stmt) : Stmt(N++, tk_, null, null)
     data class If     (val tk_: Tk.Key, val tst: Expr, val true_: Block, val false_: Block) : Stmt(N++, tk_, null, null)
@@ -117,7 +117,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Block  (val tk_: Tk.Chr, val iscatch: Boolean, var scp1: Tk.Id?, val body: Stmt) : Stmt(N++, tk_, null, null)
     data class Typedef (
         val tk_: Tk.Id,
-        val xscp1s: Pair<List<Tk.Id>?,List<Pair<String,String>>?>,
+        var xscp1s: Pair<List<Tk.Id>?,List<Pair<String,String>>?>,
         val type: Type
     ) : Stmt(N++, tk_, null, null)
 }
