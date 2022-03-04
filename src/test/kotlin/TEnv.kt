@@ -16,7 +16,9 @@ class TEnv {
             s.setScp1s()
             s.setEnvs(null)
             check_00_after_envs(s)
+            s.xinfScp1s()
             check_01_before_tps(s)
+            s.xinfTypes(null)
             s.setTypes()
             s.setScp2s()
             check_02_after_tps(s)
@@ -81,7 +83,8 @@ class TEnv {
             var x: <(),()>
             output std(x.0)
         """.trimIndent())
-        assert(out.startsWith("(ln 2, col 14): invalid discriminator : type mismatch : expected tuple")) { out }
+        //assert(out.startsWith("(ln 2, col 14): invalid discriminator : type mismatch : expected tuple")) { out }
+        assert(out == "(ln 2, col 12): invalid discriminator : type mismatch : expected tuple : have <(),()>") { out }
     }
     @Test
     fun b04_user_disc_cons_err () {

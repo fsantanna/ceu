@@ -70,7 +70,7 @@ fun check_02_after_tps (s: Stmt) {
                 val arg1 = e.arg.wtype!!
 
                 val (scp1s,inp1,out1) = when (func) {
-                    is Type.Func   -> Triple(Pair(func.xscps.second,func.xscps.third),func.inp,func.out)
+                    is Type.Func   -> Triple(Pair(func.xscps.second!!,func.xscps.third!!),func.inp,func.out)
                     is Type.Nat    -> Triple(Pair(emptyList(),emptyList()),func,func)
                     else -> error("impossible case")
                 }
@@ -80,7 +80,7 @@ fun check_02_after_tps (s: Stmt) {
                 All_assert_tk(e.tk, s1 == s2) {
                     "invalid call : scope mismatch : expecting $s1, have $s2 argument(s)"
                 }
-                All_assert_tk(e.tk, check_ctrs(e,Pair(scp1s.first!!.map { it.scp1 },scp1s.second!!),e.xscps.first!!)) {
+                All_assert_tk(e.tk, check_ctrs(e,Pair(scp1s.first.map { it.scp1 },scp1s.second),e.xscps.first!!)) {
                     "invalid call : scope mismatch : constraint mismatch"
                 }
 

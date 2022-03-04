@@ -115,7 +115,7 @@ fun Stmt.xinfScp1s () {
                         .filter { it.scp1.isscopepar() }
                         
                 }
-                tp.xscps = Triple(tp.xscps.first, second, tp.xscps.third)
+                tp.xscps = Triple(tp.xscps.first, second, tp.xscps.third ?: emptyList())
             }
         }
     }

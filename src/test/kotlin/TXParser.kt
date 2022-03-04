@@ -39,7 +39,7 @@ class TXParser {
     fun c01_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x: () = ()"), 2))
         Lexer.lex()
-        val s = XParser().stmt()
+        val s = Parser().stmt()
         assert(s is Stmt.Seq && s.s1 is Stmt.Var && s.s2 is Stmt.Set)
         assert(s.tostr() == "var x: ()\nset x = ()\n") { s.tostr() }
     }
@@ -47,7 +47,7 @@ class TXParser {
     fun c02_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x: ()"), 2))
         Lexer.lex()
-        val s = XParser().stmt()
+        val s = Parser().stmt()
         assert(s is Stmt.Var)
         assert(s.tostr() == "var x: ()\n") { s.tostr() }
     }
@@ -55,7 +55,7 @@ class TXParser {
     fun c03_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x = ()"), 2))
         Lexer.lex()
-        val s = XParser().stmt()
+        val s = Parser().stmt()
         assert(s is Stmt.Seq && s.s1 is Stmt.Var && s.s2 is Stmt.Set)
     }
     @Test
@@ -63,7 +63,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("var x"), 2))
         Lexer.lex()
         try {
-            XParser().stmt()
+            Parser().stmt()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 6): expected type declaration : have end of file")

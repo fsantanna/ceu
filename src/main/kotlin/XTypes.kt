@@ -22,7 +22,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Id): Type {
 fun Expr.xinfTypes (inf: Type?) {
     val xinf = inf?.noalias()
     this.wtype = when (this) {
-        is Expr.Unit  -> inf ?: this.wtype!!
+        is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
