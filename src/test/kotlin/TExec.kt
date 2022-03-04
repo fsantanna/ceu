@@ -987,8 +987,8 @@ class TExec {
             set l = new _1: _int @LOCAL
             output std l
         """.trimIndent())
-        //assert(out == "(ln 3, col 9): invalid `new` : expected constructor") { out }
-        assert(out == "(ln 3, col 9): invalid `new` : expected alias constructor") { out }
+        assert(out == "(ln 3, col 9): invalid `new` : expected constructor") { out }
+        //assert(out == "(ln 3, col 9): invalid `new` : expected alias constructor") { out }
     }
     @Test
     fun j02_list_new_ok () {

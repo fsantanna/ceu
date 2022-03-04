@@ -2300,7 +2300,7 @@ class TEnv {
         val out = inp2env(
             """
             type Xxx @[a] = _int
-            var x: Xxx
+            var x: Xxx @[]
         """.trimIndent()
         )
         assert(out == "(ln 2, col 8): invalid type : scope mismatch : expecting 1, have 0 argument(s)") { out }

@@ -101,7 +101,8 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()"), 2))
         Lexer.lex()
         val t = Parser().type()
-        assert(t is Type.Pointer && t.xscp!!.scp1.id=="LOCAL")
+        //assert(t is Type.Pointer && t.xscp!!.scp1.id=="LOCAL")
+        assert(t is Type.Pointer && t.xscp==null)
         //assert(e.message == "(ln 1, col 4): expected `@´ : have end of file") { e.message!! }
     }
     @Test
@@ -226,7 +227,8 @@ class TParser {
             Parser().expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 1): expected expression : have \"Point\"")
+            //assert(e.message == "(ln 1, col 1): expected expression : have \"Point\"") { e.message!! }
+            assert(e.message == "(ln 1, col 6): expected `{´ : have end of file") { e.message!! }
         }
     }
 
@@ -368,12 +370,16 @@ class TParser {
     fun b15_parser_expr_cons_err () {
         All_restart(null, PushbackReader(StringReader("<.0>"), 2))
         Lexer.lex()
+        val e = Parser().expr()
+        assert(e is Expr.UNull && e.xtype==null)
+        /*
         try {
             Parser().expr()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 5): expected `:´ : have end of file") { e.message!! }
         }
+         */
     }
     @Test
     fun b15_parser_expr_cons_err2 () {
@@ -666,12 +672,16 @@ class TParser {
     fun c11_parser_stmt_if_err () {
         All_restart(null, PushbackReader(StringReader("if <.2()>:<()> {}"), 2))
         Lexer.lex()
+        val s = Parser().stmts()
+        assert(s is Stmt.If && s.false_.body is Stmt.Nop)
+        /*
         try {
             Parser().stmts()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 18): expected `else` : have end of file") { e.message!! }
         }
+         */
     }
     @Test
     fun c11_parser_stmt_if () {

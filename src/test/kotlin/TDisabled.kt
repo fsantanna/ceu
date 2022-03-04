@@ -19,7 +19,7 @@ class TDisabled {
             s.setEnvs(null)
             check_00_after_envs(s)
             check_01_before_tps(s)
-            s.setTypes()
+            //s.setTypes()
             s.setScp2s()
             check_02_after_tps(s)
             return "OK"
