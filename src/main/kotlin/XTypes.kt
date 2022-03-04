@@ -32,12 +32,33 @@ fun Expr.xinfTypes (inf: Type?) {
         }
         is Expr.As -> {
             val tp = this.xtype ?: inf
-            this.e.xinfTypes(tp?.noalias())
-            if (tp is Type.Alias) {
-                this.xtype = tp
+            when (this.tk_.sym) {
+                ":+" -> {
+                    this.e.xinfTypes(tp?.noalias())
+                    if (tp is Type.Alias) {
+                        this.xtype = this.xtype ?: tp
+                    }
+                    this.xtype ?: this.e.wtype!!
+                }
+                ":-" -> {
+                    this.e.xinfTypes(tp)
+                    if (this.e.wtype is Type.Alias) {
+                        this.xtype = this.xtype ?: (this.e.wtype as Type.Alias)
+                    }
+                    this.xtype?.noalias() ?: this.e.wtype!!
+                }
+                else -> error("bug found")
+            }.let { ret ->
+                this.e.wtype.let {
+                    when (it) {
+                        is Type.Active  -> Type.Active (it.tk_,ret).clone(e,e.tk.lin,e.tk.col)
+                        is Type.Actives -> Type.Actives(it.tk_,it.len,it).clone(e,e.tk.lin,e.tk.col)
+                        else -> ret
+                    }
+                }
             }
-            this.xtype ?: this.e.wtype!!
         }
+
         is Expr.Upref -> {
             All_assert_tk(this.tk, inf==null || xinf is Type.Pointer) { "invalid inference : type mismatch"}
             this.pln.xinfTypes((xinf as Type.Pointer?)?.pln)

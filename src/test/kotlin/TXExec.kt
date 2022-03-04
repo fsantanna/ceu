@@ -224,7 +224,7 @@ class TXExec {
             }
             output std p1\
         """.trimIndent())
-        assert(out.startsWith("(ln 6, col 8): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("(ln 5, col 12): invalid assignment : type mismatch")) { out }
     }
 
     // old disabled
@@ -427,7 +427,7 @@ class TXExec {
             output std (f ())
         """.trimIndent()
         )
-        assert(out.startsWith("(ln 3, col 9): invalid return : type mismatch")) { out }
+        assert(out.startsWith("(ln 2, col 5): invalid return : type mismatch")) { out }
     }
     @Test
     fun c07_ptr_arg_ret () {
@@ -530,7 +530,7 @@ class TXExec {
         """.trimIndent()
         )
         //assert(out == "()\n") { out }
-        assert(out.startsWith("(ln 5, col 7): invalid assignment : type mismatch :")) { out }
+        assert(out.startsWith("(ln 4, col 11): invalid assignment : type mismatch :")) { out }
     }
 
     // TYPE / ALIAS
@@ -602,7 +602,8 @@ class TXExec {
             output std one
         """.trimIndent())
         //assert(out == "<.1 <.0>>\n") { out }
-        assert(out == "(ln 3, col 18): invalid type : expected pointer to alias type\n") { out }
+        //assert(out == "(ln 3, col 18): invalid type : expected pointer to alias type\n") { out }
+        assert(out == "(ln 1, col 6): invalid recursive type : cannot be a pointer") { out }
     }
     @Test
     fun e09_bool() {
@@ -697,7 +698,7 @@ class TXExec {
         val out = all("""
             output std () until ()
         """.trimIndent())
-        assert(out == "(ln 4, col 1): invalid condition : type mismatch : expected _int : have ()\n") { out }
+        assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()\n") { out }
     }
     @Test
     fun f05_err () {

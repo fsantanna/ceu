@@ -2294,7 +2294,7 @@ class TEnv {
         """.trimIndent()
         )
         //assert(out == "OK") { out }
-        assert(out == "(ln 1, col 6): invalid type alias : cannot be a pointer") { out }
+        assert(out == "(ln 1, col 6): invalid recursive type : cannot be a pointer") { out }
     }
     @Test
     fun q13 () {

@@ -1287,10 +1287,11 @@ class TTask {
     @Test
     fun i02_err () {
         val out = all("""
+            type Event = <(),_uint64_t,_int>
             var x1 : active task @[]->()->()->()
             emit @GLOBAL x1 ()
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid call : not a function") { out }
+        assert(out == "(ln 3, col 14): invalid call : not a function") { out }
     }
 
     // PAUSE
