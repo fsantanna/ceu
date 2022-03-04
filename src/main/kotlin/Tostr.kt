@@ -57,7 +57,7 @@ open class Tostr
             is Expr.TCons -> "[" + e.arg.map { this.tostr(it) }.joinToString(",") + "]"
             is Expr.UCons -> "<." + e.tk_.num + " " + this.tostr(e.arg) + ">: " + this.tostr(e.wtype!!)
             is Expr.UNull -> "<.0>: " + this.tostr(e.xtype!!)
-            is Expr.TDisc -> "(" + this.dncast(e.tup.wtype, this.tostr(e.tup)) + "." + e.tk_.num + ")"
+            is Expr.TDisc -> "(" + this.tostr(e.tup) + "." + e.tk_.num + ")"
             is Expr.Field -> {
                 val tsk = this.dncast(e.tsk.wtype!!.noact(), this.tostr(e.tsk))
                 "(" + tsk + ".${e.tk_.id})"

@@ -767,7 +767,14 @@ open class Parser
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, e)
                         } else {
-                            Expr.TDisc(num!!, e)
+                            Expr.TDisc (
+                                num!!,
+                                Expr.As (
+                                    Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"),
+                                    e,
+                                    null
+                                )
+                            )
                         }
                     }
                     else -> error("impossible case")

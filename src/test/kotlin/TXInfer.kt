@@ -198,7 +198,7 @@ class TXInfer {
         """.trimIndent()) { out }
     }
     @Test
-    fun a12_new () {
+    fun todo_a12_new () {
         val out = all("""
             type List = <Cons=/List>
             var l = new List.Cons <.0>
@@ -1167,7 +1167,7 @@ class TXInfer {
             var xy: Point
             set xy = ([(_1: _int),(_2: _int)] :+ Point)
             var x: _int
-            set x = ((xy:- Point).1)
+            set x = ((xy :- Point).1)
             
         """.trimIndent()) { out }
     }
@@ -1187,7 +1187,7 @@ class TXInfer {
             var r: Rect
             set r = ([([(_1: _int),(_2: _int)] :+ Point),([(_1: _int),(_2: _int)] :+ Dims)] :+ Rect)
             var h: _int
-            set h = ((((r:- Rect).2):- Dims).2)
+            set h = ((((r :- Rect).2) :- Dims).2)
             
         """.trimIndent()) { out }
     }

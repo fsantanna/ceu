@@ -403,18 +403,22 @@ class TParser {
     fun b17_parser_expr_cons () {
         All_restart(null, PushbackReader(StringReader("<.2 <.1 [(),()]>:<()>>:<()>"), 2))
         Lexer.lex()
-        val e = (Parser().expr() as Expr.As).e
-        assert(e is Expr.UCons && e.tk_.num==2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
+        val e = Parser().expr()
+        assert(e is Expr.UCons && e.tk_.num==2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.As)
     }
 
     // INDEX
+
+    fun Expr.noas (): Expr {
+        return (this as Expr.As).e
+    }
 
     @Test
     fun b18_parser_expr_index () {
         All_restart(null, PushbackReader(StringReader("x.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup.noas() is Expr.Var)
     }
     @Test
     fun b19_parser_expr_index () {
@@ -449,7 +453,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x\\.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tup is Expr.Dnref && (e.tup as Expr.Dnref).ptr is Expr.Var)
+        assert(e is Expr.TDisc && e.tup.noas() is Expr.Dnref && (e.tup.noas() as Expr.Dnref).ptr is Expr.Var)
     }
     @Test
     fun b24_parser_expr_dnref () {
@@ -491,14 +495,14 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.10"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==10 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && e.tk_.num==10 && e.tup.noas() is Expr.Var)
     }
     @Test
     fun b28_parser_expr_disc () {
         All_restart(null, PushbackReader(StringReader("arg.1\\!1.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup is Expr.UDisc)
+        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup.noas() is Expr.UDisc)
     }
 
     // ATTR

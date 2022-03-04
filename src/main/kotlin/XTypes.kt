@@ -45,7 +45,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     if (this.e.wtype is Type.Alias) {
                         this.xtype = this.xtype ?: (this.e.wtype as Type.Alias)
                     }
-                    this.xtype?.noalias() ?: this.e.wtype!!
+                    (this.xtype ?: this.e.wtype!!).noalias()
                 }
                 else -> error("bug found")
             }.let { ret ->
@@ -162,7 +162,7 @@ fun Expr.xinfTypes (inf: Type?) {
         }
         is Expr.TDisc -> {
             this.tup.xinfTypes(null)  // not possible to infer big (tuple) from small (disc)
-            this.tup.wtype!!.noalias().let {
+            this.tup.wtype!!.let {
                 All_assert_tk(this.tk, it is Type.Tuple) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }

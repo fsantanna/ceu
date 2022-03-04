@@ -36,6 +36,7 @@ fun Expr.toBaseVar (): Expr.Var? {
         is Expr.Dnref -> this.ptr.toBaseVar()
         is Expr.Upref -> this.pln.toBaseVar()
         is Expr.UDisc -> this.uni.toBaseVar()
+        is Expr.As    -> this.e.toBaseVar()
         else -> error("bug found")
     }
 }
