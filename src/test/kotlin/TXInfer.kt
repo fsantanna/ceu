@@ -176,7 +176,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (<.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>:+ List @[GLOBAL]): @GLOBAL)
+            set l = (new (<.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL> :+ List @[GLOBAL]): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -404,7 +404,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\):- List @[j])!1) = (new (<.1 <.0>: /List @[j] @j>: </List @[j] @j>:+ List @[j]): @j)
+            set (((arg\):- List @[j])!1) = (new (<.1 <.0>: /List @[j] @j>: </List @[j] @j> :+ List @[j]): @j)
             }
 
 
@@ -622,7 +622,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             {
             var pa: /List @[LOCAL] @LOCAL
-            set pa = (new (<.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>:+ List @[LOCAL]): @LOCAL)
+            set pa = (new (<.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL> :+ List @[LOCAL]): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
 
@@ -700,7 +700,7 @@ class TXInfer {
             }
             else
             {
-            set ret = (new (<.1 (clone @[j,j,l,l] (((arg\):- List @[j])!1): @l)>: </List @[l] @l>:+ List @[l]): @k)
+            set ret = (new (<.1 (clone @[j,j,l,l] (((arg\):- List @[j])!1): @l)>: </List @[l] @l> :+ List @[l]): @k)
             return
             }
             }
@@ -799,11 +799,11 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             { @A
             var pa: /List @[A] @A
-            set pa = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A>:+ List @[A]): @A)
+            set pa = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
-            set pf = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A>:+ List @[A]): @A)
+            set pf = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
             set (((pa\):- List @[A])!1) = pf
             }
             

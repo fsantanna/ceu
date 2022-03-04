@@ -113,10 +113,18 @@ class XParser: Parser()
                     }
                     tp
                 }
-                if (tk0.num == 0) {
-                    Expr.UNull(tk0, tp as Type.Pointer?)
-                } else {
-                    Expr.UCons(tk0, tp as Type.Union?, cons!!)
+                when {
+                    (tk0.num == 0) -> Expr.UNull(tk0, tp as Type.Pointer?)
+                    (tp is Type.Alias) -> Expr.As (  // TODO: upcast
+                        Tk.Sym(TK.XAS,tp.tk.lin,tp.tk.col,":+"),
+                        Expr.UCons(tk0, null, cons!!),
+                        tp
+                    )
+                    else -> Expr.As (
+                        Tk.Sym(TK.XAS,cons!!.tk.lin,cons!!.tk.col,":+"),
+                        Expr.UCons(tk0, tp as Type.Union?, cons!!),
+                        null
+                    )
                 }
             }
             alls.accept(TK.NEW) -> {

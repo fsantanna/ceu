@@ -33,6 +33,15 @@ class TExec {
         assert(out == "10\n") { out }
     }
     @Test
+    fun a01_output3 () {
+        val out = all("""
+            var x: _int
+            set x = ((_abs: _) @[] (_(-1): _))
+            output std x            
+        """.trimIndent())
+        assert(out == "1\n") { out }
+    }
+    @Test
     fun a02_var () {
         val out = all("""
             var x: ()

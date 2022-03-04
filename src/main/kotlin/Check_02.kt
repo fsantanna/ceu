@@ -32,30 +32,34 @@ fun check_02_after_tps (s: Stmt) {
         when (e) {
             is Expr.As -> {
                 //val def = e.env(e.type.tk_.id) as Stmt.Typedef
-                val noact = e.e.wtype!!.noact()
-                val okalias = e.type
-                val noalias = e.type.noalias()
-                val (sup,sub) = when (e.tk_.sym) {
-                    ":+" -> Pair(noalias, noact)    // () :+ Unit
-                    ":-" -> Pair(noact, okalias)    // Unit :- ()
-                    else -> error("bug found")
-                }
-                All_assert_tk(e.tk, sup.isSupOf(sub)) {
-                    //println(sup.tostr())
-                    //println(sub.tostr())
-                    "invalid type cast : ${mismatch(noact,e.type)}"
+                e.xtype.let {
+                    if (it != null) {
+                        val noact = e.e.wtype!!.noact()
+                        val okalias = it
+                        val noalias = it.noalias()
+                        val (sup,sub) = when (e.tk_.sym) {
+                            ":+" -> Pair(noalias, noact)    // () :+ Unit
+                            ":-" -> Pair(noact, okalias)    // Unit :- ()
+                            else -> error("bug found")
+                        }
+                        All_assert_tk(e.tk, sup.isSupOf(sub)) {
+                            //println(sup.tostr())
+                            //println(sub.tostr())
+                            "invalid type cast : ${mismatch(noact,it)}"
+                        }
+                    }
                 }
             }
             is Expr.UCons -> {
                 e.check(e.xtype!!)
-                val sup = e.xtype.vec[e.tk_.num - 1]
+                val sup = e.xtype!!.vec[e.tk_.num - 1]
                 val sub = e.arg.wtype!!
                 All_assert_tk(e.tk, sup.isSupOf(sub)) {
                     "invalid union constructor : ${mismatch(sup,sub)}"
                 }
             }
             is Expr.New -> {
-                All_assert_tk(e.tk, (e.arg as Expr.As).type.xisrec) {
+                All_assert_tk(e.tk, (e.arg as Expr.As).xtype!!.xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }

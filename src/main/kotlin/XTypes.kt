@@ -27,11 +27,16 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype ?: inf!!
+            this.xtype = this.xtype ?: inf!!
+            this.xtype!!
         }
         is Expr.As -> {
-            this.e.xinfTypes(this.type.noalias())
-            this.type
+            val tp = this.xtype ?: inf
+            this.e.xinfTypes(tp?.noalias())
+            if (tp is Type.Alias) {
+                this.xtype = tp
+            }
+            this.xtype ?: this.e.wtype!!
         }
         is Expr.Upref -> {
             All_assert_tk(this.tk, inf==null || xinf is Type.Pointer) { "invalid inference : type mismatch"}
@@ -93,14 +98,16 @@ fun Expr.xinfTypes (inf: Type?) {
                 this.check(xinf!!)
                 val x = (xinf as Type.Union).vec[this.tk_.num-1]
                 this.arg.xinfTypes(x)
-                inf
+                this.xtype = xinf
+                this.xtype!!
             }
         }
         is Expr.UNull -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype ?: inf!!
+            this.xtype = this.xtype ?: (inf as Type.Pointer)
+            this.xtype!!
                 //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
         }
         is Expr.New -> {

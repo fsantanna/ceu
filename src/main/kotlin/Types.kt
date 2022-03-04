@@ -4,8 +4,8 @@ fun Stmt.setTypes () {
             is Expr.Unit, is Expr.Nat, is Expr.UCons, is Expr.UNull, is Expr.Func -> e.wtype!!
             is Expr.As -> {
                 when (e.tk_.sym) {
-                    ":+" -> e.type
-                    ":-" -> e.type.noalias()
+                    ":+" -> e.xtype!!
+                    ":-" -> e.xtype!!.noalias()
                     else -> error("bug found")
                 }.let { ret ->
                     e.e.wtype.let {

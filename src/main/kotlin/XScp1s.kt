@@ -85,7 +85,6 @@ fun Stmt.xinfScp1s () {
                     (tp.pln is Type.Alias && tp.pln.xscps!=null && tp.pln.xscps!!.size>0) -> {
                         // copy alias scope to enclosing pointer scope
                         // var x: /List @[A] --> /List @[A] @A
-                        println(tp.pln)
                         assert(tp.pln.xscps!!.size == 1) { "can't choose from multiple scopes" }
                         tp.xscp = tp.pln.xscps!![0]
                     }
