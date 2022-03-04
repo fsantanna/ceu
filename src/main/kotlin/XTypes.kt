@@ -178,14 +178,16 @@ fun Expr.xinfTypes (inf: Type?) {
             val tp = uni.wtype!!
             val xtp = tp.noalias()
 
+            val str = if (this is Expr.UDisc) "discriminator" else "predicate"
+
             All_assert_tk(this.tk, xtp is Type.Union) {
-                "invalid discriminator : not an union"
+                "invalid $str : not an union"
             }
             assert(tk_.num!=0 || tp.isrec()) { "bug found" }
 
             val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
             All_assert_tk(this.tk, MIN <= tk_.num && tk_.num <= MAX) {
-                "invalid discriminator : out of bounds"
+                "invalid $str : out of bounds"
             }
 
             when (this) {
