@@ -219,7 +219,11 @@ open class Parser
                     es.add(e2)
                 }
                 alls.accept_err(TK.CHAR, ']')
-                Expr.TCons(tk0, es)
+                Expr.As (
+                    Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
+                    Expr.TCons(tk0, es),
+                    null
+                )
             }
             alls.check(TK.TASK) || alls.check(TK.FUNC) -> {
                 val tk = alls.tk1 as Tk.Key
@@ -746,9 +750,11 @@ open class Parser
                     alls.accept_err(TK.XNUM)
                 }
                 val num = if (ok) null else (alls.tk0 as Tk.Num)
+                /*
                 all().assert_tk(alls.tk0, e !is Expr.TCons && e !is Expr.UCons && e !is Expr.UNull) {
                     "invalid discriminator : unexpected constructor"
                 }
+                */
                 if (chr.chr == '?' || chr.chr == '!') {
                     All_assert_tk(alls.tk0, num!!.num != 0 || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be <.0>"

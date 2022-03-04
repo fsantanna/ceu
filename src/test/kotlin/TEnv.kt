@@ -233,10 +233,11 @@ class TEnv {
     @Test
     fun c05_type_idx () {
         val out = inp2env("""
-            var x: (); set x = [[()],[()]].1
+            var x: ()
+            set x = [[()],[()]].1
         """.trimIndent())
-        //assert(out == "(ln 1, col 18): invalid assignment : type mismatch") { out }
-        assert(out == "(ln 1, col 32): invalid discriminator : unexpected constructor") { out }
+        assert(out.startsWith("(ln 2, col 7): invalid assignment : type mismatch :")) { out }
+        //assert(out == "(ln 1, col 32): invalid discriminator : unexpected constructor") { out }
     }
     @Test
     fun c06_type_idx () {
@@ -391,7 +392,8 @@ class TEnv {
         val out = inp2env("""
             output std [()].2
         """.trimIndent())
-        assert(out == "(ln 1, col 17): invalid discriminator : unexpected constructor") { out }
+        //assert(out == "(ln 1, col 17): invalid discriminator : unexpected constructor") { out }
+        assert(out == "(ln 1, col 17): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun c17_uni_disc_err () {
@@ -414,21 +416,24 @@ class TEnv {
         val out = inp2env("""
             output std <.1()>:<()>!2
         """.trimIndent())
-        assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
+        //assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
+        assert(out == "(ln 1, col 24): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun c19_uni_pred_err () {
         val out = inp2env("""
             output std <.1()>:<()>?1
         """.trimIndent())
-        assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
+        //assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
+        assert(out == "OK") { out }
     }
     @Test
     fun c20_uni_disc_err () {
         val out = inp2env("""
             output std <.2()>:<(),()>!2
         """.trimIndent())
-        assert(out == "(ln 1, col 27): invalid discriminator : unexpected constructor") { out }
+        //assert(out == "(ln 1, col 27): invalid discriminator : unexpected constructor") { out }
+        assert(out == "OK") { out }
     }
     @Test
     fun c21_uni_disc_err () {

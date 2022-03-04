@@ -698,7 +698,7 @@ class TXExec {
         val out = all("""
             output std () until ()
         """.trimIndent())
-        assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()\n") { out }
+        assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()") { out }
     }
     @Test
     fun f05_err () {

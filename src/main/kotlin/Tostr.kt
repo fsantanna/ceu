@@ -54,7 +54,7 @@ open class Tostr
             is Expr.As  -> if (e.xtype==null) this.tostr(e.e) else ("(" + this.tostr(e.e) + " " + e.tk_.sym + " " + this.tostr(e.xtype!!) + ")")
             is Expr.Upref -> "(/" + this.tostr(e.pln) + ")"
             is Expr.Dnref -> "(" + this.tostr(e.ptr) + "\\)"
-            is Expr.TCons -> this.upcast(e, "[" + e.arg.map { this.tostr(it) }.joinToString(",") + "]")
+            is Expr.TCons -> "[" + e.arg.map { this.tostr(it) }.joinToString(",") + "]"
             is Expr.UCons -> "<." + e.tk_.num + " " + this.tostr(e.arg) + ">: " + this.tostr(e.wtype!!)
             is Expr.UNull -> "<.0>: " + this.tostr(e.xtype!!)
             is Expr.TDisc -> "(" + this.dncast(e.tup.wtype, this.tostr(e.tup)) + "." + e.tk_.num + ")"

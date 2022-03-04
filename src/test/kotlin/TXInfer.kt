@@ -1165,7 +1165,7 @@ class TXInfer {
         assert(out == """
             type Point @[] = [_int,_int]
             var xy: Point
-            set xy = ([(_1: _int),(_2: _int)]:+ Point)
+            set xy = ([(_1: _int),(_2: _int)] :+ Point)
             var x: _int
             set x = ((xy:- Point).1)
             
@@ -1185,7 +1185,7 @@ class TXInfer {
             type Dims @[] = [_int,_int]
             type Rect @[] = [Point,Dims]
             var r: Rect
-            set r = ([([(_1: _int),(_2: _int)]:+ Point),([(_1: _int),(_2: _int)]:+ Dims)]:+ Rect)
+            set r = ([([(_1: _int),(_2: _int)] :+ Point),([(_1: _int),(_2: _int)] :+ Dims)] :+ Rect)
             var h: _int
             set h = ((((r:- Rect).2):- Dims).2)
             
