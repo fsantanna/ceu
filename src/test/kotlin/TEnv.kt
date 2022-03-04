@@ -1015,7 +1015,7 @@ class TEnv {
                 set p = z\      -- ERR here
             }
         """.trimIndent())
-        assert(out.startsWith("ERR")) { out }
+        assert(out.startsWith("(ln 9, col 11): invalid assignment : type mismatch :")) { out }
     }
 
     // POINTERS - FUNC - CALL
@@ -1928,10 +1928,10 @@ class TEnv {
     fun p14_pool_ff() {
         val out = inp2env(
             """
-            var f:(func@[i1]-> () -> ())
-            set f = func@[i1]->() -> () {}
-            var g:    (func@[i1]-> (func@[i1]->()->()) -> ())
-            set g = func@[i1]-> (func@[i1]->()->()) -> () {}
+            var f : func@[i1] -> () -> ()
+            set f = func@[i1] -> () -> () {}
+            var g : func@[i1] -> (func@[i1]->()->()) -> ()
+            set g = func@[i1] -> (func@[i1]->()->()) -> () {}
             call g @[LOCAL] f
         """.trimIndent()
         )

@@ -287,8 +287,8 @@ fun Expr.xinfTypes (inf: Type?) {
                                 .map { it.second }
 
                             Pair (
-                                scp1s.map { Scope(it,null) },
-                                if (ret1s.size==0) null else Scope(ret1s[0],null)
+                                this.xscps.first  ?: scp1s.map { Scope(it,null) },
+                                this.xscps.second ?: if (ret1s.size==0) null else Scope(ret1s[0],null)
                             )
                         }
 

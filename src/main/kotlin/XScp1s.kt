@@ -27,7 +27,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                         (tp.xscps != null) -> tp.xscps!!  // just forward existing? (TODO: assert above failed)
                         else -> {
                             val def = tp.env(tp.tk_.id)!! as Stmt.Typedef
-                            tp.xscps = def.xscp1s.first!!.map {
+                            tp.xscps = tp.xscps ?: def.xscp1s.first!!.map {
                                 c += 1  // infer implicit scope incrementally
                                 Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, c + ""), null)
                             }
@@ -69,13 +69,13 @@ fun Stmt.xinfScp1s () {
                         // copy alias scope from enclosing pointer scope
                         // var x: /List @A --> /List @[A] @A
                         assert(def.xscp1s.first!!.size == 1) { "can't choose from multiple scopes" }
-                        tp.xscps = listOf((tp.wup as Type.Pointer).xscp!!)
+                        tp.xscps = tp.xscps ?: listOf((tp.wup as Type.Pointer).xscp!!)
                     }
                     // do not infer inside func/typedef declaration (it is inferred there)
                     (tp.ups_first { it is Stmt.Typedef || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
-                        tp.xscps = List(size) { Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
+                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
                     }
                 }
             }
@@ -166,9 +166,12 @@ fun Stmt.xinfScp1s () {
                     
                 //println(tps)
                 tps.filter { it is Type.Alias && it.xisrec }.let { it as List<Type.Alias> }.forEach {
-                    it.xscps = fst
+                    it.xscps = it.xscps ?: fst
                 }
-                s.xscp1s = Pair(fst.map { it.scp1 }, s.xscp1s.second ?: emptyList())
+                s.xscp1s = Pair (
+                    s.xscp1s.first  ?: fst.map { it.scp1 },
+                    s.xscp1s.second ?: emptyList()
+                )
             }
         }
     }
