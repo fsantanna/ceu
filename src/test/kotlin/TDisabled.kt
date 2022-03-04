@@ -581,6 +581,75 @@ class TDisabled {
     }
      */
 
+    // TYPE / ALIAS / RECURSIVE / CANNOT BE POINTER
+
+    /*
+    @Test
+    fun c09_null () {
+        val out = all("""
+            type List @[i] = /</List @[i] @i> @i
+            var f : func List -> ()
+            call f <.0>
+        """.trimIndent())
+        assert(out == """
+            type List @[i] = /</List @[i] @i> @i
+            var f: func @[i] -> List @[i] -> ()
+            call (f @[GLOBAL] <.0>: List @[GLOBAL])
+
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun c09_null2 () {
+        val out = all("""
+            type List = /</List>
+            var f : func List -> ()
+            call f <.0>
+        """.trimIndent())
+        assert(out == """
+            type List @[i] = /</List @[i] @i> @i
+            var f: func @[i] -> List @[i] -> ()
+            call (f @[GLOBAL] <.0>: List @[GLOBAL])
+
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun e07_ptr_num() {
+        val out = all("""
+            type Num = /<Num>
+            var zero:  Num = <.0>
+            var one:   Num = new <.1 zero>
+        """.trimIndent())
+        assert(out == """
+            type Num @[i] = /<Num @[i]> @i
+            var zero: Num @[GLOBAL]
+            set zero = <.0>: Num @[GLOBAL]
+            var one: Num @[GLOBAL]
+            set one = (new <.1 zero>: <Num @[GLOBAL]>: @GLOBAL)
+
+        """.trimIndent()) { out }
+    }
+
+    @Test
+    fun e06_type() {
+        val out = all("""
+            type List = /<List>
+            var l1: List = <.0>
+            var l2: List = new <.1 <.0>>
+            var l3: List = new <.1 l2>
+        """.trimIndent())
+        assert(out == """
+            type List @[i] = /<List @[i]> @i
+            var l1: List @[GLOBAL]
+            set l1 = <.0>: List @[GLOBAL]
+            var l2: List @[GLOBAL]
+            set l2 = (new <.1 <.0>: List @[GLOBAL]>: <List @[GLOBAL]>: @GLOBAL)
+            var l3: List @[GLOBAL]
+            set l3 = (new <.1 l2>: <List @[GLOBAL]>: @GLOBAL)
+
+        """.trimIndent()) { out }
+    }
+     */
+
     // CLOSURES
 
     @Test

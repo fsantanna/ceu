@@ -55,7 +55,7 @@ open class Tostr
             is Expr.Upref -> "(/" + this.tostr(e.pln) + ")"
             is Expr.Dnref -> "(" + this.tostr(e.ptr) + "\\)"
             is Expr.TCons -> this.upcast(e, "[" + e.arg.map { this.tostr(it) }.joinToString(",") + "]")
-            is Expr.UCons -> this.upcast(e, "<." + e.tk_.num + " " + this.tostr(e.arg) + ">: " + this.tostr(e.wtype!!.noalias()))
+            is Expr.UCons -> "<." + e.tk_.num + " " + this.tostr(e.arg) + ">: " + this.tostr(e.wtype!!)
             is Expr.UNull -> "<.0>: " + this.tostr(e.xtype!!)
             is Expr.TDisc -> "(" + this.dncast(e.tup.wtype, this.tostr(e.tup)) + "." + e.tk_.num + ")"
             is Expr.Field -> {

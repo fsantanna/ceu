@@ -17,10 +17,10 @@ fun Stmt.setTypes () {
                     }
                 }
             }
-            is Expr.Upref -> e.pln.wtype!!.let {
+            is Expr.Upref -> {
                 val id = e.toBaseVar()?.tk_?.id ?: "GLOBAL"   // uppercase /x -> /X
                 val scp1 = Tk.Id(TK.XID,e.tk.lin,e.tk.col, id.toUpperCase())
-                Type.Pointer(e.tk_, Scope(scp1,null), it)
+                Type.Pointer(e.tk_, Scope(scp1,null), e.pln.wtype!!)
             }
             is Expr.Dnref -> e.ptr.wtype.let {
                 if (it is Type.Nat) it else {

@@ -59,7 +59,8 @@ class TTask {
         val out = all("""
             emit @GLOBAL _1:_int
         """.trimIndent())
-        assert(out == "(ln 1, col 1): invalid `emit` : type mismatch : expected Event : have _int") { out }
+        //assert(out == "(ln 1, col 1): invalid `emit` : type mismatch : expected Event : have _int") { out }
+        assert(out == "(ln 1, col 1): invalid `emit` : undeclared type \"Event\"") { out }
     }
     @Test
     fun a02_await () {

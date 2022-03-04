@@ -163,10 +163,14 @@ open class Parser
                     }
                     tp
                 }
-                if (tk0.num == 0) {
-                    Expr.UNull(tk0, tp as Type.Pointer?)
-                } else {
-                    Expr.UCons(tk0, tp as Type.Union?, cons!!)
+                when {
+                    (tk0.num == 0) -> Expr.UNull(tk0, tp as Type.Pointer?)
+                    (tp != null)   -> Expr.UCons(tk0, tp as Type.Union?, cons!!)
+                    else -> Expr.As (
+                        Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
+                        Expr.UCons(tk0, tp as Type.Union?, cons!!),
+                        null
+                    )
                 }
             }
             alls.accept(TK.NEW) -> {

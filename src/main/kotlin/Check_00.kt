@@ -71,6 +71,20 @@ fun check_00_after_envs (s: Stmt) {
                     }
                 }
             }
+            is Stmt.Typedef -> {
+                val isrec = s.type.flattenLeft().any { it is Type.Alias && it.tk_.id==s.tk_.id }
+                if (isrec) {
+                    All_assert_tk(s.tk, s.type !is Type.Pointer) {
+                        "invalid recursive type : cannot be a pointer"
+                    }
+                }
+
+            }
+            is Stmt.Emit -> {
+                All_assert_tk(s.tk, s.env("Event")!=null) {
+                    "invalid `emit` : undeclared type \"Event\""
+                }
+            }
         }
     }
     s.visit(::fs, ::fe, ::ft, null)
