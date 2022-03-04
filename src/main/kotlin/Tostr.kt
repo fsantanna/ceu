@@ -78,7 +78,7 @@ open class Tostr
             is Expr.Call -> {
                 val inps = " @[" + e.xscps.first!!.map { it.scp1.anon2local() }.joinToString(",") + "]"
                 val out = e.xscps.second.let { if (it == null) "" else ": @" + it.scp1.anon2local() }
-                "(" + this.dncast(e.f.wtype,this.tostr(e.f)) + inps + " " + this.tostr(e.arg) + out + ")"
+                "(" + this.tostr(e.f) + inps + " " + this.tostr(e.arg) + out + ")"
             }
             is Expr.Func -> this.tostr(e.ftp()!!) + " " + this.tostr(e.block)
         }

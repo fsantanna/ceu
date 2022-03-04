@@ -896,9 +896,9 @@ class TXInfer {
              :+ Xask)
             output std (_1: _int)
             var x: active Xask
-            set x = spawn ((t:- Xask) @[] ())
-            var y: active Xask
-            set y = spawn ((t:- Xask) @[] ())
+            set x = spawn ((t :- Xask) @[] ())
+            var y: active task @[] -> () -> _int -> ()
+            set y = spawn ((t :- Xask) @[] ())
             output std ((x:- Xask).pub)
             output std (_3: _int)
             
@@ -916,7 +916,7 @@ class TXInfer {
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
             var xs: active {} Xask
-            spawn ((t:- Xask) @[] ()) in xs
+            spawn ((t :- Xask) @[] ()) in xs
 
         """.trimIndent()) { out }
     }
@@ -1273,7 +1273,7 @@ class TXInfer {
             }
              :+ Int2Int)
             var x: _int
-            set x = ((f:- Int2Int) @[] (_10: _int))
+            set x = ((f :- Int2Int) @[] (_10: _int))
             output std x
             
         """.trimIndent()) { out }
@@ -1302,19 +1302,19 @@ return
 spawn (task @[] -> _ -> _ -> _ {
 var x: _int
 {
-var tsk_23: active task @[] -> _int -> () -> _int
-set tsk_23 = spawn (f @[] (_1: _int))
-var st_23: _int
-set st_23 = (tsk_23.state)
-if (_(${D}st_23 == TASK_AWAITING): _int)
+var tsk_24: active task @[] -> _int -> () -> _int
+set tsk_24 = spawn (f @[] (_1: _int))
+var st_24: _int
+set st_24 = (tsk_24.state)
+if (_(${D}st_24 == TASK_AWAITING): _int)
 {
-await tsk_23
+await tsk_24
 }
 else
 {
 
 }
-set x = (tsk_23.ret)
+set x = (tsk_24.ret)
 }
 output std x
 }

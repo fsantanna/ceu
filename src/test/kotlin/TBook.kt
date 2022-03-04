@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
-val nums = """
+private val nums = """
     type Num @[s] = </Num @[s] @s>
     var zero: /(Num @[LOCAL])@LOCAL
     set zero = <.0>: /(Num @[LOCAL]) @LOCAL
@@ -33,7 +33,7 @@ val NumR1  = Num(true,  "r1")
 val _NumR1 = Num(false, "r1")
 val NumS1  = Num(true,  "s1")
 
-val clone = """
+private val clone = """
     var clone : func @[r1,a1]-> $NumA1 -> $NumR1
     set clone = func @[r1,a1]-> $NumA1 -> $NumR1 {
         if arg\?0 {
@@ -44,7 +44,7 @@ val clone = """
     }
 """.trimIndent()
 
-val add = """
+private val add = """
     var add : func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
     set add = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
@@ -59,7 +59,7 @@ val add = """
     }
 """.trimIndent()
 
-val mul = """
+private val mul = """
     var mul : func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
     set mul = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
@@ -76,7 +76,7 @@ val mul = """
     }
 """.trimIndent()
 
-val lt = """
+private val lt = """
     var lt : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set lt = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
         if arg.2\?0 {
@@ -91,7 +91,7 @@ val lt = """
     }
 """.trimIndent()
 
-val sub = """
+private val sub = """
     var sub : func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
     set sub = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
@@ -110,7 +110,7 @@ val sub = """
     }
 """.trimIndent()
 
-val mod = """
+private val mod = """
     var mod : func @[r1,a1,b1] -> [$NumA1,$NumB1] -> $NumR1
     set mod = func @[r1,a1,b1] -> [$NumA1,$NumB1] -> $NumR1 {
         if lt @[a1,b1] arg {
@@ -123,7 +123,7 @@ val mod = """
     }    
 """.trimIndent()
 
-val eq = """
+private val eq = """
     var eq : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set eq = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
         var x: $NumA1
@@ -142,7 +142,7 @@ val eq = """
     }
 """.trimIndent()
 
-val lte = """
+private val lte = """
     var lte : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set lte = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
         var islt: _int
