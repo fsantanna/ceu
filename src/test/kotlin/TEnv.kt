@@ -999,7 +999,7 @@ class TEnv {
                 set p = /y      -- ERR here
             }
         """.trimIndent())
-        assert(out.startsWith("ERR")) { out }
+        assert(out.startsWith("(ln 7, col 11): invalid assignment : type mismatch :")) { out }
     }
     @Test
     fun f04_ptr_ptr_err () {

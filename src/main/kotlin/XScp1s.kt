@@ -75,7 +75,7 @@ fun Stmt.xinfScp1s () {
                     (tp.ups_first { it is Stmt.Typedef || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
-                        tp.xscps = List(size) { Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id(false)), null) }
+                        tp.xscps = List(size) { Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
                     }
                 }
             }
@@ -91,7 +91,7 @@ fun Stmt.xinfScp1s () {
                     // do not infer to LOCAL if inside function/typedef declaration
                     (tp.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> {}
                     else -> {
-                        tp.xscp = Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id(false)), null)
+                        tp.xscp = Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null)
                     }
                 }
             }
@@ -139,14 +139,12 @@ fun Stmt.xinfScp1s () {
                             //println(x.tk_.id + ": $lvlF > $lvlV")
                             if (lvlV>0 && lvlF>lvlV && lvlV<lvlM) {
                                 lvlM = lvlV
-                                scp = env.ups_first { it is Stmt.Block }
-                                    .let { it as Stmt.Block }
-                                    .let {
-                                        if (it.scp1.isanon()) {
-                                            it.scp1 = Tk.Id(TK.XID, it.tk.lin, it.tk.col, "X${it.n}")
-                                        }
-                                        it.scp1!!
+                                scp = env.ups_first_block()!!.let {
+                                    if (it.scp1.isanon()) {
+                                        it.scp1 = Tk.Id(TK.XID, it.tk.lin, it.tk.col, "X${it.n}")
                                     }
+                                    it.scp1!!
+                                }
                             }
                         }
                     }

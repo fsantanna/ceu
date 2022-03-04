@@ -56,7 +56,7 @@ fun Any.env (id: String): Any? {
         when {
             (it is Stmt.Typedef && it.tk_.id==xid)                  -> it
             (it is Stmt.Var     && it.tk_.id.toUpperCase()==xid)    -> it
-            (it is Stmt.Block   && it.scp1?.id?.toUpperCase()==xid) -> it
+            (it is Stmt.Block   && (it.scp1?.id==xid || "B"+it.n==xid)) -> it
             (it is Expr.Func) -> {
                 fun Type.nonat_ (): Type? {
                     return if (this is Type.Nat && this.tk_.src=="") null else this

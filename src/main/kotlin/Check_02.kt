@@ -188,6 +188,8 @@ fun check_02_after_tps (s: Stmt) {
                 //val pdst = dst as Type.Pointer
                 //println(pdst.xscp2)
                 //println(pdst)
+                //println(dst.tostr())
+                //println(src.tostr())
                 All_assert_tk(s.tk, dst.isSupOf(src)) {
                     val str = if (s.dst is Expr.Var && s.dst.tk_.id == "ret") "return" else "assignment"
                     "invalid $str : ${mismatch(dst,src)}"

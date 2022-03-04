@@ -915,10 +915,7 @@ open class Parser
         }
         val ss = this.stmts()
         alls.accept_err(TK.CHAR, '}')
-        return Stmt.Block(tk0, iscatch, scp1, ss).let {
-            it.scp1 = it.scp1 ?: Tk.Id(TK.XID, tk0.lin, tk0.col, "B${it.n}")
-            it
-        }
+        return Stmt.Block(tk0, iscatch, scp1, ss)
     }
 
     fun stmts (): Stmt {

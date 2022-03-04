@@ -24,6 +24,10 @@ fun Any.ups_first (me: Boolean=false, f: (Any)->Boolean): Any? {
     }
 }
 
+fun Any.ups_first_block (me: Boolean=false): Stmt.Block? {
+    return this.ups_first(me) { it is Stmt.Block } as Stmt.Block?
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 fun Type.setUps (up: Any) {

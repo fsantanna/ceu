@@ -4,7 +4,7 @@ fun Scope.check (up: Any) {
         (this.scp1.id == "LOCAL") -> true
         (up.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> true  // (@i1 -> ...)
         up.env(this.scp1.id).let {                              // { @aaa ... @aaa }
-            it is Stmt.Block && this.scp1.id==it.scp1!!.id  ||
+            it is Stmt.Block && (this.scp1.id==it.scp1?.id || this.scp1.id=="B"+it.n) ||
             it is Stmt.Var   && this.scp1.id==it.tk_.id.toUpperCase()
         } -> true
         (up.ups_first {                                     // [@i1, ...] { @i1 }

@@ -9,21 +9,14 @@ fun Tk.Id.anon2local (): String {
     return if (this.isanon()) "LOCAL" else this.id
 }
 
-fun Any.localBlockScp1Id (forceAnon: Boolean): String {
-    return (this.ups_first { it is Stmt.Block } as Stmt.Block?).let {
-        when {
-            (it == null) -> "GLOBAL"
-            //else -> "B" + it.n
-            forceAnon -> "B" + it.n
-            else -> it.scp1!!.id
-        }
-    }
+fun Any.localBlockScp1Id (): String {
+    return this.ups_first_block().let { if (it == null) "GLOBAL" else (it.scp1?.id ?: "B"+it.n) }
 }
 
 fun Stmt.setScp1s () {
     fun fx (up: Any, scp: Scope) {
         scp.scp1 = if (scp.scp1.id != "LOCAL") scp.scp1 else {
-            Tk.Id(TK.XID, scp.scp1.lin, scp.scp1.col, up.localBlockScp1Id(false))
+            Tk.Id(TK.XID, scp.scp1.lin, scp.scp1.col, up.localBlockScp1Id())
         }
     }
     this.visit(null, null, null, ::fx)
