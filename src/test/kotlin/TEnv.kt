@@ -83,8 +83,7 @@ class TEnv {
             var x: <(),()>
             output std(x.0)
         """.trimIndent())
-        //assert(out.startsWith("(ln 2, col 14): invalid discriminator : type mismatch : expected tuple")) { out }
-        assert(out == "(ln 2, col 12): invalid discriminator : type mismatch : expected tuple : have <(),()>") { out }
+        assert(out == "(ln 2, col 14): invalid discriminator : type mismatch : expected tuple : have <(),()>") { out }
     }
     @Test
     fun b04_user_disc_cons_err () {
@@ -701,7 +700,7 @@ class TEnv {
                 }
             }
         """.trimIndent())
-        assert(out == "(ln 7, col 14): invalid call : scope mismatch : constraint mismatch") { out }
+        assert(out.startsWith("(ln 7, col 14): invalid call : scope mismatch : constraint mismatch")) { out }
 
     }
     @Test
@@ -993,25 +992,30 @@ class TEnv {
         val out = inp2env("""
             var p: //_int @LOCAL @LOCAL
             {
-                var z: _int; set z = _10: _int
-                var y: /_int @LOCAL; set y = /z
-                set p = /y
+                var z: _int
+                set z = _10: _int
+                var y: /_int @LOCAL
+                set y = /z
+                set p = /y      -- ERR here
             }
         """.trimIndent())
-        assert(out.startsWith("(ln 5, col 11): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("ERR")) { out }
     }
     @Test
     fun f04_ptr_ptr_err () {
         val out = inp2env("""
             var p: /_int @LOCAL
             {
-                var x: _int; set x = _10: _int
-                var y: /_int @LOCAL; set y = /x
-                var z: //_int @LOCAL @LOCAL; set z = /y
-                set p = z\
+                var x: _int
+                set x = _10: _int
+                var y: /_int @LOCAL
+                set y = /x
+                var z: //_int @LOCAL @LOCAL
+                set z = /y
+                set p = z\      -- ERR here
             }
         """.trimIndent())
-        assert(out.startsWith("(ln 6, col 11): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("ERR")) { out }
     }
 
     // POINTERS - FUNC - CALL

@@ -69,7 +69,7 @@ fun Expr.xinfTypes (inf: Type?) {
             })
             this.ptr.wtype!!.let {
                 if (it is Type.Nat) it else {
-                    All_assert_tk(it.tk, it.noalias() is Type.Pointer) {
+                    All_assert_tk(this.tk, it.noalias() is Type.Pointer) {
                         "invalid operand to `\\´ : not a pointer"
                     }
                     (it.noalias() as Type.Pointer).pln
@@ -142,7 +142,7 @@ fun Expr.xinfTypes (inf: Type?) {
         is Expr.TDisc -> {
             this.tup.xinfTypes(null)  // not possible to infer big (tuple) from small (disc)
             this.tup.wtype!!.noalias().let {
-                All_assert_tk(it.tk, it is Type.Tuple) {
+                All_assert_tk(this.tk, it is Type.Tuple) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }
                 val (MIN, MAX) = Pair(1, (it as Type.Tuple).vec.size)
