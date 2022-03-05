@@ -42,8 +42,9 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
                 ":-" -> {
                     this.e.xinfTypes(tp)
-                    if (this.e.wtype is Type.Alias) {
-                        this.xtype = this.xtype ?: (this.e.wtype as Type.Alias)
+                    val alias = this.e.wtype.let { if (it is Type.Active) it.tsk else it }
+                    if (alias is Type.Alias) {
+                        this.xtype = this.xtype ?: alias
                     }
                     (this.xtype ?: this.e.wtype!!).noalias()
                 }
