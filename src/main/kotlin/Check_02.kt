@@ -136,9 +136,8 @@ fun check_02_after_tps (s: Stmt) {
                     }
                     val dst = (s.dst.wtype!! as Type.Active).tsk
                     //println("invalid `spawn` : type mismatch : ${dst.tostr()} = ${call.tostr()}")
-                    val alias = if (s.call.f !is Expr.As) call else s.call.f.e.wtype!!
-                    All_assert_tk(s.tk, dst.isSupOf(alias)) {
-                        "invalid `spawn` : ${mismatch(dst, alias)}"
+                    All_assert_tk(s.tk, dst.isSupOf(call)) {
+                        "invalid `spawn` : ${mismatch(dst, call)}"
                     }
                 }
             }

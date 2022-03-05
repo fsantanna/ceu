@@ -1741,6 +1741,18 @@ class TExec {
        """.trimIndent())
         assert(out == "10\n") { out }
     }
+    @Test
+    fun o14_func_alias () {
+        val out = all("""
+            type Xask @[] = task @[] -> () -> () -> ()
+            var t: Xask
+            set t = (task @[] -> () -> () -> () {
+            }
+            :+ Xask)
+            output std ()
+       """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 
     // ALL
 

@@ -27,7 +27,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: inf!!
+            this.xtype = this.xtype ?: inf!!.clone(this,this.tk.lin,this.tk.col)
             this.xtype!!
         }
         is Expr.As -> {
@@ -36,7 +36,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 ":+" -> {
                     this.e.xinfTypes(tp?.noalias())
                     if (tp is Type.Alias) {
-                        this.xtype = this.xtype ?: tp
+                        this.xtype = this.xtype ?: (tp.clone(this,this.tk.lin,this.tk.col) as Type.Alias)
                     }
                     this.xtype ?: this.e.wtype!!
                 }
@@ -44,7 +44,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     this.e.xinfTypes(tp)
                     val alias = this.e.wtype.let { if (it is Type.Active) it.tsk else it }
                     if (alias is Type.Alias) {
-                        this.xtype = this.xtype ?: alias
+                        this.xtype = this.xtype ?: (alias.clone(this,this.tk.lin,this.tk.col) as Type.Alias)
                     }
                     (this.xtype ?: this.e.wtype!!).noalias()
                 }
@@ -52,8 +52,8 @@ fun Expr.xinfTypes (inf: Type?) {
             }.let { ret ->
                 this.e.wtype.let {
                     when (it) {
-                        is Type.Active  -> Type.Active (it.tk_,ret).clone(e,e.tk.lin,e.tk.col)
-                        is Type.Actives -> Type.Actives(it.tk_,it.len,it).clone(e,e.tk.lin,e.tk.col)
+                        is Type.Active  -> Type.Active (it.tk_,ret).clone(this,this.tk.lin,this.tk.col)
+                        is Type.Actives -> Type.Actives(it.tk_,it.len,it).clone(this,this.tk.lin,this.tk.col)
                         else -> ret
                     }
                 }
@@ -120,7 +120,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 this.check(xinf!!)
                 val x = (xinf as Type.Union).vec[this.tk_.num-1]
                 this.arg.xinfTypes(x)
-                this.xtype = xinf
+                this.xtype = xinf.clone(this,this.tk.lin,this.tk.col) as Type.Union
                 this.xtype!!
             }
         }
@@ -128,7 +128,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: (inf as Type.Pointer)
+            this.xtype = this.xtype ?: (inf?.clone(this,this.tk.lin,this.tk.col) as Type.Pointer)
             this.xtype!!
                 //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
         }
@@ -386,7 +386,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             // inf is at least Unit
             this.arg.xinfTypes(null)
             this.dst?.xinfTypes(null)
-            this.xtype = this.xtype ?: this.dst?.wtype ?: inf?.clone(this,this.tk.lin,this.tk.col) ?: unit()
+            this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this,this.tk.lin,this.tk.col) ?: unit()
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument
         is Stmt.If -> {

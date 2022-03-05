@@ -1322,4 +1322,23 @@ output std x
 
         """.trimIndent()) { out }
     }
+
+    @Test
+    fun f11_task_type () {
+        val out = all("""
+            type Xask = task ()->()->()
+            var t = Xask {}
+            output std ()
+        """.trimIndent())
+        assert(out == """
+            type Xask @[] = task @[] -> () -> () -> ()
+            var t: Xask
+            set t = (task @[] -> () -> () -> () {
+            
+            }
+             :+ Xask)
+            output std ()
+            
+        """.trimIndent()) { out }
+    }
 }

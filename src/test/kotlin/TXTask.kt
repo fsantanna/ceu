@@ -784,6 +784,15 @@ class TXTask {
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
     @Test
+    fun fxx_task_type () {
+        val out = all("""
+            type Xask = task ()->()->()
+            var t = Xask {}
+            output std ()
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
+    @Test
     fun f11_task_type () {
         val out = all("""
             type Xask = task ()->()->()
