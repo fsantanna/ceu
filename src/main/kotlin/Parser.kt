@@ -771,7 +771,14 @@ open class Parser
                     (chr.chr == '!') -> Expr.UDisc(num!!, e)
                     (chr.chr == '.') -> {
                         if (alls.tk0.enu == TK.XID) {
-                            Expr.Field(alls.tk0 as Tk.Id, e)
+                            Expr.Field (
+                                alls.tk0 as Tk.Id,
+                                Expr.As (
+                                    Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"),
+                                    e,
+                                    null
+                                )
+                            )
                         } else {
                             Expr.TDisc (
                                 num!!,

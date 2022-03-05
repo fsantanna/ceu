@@ -76,7 +76,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     }
                 } ?: "GLOBAL"
                 val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col,lbl)
-                Type.Pointer(this.tk_, Scope(scp1,null), it)
+                Type.Pointer(this.tk_, Scope(scp1,null), this.pln.wtype!!)
             }
         }
         is Expr.Dnref -> {
@@ -179,7 +179,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
-                val ftp = (it as Type.Active).tsk.noalias() as Type.Func
+                val ftp = ((it as Type.Active).tsk as Type.Active).tsk.noalias() as Type.Func
                 when (this.tk_.id) {
                     "state" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                     "pub"   -> ftp.pub!!
@@ -375,7 +375,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.call.xinfTypes(null)
         }
         is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).clone(this, this.tk.lin, this.tk.col))
-        is Stmt.Emit  -> this.e.xinfTypes(Type.Alias(Tk.Id(TK.XID, this.tk.lin, this.tk.col,"Event"), false, emptyList()).clone(this,this.tk.lin,this.tk.col))
+        is Stmt.Emit  -> this.e.xinfTypes(Type.Alias(Tk.Id(TK.XID, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {
             //All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
