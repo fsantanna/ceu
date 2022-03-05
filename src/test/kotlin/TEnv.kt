@@ -2570,4 +2570,14 @@ class TEnv {
        """.trimIndent())
         assert(out == "OK") { out }
     }
+
+    @Test
+    fun s07_task_type () {
+        val out = inp2env("""
+            type Xask = task ()->()->()
+            var t = Xask {}
+            var y = spawn t ()
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
 }

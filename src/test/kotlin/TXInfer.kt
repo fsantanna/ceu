@@ -899,7 +899,7 @@ class TXInfer {
             set x = spawn ((t :- Xask) @[] ())
             var y: active task @[] -> () -> _int -> ()
             set y = spawn ((t :- Xask) @[] ())
-            output std ((x:- Xask).pub)
+            output std ((x :- Xask).pub)
             output std (_3: _int)
             
         """.trimIndent()) { out }
