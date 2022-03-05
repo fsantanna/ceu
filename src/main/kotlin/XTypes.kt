@@ -179,7 +179,8 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
-                val ftp = ((it as Type.Active).tsk as Type.Active).tsk.noalias() as Type.Func
+                val tsk = (it as Type.Active).tsk
+                val ftp = if (tsk is Type.Func) tsk else ((tsk as Type.Active).tsk.noalias() as Type.Func)
                 when (this.tk_.id) {
                     "state" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                     "pub"   -> ftp.pub!!

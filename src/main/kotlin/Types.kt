@@ -73,10 +73,12 @@ fun Stmt.setTypes () {
                 All_assert_tk(e.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task : have ${e.tsk.wtype!!.tostr()}"
                 }
+                val tsk = (it as Type.Active).tsk
+                val ftp = if (tsk is Type.Func) tsk else ((tsk as Type.Active).tsk.noalias() as Type.Func)
                 when (e.tk_.id) {
                     "state" -> Type.Nat(Tk.Nat(TK.XNAT, e.tk.lin, e.tk.col, null, "int"))
-                    "pub"   -> ((it as Type.Active).tsk as Type.Func).pub!!
-                    "ret"   -> ((it as Type.Active).tsk as Type.Func).out
+                    "pub"   -> ftp.pub!!
+                    "ret"   -> ftp.out
                     else -> error("bug found")
                 }
 
