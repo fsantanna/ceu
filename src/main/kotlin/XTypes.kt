@@ -238,21 +238,30 @@ fun Expr.xinfTypes (inf: Type?) {
             val nat = Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,""))
             this.f.xinfTypes(nat)    // no infer for functions, default _ for nat
 
-            this.f.wtype!!.noalias().let { ft ->
-                when (ft) {
+            this.f.wtype!!.noalias().let { ftp ->
+                when (ftp) {
                     is Type.Nat -> {
                         this.arg.xinfTypes(nat)
                         this.xscps = Pair(this.xscps.first ?: emptyList(), this.xscps.second)
-                        ft
+                        ftp
                     }
                     is Type.Func -> {
                         val e = this
 
                         // TODO: remove after change increasing?
-                        this.arg.xinfTypes(ft.inp.mapScp1(e, Tk.Id(TK.XID, this.tk.lin, this.tk.col,this.localBlockScp1Id())))
+                        this.arg.xinfTypes(ftp.inp.mapScp1(e, Tk.Id(TK.XID, this.tk.lin, this.tk.col,this.localBlockScp1Id())))
 
                         // Calculates type scopes {...}:
                         //  call f @[...] arg
+
+                        fun Expr.isspawn (): Boolean {
+                            val wup = this.wup
+                            return when (wup) {
+                                is Stmt.SSpawn, is Stmt.DSpawn -> true
+                                is Expr.As -> wup.isspawn()
+                                else -> false
+                            }
+                        }
 
                         this.xscps = let {
                             // scope of expected closure environment
@@ -268,18 +277,18 @@ fun Expr.xinfTypes (inf: Type?) {
                                 }
                             }
 
-                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (xinf is Type.Func && xinf.xscps.first!=null) {
-                                listOf(Pair((ft.out as Type.Func).xscps.first!!.scp1,xinf.xscps.first!!.scp1))
+                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (!isspawn() && xinf is Type.Func) {
+                                listOf(Pair((ftp.out as Type.Func).xscps.first!!.scp1,xinf.xscps.first!!.scp1))
                             } else {
                                 emptyList()
                             }
 
                             val ret1s: List<Tk.Id> = if (inf == null) {
                                 // no attribution expected, save to @LOCAL as shortest scope possible
-                                ft.out.flattenLeft()
+                                ftp.out.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
-                                    .map { Tk.Id(TK.XID, ft.tk.lin, ft.tk.col, ft.localBlockScp1Id()) }
+                                    .map { Tk.Id(TK.XID, ftp.tk.lin, ftp.tk.col, ftp.localBlockScp1Id()) }
                             } else {
                                 inf.flattenLeft()
                                    .map { it.toScp1s() }
@@ -292,7 +301,7 @@ fun Expr.xinfTypes (inf: Type?) {
                                     .map { it.toScp1s() }
                                     .flatten()
                                 // func inp -> out  ==>  { inp, out }
-                                val inp_out: List<Tk.Id> = (ft.inp.flattenLeft() + ft.out.flattenLeft())
+                                val inp_out: List<Tk.Id> = (ftp.inp.flattenLeft() + ftp.out.flattenLeft())
                                     .map { it.toScp1s() }
                                     .flatten()
                                 inp_out.zip(arg1s+ret1s)
@@ -321,13 +330,23 @@ fun Expr.xinfTypes (inf: Type?) {
                         //  so @scp2 maps to @b_1
                         // zip [[{@scp1a,@scp1b},{@scp2a,@scp2b}],{@a1,@b_1}]
 
-                        if (ft.xscps.second!!.size != this.xscps.first!!.size) {
-                            // TODO: may fail before check2, return anything
-                            Type.Nat(Tk.Nat(TK.NATIVE, this.tk.lin, this.tk.col, null,"ERR"))
-                        } else {
-                            ft.out.mapScps(true,
-                                ft.xscps.second!!.map { it.scp1.id }.zip(this.xscps.first!!).toMap()
-                            )
+                        when {
+                            this.isspawn() -> {
+                                Type.Active (
+                                    Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
+                                    this.f.wtype!!
+                                )
+                            }
+                            (ftp.xscps.second!!.size != this.xscps.first!!.size) -> {
+                                // TODO: may fail before check2, return anything
+                                Type.Nat(Tk.Nat(TK.NATIVE, this.tk.lin, this.tk.col, null, "ERR"))
+                            }
+                            else -> {
+                                ftp.out.mapScps(
+                                    true,
+                                    ftp.xscps.second!!.map { it.scp1.id }.zip(this.xscps.first!!).toMap()
+                                )
+                            }
                         }
                     }
                     else -> {
@@ -361,12 +380,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         is Stmt.SCall -> this.e.xinfTypes(unit())
         is Stmt.SSpawn -> {
             this.call.xinfTypes(null)
-            this.dst?.xinfTypes (
-                Type.Active (
-                    Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
-                    (this.call.noas() as Expr.Call).f.wtype!!.clone(this,this.tk.lin,this.tk.col)
-                )
-            )
+            this.dst?.xinfTypes(this.call.wtype!!)
         }
         is Stmt.DSpawn -> {
             this.dst.xinfTypes(null)

@@ -254,11 +254,13 @@ open class Parser
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
-                Expr.As (
-                    Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"),
-                    e,
+                if (e is Expr.As) e else {
+                    Expr.As(
+                        Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":-"),
+                        e,
                     null
-                ),
+                    )
+                },
                 arg,
                 Pair(
                     if (iscps==null) null else iscps.map { Scope(it,null) },

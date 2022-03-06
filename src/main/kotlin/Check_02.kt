@@ -126,18 +126,17 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Stmt.SSpawn -> {
-                val call = (s.call.noas() as Expr.Call).f.wtype!!
-                All_assert_tk(s.call.tk, call is Type.Func && call.tk.enu == TK.TASK) {
+                val call = s.call.wtype!!
+                All_assert_tk(s.call.tk, call is Type.Active) {
                     "invalid `spawn` : type mismatch : expected task : have ${call.tostr()}"
                 }
                 if (s.dst != null) {
-                    All_assert_tk(s.dst.tk, s.dst.wtype is Type.Active) {
+                    val dst = s.dst.wtype
+                    All_assert_tk(s.dst.tk, dst is Type.Active) {
                         "invalid `spawn` : type mismatch : expected active task : have ${s.dst.wtype!!.tostr()}"
                     }
-                    val dst = (s.dst.wtype!! as Type.Active).tsk
-                    //println("invalid `spawn` : type mismatch : ${dst.tostr()} = ${call.tostr()}")
-                    All_assert_tk(s.tk, dst.isSupOf(call)) {
-                        "invalid `spawn` : ${mismatch(dst, call)}"
+                    All_assert_tk(s.tk, dst!!.isSupOf(call)) {
+                        "invalid `spawn` : ${mismatch(dst!!,call)}"
                     }
                 }
             }

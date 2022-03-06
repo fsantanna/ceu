@@ -12,7 +12,7 @@ fun Stmt.name (): String {
 }
 
 fun Type.dump (spc: Int = 0): String {
-    return " ".repeat(spc) + "Type." + when (this) {
+    return "[${this.tk.lin}] " + " ".repeat(spc) + "Type." + when (this) {
         is Type.Unit -> "Unit\n"
         is Type.Nat  -> "Nat '" + this.tk_.src + "'\n"
         is Type.Pointer -> "Pointer " + this.xscp!!.scp1.id + "\n" + this.pln.dump(spc+4)
@@ -26,7 +26,7 @@ fun Type.dump (spc: Int = 0): String {
 }
 
 fun Expr.dump (spc: Int = 0): String {
-    return " ".repeat(spc) + "Expr." + when (this) {
+    return "[${this.tk.lin}] " + " ".repeat(spc) + "Expr." + when (this) {
         is Expr.Unit  -> "Unit\n"
         is Expr.Var   -> "Var '" + this.tk_.id + "'\n"
         is Expr.Nat   -> "Nat '" + this.tk_.src + "'\n"
@@ -47,7 +47,7 @@ fun Expr.dump (spc: Int = 0): String {
 }
 
 fun Stmt.dump (spc: Int = 0): String {
-    return " ".repeat(spc) + "Stmt." + when (this) {
+    return "[${this.tk.lin}] " + " ".repeat(spc) + "Stmt." + when (this) {
         is Stmt.Nop -> "Nop\n"
         is Stmt.Native -> "Native " + this.tk_.toce() + "\n"
         is Stmt.Var -> "Var " + this.tk_.id + "\n" + this.xtype!!.dump(spc+4)
