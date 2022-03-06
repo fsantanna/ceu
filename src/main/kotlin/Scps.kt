@@ -31,8 +31,7 @@ fun Scope.toScp2 (up: Any): Triple<Int,String?,Int?> {
             if (blk != null) {
                 // @A, @x, ...
                 val one = if (blk is Stmt.Block) 1 else 0
-                val umn = if (this.scp1.id=="arg")    1 else 0   // "arg" is in between Func-arg-Block
-                Triple(lvl, null, one - umn + blk.ups_tolist().let { it.count{it is Stmt.Block} + 2*it.count{it is Expr.Func} })
+                Triple(lvl, null, one + blk.ups_tolist().let { it.count{it is Stmt.Block} + 2*it.count{it is Expr.Func} })
             } else {
                 Triple(lvl, this.scp1.id, null)
             }
