@@ -663,8 +663,9 @@ class TXExec {
             type Int2Int = func @[] -> () -> ()
             var f: Int2Int
             set f = Int2Int {} 
+            output std ()
        """.trimIndent())
-        assert(out == "10\n") { out }
+        assert(out == "()\n") { out }
     }
     @Test
     fun eyy_func_alias () {
@@ -672,9 +673,9 @@ class TXExec {
             type Int2Int = func @[] -> () -> ()
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {}
-            --output std ()
+            output std ()
        """.trimIndent())
-        assert(out == "10\n") { out }
+        assert(out == "()\n") { out }
     }
     @Test
     fun e13_func_alias () {

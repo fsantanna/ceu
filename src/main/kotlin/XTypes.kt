@@ -151,7 +151,8 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, xinf is Type.Func) {
                     "invalid type : expected function type"
                 }
-                this.wtype = xinf!! // must set wtype before b/c block may access arg/ret/etc
+                this.xtype = xinf as Type.Func
+                this.wtype = this.xtype // must set wtype before b/c block may access arg/ret/etc
             }
             this.block.xinfTypes(null)
             this.xtype ?: xinf!!
