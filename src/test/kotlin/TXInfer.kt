@@ -17,7 +17,6 @@ class TXInfer {
             s.setUps(null)
             s.setScp1s()
             s.setEnvs(null)
-            //println(s.xtostr())
             check_00_after_envs(s)
             s.xinfScp1s()
             check_01_before_tps(s)

@@ -4,7 +4,7 @@ open class Parser
         return if (alls.accept(TK.XCLK)) {
             "" + (alls.tk0 as Tk.Clk).ms + "ms"
         } else {
-            this.expr().xtostr()
+            this.expr().tostr(true)
         }
     }
 
@@ -281,12 +281,12 @@ open class Parser
                         All_nest(
                             """
                         {
-                            var tsk_$N = spawn ${e.xtostr()}
+                            var tsk_$N = spawn ${e.tostr(true)}
                             var st_$N = tsk_$N.state
                             if _(${D}st_$N == TASK_AWAITING) {
                                 await tsk_$N
                             }
-                            set ${dst.xtostr()} = tsk_$N.ret
+                            set ${dst.tostr(true)} = tsk_$N.ret
                         }
                     """.trimIndent()
                         ) {
@@ -354,7 +354,7 @@ open class Parser
                             val ret = All_nest(
                                 """
                                 {
-                                    var tsk_$N = spawn ${e.xtostr()}
+                                    var tsk_$N = spawn ${e.tostr(true)}
                                     var st_$N = tsk_$N.state
                                     if _(${D}st_$N == TASK_AWAITING) {
                                         await tsk_$N
@@ -400,10 +400,11 @@ open class Parser
                 } else {
                     val tk0 = alls.tk0
                     val e = this.expr()
+                    //println(e.tostr(true))
                     All_nest(
                         tk0.lincol(
                             """
-                        set ret = ${e.xtostr()}
+                        set ret = ${e.tostr(true)}
                         return
                         
                     """.trimIndent()
@@ -436,7 +437,7 @@ open class Parser
                 val tk0 = alls.tk0 as Tk.Key
                 if (alls.check(TK.CHAR, '{')) {
                     val block = this.block()
-                    All_nest("spawn (task _ -> _ -> _ ${block.xtostr()}) ()") {
+                    All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()") {
                         this.stmt()
                     } as Stmt
                 } else {
@@ -456,11 +457,11 @@ open class Parser
                 All_nest(
                     """
                     {
-                        var tsk_$N = spawn ${blk.xtostr()}
+                        var tsk_$N = spawn ${blk.tostr(true)}
                         watching tsk_$N {
                             loop {
-                                await ${pred.xtostr()}
-                                var x_$N = ${pred.uni.xtostr()}!${pred.tk_.num}
+                                await ${pred.tostr(true)}
+                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk_.num}
                                 if x_$N {
                                     pause tsk_$N
                                 } else {
@@ -481,7 +482,7 @@ open class Parser
                 while (alls.accept(TK.WITH)) {
                     pars.add(this.block())
                 }
-                val srcs = pars.map { "spawn ${it.xtostr()}" }.joinToString("\n")
+                val srcs = pars.map { "spawn ${it.tostr(true)}" }.joinToString("\n")
                 All_nest(srcs + "await _0\n") {
                     this.stmts()
                 } as Stmt
@@ -494,7 +495,7 @@ open class Parser
                     pars.add(this.block())
                 }
                 val spws =
-                    pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.xtostr()} }" }.joinToString("\n")
+                    pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.tostr(true)} }" }.joinToString("\n")
                 val oks =
                     pars.mapIndexed { i, _ -> "var ok_${N}_$i: _int = _((${D}tk_${N}_$i->task0.state == TASK_DEAD))" }
                         .joinToString("\n")
@@ -530,7 +531,7 @@ open class Parser
                     """
                     loop {
                         await $evt
-                        ${blk.xtostr()}
+                        ${blk.tostr(true)}
                     }
                     
                 """.trimIndent()
@@ -546,7 +547,7 @@ open class Parser
                     paror {
                         await $evt
                     } with
-                        ${blk.xtostr()}
+                        ${blk.tostr(true)}
                     
                 """.trimIndent()
                 ) {
@@ -651,7 +652,7 @@ open class Parser
                 val cnd = this.expr()
                 val if1 = All_nest(
                     """
-                    if ${cnd.xtostr()} {
+                    if ${cnd.tostr(true)} {
                         break
                     }
                     
@@ -664,8 +665,8 @@ open class Parser
                 All_nest(
                     """
                     loop {
-                        ${it2.xtostr()}
-                        ${if2.xtostr()}
+                        ${it2.tostr(true)}
+                        ${if2.tostr(true)}
                     }
                     
                 """.trimIndent()
@@ -673,7 +674,7 @@ open class Parser
                     this.stmt()
                 } as Stmt
             }
-            //println(it3.xtostr())
+            //println(it3.tostr(true))
             it3
         }
     }
@@ -805,8 +806,8 @@ open class Parser
             (s !is Stmt.Seq) -> {
                 All_nest("""
                     {
-                        ${blk.body.xtostr()}
-                        ${s.xtostr()}
+                        ${blk.body.tostr(true)}
+                        ${s.tostr(true)}
                     }
                     
                 """.trimIndent()) {
@@ -816,10 +817,10 @@ open class Parser
             (s.s1 is Stmt.Var) -> {
                 /*
                     val old = All_nest("""
-                        ${until.s1.xtostr()}        // this wouldn't work b/c var has no type yet
+                        ${until.s1.tostr(true)}        // this wouldn't work b/c var has no type yet
                         {
-                            ${blk.body.xtostr()}
-                            ${until.s2.xtostr()}
+                            ${blk.body.tostr(true)}
+                            ${until.s2.tostr(true)}
                         }
                     """.trimIndent())
                  */
@@ -834,10 +835,10 @@ open class Parser
             (s.s2 is Stmt.Return) -> {
                 All_nest("""
                     {
-                        ${blk.body.xtostr()}
-                        ${s.s1.xtostr()}
+                        ${blk.body.tostr(true)}
+                        ${s.s1.tostr(true)}
                     }
-                    ${s.s2.xtostr()}
+                    ${s.s2.tostr(true)}
                     
                 """.trimIndent()) {
                     this.stmt()
