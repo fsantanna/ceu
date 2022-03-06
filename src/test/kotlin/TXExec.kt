@@ -658,6 +658,25 @@ class TXExec {
         assert(out == "<.1>\n<.2 [1,2]>\n") { out }
     }
     @Test
+    fun exx_func_alias () {
+        val out = all("""
+            type Int2Int = func @[] -> () -> ()
+            var f: Int2Int
+            set f = Int2Int {} 
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun eyy_func_alias () {
+        val out = all("""
+            type Int2Int = func @[] -> () -> ()
+            var f: func @[] -> () -> ()
+            set f = func @[] -> () -> () {}
+            --output std ()
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
     fun e13_func_alias () {
         val out = all("""
             type Int2Int = func @[] -> _int -> _int

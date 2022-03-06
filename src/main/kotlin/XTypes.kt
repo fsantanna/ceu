@@ -64,19 +64,14 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, inf==null || xinf is Type.Pointer) { "invalid inference : type mismatch"}
             this.pln.xinfTypes((xinf as Type.Pointer?)?.pln)
             this.pln.wtype!!.let {
-                val lbl = this.toBaseVar()?.let {
-                    val blk = it.env(it.tk_.id)!!.ups_first_block()
-                    when {
-                        (blk == null) -> "GLOBAL"
-                        blk.scp1.isanon() -> {
-                            val lbl = "SS" + it.tk_.id.toUpperCase()
-                            blk.scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col,lbl)
-                            lbl
-                        }
-                        else -> blk.scp1!!.id
-                    }
-                } ?: "GLOBAL"
-                val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col,lbl)
+                val base = this.toBaseVar()
+                val blk  = base?.env(base?.tk_.id)?.ups_first { it is Stmt.Block || it is Expr.Func }
+                val id   = when {
+                    (base == null) -> "GLOBAL"
+                    (blk == null) -> "GLOBAL"
+                    else -> base.tk_.id
+                }
+                val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col, id.toUpperCase())
                 Type.Pointer(this.tk_, Scope(scp1,null), this.pln.wtype!!)
             }
         }
@@ -103,7 +98,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 "invalid inference : type mismatch"
             }
             this.arg.forEachIndexed { i,e -> e.xinfTypes(xinf?.let { (it as Type.Tuple).vec[i] }) }
-            inf ?: Type.Tuple(this.tk_, this.arg.map { it.wtype!! })
+            Type.Tuple(this.tk_, this.arg.map { it.wtype!! })
         }
         is Expr.UCons -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
@@ -377,7 +372,12 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.call.xinfTypes(null)
         }
         is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).clone(this, this.tk.lin, this.tk.col))
-        is Stmt.Emit  -> this.e.xinfTypes(Type.Alias(Tk.Id(TK.XID, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+        is Stmt.Emit  -> {
+            if (this.tgt is Expr) {
+                this.tgt.xinfTypes(null)
+            }
+            this.e.xinfTypes(Type.Alias(Tk.Id(TK.XID, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+        }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {
             //All_assert_tk(this.tk, this.xtype!=null || inf!=null) {

@@ -332,13 +332,13 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var f: func @[k] -> /_int @k -> ()
-            { @SSX
+            {
             var x: _int
             set x = (_1: _int)
             var y: _int
             set y = (_1: _int)
-            call (f @[SSX] (/x))
-            call (f @[SSX] (/y))
+            call (f @[X] (/x))
+            call (f @[Y] (/y))
             }
             
         """.trimIndent()) { out }

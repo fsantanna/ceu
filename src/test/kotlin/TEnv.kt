@@ -19,7 +19,7 @@ class TEnv {
             s.xinfScp1s()
             check_01_before_tps(s)
             s.xinfTypes(null)
-            s.setTypes()
+            //s.setTypes()
             s.setScp2s()
             check_02_after_tps(s)
             return "OK"

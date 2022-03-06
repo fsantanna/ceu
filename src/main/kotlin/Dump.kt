@@ -1,14 +1,27 @@
+internal fun name (dmp: String): String {
+    return dmp.takeWhile { it!=' ' && it!='\n' }
+}
+fun Type.name (): String {
+    return name(this.dump())
+}
+fun Expr.name (): String {
+    return name(this.dump())
+}
+fun Stmt.name (): String {
+    return name(this.dump())
+}
+
 fun Type.dump (spc: Int = 0): String {
     return " ".repeat(spc) + "Type." + when (this) {
         is Type.Unit -> "Unit\n"
         is Type.Nat  -> "Nat '" + this.tk_.src + "'\n"
-        is Type.Pointer -> "Pointer\n" + this.pln.dump(spc+4)
+        is Type.Pointer -> "Pointer " + this.xscp!!.scp1.id + "\n" + this.pln.dump(spc+4)
         is Type.Tuple -> "Tuple\n" + this.vec.forEach { it.dump(spc+4) }
         is Type.Union -> "Union\n" + this.vec.forEach { it.dump(spc+4) }
         is Type.Active -> "Active\n" + this.tsk.dump(spc+4)
         is Type.Actives -> "Actives\n" + this.tsk.dump(spc+4)
         is Type.Alias -> "Alias '" + this.tk_.id + "'\n"
-        is Type.Func -> "Func\n" + this.inp.dump(spc+4) + this.pub?.dump(spc+4) + this.out.dump(spc+4)
+        is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (if (this.pub==null) "" else this.pub?.dump(spc+4)) + this.out.dump(spc+4)
     }
 }
 
@@ -17,7 +30,7 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Unit  -> "Unit\n"
         is Expr.Var   -> "Var '" + this.tk_.id + "'\n"
         is Expr.Nat   -> "Nat '" + this.tk_.src + "'\n"
-        is Expr.As    -> "As " + this.tk_.sym + " " + this.xtype?.dump() + this.e.dump(spc+4)
+        is Expr.As    -> "As " + this.tk_.sym + "\n" + (this.xtype?.dump(spc+4)?:"none\n") + this.e.dump(spc+4)
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)
         is Expr.TCons -> "TCons\n" + this.arg.forEach { it.dump(spc+4) }
@@ -29,43 +42,46 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.UPred -> "UPred ?" + this.tk_.num + "\n" + this.uni.dump(spc+4)
         is Expr.New   -> "New\n" + this.arg.dump(spc+4)
         is Expr.Call  -> "Call\n" + this.f.dump(spc+4) + this.arg.dump(spc+4)
-        is Expr.Func  -> "Func\n" + this.ftp()!!.dump(spc+4) //+ this.tostr(e.block)
+        is Expr.Func  -> "Func\n" + this.xtype?.dump(spc+4) + this.block.dump(spc+4)
     }
 }
 
-/*
-    open fun tostr (s: Stmt): String {
-        return when (s) {
-            is Stmt.Nop -> "\n"
-            is Stmt.Native -> "native " + (if (s.istype) "type " else "") + s.tk_.toce() + "\n"
-            is Stmt.Var -> "var " + s.tk_.id + ": " + this.tostr(s.xtype!!) + "\n"
-            is Stmt.Set -> "set " + this.tostr(s.dst) + " = " + this.tostr(s.src) + "\n"
-            is Stmt.Break -> "break\n"
-            is Stmt.Return -> "return\n"
-            is Stmt.Seq -> this.tostr(s.s1) + this.tostr(s.s2)
-            is Stmt.SCall -> "call " + this.tostr(s.e) + "\n"
-            is Stmt.Input -> (if (s.dst == null) "" else "set " + this.tostr(s.dst) + " = ") + "input " + s.lib.id + " " + this.tostr(s.arg) + ": " + this.tostr(s.xtype!!) + "\n"
-            is Stmt.Output -> "output " + s.lib.id + " " + this.tostr(s.arg) + "\n"
-            is Stmt.If -> "if " + this.tostr(s.tst) + "\n" + this.tostr(s.true_) + "else\n" + this.tostr(s.false_)
-            is Stmt.Loop -> "loop " + this.tostr(s.block)
-            is Stmt.Block -> (if (s.iscatch) "catch " else "") + "{" + (if (s.scp1.isanon()) "" else " @" + s.scp1!!.id) + "\n" + this.tostr(s.body) + "}\n"
-            is Stmt.SSpawn -> (if (s.dst == null) "" else "set " + this.tostr(s.dst) + " = ") + "spawn " + this.tostr(s.call) + "\n"
-            is Stmt.DSpawn -> "spawn " + this.tostr(s.call) + " in " + this.tostr(s.dst) + "\n"
-            is Stmt.Await -> "await " + this.tostr(s.e) + "\n"
-            is Stmt.Pause -> (if (s.pause) "pause " else "resume ") + this.tostr(s.tsk) + "\n"
-            is Stmt.Emit -> when (s.tgt) {
-                is Scope -> "emit @" + s.tgt.scp1.anon2local() + " " + this.tostr(s.e) + "\n"
-                is Expr  -> "emit " + s.tgt.tostr() + " " + this.tostr(s.e) + "\n"
-                else -> error("bug found")
-            }
-            is Stmt.Throw -> "throw\n"
-            is Stmt.DLoop -> "loop " + this.tostr(s.i) + " in " + this.tostr(s.tsks) + " " + this.tostr(s.block)
-            is Stmt.Typedef -> {
-                val scps = " @[" + s.xscp1s.first!!.map { it.id }.joinToString(",") + "]"
-                "type " + s.tk_.id + scps + " = " + this.tostr(s.type) + "\n"
-            }
+fun Stmt.dump (spc: Int = 0): String {
+    return " ".repeat(spc) + "Stmt." + when (this) {
+        is Stmt.Nop -> "Nop\n"
+        is Stmt.Native -> "Native " + this.tk_.toce() + "\n"
+        is Stmt.Var -> "Var " + this.tk_.id + "\n" + this.xtype!!.dump(spc+4)
+        is Stmt.Set -> "Set\n" + this.dst.dump(spc+4) + this.src.dump(spc+4)
+        is Stmt.Break -> "Break\n"
+        is Stmt.Return -> "Return\n"
+        is Stmt.Seq -> "Seq\n" + this.s1.dump(spc+4) + this.s2.dump(spc+4)
+        is Stmt.SCall -> "SCall\n" + this.e.dump(spc+4)
+        is Stmt.Input -> "Input " + this.lib.id + "\n" +
+                this.xtype!!.dump(spc+4) +
+                (if (this.dst == null) "none\n" else this.dst.dump(spc+4)) +
+                this.arg.dump(spc+4)
+        is Stmt.Output -> "Output " + this.lib.id + "\n" + this.arg.dump(spc+4)
+        is Stmt.If -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
+        is Stmt.Loop -> "Loop\n" + this.block.dump(spc+4)
+        is Stmt.Block -> "Block" +
+                (if (this.iscatch) " (catch)" else "") +
+                (if (this.scp1.isanon()) "" else " @" + this.scp1!!.id) +
+                "\n" +
+                this.body.dump(spc+4)
+        is Stmt.SSpawn -> "SSpawn\n" +
+                (if (this.dst == null) "none\n" else this.dst.dump(spc+4)) +
+                this.call.dump(spc+4)
+        is Stmt.DSpawn -> "DSpawn\n" + this.call.dump(spc+4) + this.dst.dump(spc+4)
+        is Stmt.Await -> "Await\n" + this.e.dump(spc+4)
+        is Stmt.Pause -> "Pause\n" + this.tsk.dump(spc+4)
+        is Stmt.Emit -> "Emit" + when (this.tgt) {
+            is Scope -> " @" + this.tgt.scp1.anon2local() + "\n"
+            is Expr -> this.tgt.dump(spc+4)
             else -> error("bug found")
-        }
+        } + this.e.dump(spc+4)
+        is Stmt.Throw -> "Throw\n"
+        is Stmt.DLoop -> "DLoop\n" + this.i.dump(spc+4) + this.tsks.dump(spc+4) + this.block.dump(spc+4)
+        is Stmt.Typedef -> "Typedef " + this.tk_.id + "\n" + this.type.dump(spc+4)
+        else -> error("bug found")
     }
 }
-*/
