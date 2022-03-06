@@ -126,7 +126,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Stmt.SSpawn -> {
-                val call = s.call.f.wtype!!
+                val call = (s.call.noas() as Expr.Call).f.wtype!!
                 All_assert_tk(s.call.tk, call is Type.Func && call.tk.enu == TK.TASK) {
                     "invalid `spawn` : type mismatch : expected task : have ${call.tostr()}"
                 }
@@ -145,13 +145,14 @@ fun check_02_after_tps (s: Stmt) {
                 All_assert_tk(s.dst.tk, s.dst.wtype is Type.Actives) {
                     "invalid `spawn` : type mismatch : expected active tasks : have ${s.dst.wtype!!.tostr()}"
                 }
-                val call = s.call.f.wtype!!
-                All_assert_tk(s.call.tk, call is Type.Func && call.tk.enu==TK.TASK) {
-                    "invalid `spawn` : type mismatch : expected task : have ${call.tostr()}"
+                val call = s.call.noas() as Expr.Call
+                val ftp = call.f.wtype!!
+                All_assert_tk(s.call.tk, ftp is Type.Func && ftp.tk.enu==TK.TASK) {
+                    "invalid `spawn` : type mismatch : expected task : have ${ftp.tostr()}"
                 }
                 val dst = (s.dst.wtype!! as Type.Actives).tsk
                 //println("invalid `spawn` : type mismatch : ${dst.tostr()} = ${call.tostr()}")
-                val alias = if (s.call.f !is Expr.As) call else s.call.f.e.wtype!!
+                val alias = if (call.f !is Expr.As) ftp else call.f.e.wtype!!
                 All_assert_tk(s.tk, dst.isSupOf(alias)) {
                     "invalid `spawn` : ${mismatch(dst,alias)}"
                 }

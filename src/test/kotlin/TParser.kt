@@ -409,10 +409,6 @@ class TParser {
 
     // INDEX
 
-    fun Expr.noas (): Expr {
-        return (this as Expr.As).e
-    }
-
     @Test
     fun b18_parser_expr_index () {
         All_restart(null, PushbackReader(StringReader("x.1"), 2))
@@ -816,7 +812,8 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("set x = spawn f ()"), 2))
         Lexer.lex()
         val s = Parser().stmt()
-        assert(s is Stmt.SSpawn && s.call.f.noas() is Expr.Var && s.dst is Expr.Var)
+        println(s.dump())
+        assert(s is Stmt.SSpawn && (s.call.noas() as Expr.Call).f.noas() is Expr.Var && s.dst is Expr.Var)
     }
 
     // LOOP

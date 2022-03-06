@@ -1753,6 +1753,25 @@ class TExec {
        """.trimIndent())
         assert(out == "()\n") { out }
     }
+    @Test
+    fun o15_func_alias () {
+        val out = all("""
+            type Xask @[] = task @[] -> () -> _int -> ()
+            var t: Xask
+                set t = (task @[] -> () -> _int -> () {
+                output std (_2: _int)
+            }
+            :+ Xask)
+            output std (_1: _int)
+            var x: active Xask
+            set x = spawn ((t :- Xask) @[] ()) :+ Xask
+            var y: active task @[] -> () -> _int -> ()
+            set y = spawn ((t :- Xask) @[] ())
+            output std ((x :- Xask).pub)
+            output std (_3: _int)
+       """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 
     // ALL
 

@@ -30,7 +30,7 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Unit  -> "Unit\n"
         is Expr.Var   -> "Var '" + this.tk_.id + "'\n"
         is Expr.Nat   -> "Nat '" + this.tk_.src + "'\n"
-        is Expr.As    -> "As " + this.tk_.sym + "\n" + (this.xtype?.dump(spc+4)?:"none\n") + this.e.dump(spc+4)
+        is Expr.As    -> "As " + this.tk_.sym + "\n" + (this.xtype?.dump(spc+4)?:(" ".repeat(spc+4)+"none\n")) + this.e.dump(spc+4)
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)
         is Expr.TCons -> "TCons\n" + this.arg.forEach { it.dump(spc+4) }
@@ -58,7 +58,7 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.SCall -> "SCall\n" + this.e.dump(spc+4)
         is Stmt.Input -> "Input " + this.lib.id + "\n" +
                 this.xtype!!.dump(spc+4) +
-                (if (this.dst == null) "none\n" else this.dst.dump(spc+4)) +
+                (if (this.dst == null) (" ".repeat(spc+4)+"none\n") else this.dst.dump(spc+4)) +
                 this.arg.dump(spc+4)
         is Stmt.Output -> "Output " + this.lib.id + "\n" + this.arg.dump(spc+4)
         is Stmt.If -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
@@ -69,7 +69,7 @@ fun Stmt.dump (spc: Int = 0): String {
                 "\n" +
                 this.body.dump(spc+4)
         is Stmt.SSpawn -> "SSpawn\n" +
-                (if (this.dst == null) "none\n" else this.dst.dump(spc+4)) +
+                (if (this.dst == null) (" ".repeat(spc+4)+"none\n") else this.dst.dump(spc+4)) +
                 this.call.dump(spc+4)
         is Stmt.DSpawn -> "DSpawn\n" + this.call.dump(spc+4) + this.dst.dump(spc+4)
         is Stmt.Await -> "Await\n" + this.e.dump(spc+4)

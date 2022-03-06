@@ -40,3 +40,8 @@ fun Expr.toBaseVar (): Expr.Var? {
         else -> error("bug found")
     }
 }
+
+fun Expr.noas (): Expr {
+    return if (this !is Expr.As) this else this.e.noas()
+}
+

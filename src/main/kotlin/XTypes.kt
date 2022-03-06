@@ -364,7 +364,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.dst?.xinfTypes (
                 Type.Active (
                     Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
-                    this.call.f.wtype!!.clone(this,this.tk.lin,this.tk.col)
+                    (this.call.noas() as Expr.Call).f.wtype!!.clone(this,this.tk.lin,this.tk.col)
                 )
             )
         }

@@ -442,12 +442,12 @@ open class Parser
                     } as Stmt
                 } else {
                     val e = this.expr()
-                    All_assert_tk(tk0, e is Expr.Call) { "expected call expression" }
+                    All_assert_tk(tk0, e.noas() is Expr.Call) { "expected call expression" }
                     if (alls.accept(TK.IN)) {
                         val tsks = this.expr()
-                        Stmt.DSpawn(tk0, tsks, e as Expr.Call)
+                        Stmt.DSpawn(tk0, tsks, e)
                     } else {
-                        Stmt.SSpawn(tk0, null, e as Expr.Call)
+                        Stmt.SSpawn(tk0, null, e)
                     }
                 }
             }
