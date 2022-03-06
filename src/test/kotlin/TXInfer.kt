@@ -744,13 +744,13 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             { @A
-            var pa: /List @[A] @A
-            set pa = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
+            var pa: /List @[LOCAL] @LOCAL
+            set pa = (new (<.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL> :+ List @[LOCAL]): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
             set pf = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
-            set (((pa\):- List @[A])!1) = pf
+            set (((pa\):- List @[LOCAL])!1) = pf
             }
             
             call (f @[] ())

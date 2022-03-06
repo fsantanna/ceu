@@ -269,7 +269,7 @@ fun Scope.toce (up: Any): String {
 }
 
 fun Any.localBlockMem (): String {
-    return this.ups_first_block().let { if (it == null) "GLOBAL" else "(&" + ("B"+it.n).loc_mem(this) + ")" }
+    return this.localBlockScp1Id().let { if (it == "GLOBAL") "GLOBAL" else "(&" + it.loc_mem(this) + ")" }
 }
 
 fun String.native (up: Any, tk: Tk): String {

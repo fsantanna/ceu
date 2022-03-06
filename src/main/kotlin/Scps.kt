@@ -10,7 +10,7 @@ fun Tk.Id.anon2local (): String {
 }
 
 fun Any.localBlockScp1Id (): String {
-    return this.ups_first_block().let { if (it == null) "GLOBAL" else (it.scp1?.id ?: "B"+it.n) }
+    return this.ups_first_block().let { if (it == null) "GLOBAL" else ("B"+it.n) }
 }
 
 fun Stmt.setScp1s () {
