@@ -96,7 +96,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
 
 sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Nop    (val tk_: Tk) : Stmt(N++, tk_, null, null)
-    data class Var    (val tk_: Tk.Id, var xtype: Type?, val xinfer: String?) : Stmt(N++, tk_, null, null)
+    data class Var    (val tk_: Tk.Id, var xtype: Type?) : Stmt(N++, tk_, null, null)
     data class Set    (val tk_: Tk.Chr, val dst: Expr, val src: Expr) : Stmt(N++, tk_, null, null)
     data class Native (val tk_: Tk.Nat, val istype: Boolean) : Stmt(N++, tk_, null, null)
     data class SCall  (val tk_: Tk.Key, val e: Expr.Call): Stmt(N++, tk_, null, null)

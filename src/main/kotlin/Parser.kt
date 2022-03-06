@@ -324,31 +324,29 @@ open class Parser
                     if (tp == null) {
                         alls.err_expected("type declaration")
                     }
-                    Stmt.Var(tk_id, tp, null)
+                    Stmt.Var(tk_id, tp)
                 } else if (alls.accept(TK.VAR)) {
-                    Lexer.lex() // accept any KEY
-                    Stmt.Var(tk_id, null, (alls.tk0 as Tk.Key).key)
+                    Stmt.Var(tk_id, null)
                 } else {
                     fun tpor(inf: String): String? {
                         return if (tp == null) inf else null
                     }
-
                     val tk0 = alls.tk0 as Tk.Chr
                     val dst = Expr.Var(tk_id)
-                    val (inf, src) = when {
+                    val src = when {
                         alls.accept(TK.INPUT) -> {
                             val tk = alls.tk0 as Tk.Key
                             alls.accept_err(TK.XID)
                             val lib = (alls.tk0 as Tk.Id)
                             val arg = this.expr()
                             val inp = if (!alls.accept(TK.CHAR, ':')) null else this.type()
-                            Pair(tpor("input"), Stmt.Input(tk, inp, dst, lib, arg))
+                            Stmt.Input(tk, inp, dst, lib, arg)
                         }
                         alls.check(TK.SPAWN) -> {
                             val s = this.stmt()
                             All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
                             val ss = s as Stmt.SSpawn
-                            Pair(tpor("spawn"), Stmt.SSpawn(ss.tk_, dst, ss.call))
+                            Stmt.SSpawn(ss.tk_, dst, ss.call)
                         }
                         alls.accept(TK.AWAIT) -> {
                             val e = this.expr()
@@ -367,14 +365,14 @@ open class Parser
                             ) {
                                 this.stmts()
                             }
-                            Pair(tpor("await"), ret as Stmt)
+                            ret as Stmt
                         }
                         else -> {
                             val src = this.expr()
-                            Pair(tpor("set"), Stmt.Set(tk0, dst, src))
+                            Stmt.Set(tk0, dst, src)
                         }
                     }
-                    Stmt.Seq(tk_id, Stmt.Var(tk_id, tp, inf), src)
+                    Stmt.Seq(tk_id, Stmt.Var(tk_id, tp), src)
                 }
             }
             alls.accept(TK.INPUT) -> {

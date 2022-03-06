@@ -58,8 +58,8 @@ class XTostr: Tostr()
 
     override fun tostr (s: Stmt): String {
         return when {
-            (s is Stmt.Var && s.xinfer!=null) -> {
-                "var " + s.tk_.id + " = var " + s.xinfer + "\n"
+            (s is Stmt.Var && s.xtype==null) -> {
+                "var " + s.tk_.id + " = var\n"
             }
             (s is Stmt.Input && s.xtype==null) -> {
                 if (s.dst == null) "" else "set " + this.tostr(s.dst) + " = " + "input " + s.lib.id + " " + this.tostr(s.arg)
