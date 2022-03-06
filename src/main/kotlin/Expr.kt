@@ -45,3 +45,11 @@ fun Expr.noas (): Expr {
     return if (this !is Expr.As) this else this.e.noas()
 }
 
+fun Expr.upspawn (): Stmt? {
+    val wup = this.wup
+    return when (wup) {
+        is Stmt.SSpawn, is Stmt.DSpawn -> wup as Stmt
+        is Expr.As -> wup.upspawn()
+        else -> null
+    }
+}

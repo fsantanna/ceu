@@ -452,7 +452,7 @@ fun code_fe (e: Expr) {
                         }
                     }
 
-                    val (ret1,ret2) = when (e.wup) {
+                    val (ret1,ret2) = when (e.upspawn()) {
                         is Stmt.SSpawn -> Pair("${tpf.toce()}* ret_${e.n};", "ret_${e.n} = frame;")
                         is Stmt.DSpawn -> Pair("", "")
                         else           -> Pair("${tpf.out.pos()} ret_${e.n};", "ret_${e.n} = (((${tpf.toce()}*)frame)->ret);")

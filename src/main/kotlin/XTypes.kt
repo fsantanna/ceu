@@ -254,15 +254,6 @@ fun Expr.xinfTypes (inf: Type?) {
                         // Calculates type scopes {...}:
                         //  call f @[...] arg
 
-                        fun Expr.isspawn (): Boolean {
-                            val wup = this.wup
-                            return when (wup) {
-                                is Stmt.SSpawn, is Stmt.DSpawn -> true
-                                is Expr.As -> wup.isspawn()
-                                else -> false
-                            }
-                        }
-
                         this.xscps = let {
                             // scope of expected closure environment
                             //      var f: func {@LOCAL} -> ...     // f will hold env in @LOCAL
@@ -272,12 +263,12 @@ fun Expr.xinfTypes (inf: Type?) {
                                 return when (this) {
                                     is Type.Pointer -> listOf(this.xscp!!.scp1)
                                     is Type.Alias   -> this.xscps!!.map { it.scp1 }
-                                    is Type.Func    -> this.xscps.first.let { if (it==null) emptyList() else listOf(it.scp1) }
+                                    is Type.Func    -> listOf(this.xscps.first.scp1)
                                     else -> emptyList()
                                 }
                             }
 
-                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (!isspawn() && xinf is Type.Func) {
+                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (this.upspawn()==null && xinf is Type.Func) {
                                 listOf(Pair((ftp.out as Type.Func).xscps.first!!.scp1,xinf.xscps.first!!.scp1))
                             } else {
                                 emptyList()
@@ -331,7 +322,7 @@ fun Expr.xinfTypes (inf: Type?) {
                         // zip [[{@scp1a,@scp1b},{@scp2a,@scp2b}],{@a1,@b_1}]
 
                         when {
-                            this.isspawn() -> {
+                            (this.upspawn() != null) -> {
                                 Type.Active (
                                     Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
                                     this.f.wtype!!

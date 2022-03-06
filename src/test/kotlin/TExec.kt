@@ -1760,6 +1760,7 @@ class TExec {
             var t: Xask
                 set t = (task @[] -> () -> _int -> () {
                 output std (_2: _int)
+                set pub = _10:_int
             }
             :+ Xask)
             output std (_1: _int)
@@ -1770,7 +1771,7 @@ class TExec {
             output std ((x :- Xask).pub)
             output std (_3: _int)
        """.trimIndent())
-        assert(out == "()\n") { out }
+        assert(out == "1\n2\n2\n10\n3\n") { out }
     }
 
     // ALL
