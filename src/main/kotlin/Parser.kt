@@ -171,7 +171,7 @@ open class Parser
                         Expr.Pak (
                             Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
                             Expr.UCons(tk0, tp as Type.Union?, cons!!),
-                            false,
+                            null,
                             null
                         )
                     }
@@ -228,7 +228,7 @@ open class Parser
                     Expr.Pak(
                         Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
                         ret,
-                        false,
+                        null,
                         null
                     )
                 }

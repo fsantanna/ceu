@@ -9,6 +9,7 @@ import java.io.StringReader
 class TXInfer {
 
     fun all (inp: String): String {
+        INFER = true
         All_restart(null, PushbackReader(StringReader(inp), 2))
         N = 1
         Lexer.lex()
@@ -99,10 +100,24 @@ class TXInfer {
         val out = all("""
             var v = _f ()
         """.trimIndent())
+        assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
+        /*
         assert(out == """
             var v: _
             set v = ((_f: _) @[] ())
 
+        """.trimIndent()) { out }
+         */
+    }
+    @Test
+    fun a07_call2 () {
+        val out = all("""
+            var x: _int
+            set x = _abs _(-1)
+            output std x
+        """.trimIndent())
+        assert(out == """
+            TODO
         """.trimIndent()) { out }
     }
     @Test
@@ -352,8 +367,8 @@ class TXInfer {
             }
         """.trimIndent()
         )
-        //assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
-        assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
+        assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
+        //assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
     }
     @Test
     fun c06_new_return0 () {
@@ -895,10 +910,10 @@ class TXInfer {
              :+ Xask)
             output std (_1: _int)
             var x: active Xask
-            set x = spawn ((t :- Xask) @[] ())
+            set x = spawn ((t :-) @[] ())
             var y: active task @[] -> () -> _int -> ()
-            set y = spawn ((t :- Xask) @[] ())
-            output std ((x :- Xask).pub)
+            set y = spawn ((t :-) @[] ())
+            output std ((x :-).pub)
             output std (_3: _int)
             
         """.trimIndent()) { out }
@@ -915,7 +930,7 @@ class TXInfer {
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
             var xs: active {} Xask
-            spawn ((t :- Xask) @[] ()) in xs
+            spawn ((t :-) @[] ()) in xs
 
         """.trimIndent()) { out }
     }
@@ -1166,7 +1181,7 @@ class TXInfer {
             var xy: Point
             set xy = ([(_1: _int),(_2: _int)] :+ Point)
             var x: _int
-            set x = ((xy :- Point).1)
+            set x = ((xy :-).1)
             
         """.trimIndent()) { out }
     }
@@ -1186,7 +1201,7 @@ class TXInfer {
             var r: Rect
             set r = ([([(_1: _int),(_2: _int)] :+ Point),([(_1: _int),(_2: _int)] :+ Dims)] :+ Rect)
             var h: _int
-            set h = ((((r :- Rect).2) :- Dims).2)
+            set h = ((((r :-).2) :-).2)
             
         """.trimIndent()) { out }
     }
@@ -1272,7 +1287,7 @@ class TXInfer {
             }
              :+ Int2Int)
             var x: _int
-            set x = ((f :- Int2Int) @[] (_10: _int))
+            set x = ((f :-) @[] (_10: _int))
             output std x
             
         """.trimIndent()) { out }
