@@ -7,6 +7,7 @@ import java.io.File
 class TTask {
 
     fun all (inp: String): String {
+        INFER = false
         val (ok1,out1) = ce2c(null, inp)
         if (!ok1) {
             return out1

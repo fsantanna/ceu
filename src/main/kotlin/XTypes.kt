@@ -371,9 +371,6 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         }
         is Stmt.SCall -> this.e.xinfTypes(unit())
         is Stmt.SSpawn -> {
-            this.call.xinfTypes(null)
-            this.dst?.xinfTypes(this.call.wtype!!)
-            /*
             try {
                 this.dst!!.xinfTypes(null)
                 this.call.xinfTypes(this.dst!!.wtype!!)
@@ -381,8 +378,6 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.call.xinfTypes(null)
                 this.dst?.xinfTypes(this.call.wtype!!)
             }
-
-             */
         }
         is Stmt.DSpawn -> {
             this.dst.xinfTypes(null)

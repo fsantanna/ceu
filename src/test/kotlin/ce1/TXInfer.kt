@@ -897,7 +897,7 @@ class TXInfer {
              :+ Xask)
             output std (_1: _int)
             var x: active Xask
-            set x = spawn ((t :-) @[] ())
+            set x = spawn (((t :-) @[] (): @GLOBAL) :+ active Xask)
             var y: active task @[] -> () -> _int -> ()
             set y = spawn ((t :-) @[] ())
             output std ((x :-).pub)
@@ -1303,19 +1303,19 @@ return
 spawn (task @[] -> _ -> _ -> _ {
 var x: _int
 {
-var tsk_24: active task @[] -> _int -> () -> _int
-set tsk_24 = spawn (f @[] (_1: _int))
-var st_24: _int
-set st_24 = (tsk_24.state)
-if (_(${D}st_24 == TASK_AWAITING): _int)
+var tsk_25: active task @[] -> _int -> () -> _int
+set tsk_25 = spawn (f @[] (_1: _int))
+var st_25: _int
+set st_25 = (tsk_25.state)
+if (_(${D}st_25 == TASK_AWAITING): _int)
 {
-await tsk_24
+await tsk_25
 }
 else
 {
 
 }
-set x = (tsk_24.ret)
+set x = (tsk_25.ret)
 }
 output std x
 }

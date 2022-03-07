@@ -32,10 +32,10 @@ fun check_02_after_tps (s: Stmt) {
         when (e) {
             is Expr.Pak -> {
                 e.xtype?.let {
-                    val noact   = e.e.wtype!!.noact()
-                    val noalias = it.noalias()
-                    All_assert_tk(e.tk, noalias.isSupOf(noact)) {
-                        "invalid type pack : ${mismatch(noact,it)}"
+                    val dst = it.noactnoalias()
+                    val src = e.e.wtype!!.noact()
+                    All_assert_tk(e.tk, dst.isSupOf(src)) {
+                        "invalid type pack : ${mismatch(dst,src)}"
                     }
                 }
             }
@@ -121,7 +121,7 @@ fun check_02_after_tps (s: Stmt) {
             }
             is Stmt.SSpawn -> {
                 val call = s.call.wtype!!
-                All_assert_tk(s.call.tk, call is Type.Active) {
+                All_assert_tk(s.tk, call is Type.Active) {
                     "invalid `spawn` : type mismatch : expected active task : have ${call.tostr()}"
                 }
                 if (s.dst != null) {

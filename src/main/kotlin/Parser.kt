@@ -269,7 +269,16 @@ open class Parser
                 Pair(
                     if (iscps==null) null else iscps.map { Scope(it,null) },
                     if (oscp==null) null else Scope(oscp,null)
-                ))
+                )
+            )
+            if (!INFER) e else {
+                e = Expr.Pak(
+                    Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":+"),
+                    e,
+                    null,
+                    null
+                )
+            }
         }
         return e
     }
@@ -356,7 +365,7 @@ open class Parser
                         }
                         alls.accept(TK.AWAIT) -> {
                             val e = this.expr()
-                            All_assert_tk(e.tk, e is Expr.Call) { "expected task call" }
+                            All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                             val ret = All_nest(
                                 """
                                 {
@@ -436,8 +445,8 @@ open class Parser
             alls.accept(TK.CALL) -> {
                 val tk0 = alls.tk0 as Tk.Key
                 val e = this.expr()
-                All_assert_tk(tk0, e is Expr.Call) { "expected call expression" }
-                Stmt.SCall(tk0, e as Expr.Call)
+                All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
+                Stmt.SCall(tk0, e.unpak() as Expr.Call)
             }
             alls.accept(TK.SPAWN) -> {
                 val tk0 = alls.tk0 as Tk.Key

@@ -58,9 +58,9 @@ fun code_ft (tp: Type) {
     CODE.addFirst(when (tp) {
         is Type.Nat, is Type.Unit, is Type.Alias -> Code("","","","","")
         is Type.Pointer -> CODE.removeFirst()
-        is Type.Active   -> CODE.removeFirst()
-        is Type.Actives  -> CODE.removeFirst()
-        is Type.Func -> {
+        is Type.Active  -> CODE.removeFirst()
+        is Type.Actives -> CODE.removeFirst()
+        is Type.Func    -> {
             val out = CODE.removeFirst()
             val pub = if (tp.pub == null) Code("","","","","") else CODE.removeFirst()
             val inp = CODE.removeFirst()
@@ -436,6 +436,7 @@ fun code_fe (e: Expr) {
             val f    = CODE.removeFirst()
             val blks = e.xscps.first!!.map { it.toce(e) }.joinToString(",")
             val tpf  = e.f.wtype!!.noact()
+            val upspawn = e.upspawn()
             when {
                 (e.f is Expr.Var && e.f.tk_.id=="output_std") -> {
                     Code (
@@ -447,7 +448,7 @@ fun code_fe (e: Expr) {
                     )
                 }
                 (tpf is Type.Func) -> {
-                    val block = e.wup.let {
+                    val block = upspawn.let {
                         if (it is Stmt.DSpawn) {
                             "&" + (it.dst as Expr.Var).tk_.id.out_mem(e) + ".block"
                         } else {
@@ -456,7 +457,7 @@ fun code_fe (e: Expr) {
                         }
                     }
 
-                    val (ret1,ret2) = when (e.upspawn()) {
+                    val (ret1,ret2) = when (upspawn) {
                         is Stmt.SSpawn -> Pair("${tpf.toce()}* ret_${e.n};", "ret_${e.n} = frame;")
                         is Stmt.DSpawn -> Pair("", "")
                         else           -> Pair("${tpf.out.pos()} ret_${e.n};", "ret_${e.n} = (((${tpf.toce()}*)frame)->ret);")
