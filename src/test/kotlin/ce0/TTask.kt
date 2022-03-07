@@ -1107,11 +1107,11 @@ class TTask {
                         output std (_4: _int)                             
                     } @[] ())                          
             
-                    await ((evt:- Event)?2)     
+                    await ((evt:-)?2)     
                     output std (_5: _int)                  
                 } @[] ())                   
             
-                await ((evt:- Event)?2)            
+                await (evt:-?2)            
                 output std (_6: _int)                                  
             } @[] ())
             
@@ -1168,7 +1168,7 @@ class TTask {
             
             var x1: active Bird
             output std _1:_int
-            set x1 = spawn t1:-Bird ()
+            set x1 = spawn (t1:- ()) :+ active Bird
              output std _3:_int
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -1185,9 +1185,9 @@ class TTask {
             } :+ Xask
             var x : active Xask
             output std _1:_int
-            set x = spawn (t:-Xask) ()
+            set x = spawn (t:- ()) :+ active Xask
             output std _3:_int
-            output std (x:-Xask).pub
+            output std (x:-).pub
         """.trimIndent())
         assert(out == "1\n2\n3\n10\n") { out }
     }
@@ -1203,10 +1203,10 @@ class TTask {
                 await _0:_int
             } :+ Xask
             var xs: active {} Xask
-            spawn ((t:- Xask) @[] ()) in xs
+            spawn (t:- @[] ()) in xs
             var i: active Xask
             loop i in xs {
-                output std (i:-Xask).pub
+                output std (i:-).pub
             }
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -1227,10 +1227,10 @@ class TTask {
             } :+ Xask
             
             var xs: active {2} Xask
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
             output std n
         """.trimIndent())
         assert(out == "2\n") { out }
@@ -1252,10 +1252,10 @@ class TTask {
             } :+ Xask
             
             var xs: active {2} Xask
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
-            spawn ((t:- Xask) @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
+            spawn (t:- @[] ()) in xs
             output std n
         """.trimIndent())
         assert(out == "4\n") { out }

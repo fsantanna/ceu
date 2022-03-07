@@ -31,33 +31,20 @@ fun Expr.xinfTypes (inf: Type?) {
             this.xtype!!
         }
         is Expr.Pak -> {
-            val tp = this.xtype ?: inf
-            when (this.tk_.sym) {
-                ":+" -> {
-                    this.e.xinfTypes(tp?.noalias())
-                    if (tp is Type.Alias) {
-                        this.xtype = this.xtype ?: (tp.clone(this,this.tk.lin,this.tk.col) as Type.Alias)
-                    }
-                    this.xtype ?: this.e.wtype!!
-                }
-                ":-" -> {
-                    this.e.xinfTypes(tp)
-                    val alias = this.e.wtype.let { if (it is Type.Active) it.tsk else it }
-                    if (alias is Type.Alias) {
-                        this.xtype = this.xtype ?: (alias.clone(this,this.tk.lin,this.tk.col) as Type.Alias)
-                    }
-                    (this.xtype ?: this.e.wtype!!).noalias()
-                }
-                else -> error("bug found")
-            }.let { ret ->
-                this.e.wtype.let {
-                    when (it) {
-                        is Type.Active  -> Type.Active (it.tk_,ret).clone(this,this.tk.lin,this.tk.col)
-                        is Type.Actives -> Type.Actives(it.tk_,it.len,it).clone(this,this.tk.lin,this.tk.col)
-                        else -> ret
-                    }
-                }
+            //val tp = this.xtype ?: inf
+            val unpak = this.xtype!!.react_noalias(this)
+            this.e.xinfTypes(unpak)
+            if (!this.isact) this.xtype!! else {
+                Type.Active (
+                    Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
+                    this.wtype!!
+                )
             }
+            //(this.xtype ?: this.e.wtype!!)
+        }
+        is Expr.Unpak -> {
+            this.e.xinfTypes(null)
+            this.e.wtype!!.react_noalias(this)
         }
 
         is Expr.Upref -> {
@@ -172,12 +159,11 @@ fun Expr.xinfTypes (inf: Type?) {
         }
         is Expr.Field -> {
             this.tsk.xinfTypes(null)  // not possible to infer big (tuple) from small (disc)
-            this.tsk.wtype.let {
+            this.tsk.wtype!!.let {
                 All_assert_tk(this.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
-                val tsk = (it as Type.Active).tsk
-                val ftp = if (tsk is Type.Func) tsk else ((tsk as Type.Active).tsk.noalias() as Type.Func)
+                val ftp = it.noactnoalias() as Type.Func
                 when (this.tk_.id) {
                     "state" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                     "pub"   -> ftp.pub!!
@@ -238,7 +224,7 @@ fun Expr.xinfTypes (inf: Type?) {
             val nat = Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,""))
             this.f.xinfTypes(nat)    // no infer for functions, default _ for nat
 
-            this.f.wtype!!.noalias().let { ftp ->
+            this.f.wtype!!.let { ftp ->
                 when (ftp) {
                     is Type.Nat -> {
                         this.arg.xinfTypes(nat)
@@ -269,7 +255,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             }
 
                             val clo: List<Pair<Tk.Id,Tk.Id>> = if (this.upspawn()==null && xinf is Type.Func) {
-                                listOf(Pair((ftp.out as Type.Func).xscps.first!!.scp1,xinf.xscps.first!!.scp1))
+                                listOf(Pair((ftp.out as Type.Func).xscps.first.scp1,xinf.xscps.first.scp1))
                             } else {
                                 emptyList()
                             }
@@ -372,6 +358,16 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         is Stmt.SSpawn -> {
             this.call.xinfTypes(null)
             this.dst?.xinfTypes(this.call.wtype!!)
+            /*
+            try {
+                this.dst!!.xinfTypes(null)
+                this.call.xinfTypes(this.dst!!.wtype!!)
+            } catch (e: Throwable) {
+                this.call.xinfTypes(null)
+                this.dst?.xinfTypes(this.call.wtype!!)
+            }
+
+             */
         }
         is Stmt.DSpawn -> {
             this.dst.xinfTypes(null)

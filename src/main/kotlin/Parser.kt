@@ -131,7 +131,7 @@ open class Parser
                     val block = this.block()
                     Expr.Func(id, null, block)
                 }
-                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, tp)
+                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, false, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
@@ -171,6 +171,7 @@ open class Parser
                         Expr.Pak (
                             Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
                             Expr.UCons(tk0, tp as Type.Union?, cons!!),
+                            false,
                             null
                         )
                     }
@@ -227,7 +228,8 @@ open class Parser
                     Expr.Pak(
                         Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
                         ret,
-                null
+                        false,
+                        null
                     )
                 }
             }
@@ -718,11 +720,12 @@ open class Parser
         return if (!alls.accept(TK.XAS)) e else {
             val tk0 = alls.tk0 as Tk.Sym
             if (tk0.sym == ":+") {
+                val isact = alls.accept(TK.ACTIVE)
                 val type = this.type()
                 All_assert_tk(alls.tk0, type is Type.Alias) {
                     "expected alias type"
                 }
-                Expr.Pak(tk0, e, type as Type.Alias)
+                Expr.Pak(tk0, e, isact, type as Type.Alias)
             } else {
                 Expr.Unpak(tk0, e)
             }

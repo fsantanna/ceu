@@ -1023,7 +1023,7 @@ class TExec {
             var one: /List @LOCAL
             set one = new <.1 z>:</List @LOCAL>:+List: @LOCAL
             set l = new <.1 one>:</List @LOCAL>:+List: @LOCAL
-            output std l\ :- List !1
+            output std l\ :- !1
         """.trimIndent())
         assert(out == "<.1 <.0>>\n") { out }
     }
@@ -1033,7 +1033,7 @@ class TExec {
             type List = </List @LOCAL>
             var l: /List @LOCAL
             set l = <.0>: /List @LOCAL
-            output std l\ :- List !1
+            output std l\ :- !1
         """.trimIndent())
         assert(out.endsWith("(global.l)) != NULL' failed.\n")) { out }
     }
@@ -1277,7 +1277,7 @@ class TExec {
             var l2: /List @LOCAL
             set l2 = new <.1 l1>:</List @LOCAL>:+List: @LOCAL
             var t3: [(),/List @LOCAL]
-            set t3 = [(), new <.1 l2\ :-List !1>:</List @LOCAL>:+List: @LOCAL]
+            set t3 = [(), new <.1 l2\ :- !1>:</List @LOCAL>:+List: @LOCAL]
             output std l1
             output std /t3
         """.trimIndent())
@@ -1365,7 +1365,7 @@ class TExec {
                 set f = func @[]-> ()->() {
                     var pf: /List @[A] @A
                     set pf = new <.1 <.0>: /List @[A] @A>:</List @[A] @A>:+List @[A]: @A
-                    set pa\ :- List@[A] !1 = pf
+                    set pa\ :- !1 = pf
                     --output std pa
                 }
                 call f ()
@@ -1398,7 +1398,7 @@ class TExec {
             type List @[a] = </List @[a] @a>
             var f: func @[i1]->/(List @[i1])@i1->()
             set f = func@[i1]-> /(List @[i1])@i1->() {
-                set arg\ :- List@[i1] !1 = new <.1 <.0>:/(List @[i1])@i1>:</List @[i1] @i1>:+(List @[i1]): @i1
+                set arg\ :-  !1 = new <.1 <.0>:/(List @[i1])@i1>:</List @[i1] @i1>:+(List @[i1]): @i1
             }
             {
                 var x: /(List @[LOCAL]) @LOCAL
@@ -1415,8 +1415,8 @@ class TExec {
             type List @[a] = </List @[a] @a>
             var f: func @[a1,a2] -> [/(List @[a1])@a1,/(List @[a2])@a2]->()
             set f = func @[a1,a2]->[/(List @[a1])@a1,/(List @[a2])@a2]->() {
-                set arg.1\ :- List@[a1] !1 = new <.1 <.0>:/(List @[a1])@a1>:</List @[a1] @a1>:+(List @[a1]): @a1
-                set arg.2\ :- List@[a2] !1 = new <.1 <.0>:/(List @[a2])@a2>:</List @[a2] @a2>:+(List @[a2]): @a2
+                set arg.1\ :- !1 = new <.1 <.0>:/(List @[a1])@a1>:</List @[a1] @a1>:+(List @[a1]): @a1
+                set arg.2\ :- !1 = new <.1 <.0>:/(List @[a2])@a2>:</List @[a2] @a2>:+(List @[a2]): @a2
             }
             {
                 var x: /(List @[LOCAL]) @LOCAL
@@ -1433,7 +1433,7 @@ class TExec {
             type List @[a] = </List @[a] @a>
             var f: func @[i1]->/(List @[i1])@i1->()
             set f = func @[i1]->/(List @[i1])@i1->() {
-                set arg\ :- List @[i1] !1 = new <.1 <.0>:/(List @[i1])@i1>:</List @[i1] @i1>:+(List @[i1]): @i1
+                set arg\ :- !1 = new <.1 <.0>:/(List @[i1])@i1>:</List @[i1] @i1>:+(List @[i1]): @i1
             }
             {
                 var x: /(List @[LOCAL]) @LOCAL
@@ -1721,7 +1721,7 @@ class TExec {
             type Rect @[] = [Point,Dims]
             var rect: Rect
             set rect = [[(_10: _int),(_10: _int)]:+ Point,[(_5: _int),(_5: _int)]:+ Dims]:+ Rect
-            output std rect :- Rect .2 :- Dims .1
+            output std rect  :- .2 :-  .1
         """.trimIndent())
         assert(out == "5\n") { out }
     }
@@ -1736,7 +1736,7 @@ class TExec {
             } :+ Int2Int
             
             var x: _int
-            set x = f:-Int2Int _10:_int
+            set x = f:- _10:_int
             
             output std x
        """.trimIndent())
@@ -1766,10 +1766,10 @@ class TExec {
             :+ Xask)
             output std (_1: _int)
             var x: active Xask
-            set x = spawn ((t :- Xask) @[] ()) :+ Xask
+            set x = spawn ((t :- ) @[] ()) :+ active Xask
             var y: active task @[] -> () -> _int -> ()
-            set y = spawn ((t :- Xask) @[] ())
-            output std ((x :- Xask).pub)
+            set y = spawn ((t :- ) @[] ())
+            output std ((x :- ).pub)
             output std (_3: _int)
        """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
@@ -1862,7 +1862,7 @@ class TExec {
             set y = [(), new <.1 [(),<.0>: /(List @[LOCAL])@LOCAL]>:<[(),/List@[LOCAL]@LOCAL]>:+(List @[LOCAL]): @LOCAL]
             var z: [(),//(List @[LOCAL]) @LOCAL @LOCAL]
             set z = [(), /x]
-            output std z.2\\ :- List @[LOCAL] !1.2\!0
+            output std z.2\\ :- !1.2\!0
         """.trimIndent())
         assert(out == "()\n") { out }
     }

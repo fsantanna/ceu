@@ -31,23 +31,17 @@ fun check_02_after_tps (s: Stmt) {
     fun fe (e: Expr) {
         when (e) {
             is Expr.Pak -> {
-                //val def = e.env(e.type.tk_.id) as Stmt.Typedef
-                e.xtype.let {
-                    if (it != null) {
-                        val noact = e.e.wtype!!.noact()
-                        val okalias = it
-                        val noalias = it.noalias()
-                        val (sup,sub) = when (e.tk_.sym) {
-                            ":+" -> Pair(noalias, noact)    // () :+ Unit
-                            ":-" -> Pair(noact, okalias)    // Unit :- ()
-                            else -> error("bug found")
-                        }
-                        All_assert_tk(e.tk, sup.isSupOf(sub)) {
-                            //println(sup.tostr())
-                            //println(sub.tostr())
-                            "invalid type cast : ${mismatch(noact,it)}"
-                        }
+                e.xtype!!.let {
+                    val noact   = e.e.wtype!!.noact()
+                    val noalias = it.noalias()
+                    All_assert_tk(e.tk, noalias.isSupOf(noact)) {
+                        "invalid type pack : ${mismatch(noact,it)}"
                     }
+                }
+            }
+            is Expr.Unpak -> {
+                All_assert_tk(e.tk, e.e.wtype?.noact() is Type.Alias) {
+                    "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
             }
             is Expr.UCons -> {

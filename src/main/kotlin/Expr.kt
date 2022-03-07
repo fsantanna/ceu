@@ -44,14 +44,14 @@ fun Expr.toBaseVar (): Expr.Var? {
 }
 
 fun Expr.unpak (): Expr {
-    return if (this !is Expr.Unpak) this else this.e.unpak()
+    return if (this !is Expr.Pak) this else this.e.unpak()
 }
 
 fun Expr.upspawn (): Stmt? {
     val wup = this.wup
     return when (wup) {
         is Stmt.SSpawn, is Stmt.DSpawn -> wup as Stmt
-        is Expr.Unpak -> wup.upspawn()
+        is Expr.Pak -> wup.upspawn()
         else -> null
     }
 }
