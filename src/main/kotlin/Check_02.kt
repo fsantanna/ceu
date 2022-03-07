@@ -30,7 +30,7 @@ fun check_02_after_tps (s: Stmt) {
 
     fun fe (e: Expr) {
         when (e) {
-            is Expr.As -> {
+            is Expr.Pak -> {
                 //val def = e.env(e.type.tk_.id) as Stmt.Typedef
                 e.xtype.let {
                     if (it != null) {
@@ -59,7 +59,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New -> {
-                All_assert_tk(e.tk, ((e.arg as Expr.As).xtype!! as Type.Alias).xisrec) {
+                All_assert_tk(e.tk, ((e.arg as Expr.Pak).xtype!! as Type.Alias).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
@@ -151,7 +151,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
                 val dst = (s.dst.wtype!! as Type.Actives).tsk
                 //println("invalid `spawn` : type mismatch : ${dst.tostr()} = ${call.tostr()}")
-                val alias = if (call.f !is Expr.As) ftp else call.f.e.wtype!!
+                val alias = if (call.f !is Expr.Pak) ftp else call.f.e.wtype!!
                 All_assert_tk(s.tk, dst.isSupOf(alias)) {
                     "invalid `spawn` : ${mismatch(dst,alias)}"
                 }

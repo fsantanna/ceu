@@ -30,7 +30,7 @@ fun Expr.xinfTypes (inf: Type?) {
             this.xtype = this.xtype ?: inf!!.clone(this,this.tk.lin,this.tk.col)
             this.xtype!!
         }
-        is Expr.As -> {
+        is Expr.Pak -> {
             val tp = this.xtype ?: inf
             when (this.tk_.sym) {
                 ":+" -> {

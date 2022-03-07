@@ -131,7 +131,7 @@ open class Parser
                     val block = this.block()
                     Expr.Func(id, null, block)
                 }
-                Expr.As(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, tp)
+                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
@@ -168,7 +168,7 @@ open class Parser
                     (tp != null)   -> Expr.UCons(tk0, tp as Type.Union?, cons!!)
                     else -> {
                         assert(INFER)
-                        Expr.As (
+                        Expr.Pak (
                             Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
                             Expr.UCons(tk0, tp as Type.Union?, cons!!),
                             null
@@ -179,7 +179,7 @@ open class Parser
             alls.accept(TK.NEW) -> {
                 val tk0 = alls.tk0
                 val e = this.expr()
-                all().assert_tk(tk0, e is Expr.As || (e is Expr.UCons && e.tk_.num!=0)) {
+                all().assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons && e.tk_.num!=0)) {
                     "invalid `new` : expected constructor"
                 }
 
@@ -224,7 +224,7 @@ open class Parser
                 alls.accept_err(TK.CHAR, ']')
                 val ret = Expr.TCons(tk0, es)
                 if (!INFER) ret else {
-                    Expr.As(
+                    Expr.Pak(
                         Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
                         ret,
                 null
@@ -260,8 +260,8 @@ open class Parser
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
-                if (e is Expr.As || !INFER) e else {
-                    Expr.As(
+                if (e is Expr.Pak || !INFER) e else {
+                    Expr.Pak(
                         Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":-"),
                         e,
                     null
@@ -725,7 +725,7 @@ open class Parser
             All_assert_tk(alls.tk0, type is Type.Alias) {
                 "expected alias type"
             }
-            Expr.As(tk0, e, type as Type.Alias)
+            Expr.Pak(tk0, e, type as Type.Alias)
         }
     }
 
@@ -778,7 +778,7 @@ open class Parser
                     (chr.chr == '!') -> Expr.UDisc(num!!, e)
                     (chr.chr == '.') -> {
                         val xas = if (!INFER) e else {
-                            Expr.As(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e,null)
+                            Expr.Pak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e,null)
                         }
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, xas)
