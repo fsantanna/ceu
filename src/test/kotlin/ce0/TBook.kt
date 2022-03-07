@@ -1,3 +1,9 @@
+package ce0
+
+import D
+import VALGRIND
+import ce2c
+import exec
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
@@ -366,7 +372,7 @@ class TBook {
             var multiply: func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
             set multiply = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
                 if arg.1\?0 {
-                    set ret = <.0>:${NumR1}
+                    set ret = <.0>:$NumR1
                 } else {
                     set ret = mul @[r1,a1,b1] [arg.1,arg.2]: @r1
                 }
@@ -648,9 +654,9 @@ class TBook {
             set leap = func @[a1] -> $NumA1 -> $B {
                 var mod4: $NumTL
                 set mod4 = mod @[LOCAL,a1,GLOBAL] [arg,four]
-                var mod100: ${NumTL}
+                var mod100: $NumTL
                 set mod100 = mod @[LOCAL,a1,GLOBAL] [arg,n100]
-                var mod400: ${NumTL}
+                var mod400: $NumTL
                 set mod400 = mod @[LOCAL,a1,GLOBAL] [arg,n400]
                 set ret = or [ntob mod4\?0, and [ntob mod100\?1, ntob mod400\?0]]
             }

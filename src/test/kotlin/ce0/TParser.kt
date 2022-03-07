@@ -1,3 +1,17 @@
+package ce0
+
+import All_restart
+import Attr
+import D
+import Expr
+import Lexer
+import Parser
+import Stmt
+import TK
+import Tk
+import Type
+import dump
+import noas
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -887,7 +901,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("active {} task @[]->()->()->()"), 2))
         Lexer.lex()
         val tp = Parser().type()
-        assert(tp is Type.Actives && tp.tsk.tk.enu==TK.TASK && (tp.tsk as Type.Func).xscps.first.scp1.id=="LOCAL")
+        assert(tp is Type.Actives && tp.tsk.tk.enu== TK.TASK && (tp.tsk as Type.Func).xscps.first.scp1.id=="LOCAL")
     }
 
     // TYPEDEF

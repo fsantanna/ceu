@@ -1,6 +1,13 @@
+package ce1
+
+import All_restart
+import Lexer
+import Parser
+import Stmt
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import tostr
 import java.io.PushbackReader
 import java.io.StringReader
 

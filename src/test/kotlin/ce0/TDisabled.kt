@@ -1,7 +1,24 @@
+package ce0
+
+import All_restart
+import Lexer
+import Parser
+import THROW
+import TK
+import Type
+import check_00_after_envs
+import check_01_before_tps
+import check_02_after_tps
+import isSupOf
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import setEnvs
+import setScp1s
+import setScp2s
+import setUps
+import visit
 import java.io.PushbackReader
 import java.io.StringReader
 
@@ -657,7 +674,7 @@ class TDisabled {
         All_restart(null, PushbackReader(StringReader("task @LOCAL->@[]->()->()->() {}"), 2))
         Lexer.lex()
         val tp = Parser().type()
-        assert(tp is Type.Func && tp.tk.enu==TK.TASK)
+        assert(tp is Type.Func && tp.tk.enu== TK.TASK)
     }
     @Test
     fun noclo_d09_tasks () { // task @LOCAL->@[]->()->()->() {}
@@ -949,19 +966,19 @@ class TDisabled {
     fun ch_01_04_addc_pg12() {
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
             -- 34
-            var plusc : func @[a1]-> $NumA1 -> (func @a1->@[r1,b1]->$NumB1->$NumR1)
-            set plusc = func @[a1]-> $NumA1 -> (func @a1->@[r1,b1]->$NumB1->$NumR1) {
-                var x: $NumA1
+            var plusc : func @[a1]-> $getNumA1 -> (func @a1->@[r1,b1]->$getNumB1->$getNumR1)
+            set plusc = func @[a1]-> $getNumA1 -> (func @a1->@[r1,b1]->$getNumB1->$getNumR1) {
+                var x: $getNumA1
                 set x = arg
-                set ret = func @a1->@[r1,b1]->$NumB1->$NumR1 [x] {
+                set ret = func @a1->@[r1,b1]->$getNumB1->$getNumR1 [x] {
                     set ret = add @[r1,a1,b1] [x,arg]: @r1
                 }
             }
-            var f: func @LOCAL->@[r1,b1]->$NumB1->$NumR1
+            var f: func @LOCAL->@[r1,b1]->$getNumB1->$getNumR1
             set f = plusc @[LOCAL] one
             output std f @[LOCAL,LOCAL] two: @LOCAL
             output std f @[LOCAL,LOCAL] one: @LOCAL
@@ -975,23 +992,23 @@ class TDisabled {
     fun ch_01_04_quad_pg12() {
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
-            $mul
-            var square: func @[r1,a1]-> $NumA1 -> $NumR1
-            set square = func @[r1,a1]-> $NumA1 -> $NumR1 {
+            $X.mul
+            var square: func @[r1,a1]-> $getNumA1 -> $getNumR1
+            set square = func @[r1,a1]-> $getNumA1 -> $getNumR1 {
                 set ret = mul @[r1,a1,a1] [arg,arg]: @r1
             }
-            var twicec:  func @[] -> (func @[r1,a1]->$NumA1->$NumR1) -> (func @GLOBAL->@[s1,b1]->$NumB1->$NumS1)
-            set twicec = func @[] -> (func @[r1,a1]->$NumA1->$NumR1) -> (func @GLOBAL->@[s1,b1]->$NumB1->$NumS1) {
-                var f: func @[r1,a1]->$NumA1->$NumR1
+            var twicec:  func @[] -> (func @[r1,a1]->$getNumA1->$getNumR1) -> (func @GLOBAL->@[s1,b1]->$getNumB1->$getNumS1)
+            set twicec = func @[] -> (func @[r1,a1]->$getNumA1->$getNumR1) -> (func @GLOBAL->@[s1,b1]->$getNumB1->$getNumS1) {
+                var f: func @[r1,a1]->$getNumA1->$getNumR1
                 set f = arg
-                set ret = func @GLOBAL->@[s1,b1]->$NumB1->$NumS1 [f] {
+                set ret = func @GLOBAL->@[s1,b1]->$getNumB1->$getNumS1 [f] {
                     set ret = f @[s1,s1] (f @[s1,b1] arg)
                 }
             }
-            var quad: func @GLOBAL->@[s1,b1]->$NumB1->$NumS1
+            var quad: func @GLOBAL->@[s1,b1]->$getNumB1->$getNumS1
             set quad = twicec square
             output std quad @[LOCAL,LOCAL] two
         """.trimIndent()
@@ -1001,25 +1018,25 @@ class TDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_curry_pg13() {
-        val fadd = "func @[r1,a1,b1] -> [$NumA1,$NumB1] -> $NumR1"
-        val ret2 = "func @a1->@[r1,b1]->$NumB1->$NumR1"
-        val ret1 = "func @GLOBAL -> @[a1] -> $NumA1 -> $ret2"
+        val fadd = "func @[r1,a1,b1] -> [$getNumA1,$getNumB1] -> $getNumR1"
+        val ret2 = "func @a1->@[r1,b1]->$getNumB1->$getNumR1"
+        val ret1 = "func @GLOBAL -> @[a1] -> $getNumA1 -> $ret2"
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
             var curry: func @[] -> $fadd -> $ret1
             set curry = func @[] -> $fadd -> $ret1 {
                 var f: $fadd
                 set f = arg
                 set ret = $ret1 [f] {
-                    var x: $NumA1
+                    var x: $getNumA1
                     set x = arg
                     var ff: $fadd
                     set ff = f
                     set ret = $ret2 [ff,x] {
-                        var y: $NumB1
+                        var y: $getNumB1
                         set y = arg
                         set ret = ff @[r1,a1,b1] [x,y]: @r1
                     }
@@ -1035,14 +1052,14 @@ class TDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_uncurry_pg13() {
-        val fadd  = "func @[r1,a1,b1] -> [$NumA1,$NumB1] -> $NumR1"
-        val fadd2 = "func @GLOBAL -> @[r1,a1,b1] -> [$NumA1,$NumB1] -> $NumR1"
-        val ret2  = "func @a1->@[r1,b1]->$NumB1->$NumR1"
-        val ret1  = "func @GLOBAL -> @[a1] -> $NumA1 -> $ret2"
+        val fadd  = "func @[r1,a1,b1] -> [$getNumA1,$getNumB1] -> $getNumR1"
+        val fadd2 = "func @GLOBAL -> @[r1,a1,b1] -> [$getNumA1,$getNumB1] -> $getNumR1"
+        val ret2  = "func @a1->@[r1,b1]->$getNumB1->$getNumR1"
+        val ret1  = "func @GLOBAL -> @[a1] -> $getNumA1 -> $ret2"
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
 
             var curry: func @[] -> $fadd -> $ret1
@@ -1050,12 +1067,12 @@ class TDisabled {
                 var f: $fadd
                 set f = arg
                 set ret = $ret1 [f] {
-                    var x: $NumA1
+                    var x: $getNumA1
                     set x = arg
                     var ff: $fadd
                     set ff = f
                     set ret = $ret2 [ff,x] {
-                        var y: $NumB1
+                        var y: $getNumB1
                         set y = arg
                         set ret = ff @[r1,a1,b1] [x,y]: @r1
                     }
@@ -1085,16 +1102,16 @@ class TDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_composition_pg15() {
-        val T = "func @[r1,a1] -> $NumA1 -> $NumR1"
-        val S = "func @GLOBAL -> @[r1,a1] -> $NumA1 -> $NumR1"
+        val T = "func @[r1,a1] -> $getNumA1 -> $getNumR1"
+        val S = "func @GLOBAL -> @[r1,a1] -> $getNumA1 -> $getNumR1"
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
 
             var inc: $T
-            set inc = func @[r1,a1]-> $NumA1 -> $NumR1 {
+            set inc = func @[r1,a1]-> $getNumA1 -> $getNumR1 {
                 set ret = add @[r1,GLOBAL,a1] [one,arg]: @r1
             }
             output std inc @[LOCAL,LOCAL] two
@@ -1106,7 +1123,7 @@ class TDisabled {
                 var g: $T
                 set g = arg.2
                 set ret = $S [f,g] {
-                    var v: $NumTL
+                    var v: $getNumTL
                     set v = f @[LOCAL,a1] arg: @LOCAL
                     set ret = g @[r1,LOCAL] v: @r1
                 }
@@ -1121,13 +1138,13 @@ class TDisabled {
     fun ch_01_04_currying_pg11() {
         val out = all(
             """
-            $nums
-            $lt
-            var smallerc:  func @[r1]-> $NumR1 -> (func @r1->@[]-> $NumR1->$NumR1)
-            set smallerc = func @[r1]-> $NumR1 -> (func @r1->@[]-> $NumR1->$NumR1) {
-                var x: $NumR1
+            $X.nums
+            $X.lt
+            var smallerc:  func @[r1]-> $getNumR1 -> (func @r1->@[]-> $getNumR1->$getNumR1)
+            set smallerc = func @[r1]-> $getNumR1 -> (func @r1->@[]-> $getNumR1->$getNumR1) {
+                var x: $getNumR1
                 set x = arg
-                set ret = func @r1->@[]-> $NumR1->$NumR1 [x] {
+                set ret = func @r1->@[]-> $getNumR1->$getNumR1 [x] {
                     if (lt @[r1,r1] [x,arg]) {
                         set ret = x
                     } else {
@@ -1135,7 +1152,7 @@ class TDisabled {
                     }
                 }
             }
-            var f: func @LOCAL->@[]-> $NumTL -> $NumTL
+            var f: func @LOCAL->@[]-> $getNumTL -> $getNumTL
             set f = smallerc @[LOCAL] two: @LOCAL   -- smallerc could keep two in memory as long as smallerc does not live longer than two
             output std f one
             output std f three

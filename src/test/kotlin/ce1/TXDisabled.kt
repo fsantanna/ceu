@@ -1,10 +1,13 @@
+package ce1
+
+import VALGRIND
+import ce2c
+import exec
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
-import java.io.PushbackReader
-import java.io.StringReader
 
 @Disabled
 @TestMethodOrder(Alphanumeric::class)
@@ -509,11 +512,11 @@ class TXDisabled {
     @Test
     fun ch_01_04_addc_pg12() {
         val out = all("""
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
             -- 25
-            var plusc = func $NumA1 -> (func @a1->$Num->$Num) {
+            var plusc = func $getNumA1 -> (func @a1->$Num->$Num) {
                 var x = arg
                 return func @a1->$Num->$Num {
                     return add [x,arg]
@@ -532,10 +535,10 @@ class TXDisabled {
     fun ch_01_04_quad_pg12() {
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
-            $mul
+            $X.mul
             var square: func $Num -> $Num
             set square = func $Num -> $Num {
                 return mul [arg,arg]
@@ -557,12 +560,12 @@ class TXDisabled {
     fun ch_01_04_curry_pg13() {
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
-            var curry = func (func [$Num,$Num] -> $Num) -> (func @GLOBAL -> $NumA1 -> (func @a1->$Num->$Num)) {
+            var curry = func (func [$Num,$Num] -> $Num) -> (func @GLOBAL -> $getNumA1 -> (func @a1->$Num->$Num)) {
                 var f = arg
-                return func @GLOBAL -> $NumA1 -> (func @a1->$Num->$Num) {
+                return func @GLOBAL -> $getNumA1 -> (func @a1->$Num->$Num) {
                     var x = arg
                     var ff = f
                     return func @a1->$Num->$Num {
@@ -596,8 +599,8 @@ class TXDisabled {
     fun ch_01_04_composition_pg15() {
         val out = all(
             """
-            $nums
-            $clone
+            $X.nums
+            $X.clone
             $add
             
             var inc = func $Num -> $Num {
@@ -623,11 +626,11 @@ class TXDisabled {
     fun ch_01_04_currying_pg11() {
         val out = all(
             """
-            $nums
-            $clone
-            $lt
+            $X.nums
+            $X.clone
+            $X.lt
             -- 19
-            var smallerc = func $NumA1 -> (func @a1 -> $Num->$Num) {
+            var smallerc = func $getNumA1 -> (func @a1 -> $Num->$Num) {
                 var x = arg
                 return func @a1 -> $Num -> $Num {
                     if (lt [x,arg]) {
