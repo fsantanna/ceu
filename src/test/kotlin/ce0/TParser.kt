@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -7,6 +8,13 @@ import java.io.StringReader
 @TestMethodOrder(Alphanumeric::class)
 class TParser {
 
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        internal fun setup () {
+            INFER = false
+        }
+    }
     // TYPE
 
     @Test

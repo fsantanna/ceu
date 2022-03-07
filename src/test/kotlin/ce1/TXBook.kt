@@ -126,6 +126,8 @@ private val lte = """
 class TXBook {
 
     fun all (inp: String): String {
+        INFER = true
+
         println("nums:  ${nums.count  { it == '\n' }}")
         println("clone: ${clone.count { it == '\n' }}")
         println("add:   ${add.count   { it == '\n' }}")

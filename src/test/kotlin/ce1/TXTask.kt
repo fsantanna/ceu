@@ -8,6 +8,7 @@ import java.io.File
 class TXTask {
 
     fun all (inp: String): String {
+        INFER = true
         val (ok1,out1) = ce2c(null, inp)
         if (!ok1) {
             return out1
