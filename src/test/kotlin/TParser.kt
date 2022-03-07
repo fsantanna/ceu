@@ -267,7 +267,7 @@ class TParser {
     fun b06_parser_expr_tuple () {
         All_restart(null, PushbackReader(StringReader("[(),x,()]"), 2))
         Lexer.lex()
-        val e = (Parser().expr() as Expr.As).e
+        val e = Parser().expr()
         assert(e is Expr.TCons && e.arg.size==3 && e.arg[0] is Expr.Unit && e.arg[1] is Expr.Var && (e.arg[1].tk as Tk.Id).id=="x")
     }
     @Test
@@ -404,7 +404,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("<.2 <.1 [(),()]>:<()>>:<()>"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.UCons && e.tk_.num==2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.As)
+        assert(e is Expr.UCons && e.tk_.num==2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
     }
 
     // INDEX

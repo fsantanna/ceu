@@ -8,6 +8,7 @@ import java.io.StringReader
 class TEnv {
 
     fun inp2env (inp: String): String {
+        INFER = false
         All_restart(null, PushbackReader(StringReader(inp), 2))
         Lexer.lex()
         try {
@@ -2577,6 +2578,15 @@ class TEnv {
             type Xask = task ()->()->()
             var t = Xask {}
             var y = spawn t ()
+        """.trimIndent())
+        assert(out == "(ln 3, col 15): invalid call : not a function") { out }
+    }
+    @Test
+    fun s08_task_type () {
+        val out = inp2env("""
+            type Xask = task ()->()->()
+            var t = Xask {}
+            var y = spawn (t:-Xask) ()
         """.trimIndent())
         assert(out == "OK") { out }
     }
