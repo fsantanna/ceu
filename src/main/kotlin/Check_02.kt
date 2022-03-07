@@ -59,7 +59,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New -> {
-                All_assert_tk(e.tk, (e.arg as Expr.As).xtype!!.xisrec) {
+                All_assert_tk(e.tk, ((e.arg as Expr.As).xtype!! as Type.Alias).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
@@ -70,8 +70,8 @@ fun check_02_after_tps (s: Stmt) {
                 val arg1 = e.arg.wtype!!
 
                 val (scp1s,inp1,out1) = when (func) {
-                    is Type.Func   -> Triple(Pair(func.xscps.second!!,func.xscps.third!!),func.inp,func.out)
-                    is Type.Nat    -> Triple(Pair(emptyList(),emptyList()),func,func)
+                    is Type.Func -> Triple(Pair(func.xscps.second!!,func.xscps.third!!),func.inp,func.out)
+                    is Type.Nat  -> Triple(Pair(emptyList(),emptyList()),func,func)
                     else -> error("impossible case")
                 }
 
@@ -128,7 +128,7 @@ fun check_02_after_tps (s: Stmt) {
             is Stmt.SSpawn -> {
                 val call = s.call.wtype!!
                 All_assert_tk(s.call.tk, call is Type.Active) {
-                    "invalid `spawn` : type mismatch : expected task : have ${call.tostr()}"
+                    "invalid `spawn` : type mismatch : expected active task : have ${call.tostr()}"
                 }
                 if (s.dst != null) {
                     val dst = s.dst.wtype

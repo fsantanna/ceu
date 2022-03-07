@@ -166,11 +166,14 @@ open class Parser
                 when {
                     (tk0.num == 0) -> Expr.UNull(tk0, tp as Type.Pointer?)
                     (tp != null)   -> Expr.UCons(tk0, tp as Type.Union?, cons!!)
-                    else -> Expr.As (
-                        Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
-                        Expr.UCons(tk0, tp as Type.Union?, cons!!),
-                        null
-                    )
+                    else -> {
+                        assert(INFER)
+                        Expr.As (
+                            Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
+                            Expr.UCons(tk0, tp as Type.Union?, cons!!),
+                            null
+                        )
+                    }
                 }
             }
             alls.accept(TK.NEW) -> {
@@ -219,11 +222,14 @@ open class Parser
                     es.add(e2)
                 }
                 alls.accept_err(TK.CHAR, ']')
-                Expr.As (
-                    Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
-                    Expr.TCons(tk0, es),
-                    null
-                )
+                val ret = Expr.TCons(tk0, es)
+                if (!INFER) ret else {
+                    Expr.As(
+                        Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
+                        ret,
+                null
+                    )
+                }
             }
             alls.check(TK.TASK) || alls.check(TK.FUNC) -> {
                 val tk = alls.tk1 as Tk.Key
@@ -254,7 +260,7 @@ open class Parser
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
-                if (e is Expr.As) e else {
+                if (e is Expr.As || !INFER) e else {
                     Expr.As(
                         Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":-"),
                         e,
@@ -771,24 +777,13 @@ open class Parser
                     (chr.chr == '?') -> Expr.UPred(num!!, e)
                     (chr.chr == '!') -> Expr.UDisc(num!!, e)
                     (chr.chr == '.') -> {
+                        val xas = if (!INFER) e else {
+                            Expr.As(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e,null)
+                        }
                         if (alls.tk0.enu == TK.XID) {
-                            Expr.Field (
-                                alls.tk0 as Tk.Id,
-                                Expr.As (
-                                    Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"),
-                                    e,
-                                    null
-                                )
-                            )
+                            Expr.Field(alls.tk0 as Tk.Id, xas)
                         } else {
-                            Expr.TDisc (
-                                num!!,
-                                Expr.As (
-                                    Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"),
-                                    e,
-                                    null
-                                )
-                            )
+                            Expr.TDisc(num!!, xas)
                         }
                     }
                     else -> error("impossible case")

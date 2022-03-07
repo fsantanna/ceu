@@ -15,11 +15,12 @@ fun Type.flattenLeft (): List<Type> {
     // TODO: func/union do not make sense?
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Alias -> listOf(this)
-        is Type.Tuple -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Union -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Func  -> listOf(this) //this.inp.flatten() + this.out.flatten()
-        is Type.Active, is Type.Actives -> TODO()
-        is Type.Pointer   -> listOf(this) + this.pln.flattenLeft()
+        is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
+        is Type.Union   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
+        is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
+        is Type.Active  -> listOf(this) + this.tsk.flattenLeft()
+        is Type.Actives -> listOf(this) + this.tsk.flattenLeft()
+        is Type.Pointer -> listOf(this) + this.pln.flattenLeft()
     }
 }
 

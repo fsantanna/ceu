@@ -2,6 +2,7 @@ import java.io.PushbackReader
 import java.io.StringReader
 import java.lang.AssertionError
 
+var INFER = false
 val THROW = false
 var LINES = false
 
