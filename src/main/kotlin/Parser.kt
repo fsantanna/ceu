@@ -260,12 +260,8 @@ open class Parser
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
-                if (e is Expr.Pak || !INFER) e else {
-                    Expr.Pak(
-                        Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":-"),
-                        e,
-                    null
-                    )
+                if (e is Expr.Unpak || !INFER) e else {
+                    Expr.Unpak(Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"), e)
                 },
                 arg,
                 Pair(
