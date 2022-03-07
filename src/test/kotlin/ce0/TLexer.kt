@@ -1,16 +1,3 @@
-package ce0
-
-import All
-import All_restart
-import Lexer
-import TK
-import Tk
-import all
-import alls
-import asscopecst
-import asscopepar
-import isscopecst
-import isscopepar
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder

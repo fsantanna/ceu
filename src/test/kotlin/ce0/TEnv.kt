@@ -1,22 +1,6 @@
-package ce0
-
-import All_restart
-import INFER
-import Lexer
-import Parser
-import THROW
-import check_00_after_envs
-import check_01_before_tps
-import check_02_after_tps
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import setEnvs
-import setScp1s
-import setScp2s
-import setUps
-import xinfScp1s
-import xinfTypes
 import java.io.PushbackReader
 import java.io.StringReader
 
@@ -2191,7 +2175,7 @@ class TEnv {
             type Unit @[] = ()
             var x: Unit
             var y: ()
-            set y = x:- Unit
+            set y = x:-
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2539,15 +2523,15 @@ class TEnv {
             type Tx = [()]
             output std ():+Tx
         """.trimIndent())
-        assert(out.contains("(ln 2, col 14): invalid type cast : type mismatch :")) { out }
+        assert(out.contains("(ln 2, col 14): invalid type pack : type mismatch :")) { out }
     }
     @Test
     fun s03_err () {
         val out = inp2env("""
             type Tx = [()]
-            output std ():-Tx
+            output std ():-
         """.trimIndent())
-        assert(out.contains("(ln 2, col 14): invalid type cast : type mismatch :")) { out }
+        assert(out == "(ln 2, col 14): invalid type unpack : expected type alias : found ()") { out }
     }
     @Test
     fun s04_union () {
@@ -2556,7 +2540,7 @@ class TEnv {
             var t: Tx
             set t = <.1 ()>:<()> :+ Tx
             var u: <()>
-            set u = t:- Tx
+            set u = t:-
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -2581,7 +2565,7 @@ class TEnv {
             } :+ Int2Int
             
             var x: _int
-            set x = f:-Int2Int _10:_int
+            set x = f:- _10:_int
             
             output std x
        """.trimIndent())
@@ -2602,7 +2586,7 @@ class TEnv {
         val out = inp2env("""
             type Xask = task ()->()->()
             var t = Xask {}
-            var y = spawn (t:-Xask) ()
+            var y = spawn (t:-) ()
         """.trimIndent())
         assert(out == "OK") { out }
     }

@@ -1,24 +1,7 @@
-package ce1
-
-import All_restart
-import D
-import Lexer
-import N
-import Parser
-import THROW
-import check_00_after_envs
-import check_01_before_tps
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import setEnvs
-import setScp1s
-import setScp2s
-import setUps
-import tostr
-import xinfScp1s
-import xinfTypes
 import java.io.PushbackReader
 import java.io.StringReader
 

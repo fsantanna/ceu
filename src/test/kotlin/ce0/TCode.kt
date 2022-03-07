@@ -1,22 +1,8 @@
-package ce0
-
-import CODE
-import Expr
-import LINES
-import Stmt
-import TK
-import Tk
-import Type
-import code
-import code_fe
-import code_fs
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import toce
-import visit
 
 @TestMethodOrder(Alphanumeric::class)
 class TCode {
