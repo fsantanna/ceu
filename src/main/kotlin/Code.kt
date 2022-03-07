@@ -356,10 +356,14 @@ fun code_fe (e: Expr) {
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
         is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk_.num) }
-        is Expr.Pak    -> {
-            val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
+        is Expr.Pak   -> {
+            val tp = CODE.removeFirst()
             val e  = CODE.removeFirst()
             Code(tp.type+e.type, tp.struct+e.struct, tp.func+e.func, tp.stmt+e.stmt, tp.expr+e.expr)
+        }
+        is Expr.Unpak -> {
+            val e = CODE.removeFirst()
+            Code(e.type, e.struct, e.func, e.stmt, e.expr)
         }
         is Expr.Field -> CODE.removeFirst().let {
             val src = when (e.tk_.id) {

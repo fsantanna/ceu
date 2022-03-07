@@ -1,17 +1,3 @@
-package ce0
-
-import All_restart
-import Attr
-import D
-import Expr
-import Lexer
-import Parser
-import Stmt
-import TK
-import Tk
-import Type
-import dump
-import noas
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -325,28 +311,28 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.Call && e.f.noas() is Expr.Var && (e.f.noas().tk as Tk.Id).id=="xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.Id).id=="xxx" && e.arg is Expr.Unit)
     }
     @Test
     fun b10_parser_expr_call () {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.Call && e.f.noas() is Expr.Var && (e.f.noas().tk as Tk.Id).id=="xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.Id).id=="xxx" && e.arg is Expr.Unit)
     }
     @Test
     fun b10_parser_expr_call_err () {
         All_restart(null, PushbackReader(StringReader("() ()"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.Call && e.f.noas() is Expr.Unit && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Unit && e.arg is Expr.Unit)
     }
     @Test
     fun b11_parser_expr_call () {
         All_restart(null, PushbackReader(StringReader("f ()\n()\n()"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.Call && e.f.noas() is Expr.Var && e.arg is Expr.Call && (e.arg as Expr.Call).f.noas() is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && e.arg is Expr.Call && (e.arg as Expr.Call).f is Expr.Unit)
     }
     @Test
     fun b12_parser_expr_call () {
@@ -428,7 +414,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup.noas() is Expr.Var)
+        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup is Expr.Var)
     }
     @Test
     fun b19_parser_expr_index () {
@@ -463,7 +449,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x\\.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tup.noas() is Expr.Dnref && (e.tup.noas() as Expr.Dnref).ptr is Expr.Var)
+        assert(e is Expr.TDisc && e.tup is Expr.Dnref && (e.tup as Expr.Dnref).ptr is Expr.Var)
     }
     @Test
     fun b24_parser_expr_dnref () {
@@ -505,14 +491,14 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.10"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==10 && e.tup.noas() is Expr.Var)
+        assert(e is Expr.TDisc && e.tk_.num==10 && e.tup is Expr.Var)
     }
     @Test
     fun b28_parser_expr_disc () {
         All_restart(null, PushbackReader(StringReader("arg.1\\!1.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup.noas() is Expr.UDisc)
+        assert(e is Expr.TDisc && e.tk_.num==1 && e.tup is Expr.UDisc)
     }
 
     // ATTR
@@ -602,21 +588,21 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("call f ()"), 2))
         Lexer.lex()
         val s = Parser().stmt()
-        assert(s is Stmt.SCall && s.e.f.noas() is Expr.Var && s.e.arg is Expr.Unit)
+        assert(s is Stmt.SCall && s.e.f is Expr.Var && s.e.arg is Expr.Unit)
     }
     @Test
     fun c06_parser_stmt_call () {
         All_restart(null, PushbackReader(StringReader("call f ()"), 2))
         Lexer.lex()
         val s = Parser().stmt()
-        assert(s is Stmt.SCall && s.e.f.noas() is Expr.Var && s.e.arg is Expr.Unit)
+        assert(s is Stmt.SCall && s.e.f is Expr.Var && s.e.arg is Expr.Unit)
     }
     @Test
     fun c07_parser_stmt_call () {
         All_restart(null, PushbackReader(StringReader("call _printf:func@[]->()->() ()"), 2))
         Lexer.lex()
         val s = Parser().stmt()
-        assert(s is Stmt.SCall && s.e.f.noas() is Expr.Nat && s.e.arg is Expr.Unit)
+        assert(s is Stmt.SCall && s.e.f is Expr.Nat && s.e.arg is Expr.Unit)
     }
     @Test
     fun c07_parser_stmt_output () {
@@ -651,10 +637,10 @@ class TParser {
         Lexer.lex()
         val s = Parser().stmts()
         assert (
-            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.noas().tk as Tk.Id).id=="g" &&
+            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.tk as Tk.Id).id=="g" &&
             (s.s1 as Stmt.Seq).let {
                 it.s1 is Stmt.SCall && (it.s1 as Stmt.SCall).let {
-                    it.e.f.noas() is Expr.Var && (it.e.f.noas().tk as Tk.Id).id=="f"
+                    it.e.f is Expr.Var && (it.e.f.tk as Tk.Id).id=="f"
                 }
             }
         )
@@ -827,7 +813,7 @@ class TParser {
         Lexer.lex()
         val s = Parser().stmt()
         println(s.dump())
-        assert(s is Stmt.SSpawn && (s.call.noas() as Expr.Call).f.noas() is Expr.Var && s.dst is Expr.Var)
+        assert(s is Stmt.SSpawn && (s.call as Expr.Call).f is Expr.Var && s.dst is Expr.Var)
     }
 
     // LOOP

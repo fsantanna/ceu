@@ -450,7 +450,7 @@ open class Parser
                     } as Stmt
                 } else {
                     val e = this.expr()
-                    All_assert_tk(tk0, e.noas() is Expr.Call) { "expected call expression" }
+                    All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
                     if (alls.accept(TK.IN)) {
                         val tsks = this.expr()
                         Stmt.DSpawn(tk0, tsks, e)
@@ -721,11 +721,15 @@ open class Parser
     fun expr_as (e: Expr): Expr {
         return if (!alls.accept(TK.XAS)) e else {
             val tk0 = alls.tk0 as Tk.Sym
-            val type = this.type()
-            All_assert_tk(alls.tk0, type is Type.Alias) {
-                "expected alias type"
+            if (tk0.sym == ":+") {
+                val type = this.type()
+                All_assert_tk(alls.tk0, type is Type.Alias) {
+                    "expected alias type"
+                }
+                Expr.Pak(tk0, e, type as Type.Alias)
+            } else {
+                Expr.Unpak(tk0, e)
             }
-            Expr.Pak(tk0, e, type as Type.Alias)
         }
     }
 
@@ -778,7 +782,7 @@ open class Parser
                     (chr.chr == '!') -> Expr.UDisc(num!!, e)
                     (chr.chr == '.') -> {
                         val xas = if (!INFER) e else {
-                            Expr.Pak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e,null)
+                            Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e)
                         }
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, xas)
@@ -844,14 +848,10 @@ open class Parser
             else -> error("bug found")
         }
     }
-    fun attr_as (e: Attr): Attr {
+    fun attr_unpak (e: Attr): Attr {
         return if (!alls.accept(TK.XAS)) e else {
             val tk0 = alls.tk0 as Tk.Sym
-            val type = this.type()
-            All_assert_tk(alls.tk0, type is Type.Alias) {
-                "expected alias type"
-            }
-            Attr.As(tk0, e, type as Type.Alias)
+            Attr.Unpak(tk0, e)
         }
     }
 
@@ -885,7 +885,7 @@ open class Parser
             }
         }
 
-        e = this.attr_as(e)
+        e = this.attr_unpak(e)
 
         // one.1!\.2.1?
         while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!')) {
@@ -926,7 +926,7 @@ open class Parser
                     else -> error("impossible case")
                 }
             }
-            e = this.attr_as(e)
+            e = this.attr_unpak(e)
         }
         return e
     }
