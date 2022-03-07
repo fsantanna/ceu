@@ -31,28 +31,34 @@ fun Expr.xinfTypes (inf: Type?) {
             this.xtype!!
         }
         is Expr.Pak -> {
-            if (this.xtype != null) {
-                val tp = this.xtype!!
-                val unpak = tp.react_noalias(this)
-                this.e.xinfTypes(unpak)
-                if (!this.isact!!) tp else {
-                    Type.Active(
-                        Tk.Key(TK.ACTIVE, this.tk.lin, this.tk.col, "active"),
-                        tp
-                    )
+            when {
+                (this.xtype != null) -> {
+                    val tp = this.xtype!!
+                    val unpak = tp.react_noalias(this)
+                    this.e.xinfTypes(unpak)
+                    if (!this.isact!!) tp else {
+                        Type.Active(
+                            Tk.Key(TK.ACTIVE, this.tk.lin, this.tk.col, "active"),
+                            tp
+                        )
+                    }
                 }
-            } else {
-                this.e.xinfTypes(inf?.react_noalias(this))
-                val tp = inf!!
-                if (tp.noact() is Type.Alias) {
-                    //this.isact = tp is Type.Active
-                    this.xtype = tp
+                (inf != null) -> {
+                    this.e.xinfTypes(inf.react_noalias(this))
+                    if (inf.noact() is Type.Alias) {
+                        //this.isact = tp is Type.Active
+                        this.xtype = inf
+                    }
+                    inf
                 }
-                tp
+                else -> {
+                    this.e.xinfTypes(null)
+                    this.e.wtype!!.react_noalias(this)
+                }
             }
         }
         is Expr.Unpak -> {
-            this.e.xinfTypes(null)
+            this.e.xinfTypes(inf)
             this.e.wtype!!.react_noalias(this)
         }
 

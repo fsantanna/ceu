@@ -263,7 +263,7 @@ open class Parser
             }
             e = Expr.Call(e.tk,
                 if (e is Expr.Unpak || !INFER) e else {
-                    Expr.Unpak(Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"), e)
+                    Expr.Unpak(Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"), true, e)
                 },
                 arg,
                 Pair(
@@ -727,7 +727,7 @@ open class Parser
                 }
                 Expr.Pak(tk0, e, isact, type as Type.Alias)
             } else {
-                Expr.Unpak(tk0, e)
+                Expr.Unpak(tk0, false, e)
             }
         }
     }
@@ -781,7 +781,7 @@ open class Parser
                     (chr.chr == '!') -> Expr.UDisc(num!!, e)
                     (chr.chr == '.') -> {
                         val xas = if (!INFER) e else {
-                            Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), e)
+                            Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                         }
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, xas)

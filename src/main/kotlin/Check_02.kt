@@ -31,7 +31,7 @@ fun check_02_after_tps (s: Stmt) {
     fun fe (e: Expr) {
         when (e) {
             is Expr.Pak -> {
-                e.xtype!!.let {
+                e.xtype?.let {
                     val noact   = e.e.wtype!!.noact()
                     val noalias = it.noalias()
                     All_assert_tk(e.tk, noalias.isSupOf(noact)) {
@@ -40,7 +40,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.Unpak -> {
-                All_assert_tk(e.tk, e.e.wtype?.noact() is Type.Alias) {
+                All_assert_tk(e.tk, e.isinf || e.e.wtype?.noact().let { it is Type.Alias || it is Type.Nat }) {
                     "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
             }

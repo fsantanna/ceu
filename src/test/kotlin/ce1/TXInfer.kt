@@ -100,24 +100,11 @@ class TXInfer {
         val out = all("""
             var v = _f ()
         """.trimIndent())
-        assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
-        /*
+        //assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
         assert(out == """
             var v: _
             set v = ((_f: _) @[] ())
 
-        """.trimIndent()) { out }
-         */
-    }
-    @Test
-    fun a07_call2 () {
-        val out = all("""
-            var x: _int
-            set x = _abs _(-1)
-            output std x
-        """.trimIndent())
-        assert(out == """
-            TODO
         """.trimIndent()) { out }
     }
     @Test
@@ -367,8 +354,8 @@ class TXInfer {
             }
         """.trimIndent()
         )
-        assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
-        //assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
+        //assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
+        assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
     }
     @Test
     fun c06_new_return0 () {
