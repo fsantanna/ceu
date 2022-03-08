@@ -24,7 +24,7 @@ class TCode {
     }
     @Test
     fun a02_type_tuple () {
-        val tp = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '['), listOf(tp_unit, tp_unit))
+        val tp = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '['), listOf(tp_unit, tp_unit), null)
         assert(tp.toce() == "T_Unit_Unit_T") { tp.toce() }
     }
 
@@ -70,7 +70,7 @@ class TCode {
                 Expr.Unit(Tk.Sym(TK.UNIT, 1, 1, "()")),
             )
         )
-        e.wtype = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '['), listOf(tp_unit, tp_unit))
+        e.wtype = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '['), listOf(tp_unit, tp_unit), null)
         e.arg[0].wtype = tp_unit
         e.arg[1].wtype = tp_unit
         e.visit(null, ::code_fe, null, null)
@@ -87,10 +87,10 @@ class TCode {
         e.tup.wenv =
             Stmt.Var(
                 Tk.Id(TK.XID, 1, 1, "x"),
-                Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '('), listOf(Type.Nat(Tk.Nat(TK.XNAT, 1, 1, null, "int"))))
+                Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '('), listOf(Type.Nat(Tk.Nat(TK.XNAT, 1, 1, null, "int"))), null)
             )
         e.wtype = Type.Nat(Tk.Nat(TK.XNAT, 1, 1, null, "int"))
-        e.tup.wtype = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '('), listOf(Type.Nat(Tk.Nat(TK.XNAT, 1, 1, null, "int"))))
+        e.tup.wtype = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '('), listOf(Type.Nat(Tk.Nat(TK.XNAT, 1, 1, null, "int"))), null)
         e.visit(null, ::code_fe, null, null)
         CODE.removeFirst().expr.let {
             assert(it == "(global.x)._1")

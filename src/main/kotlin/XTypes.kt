@@ -8,8 +8,8 @@ fun Type.mapScp1 (up: Any, to: Tk.Id): Type {
     fun Type.aux (): Type {
         return when (this) {
             is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
-            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() })
-            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() })
+            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.ids)
+            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.ids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
             is Type.Alias   -> Type.Alias(this.tk_, this.xisrec,
@@ -99,7 +99,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 "invalid inference : type mismatch"
             }
             this.arg.forEachIndexed { i,e -> e.xinfTypes(inf?.let { (it as Type.Tuple).vec[i] }) }
-            Type.Tuple(this.tk_, this.arg.map { it.wtype!! })
+            Type.Tuple(this.tk_, this.arg.map { it.wtype!! }, null)
         }
         is Expr.UCons -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {

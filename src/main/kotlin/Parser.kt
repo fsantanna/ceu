@@ -8,10 +8,10 @@ open class Parser
         }
     }
 
-    open fun type (): Type {
+    open fun type (id: Tk.Id? = null): Type {
         return when {
-            alls.accept(TK.XID) -> {
-                val tk0 = alls.tk0.astype()
+            (id!=null || alls.accept(TK.XID)) -> {
+                val tk0 = (id ?: alls.tk0).astype()
                 val scps = if (alls.accept(TK.ATBRACK)) {
                     val ret = this.scp1s { it.asscope() }
                     alls.accept_err(TK.CHAR, ']')
@@ -69,7 +69,11 @@ open class Parser
             }
             alls.accept(TK.CHAR, '[') || alls.accept(TK.CHAR, '<') -> {
                 val tk0 = alls.tk0 as Tk.Chr
-                val tp = this.type()
+
+                val hasid = alls.accept(TK.XID)
+                //val haseq = hasid && alls.accept(TK.CHAR,'=')
+
+                val tp = this.type(if (hasid) alls.tk0 as Tk.Id else null)
                 val tps = arrayListOf(tp)
                 while (true) {
                     if (!alls.accept(TK.CHAR, ',')) {
@@ -80,10 +84,10 @@ open class Parser
                 }
                 if (tk0.chr == '[') {
                     alls.accept_err(TK.CHAR, ']')
-                    Type.Tuple(tk0, tps)
+                    Type.Tuple(tk0, tps, null)
                 } else {
                     alls.accept_err(TK.CHAR, '>')
-                    Type.Union(tk0, tps)
+                    Type.Union(tk0, tps, null)
                 }
             }
             alls.accept(TK.ACTIVE) -> {
