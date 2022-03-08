@@ -53,10 +53,10 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
         is Expr.UCons -> "<." + this.tk_.num + " " + this.arg.tostr(lc) + ">" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
         is Expr.UNull -> "<.0>" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
-        is Expr.TDisc -> "(" + this.tup.tostr(lc) + "." + this.tk_.num + ")"
+        is Expr.TDisc -> "(" + this.tup.tostr(lc) + "." + this.tk.tostr() + ")"
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk_.id})"
-        is Expr.UDisc -> "(" + this.uni.tostr(lc) + "!" + this.tk_.num + ")"
-        is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk_.num + ")"
+        is Expr.UDisc -> "(" + this.uni.tostr(lc) + "!" + this.tk.tostr() + ")"
+        is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk.tostr() + ")"
         is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.anon2local() } + ")"
         is Expr.Call -> {
             val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]" }

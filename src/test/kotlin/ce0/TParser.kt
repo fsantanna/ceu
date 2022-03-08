@@ -324,7 +324,7 @@ class TParser {
             Parser().expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be <.0>") { e.message!! }
+            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be null") { e.message!! }
         }
     }
 
@@ -336,7 +336,7 @@ class TParser {
             Parser().expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be <.0>") { e.message!! }
+            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be null") { e.message!! }
         }
     }
 
@@ -459,7 +459,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num == 1 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && e.tk.field2num(null)==1 && e.tup is Expr.Var)
     }
 
     @Test
@@ -527,7 +527,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x!1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.UDisc && e.tk_.num == 1 && e.uni is Expr.Var)
+        assert(e is Expr.UDisc && e.tk.field2num(null)==1 && e.uni is Expr.Var)
     }
 
     @Test
@@ -535,7 +535,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x?1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.UPred && e.tk_.num == 1 && e.uni is Expr.Var)
+        assert(e is Expr.UPred && e.tk.field2num(null)==1 && e.uni is Expr.Var)
     }
 
     @Test
@@ -543,7 +543,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.10"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num == 10 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && e.tk.field2num(null)==10 && e.tup is Expr.Var)
     }
 
     @Test
@@ -551,7 +551,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("arg.1\\!1.1"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.TDisc && e.tk_.num == 1 && e.tup is Expr.UDisc)
+        assert(e is Expr.TDisc && e.tk.field2num(null)==1 && e.tup is Expr.UDisc)
     }
 
     // ATTR

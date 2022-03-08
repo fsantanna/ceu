@@ -352,7 +352,7 @@ fun code_fe (e: Expr) {
         is Expr.Var   -> Code("", "", "", "", e.tk_.id.out_mem(e))
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
-        is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk_.num) }
+        is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk.tostr()) }
         is Expr.Pak   -> {
             val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
             val e  = CODE.removeFirst()
@@ -373,7 +373,8 @@ fun code_fe (e: Expr) {
         }
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
-            val pre = if (e.tk_.num == 0) {
+            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).ids)
+            val pre = if (e.tk.isNull()) {
                 """
                 assert(&${it.expr} == NULL);
 
@@ -381,18 +382,19 @@ fun code_fe (e: Expr) {
             } else {
                 """
                 assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
-                assert($ee.tag == ${e.tk_.num});
+                assert($ee.tag == $num);
 
                 """.trimIndent()
             }
-            Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+e.tk_.num)
+            Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
         }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
-            val pos = if (e.tk_.num == 0) {
+            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).ids)
+            val pos = if (e.tk.isNull()) {
                 "(&${it.expr} == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
-                "(&${it.expr} != NULL) && ($ee.tag == ${e.tk_.num})"
+                "(&${it.expr} != NULL) && ($ee.tag == $num)"
             }
             Code(it.type, it.struct, it.func, it.stmt, pos)
         }

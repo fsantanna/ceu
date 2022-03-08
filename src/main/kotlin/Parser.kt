@@ -499,7 +499,7 @@ open class Parser
                         watching tsk_$N {
                             loop {
                                 await ${pred.tostr(true)}
-                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk_.num}
+                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.tostr()}
                                 if x_$N {
                                     pause tsk_$N
                                 } else {
@@ -797,28 +797,25 @@ open class Parser
                 if (!ok) {
                     alls.accept_err(TK.XNUM)
                 }
-                val num = if (ok) null else (alls.tk0 as Tk.Num)
-                /*
-                all().assert_tk(alls.tk0, e !is Expr.TCons && e !is Expr.UCons && e !is Expr.UNull) {
-                    "invalid discriminator : unexpected constructor"
-                }
-                */
+
+                val fld = if (ok) null else alls.tk0
+
                 if (chr.chr == '?' || chr.chr == '!') {
-                    All_assert_tk(alls.tk0, num!!.num != 0 || e is Expr.Dnref) {
-                        "invalid discriminator : union cannot be <.0>"
+                    All_assert_tk(alls.tk0, !fld.isNull() || e is Expr.Dnref) {
+                        "invalid discriminator : union cannot be null"
                     }
                 }
-                val xas = if (!INFER || num?.num==0) e else {
+                val xas = if (!INFER || fld.isNull()) e else {
                     Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                 }
                 when {
-                    (chr.chr == '?') -> Expr.UPred(num!!, xas)
-                    (chr.chr == '!') -> Expr.UDisc(num!!, xas)
+                    (chr.chr == '?') -> Expr.UPred(fld!!, xas)
+                    (chr.chr == '!') -> Expr.UDisc(fld!!, xas)
                     (chr.chr == '.') -> {
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, xas)
                         } else {
-                            Expr.TDisc(num!!, xas)
+                            Expr.TDisc(fld!!, xas)
                         }
                     }
                     else -> error("impossible case")

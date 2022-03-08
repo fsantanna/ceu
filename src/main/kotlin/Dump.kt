@@ -41,10 +41,10 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.TCons -> "TCons\n" + this.arg.map { it.dump(spc+4) }.joinToString("")
         is Expr.UCons -> "UCons ." + this.tk_.num + "\n" + this.arg.dump(spc+4)
         is Expr.UNull -> "UNull\n"
-        is Expr.TDisc -> "TDisc ." + this.tk_.num + "\n" + this.tup.dump(spc+4)
+        is Expr.TDisc -> "TDisc ." + this.tk.tostr() + "\n" + this.tup.dump(spc+4)
         is Expr.Field -> "Field ." + this.tk_.id + "\n" + this.tsk.dump(spc+4)
-        is Expr.UDisc -> "UDisc !" + this.tk_.num + "\n" + this.uni.dump(spc+4)
-        is Expr.UPred -> "UPred ?" + this.tk_.num + "\n" + this.uni.dump(spc+4)
+        is Expr.UDisc -> "UDisc !" + this.tk.tostr() + "\n" + this.uni.dump(spc+4)
+        is Expr.UPred -> "UPred ?" + this.tk.tostr() + "\n" + this.uni.dump(spc+4)
         is Expr.New   -> "New\n" + this.arg.dump(spc+4)
         is Expr.Call  -> "Call\n" + this.f.dump(spc+4) + this.arg.dump(spc+4)
         is Expr.Func  -> "Func\n" + this.xtype?.dump(spc+4) + this.block.dump(spc+4)

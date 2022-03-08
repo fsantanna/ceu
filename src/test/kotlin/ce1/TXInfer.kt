@@ -1293,34 +1293,34 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-type Event @[] = <(),_uint64_t,_int>
-var f: task @[] -> _int -> () -> _int
-set f = task @[] -> _int -> () -> _int {
-set ret = arg
-return
-}
-
-spawn (task @[] -> _ -> _ -> _ {
-var x: _int
-{
-var tsk_25: active task @[] -> _int -> () -> _int
-set tsk_25 = spawn (f @[] (_1: _int))
-var st_25: _int
-set st_25 = (tsk_25.state)
-if (_(${D}st_25 == TASK_AWAITING): _int)
-{
-await tsk_25
-}
-else
-{
-
-}
-set x = (tsk_25.ret)
-}
-output std x
-}
- @[] ())
-
+            type Event @[] = <(),_uint64_t,_int>
+            var f: task @[] -> _int -> () -> _int
+            set f = task @[] -> _int -> () -> _int {
+            set ret = arg
+            return
+            }
+            
+            spawn (task @[] -> _ -> _ -> _ {
+            var x: _int
+            {
+            var tsk_25: active task @[] -> _int -> () -> _int
+            set tsk_25 = spawn (f @[] (_1: _int))
+            var st_25: _int
+            set st_25 = (tsk_25.state)
+            if (_(${D}st_25 == TASK_AWAITING): _int)
+            {
+            await tsk_25
+            }
+            else
+            {
+            
+            }
+            set x = (tsk_25.ret)
+            }
+            output std x
+            }
+             @[] ())
+            
         """.trimIndent()) { out }
     }
 
@@ -1342,4 +1342,40 @@ output std x
             
         """.trimIndent()) { out }
     }
+
+    // FIELDS
+
+    @Test
+    fun d01_field () {
+        val out = all("""
+            var pt: [x:_int, y:_int]
+            set pt.x = _10
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
+    @Test
+    fun d02_field_err () {
+        val out = all("""
+            var pt: [x:_int, y:_int]
+            set pt.z = _10
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
+    @Test
+    fun d03_union () {
+        val out = all("""
+            var b: <False=(), True=()>
+            set b = <.False ()>: <False=(), True=()>
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
+    @Test
+    fun d04_union_err () {
+        val out = all("""
+            var b: <False=(), True=()>
+            set b = <.Maybe ()>: <False=(), True=()>
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
+
 }

@@ -164,11 +164,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, it is Type.Tuple) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }
+                val num = this.tk.field2num((this.tup.wtype as Type.Tuple).ids)
                 val (MIN, MAX) = Pair(1, (it as Type.Tuple).vec.size)
-                All_assert_tk(this.tk, MIN <= this.tk_.num && this.tk_.num <= MAX) {
+                All_assert_tk(this.tk, MIN <= num && num <= MAX) {
                     "invalid discriminator : out of bounds"
                 }
-                it.vec[this.tk_.num - 1]
+                it.vec[num - 1]
             }
         }
         is Expr.Field -> {
@@ -202,18 +203,19 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid $str : not an union"
             }
-            assert(tk_.num!=0 || tp.isrec()) { "bug found" }
+            assert(!tk_.isNull() || tp.isrec()) { "bug found" }
 
             val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
-            All_assert_tk(this.tk, MIN <= tk_.num && tk_.num <= MAX) {
+            val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).ids)
+            All_assert_tk(this.tk, MIN <= num && num <= MAX) {
                 "invalid $str : out of bounds"
             }
 
             when (this) {
-                is Expr.UDisc -> if (this.tk_.num == 0) {
+                is Expr.UDisc -> if (this.tk.isNull()) {
                     Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()"))
                 } else {
-                    xtp.vec[this.tk_.num - 1]
+                    xtp.vec[num - 1]
                 }
                 is Expr.UPred -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                 else -> error("bug found")
