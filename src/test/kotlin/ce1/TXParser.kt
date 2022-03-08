@@ -69,4 +69,22 @@ class TXParser {
             assert(e.message == "(ln 1, col 6): expected type declaration : have end of file")
         }
     }
+
+    // EXPR / PAK / CONS
+
+    @Test
+    fun d01_pak_ucons () {
+        All_restart(null, PushbackReader(StringReader("List.1 ()"), 2))
+        Lexer.lex()
+        val e = Parser().expr()
+        assert(e is Expr.Pak && e.xtype is Type.Alias && e.e is Expr.UCons && !e.isact!!)
+    }
+    @Test
+    fun d02_pak () {
+        All_restart(null, PushbackReader(StringReader("Unit ()"), 2))
+        Lexer.lex()
+        val e = Parser().expr()
+        //println(e.dump())
+        assert(e is Expr.Pak && e.xtype is Type.Alias && e.e is Expr.Unit)
+    }
 }

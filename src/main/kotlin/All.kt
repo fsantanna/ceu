@@ -154,8 +154,8 @@ inline fun All.assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 
 fun Alls.checkExpr (): Boolean {
     return this.check(TK.CHAR, '(') || this.check(TK.UNIT) || this.check(TK.XID) || this.check(TK.XNAT)
-            || this.check(TK.CHAR, '[') || this.check(TK.CHAR, '<') || this.check(TK.NEW)
-            || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK)
+        || this.check(TK.CHAR, '[') || this.check(TK.CHAR, '<') || this.check(TK.NEW)
+        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK) || alls.tk1.istype()
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {

@@ -117,19 +117,25 @@ open class Parser
             alls.tk1.istype() -> {
                 val id = alls.tk1 as Tk.Id
                 val tp = this.type() as Type.Alias
-                val e = if (alls.accept(TK.CHAR, '.')) {
-                    alls.accept_err(TK.XNUM)
-                    val num = alls.tk0 as Tk.Num
-                    all().assert_tk(num, num.num>0) {
-                        "invalid union constructor : expected positive index"
+                val e = when {
+                    alls.accept(TK.CHAR,'.') -> {
+                        alls.accept_err(TK.XNUM)
+                        val num = alls.tk0 as Tk.Num
+                        all().assert_tk(num, num.num > 0) {
+                            "invalid union constructor : expected positive index"
+                        }
+                        val cons = if (alls.checkExpr()) this.expr() else {
+                            Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
+                        }
+                        Expr.UCons(num, null, cons)
                     }
-                    val cons = if (alls.checkExpr()) this.expr() else {
-                        Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
+                    alls.checkExpr() -> {
+                        this.expr()
                     }
-                    Expr.UCons(num, null, cons)
-                } else {
-                    val block = this.block()
-                    Expr.Func(id, null, block)
+                    else -> {
+                        val block = this.block()
+                        Expr.Func(id, null, block)
+                    }
                 }
                 Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, false, tp)
             }
