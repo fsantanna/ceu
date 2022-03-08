@@ -466,8 +466,8 @@ fun code_fe (e: Expr) {
                     val pre = """
                         $ret1
                         {
-                            ${if (e.wup !is Stmt.DSpawn) "" else {
-                                val dst = (e.wup as Stmt.DSpawn).dst as Expr.Var
+                            ${if (upspawn !is Stmt.DSpawn) "" else {
+                                val dst = upspawn.dst as Expr.Var
                                 val len = ((dst.env(dst.tk_.id) as Stmt.Var).xtype as Type.Actives).len?.num ?: 0
                                 val mem = dst.tk_.id.out_mem(e)
                                 "if ($len==0 || pool_size((Task*)&$mem)<$len) {"
@@ -476,7 +476,7 @@ fun code_fe (e: Expr) {
                             ${tpf.toce()}* frame = (${tpf.toce()}*) malloc(${f.expr}->task0.size);
                             assert(frame!=NULL && "not enough memory");
                             memcpy(frame, ${f.expr}, ${f.expr}->task0.size);
-                            //${if (e.wup is Stmt.DSpawn) "frame->task0.isauto = 1;" else ""}
+                            //${if (upspawn is Stmt.DSpawn) "frame->task0.isauto = 1;" else ""}
                             block_push($block, frame);
                             frame->task0.links.tsk_up = ${if (e.ups_first { it is Expr.Func }==null) "NULL" else "task0"};
                             task_link($block, &frame->task0);
@@ -490,7 +490,7 @@ fun code_fe (e: Expr) {
                                 return;
                             }
                             $ret2
-                            ${if (e.wup !is Stmt.DSpawn) "" else "}"}
+                            ${if (upspawn !is Stmt.DSpawn) "" else "}"}
                         }
                         
                         """.trimIndent()

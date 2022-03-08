@@ -292,7 +292,7 @@ open class Parser
                 when {
                     alls.accept(TK.AWAIT) -> {
                         val e = this.expr()
-                        All_assert_tk(e.tk, e is Expr.Call) { "expected task call" }
+                        All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                         All_nest(
                             """
                         {
