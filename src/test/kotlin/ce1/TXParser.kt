@@ -87,4 +87,52 @@ class TXParser {
         //println(e.dump())
         assert(e is Expr.Pak && e.xtype is Type.Alias && e.e is Expr.Unit)
     }
+    @Test
+    fun d03_typedef () {
+        All_restart(null, PushbackReader(StringReader("<Cons=/List,Unit=()>"), 2))
+        Lexer.lex()
+        val tp = Parser().type()
+        assert(tp is Type.Union && tp.vec[1] is Type.Unit && tp.ids!![0].id=="Cons")
+    }
+    @Test
+    fun d04_typedef () {
+        All_restart(null, PushbackReader(StringReader("<xxx=/List,Unit=()>"), 2))
+        Lexer.lex()
+        try {
+            Parser().type()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 2): invalid type identifier")
+        }
+    }
+    @Test
+    fun d05_typedef () {
+        All_restart(null, PushbackReader(StringReader("[xxx:/List,yyy:()]"), 2))
+        Lexer.lex()
+        val tp = Parser().type()
+        assert(tp is Type.Tuple && tp.vec[1] is Type.Unit && tp.ids!![0].id=="xxx")
+    }
+    @Test
+    fun d06_typedef () {
+        All_restart(null, PushbackReader(StringReader("[xxx:/List,Yyy:()]"), 2))
+        Lexer.lex()
+        try {
+            val tp = Parser().type()
+            println(tp)
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 12): invalid variable identifier") { e.message!! }
+        }
+    }
+    @Test
+    fun d07_typedef () {
+        All_restart(null, PushbackReader(StringReader("[xxx:/List,yyy=()]"), 2))
+        Lexer.lex()
+        try {
+            Parser().type()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 15): expected `:´ : have `=´") { e.message!! }
+        }
+    }
 }

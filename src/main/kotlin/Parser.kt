@@ -69,25 +69,38 @@ open class Parser
             }
             alls.accept(TK.CHAR, '[') || alls.accept(TK.CHAR, '<') -> {
                 val tk0 = alls.tk0 as Tk.Chr
+                val istup = (tk0.chr == '[')
 
                 val hasid = alls.accept(TK.XID)
-                //val haseq = hasid && alls.accept(TK.CHAR,'=')
+                val id = alls.tk0
+                val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
+                if (haseq) {
+                    if (istup) id.asvar() else id.astype()
+                }
 
-                val tp = this.type(if (hasid) alls.tk0 as Tk.Id else null)
+                val tp = this.type(if (hasid && !haseq) (id as Tk.Id) else null)
                 val tps = arrayListOf(tp)
+                val ids = if (haseq) arrayListOf(id) else null
+
                 while (true) {
                     if (!alls.accept(TK.CHAR, ',')) {
                         break
                     }
+                    if (haseq) {
+                        alls.accept_err(TK.XID)
+                        val id = if (istup) alls.tk0.asvar() else alls.tk0.astype()
+                        alls.accept_err(TK.CHAR,if (istup) ':' else '=')
+                        ids!!.add(id)
+                    }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
-                if (tk0.chr == '[') {
+                if (istup) {
                     alls.accept_err(TK.CHAR, ']')
-                    Type.Tuple(tk0, tps, null)
+                    Type.Tuple(tk0, tps, ids as List<Tk.Id>?)
                 } else {
                     alls.accept_err(TK.CHAR, '>')
-                    Type.Union(tk0, tps, null)
+                    Type.Union(tk0, tps, ids as List<Tk.Id>?)
                 }
             }
             alls.accept(TK.ACTIVE) -> {
