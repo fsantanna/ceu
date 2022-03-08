@@ -1,7 +1,7 @@
 install:
-	cp out/artifacts/Ce0_main_jar/Ce0.main.jar /usr/local/bin/Ce0.jar
+	cp out/artifacts/ceu_main_jar/ceu.main.jar /usr/local/bin/ceu.jar
 	#cp slf4j-nop-2.0.0-alpha1.jar /usr/local/bin
-	cp ce0.sh /usr/local/bin/ce0
+	cp ceu.sh /usr/local/bin/ceu
 	#cp freechains-host.sh         /usr/local/bin/freechains-host
 	#cp freechains-sync.sh         /usr/local/bin/freechains-sync
 	ls -l /usr/local/bin/[Cc]e*
@@ -9,4 +9,4 @@ install:
 
 test:
 	echo "output std ()" > /tmp/tst.ce
-	ce0 /tmp/tst.ce
+	ceu /tmp/tst.ce
