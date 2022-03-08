@@ -20,9 +20,6 @@ fun Type.pos (): String {
     }
 }
 
-//it is Type.Pointer && it.pln.noalias() is Type.Union ||
-//it is Type.Alias   && it.noalias().let { it is Type.Pointer && it.pln is Type.Union }
-
 fun Type.output_std (c: String, arg: String): String {
     val pln_from_ptr_to_tup_or_uni: Type? = this.noalias().let {
         if (it !is Type.Pointer) null else {
@@ -37,7 +34,7 @@ fun Type.output_std (c: String, arg: String): String {
             if (c == "_") "putchar('_');\n" else "puts(\"_\");\n"
         }
         this is Type.Nat -> {
-            val out = "output_std_${this.noalias().toce()}$c"
+            val out = "output_std_${this.toce()}$c"
             """
                 
                 #ifdef $out
@@ -183,7 +180,7 @@ fun code_ft (tp: Type) {
                     switch (v->tag) {
                         ${tp.vec
                             .mapIndexed { i,sub ->
-                                val s = when (sub.noalias()) {
+                                val s = when (sub) {
                                     is Type.Unit -> ""
                                     is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_std("_", "&v->_${i+1}")
                                     else -> "putchar(' ');\n" + sub.output_std("_", "v->_${i+1}")

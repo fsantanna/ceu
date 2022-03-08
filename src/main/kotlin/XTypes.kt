@@ -20,7 +20,6 @@ fun Type.mapScp1 (up: Any, to: Tk.Id): Type {
 }
 
 fun Expr.xinfTypes (inf: Type?) {
-    val xinf = inf?.noalias()
     this.wtype = when (this) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
@@ -63,8 +62,8 @@ fun Expr.xinfTypes (inf: Type?) {
         }
 
         is Expr.Upref -> {
-            All_assert_tk(this.tk, inf==null || xinf is Type.Pointer) { "invalid inference : type mismatch"}
-            this.pln.xinfTypes((xinf as Type.Pointer?)?.pln)
+            All_assert_tk(this.tk, inf==null || inf is Type.Pointer) { "invalid inference : type mismatch"}
+            this.pln.xinfTypes((inf as Type.Pointer?)?.pln)
             this.pln.wtype!!.let {
                 val base = this.toBaseVar()
                 val blk  = base?.env(base?.tk_.id)?.ups_first { it is Stmt.Block || it is Expr.Func }
@@ -78,7 +77,7 @@ fun Expr.xinfTypes (inf: Type?) {
             }
         }
         is Expr.Dnref -> {
-            this.ptr.xinfTypes(xinf?.let {
+            this.ptr.xinfTypes(inf?.let {
                 val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col,this.localBlockScp1Id())
                 Type.Pointer (
                     Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'/'),
@@ -88,18 +87,18 @@ fun Expr.xinfTypes (inf: Type?) {
             })
             this.ptr.wtype!!.let {
                 if (it is Type.Nat) it else {
-                    All_assert_tk(this.tk, it.noalias() is Type.Pointer) {
+                    All_assert_tk(this.tk, it is Type.Pointer) {
                         "invalid operand to `\\´ : not a pointer"
                     }
-                    (it.noalias() as Type.Pointer).pln
+                    (it as Type.Pointer).pln
                 }
             }
         }
         is Expr.TCons -> {
-            All_assert_tk(this.tk, inf==null || xinf is Type.Tuple) {
+            All_assert_tk(this.tk, inf==null || inf is Type.Tuple) {
                 "invalid inference : type mismatch"
             }
-            this.arg.forEachIndexed { i,e -> e.xinfTypes(xinf?.let { (it as Type.Tuple).vec[i] }) }
+            this.arg.forEachIndexed { i,e -> e.xinfTypes(inf?.let { (it as Type.Tuple).vec[i] }) }
             Type.Tuple(this.tk_, this.arg.map { it.wtype!! })
         }
         is Expr.UCons -> {
@@ -107,17 +106,17 @@ fun Expr.xinfTypes (inf: Type?) {
                 "invalid inference : undetermined type"
             }
             if (this.xtype != null) {
-                val x = (this.xtype!!.noalias() as Type.Union).vec[this.tk_.num - 1]
+                val x = this.xtype!!.vec[this.tk_.num - 1]
                 this.arg.xinfTypes(x)
                 this.xtype!!
             } else {
                 assert(inf != null)
                     //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
-                All_assert_tk(this.tk, xinf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
-                this.check(xinf!!)
-                val x = (xinf as Type.Union).vec[this.tk_.num-1]
+                All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
+                this.check(inf!!)
+                val x = (inf as Type.Union).vec[this.tk_.num-1]
                 this.arg.xinfTypes(x)
-                this.xtype = xinf.clone(this,this.tk.lin,this.tk.col) as Type.Union
+                this.xtype = inf.clone(this,this.tk.lin,this.tk.col) as Type.Union
                 this.xtype!!
             }
         }
@@ -130,13 +129,13 @@ fun Expr.xinfTypes (inf: Type?) {
                 //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
         }
         is Expr.New -> {
-            All_assert_tk(this.tk, inf==null || xinf is Type.Pointer) {
+            All_assert_tk(this.tk, inf==null || inf is Type.Pointer) {
                 "invalid inference : type mismatch"
             }
-            this.arg.xinfTypes((xinf as Type.Pointer?)?.pln)
+            this.arg.xinfTypes((inf as Type.Pointer?)?.pln)
             if (this.xscp == null) {
-                if (xinf is Type.Pointer) {
-                    this.xscp = xinf.xscp
+                if (inf is Type.Pointer) {
+                    this.xscp = inf.xscp
                 } else {
                     this.xscp = Scope(Tk.Id(TK.XID, this.tk.lin, this.tk.col, this.localBlockScp1Id()), null)
                 }
@@ -149,15 +148,15 @@ fun Expr.xinfTypes (inf: Type?) {
         }
         is Expr.Func -> {
             if (this.xtype == null) {
-                assert(xinf != null) { "bug found" }
-                All_assert_tk(this.tk, xinf is Type.Func) {
+                assert(inf != null) { "bug found" }
+                All_assert_tk(this.tk, inf is Type.Func) {
                     "invalid type : expected function type"
                 }
-                this.xtype = xinf as Type.Func
+                this.xtype = inf as Type.Func
                 this.wtype = this.xtype // must set wtype before b/c block may access arg/ret/etc
             }
             this.block.xinfTypes(null)
-            this.xtype ?: xinf!!
+            this.xtype ?: inf!!
         }
         is Expr.TDisc -> {
             this.tup.xinfTypes(null)  // not possible to infer big (tuple) from small (disc)
@@ -269,8 +268,8 @@ fun Expr.xinfTypes (inf: Type?) {
                                 }
                             }
 
-                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (this.upspawn()==null && xinf is Type.Func) {
-                                listOf(Pair((ftp.out as Type.Func).xscps.first.scp1,xinf.xscps.first.scp1))
+                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (this.upspawn()==null && inf is Type.Func) {
+                                listOf(Pair((ftp.out as Type.Func).xscps.first.scp1,inf.xscps.first.scp1))
                             } else {
                                 emptyList()
                             }
