@@ -78,6 +78,10 @@ fun Tk?.isNull (): Boolean {
     }
 }
 
+fun Tk.Id.isTask (): Boolean {
+    return this.id in arrayOf("pub","ret","state")
+}
+
 fun TK.toErr (chr: Char?): String {
     return when (this) {
         TK.EOF     -> "end of file"

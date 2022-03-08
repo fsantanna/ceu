@@ -85,8 +85,8 @@ sealed class Attr(val tk: Tk) {
     data class Nat   (val tk_: Tk.Nat, val type: Type): Attr(tk_)
     data class Unpak (val tk_: Tk.Sym, val isinf: Boolean, val e: Attr): Attr(tk_)
     data class Dnref (val tk_: Tk, val ptr: Attr): Attr(tk_)
-    data class TDisc (val tk_: Tk.Num, val tup: Attr): Attr(tk_)
-    data class UDisc (val tk_: Tk.Num, val uni: Attr): Attr(tk_)
+    data class TDisc (val tk_: Tk, val tup: Attr): Attr(tk_)
+    data class UDisc (val tk_: Tk, val uni: Attr): Attr(tk_)
     data class Field (val tk_: Tk.Id, val tsk: Attr): Attr(tk_)
 }
 
@@ -97,7 +97,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class Pak   (val tk_: Tk.Sym, val e: Expr, var isact: Boolean?, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class Unpak (val tk_: Tk.Sym, val isinf: Boolean, val e: Expr): Expr(N++, tk_, null, null, null)
     data class TCons (val tk_: Tk.Chr, val arg: List<Expr>): Expr(N++, tk_, null, null, null)
-    data class UCons (val tk_: Tk.Num, var xtype: Type.Union?, val arg: Expr): Expr(N++, tk_, null, null, xtype)
+    data class UCons (val tk_: Tk, var xtype: Type.Union?, val arg: Expr): Expr(N++, tk_, null, null, xtype)
     data class UNull (val tk_: Tk, var xtype: Type.Pointer?): Expr(N++, tk_, null, null, xtype)
     data class TDisc (val tk_: Tk, val tup: Expr): Expr(N++, tk_, null, null, null)
     data class UDisc (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)

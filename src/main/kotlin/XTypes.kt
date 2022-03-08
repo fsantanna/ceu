@@ -105,8 +105,9 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
+            val num = ((this.xtype ?: inf) as Type.Union).ids.let { this.tk.field2num(it) }
             if (this.xtype != null) {
-                val x = this.xtype!!.vec[this.tk_.num - 1]
+                val x = this.xtype!!.vec[num-1]
                 this.arg.xinfTypes(x)
                 this.xtype!!
             } else {
@@ -114,7 +115,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
                 this.check(inf!!)
-                val x = (inf as Type.Union).vec[this.tk_.num-1]
+                val x = (inf as Type.Union).vec[num-1]
                 this.arg.xinfTypes(x)
                 this.xtype = inf.clone(this,this.tk.lin,this.tk.col) as Type.Union
                 this.xtype!!

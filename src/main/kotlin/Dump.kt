@@ -39,7 +39,7 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)
         is Expr.TCons -> "TCons\n" + this.arg.map { it.dump(spc+4) }.joinToString("")
-        is Expr.UCons -> "UCons ." + this.tk_.num + "\n" + this.arg.dump(spc+4)
+        is Expr.UCons -> "UCons ." + this.tk.tostr() + "\n" + this.arg.dump(spc+4)
         is Expr.UNull -> "UNull\n"
         is Expr.TDisc -> "TDisc ." + this.tk.tostr() + "\n" + this.tup.dump(spc+4)
         is Expr.Field -> "Field ." + this.tk_.id + "\n" + this.tsk.dump(spc+4)

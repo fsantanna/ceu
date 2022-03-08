@@ -441,7 +441,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("<.1 ()>:<()>"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.UCons && e.tk_.num == 1 && e.arg is Expr.Unit)
+        assert(e is Expr.UCons && e.tk.field2num(null) == 1 && e.arg is Expr.Unit)
     }
 
     @Test
@@ -449,7 +449,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("<.2 <.1 [(),()]>:<()>>:<()>"), 2))
         Lexer.lex()
         val e = Parser().expr()
-        assert(e is Expr.UCons && e.tk_.num == 2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
+        assert(e is Expr.UCons && e.tk.field2num(null) == 2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
     }
 
     // INDEX
@@ -562,7 +562,7 @@ class TParser {
         Lexer.lex()
         val e = Parser().attr()
         //println(e)
-        assert(e is Attr.TDisc && e.tk_.num == 1)
+        assert(e is Attr.TDisc && e.tk.field2num(null) == 1)
     }
 
     @Test
@@ -571,7 +571,7 @@ class TParser {
         Lexer.lex()
         val e = Parser().attr()
         //println(e)
-        assert(e is Attr.TDisc && e.tk_.num == 1)
+        assert(e is Attr.TDisc && e.tk.field2num(null) == 1)
     }
 
     // STMT

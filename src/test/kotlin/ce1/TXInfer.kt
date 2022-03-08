@@ -1351,7 +1351,11 @@ class TXInfer {
             var pt: [x:_int, y:_int]
             set pt.x = _10
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == """
+            var pt: [x:_int,y:_int]
+            set (pt.x) = (_10: _int)
+            
+        """.trimIndent()) { out }
     }
     @Test
     fun d02_field_err () {
@@ -1365,9 +1369,13 @@ class TXInfer {
     fun d03_union () {
         val out = all("""
             var b: <False=(), True=()>
-            set b = <.False ()>: <False=(), True=()>
+            set b = <.False ()>: <False=(),True=()>
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == """
+            var b: <False=(),True=()>
+            set b = <.False ()>: <False=(),True=()>
+
+        """.trimIndent()) { out }
     }
     @Test
     fun d04_union_err () {
@@ -1377,5 +1385,56 @@ class TXInfer {
         """.trimIndent())
         assert(out == "OK") { out }
     }
+    @Test
+    fun d05_union () {
+        val out = all("""
+            type Bool = <False=(), True=()>
+            var b = Bool.False
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
+    @Test
+    fun d06_tuple () {
+        val out = all("""
+            var b: [x:_int,y:_int] = [_10,_10]
+            var c = b
+            output std c.x
+        """.trimIndent())
+        assert(out == """
+            var b: [x:_int,y:_int]
+            set b = [(_10: _int),(_10: _int)]
+            var c: [x:_int,y:_int]
+            set c = b
+            output std (c.x)
 
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun d07_tuple () {
+        val out = all("""
+            type Point = [x:_int,y:_int]
+            var b: Point = [_10,_10]
+            var c = b
+            output std c.x
+        """.trimIndent())
+        assert(out == """
+            type Point @[] = [x:_int,y:_int]
+            var b: Point
+            set b = ([(_10: _int),(_10: _int)] :+ Point)
+            var c: Point
+            set c = b
+            output std ((c :-).x)
+
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun d08_tuple () {
+        val out = all("""
+            type Point = [x:_int,y:_int]
+            var b: Point = [x=_10,y=_10]
+            var c = b
+            output std c.x
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
 }

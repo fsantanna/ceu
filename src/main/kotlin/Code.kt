@@ -426,7 +426,8 @@ fun code_fe (e: Expr) {
             val tp  = CODE.removeFirst()
             val ID  = "_tmp_" + e.n
             val pos = xp.pos()
-            val pre = "$pos $ID = (($pos) { ${e.tk_.num} , ._${e.tk_.num} = ${arg.expr} });\n"
+            val num = e.tk.field2num(e.xtype!!.ids)
+            val pre = "$pos $ID = (($pos) { $num , ._$num = ${arg.expr} });\n"
             Code(tp.type+arg.type, tp.struct+arg.struct, tp.func+arg.func, arg.stmt + pre, ID)
         }
         is Expr.UNull -> CODE.removeFirst().let { Code(it.type, it.struct, it.func,"","NULL") }

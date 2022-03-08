@@ -136,15 +136,15 @@ open class Parser
                 val tp = this.type() as Type.Alias
                 val e = when {
                     alls.accept(TK.CHAR,'.') -> {
-                        alls.accept_err(TK.XNUM)
-                        val num = alls.tk0 as Tk.Num
-                        all().assert_tk(num, num.num > 0) {
-                            "invalid union constructor : expected positive index"
+                        alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                        val dsc = alls.tk0
+                        All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                            "invalid discriminator : expected index or type identifier"
                         }
                         val cons = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
-                        Expr.UCons(num, null, cons)
+                        Expr.UCons(dsc, null, cons)
                     }
                     alls.checkExpr() -> {
                         this.expr()
@@ -164,36 +164,41 @@ open class Parser
                 Expr.Nat(tk0, tp)
             }
             alls.accept(TK.CHAR, '<') -> {
-                val tkx = alls.tk0
                 alls.accept_err(TK.CHAR, '.')
-                alls.accept_err(TK.XNUM)
-                val tk0 = alls.tk0 as Tk.Num
+
+                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                val dsc = alls.tk0
+                All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                    "invalid discriminator : expected index or type identifier"
+                }
+
                 val cons = when {
-                    (tk0.num == 0) -> null
+                    dsc.isNull() -> null
                     alls.checkExpr() -> this.expr()
                     else -> Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                 }
                 alls.accept_err(TK.CHAR, '>')
                 val tp = if (!alls.accept(TK.CHAR, ':')) null else {
                     val tp = this.type()
-                    when (tk0.num) {
-                        0 -> all().assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Alias) {
+                    if (dsc.isNull()) {
+                        All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Alias) {
                             "invalid type : expected pointer to alias type"
                         }
-                        else -> all().assert_tk(tp.tk,tp is Type.Union) {
-                            "invalid type : expected union type"
+                    } else {
+                        All_assert_tk(tp.tk,tp is Type.Union) {
+                                "invalid type : expected union type"
                         }
                     }
                     tp
                 }
                 when {
-                    (tk0.num == 0) -> Expr.UNull(tk0, tp as Type.Pointer?)
-                    (tp != null)   -> Expr.UCons(tk0, tp as Type.Union?, cons!!)
+                    dsc.isNull() -> Expr.UNull(dsc, tp as Type.Pointer?)
+                    (tp != null) -> Expr.UCons(dsc, tp as Type.Union?, cons!!)
                     else -> {
                         assert(INFER)
                         Expr.Pak (
-                            Tk.Sym(TK.XAS,tk0.lin,tk0.col,":+"),
-                            Expr.UCons(tk0, tp as Type.Union?, cons!!),
+                            Tk.Sym(TK.XAS,dsc.lin,dsc.col,":+"),
+                            Expr.UCons(dsc, tp as Type.Union?, cons!!),
                             null,
                             null
                         )
@@ -203,7 +208,7 @@ open class Parser
             alls.accept(TK.NEW) -> {
                 val tk0 = alls.tk0
                 val e = this.expr()
-                all().assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons && e.tk_.num!=0)) {
+                All_assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons && !e.tk.isNull())) {
                     "invalid `new` : expected constructor"
                 }
 
@@ -221,7 +226,7 @@ open class Parser
             alls.accept(TK.CHAR, '/') -> {
                 val tk0 = alls.tk0 as Tk.Chr
                 val e = this.expr()
-                all().assert_tk(
+                All_assert_tk(
                     alls.tk0,
                     e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.Dnref || e is Expr.Upref
                 ) {
@@ -775,7 +780,7 @@ open class Parser
         ) {
             val chr = alls.tk0 as Tk.Chr
             e = if (chr.chr == '\\') {
-                all().assert_tk(
+                All_assert_tk(
                     alls.tk0,
                     e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
                 ) {
@@ -783,39 +788,33 @@ open class Parser
                 }
                 Expr.Dnref(chr, e)
             } else {
-                val ok = when {
-                    (chr.chr != '.') -> false
-                    alls.accept(TK.XID) -> {
-                        val tk = alls.tk0 as Tk.Id
-                        all().assert_tk(tk, tk.id=="pub" || tk.id=="ret" || tk.id=="state") {
-                            "unexpected \"${tk.id}\""
-                        }
-                        true
-                    }
-                    else -> false
-                }
-                if (!ok) {
-                    alls.accept_err(TK.XNUM)
-                }
-
-                val fld = if (ok) null else alls.tk0
+                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                val fld = alls.tk0
 
                 if (chr.chr == '?' || chr.chr == '!') {
                     All_assert_tk(alls.tk0, !fld.isNull() || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be null"
+                    }
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                        "invalid discriminator : expected index or type identifier"
+                    }
+                } else {
+                    assert(chr.chr == '.')
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
+                        "invalid field : expected index or variable identifier"
                     }
                 }
                 val xas = if (!INFER || fld.isNull()) e else {
                     Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                 }
                 when {
-                    (chr.chr == '?') -> Expr.UPred(fld!!, xas)
-                    (chr.chr == '!') -> Expr.UDisc(fld!!, xas)
+                    (chr.chr == '?') -> Expr.UPred(fld, xas)
+                    (chr.chr == '!') -> Expr.UDisc(fld, xas)
                     (chr.chr == '.') -> {
-                        if (alls.tk0.enu == TK.XID) {
-                            Expr.Field(alls.tk0 as Tk.Id, xas)
+                        if (fld is Tk.Id && fld.isTask()) {
+                            Expr.Field(fld, xas)
                         } else {
-                            Expr.TDisc(fld!!, xas)
+                            Expr.TDisc(fld, xas)
                         }
                     }
                     else -> error("impossible case")
@@ -894,7 +893,7 @@ open class Parser
             alls.accept(TK.CHAR, '\\') -> {
                 val tk0 = alls.tk0 as Tk.Chr
                 val e = this.attr()
-                all().assert_tk(
+                All_assert_tk(
                     alls.tk0,
                     e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
                 ) {
@@ -919,7 +918,7 @@ open class Parser
         while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!')) {
             val chr = alls.tk0 as Tk.Chr
             e = if (chr.chr == '\\') {
-                all().assert_tk(
+                All_assert_tk(
                     alls.tk0,
                     e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
                 ) {
@@ -927,31 +926,32 @@ open class Parser
                 }
                 Attr.Dnref(chr, e)
             } else {
-                val ok = when {
-                    (chr.chr != '.') -> false
-                    alls.accept(TK.XID) -> {
-                        val tk = alls.tk0 as Tk.Id
-                        all().assert_tk(tk, tk.id == "pub") {
-                            "unexpected \"${tk.id}\""
-                        }
-                        true
+                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                val fld = alls.tk0
+
+                if (chr.chr == '!') {
+                    All_assert_tk(alls.tk0, !fld.isNull() || e is Attr.Dnref) {
+                        "invalid discriminator : union cannot be null"
                     }
-                    else -> false
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                        "invalid discriminator : expected index or type identifier"
+                    }
+                } else {
+                    assert(chr.chr == '.')
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
+                        "invalid field : expected index or variable identifier"
+                    }
                 }
-                if (!ok) {
-                    alls.accept_err(TK.XNUM)
-                }
-                val num = if (ok) null else (alls.tk0 as Tk.Num)
-                val xas = if (!INFER || num?.num==0) e else {
+                val xas = if (!INFER || fld.isNull()) e else {
                     Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                 }
                 when {
-                    (chr.chr == '!') -> Attr.UDisc(num!!, xas)
+                    (chr.chr == '!') -> Attr.UDisc(fld, xas)
                     (chr.chr == '.') -> {
-                        if (alls.tk0.enu == TK.XID) {
-                            Attr.Field(alls.tk0 as Tk.Id, xas)
+                        if (fld is Tk.Id && fld.isTask()) {
+                            Attr.Field(fld, xas)
                         } else {
-                            Attr.TDisc(num!!, xas)
+                            Attr.TDisc(fld, xas)
                         }
                     }
                     else -> error("impossible case")

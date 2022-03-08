@@ -12,6 +12,9 @@ fun Tk.lincol (src: String): String {
 }
 
 fun Type.tostr (lc: Boolean = false): String {
+    fun List<Tk.Id>?.idx (i: Int, c: Char): String {
+        return if (this == null) "" else this[i].id+c
+    }
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk_.toce()
@@ -19,8 +22,8 @@ fun Type.tostr (lc: Boolean = false): String {
         is Type.Alias   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]"
         }}
-        is Type.Tuple   -> "[" + this.vec.map { it.tostr(lc) }.joinToString(",") + "]"
-        is Type.Union   -> "<" + this.vec.map { it.tostr(lc) }.joinToString(",") + ">"
+        is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.ids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
+        is Type.Union   -> "<" + this.vec.mapIndexed { i,v -> this.ids.idx(i,'=') + v.tostr(lc) }.joinToString(",") + ">"
         is Type.Active  -> "active " + this.tsk.tostr(lc)
         is Type.Actives -> "active {${this.len?.num ?: ""}} " + this.tsk.tostr(lc)
         is Type.Alias   -> this.tk_.id + this.xscps!!.let {
@@ -51,7 +54,7 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
-        is Expr.UCons -> "<." + this.tk_.num + " " + this.arg.tostr(lc) + ">" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
+        is Expr.UCons -> "<." + this.tk.tostr() + " " + this.arg.tostr(lc) + ">" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
         is Expr.UNull -> "<.0>" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
         is Expr.TDisc -> "(" + this.tup.tostr(lc) + "." + this.tk.tostr() + ")"
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk_.id})"

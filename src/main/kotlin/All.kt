@@ -146,13 +146,6 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
         throw AssertionError(m2)
     }
 }
-inline fun All.assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"Assertion failed"}) {
-    if (!value) {
-        val m1 = lazyMessage()
-        val m2 = All_err_tk(tk, m1)
-        throw AssertionError(m2)
-    }
-}
 
 fun Alls.checkExpr (): Boolean {
     return this.check(TK.CHAR, '(') || this.check(TK.UNIT) || this.check(TK.XID) || this.check(TK.XNAT)
