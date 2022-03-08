@@ -369,7 +369,7 @@ class TXInfer {
             type List @[x] = </List @[x] @x>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\):- List @[j])!1) = <.0>: /List @[j] @j
+            set (((arg\) :-)!1) = <.0>: /List @[j] @j
             }
 
 
@@ -387,7 +387,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\):- List @[j])!1) = <.0>: /List @[j] @j
+            set (((arg\) :-)!1) = <.0>: /List @[j] @j
             }
 
 
@@ -405,7 +405,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\):- List @[j])!1) = (new (<.1 <.0>: /List @[j] @j>: </List @[j] @j> :+ List @[j]): @j)
+            set (((arg\) :-)!1) = (new (<.1 <.0>: /List @[j] @j>: </List @[j] @j> :+ List @[j]): @j)
             }
 
 
@@ -682,7 +682,7 @@ class TXInfer {
             }
             else
             {
-            set ret = (new (<.1 (clone @[j,j,l,l] (((arg\):- List @[j])!1): @l)>: </List @[l] @l> :+ List @[l]): @k)
+            set ret = (new (<.1 (clone @[j,j,l,l] (((arg\) :-)!1): @l)>: </List @[l] @l> :+ List @[l]): @k)
             return
             }
             }
@@ -751,7 +751,7 @@ class TXInfer {
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
             set pf = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
-            set (((pa\):- List @[LOCAL])!1) = pf
+            set (((pa\) :-)!1) = pf
             }
             
             call (f @[] ())
@@ -1082,8 +1082,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt:- Event)?5)
-            set ms_8 = (sub @[] [ms_8,((evt:- Event)!5)])
+            await ((evt :-)?5)
+            set ms_8 = (sub @[] [ms_8,((evt :-)!5)])
             if (lte @[] [ms_8,(_0: _int)])
             {
             break
@@ -1127,8 +1127,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt:- Event)?5)
-            set ms_13 = (sub @[] [ms_13,((evt:- Event)!5)])
+            await ((evt :-)?5)
+            set ms_13 = (sub @[] [ms_13,((evt :-)!5)])
             if (lte @[] [ms_13,(_0: _int)])
             {
             break

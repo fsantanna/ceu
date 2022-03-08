@@ -785,13 +785,13 @@ open class Parser
                         "invalid discriminator : union cannot be <.0>"
                     }
                 }
+                val xas = if (!INFER || num?.num==0) e else {
+                    Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
+                }
                 when {
-                    (chr.chr == '?') -> Expr.UPred(num!!, e)
-                    (chr.chr == '!') -> Expr.UDisc(num!!, e)
+                    (chr.chr == '?') -> Expr.UPred(num!!, xas)
+                    (chr.chr == '!') -> Expr.UDisc(num!!, xas)
                     (chr.chr == '.') -> {
-                        val xas = if (!INFER) e else {
-                            Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
-                        }
                         if (alls.tk0.enu == TK.XID) {
                             Expr.Field(alls.tk0 as Tk.Id, xas)
                         } else {
@@ -859,7 +859,7 @@ open class Parser
     fun attr_unpak (e: Attr): Attr {
         return if (!alls.accept(TK.XAS)) e else {
             val tk0 = alls.tk0 as Tk.Sym
-            Attr.Unpak(tk0, e)
+            Attr.Unpak(tk0, false, e)
         }
     }
 
@@ -922,13 +922,16 @@ open class Parser
                     alls.accept_err(TK.XNUM)
                 }
                 val num = if (ok) null else (alls.tk0 as Tk.Num)
+                val xas = if (!INFER || num?.num==0) e else {
+                    Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
+                }
                 when {
-                    (chr.chr == '!') -> Attr.UDisc(num!!, e)
+                    (chr.chr == '!') -> Attr.UDisc(num!!, xas)
                     (chr.chr == '.') -> {
                         if (alls.tk0.enu == TK.XID) {
-                            Attr.Field(alls.tk0 as Tk.Id, e)
+                            Attr.Field(alls.tk0 as Tk.Id, xas)
                         } else {
-                            Attr.TDisc(num!!, e)
+                            Attr.TDisc(num!!, xas)
                         }
                     }
                     else -> error("impossible case")

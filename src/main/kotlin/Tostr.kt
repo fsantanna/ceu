@@ -42,19 +42,8 @@ fun Type.tostr (lc: Boolean = false): String {
 }
 
 fun Expr.tostr (lc: Boolean = false): String {
-    fun upcast (e: Expr, v: String): String {
-        return if (e.wtype !is Type.Alias) v else {
-            "(" + v + ":+ " + e.wtype!!.tostr(lc) + ")"
-        }
-    }
-    fun dncast (dn: Type?, v: String): String {
-        return if (dn !is Type.Alias) v else {
-            "(" + v + ":- " + dn.tostr(lc) + ")"
-        }
-    }
-
     return when (this) {
-        is Expr.Unit  -> upcast(this, "()")
+        is Expr.Unit  -> "()"
         is Expr.Var   -> this.tk_.id
         is Expr.Nat   -> if (this.xtype==null) this.tk_.toce() else "(" + this.tk_.toce() + ": " + this.xtype!!.tostr(lc) + ")"
         is Expr.Pak   -> if (this.xtype==null) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + " " + this.tk_.sym + " " + this.xtype!!.tostr(lc) + ")")
@@ -66,18 +55,8 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.UNull -> "<.0>" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
         is Expr.TDisc -> "(" + this.tup.tostr(lc) + "." + this.tk_.num + ")"
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk_.id})"
-        is Expr.UDisc -> {
-            val uni = this.uni.tostr(lc).let {
-                if (this.tk_.num == 0) it else dncast(this.uni.wtype, it)
-            }
-            "(" + uni + "!" + this.tk_.num + ")"
-        }
-        is Expr.UPred -> {
-            val uni = this.uni.tostr(lc).let {
-                if (this.tk_.num == 0) it else dncast(this.uni.wtype, it)
-            }
-            "(" + uni + "?" + this.tk_.num + ")"
-        }
+        is Expr.UDisc -> "(" + this.uni.tostr(lc) + "!" + this.tk_.num + ")"
+        is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk_.num + ")"
         is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.anon2local() } + ")"
         is Expr.Call -> {
             val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]" }
