@@ -15,6 +15,8 @@ var LINES = false
 val VALGRIND = ""
 //val VALGRIND = "valgrind "
 
+val D = "\$"
+
 data class Alls (
     val stack: ArrayDeque<All> = ArrayDeque(),
     var tk0:   Tk = Tk.Key(TK.ERR,1,1,""),
