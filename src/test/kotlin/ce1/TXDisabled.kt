@@ -8,27 +8,12 @@ import java.io.File
 @TestMethodOrder(Alphanumeric::class)
 class TXDisabled {
 
-    fun all (inp: String): String {
-        val (ok1,out1) = ce2c(null, inp)
-        if (!ok1) {
-            return out1
-        }
-        File("out.c").writeText(out1)
-        val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
-        if (!ok2) {
-            return out2
-        }
-        val (_,out3) = exec("$VALGRIND./out.exe")
-        //println(out3)
-        return out3
-    }
-
     // MUTUTAL RECURSION
 
     @Disabled
     @Test
     fun b01 () {
-        val out = all("""
+        val out = test(true, """
             var x: /<(),/</^^,/^>>
             set x = <.1>
         """.trimIndent())
@@ -37,7 +22,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b02 () {
-        val out = all("""
+        val out = test(true, """
             var x: /<(),/</^^,/^>>
             set x = new <.2 new <.1 <.1>>>
         """.trimIndent())
@@ -46,7 +31,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b03 () {
-        val out = all("""
+        val out = test(true, """
             var x: /</<[/^^ @GLOBAL,/^ @GLOBAL]> @GLOBAL> @GLOBAL
             set x = new <.1 <.1 [<.0>,<.0>]>>
         """.trimIndent())
@@ -55,7 +40,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b04_self () {
-        val out = all("""
+        val out = test(true, """
             var z: /< [<(),//^^>,_int,/^]> = <.0>
             var x: /< [<(),//^^>,_int,/^]> = new <.1 [z,_1,new <.1 [z,_2,z]>]>
             set x!1.3!1.1 = <.1 /x>
@@ -69,7 +54,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b01_new () {
-        val out = all("""
+        val out = test(true, """
             var xxx: /<(),/</^^,/^>>
             set xxx =
                 new <.2
@@ -84,7 +69,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b02_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /<(),/</^^ @LOCAL,/^ @LOCAL> @LOCAL> @LOCAL
             set x = new <.2 new <.2 new <.2 <.0>>>>
             output std x
@@ -94,7 +79,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b03_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /<(),/</^^ @LOCAL,/^ @LOCAL> @LOCAL> @LOCAL
             set x = new <.2 new <.1 new <.1>>>
             output std x
@@ -104,7 +89,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b04_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /<(),/</^^ @LOCAL,/^ @LOCAL> @LOCAL> @LOCAL
             set x = new <.2 new <.2 new <.1 new <.1>>>>
             output std x
@@ -114,7 +99,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b05_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /</<[/^^,/^]>>
             set x = new <.1 new <.1 [<.0>,<.0>]>>
             output std x
@@ -124,7 +109,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b06_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /</<[/^^ @LOCAL,/^ @LOCAL]> @LOCAL> @LOCAL
             set x = new <.1 new <.1 [<.0>,new <.1 [<.0>,<.0>]>]>>
             output std x
@@ -134,7 +119,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b08_new () {
-        val out = all("""
+        val out = test(true, """
             var e: /<(),<(),/^^ @LOCAL>>
             set e = new <.2 <.2 new <.1>>>
             var s: <(),/<(),<(),/^^>>>
@@ -146,7 +131,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b10_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),//^^ @LOCAL @LOCAL>,/^ @LOCAL]> @LOCAL
             set x = new <.1 [<.1>,<.0>]>
             var y: /< [<(),//^^>,/^]>
@@ -160,7 +145,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b11_new_self () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),//^^ @LOCAL @LOCAL>,/^ @LOCAL]> @LOCAL
             set x = new <.1 [<.1>,<.0>]>
             var y: /< [<(),//^^>,/^]>
@@ -173,7 +158,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b14_new_self () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),//^^>,/^]>
             set x = new <.1 [<.1>,<.0>]>
             set x\!1.1 = <.2 /x>  -- ok
@@ -185,7 +170,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b15_new_self () {
-        val out = all("""
+        val out = test(true, """
             var x: /< <(),//^^ @LOCAL @LOCAL>> @LOCAL
             set x = new <.1 <.1>>
             output std x
@@ -196,7 +181,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b18_new () {
-        val out = all("""
+        val out = test(true, """
             var v1: /<(),/<[/^^,/^]>> = new <.2 <.0>>
             var v2: /<(),/<[/^^,/^]>>
             set v2 = new <.2 new <.1 [new <.1>,<.0>]>>
@@ -208,7 +193,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b19_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),//^^ @LOCAL @LOCAL>,/^ @LOCAL]> @LOCAL = new <.1 [<.1>,<.0>]>
             var y: /< [<(),//^^ @LOCAL @LOCAL>,/^ @LOCAL]> @LOCAL = new <.1 [<.1>,x]>
             set y\!1.2\!1.1 = <.1>
@@ -220,7 +205,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b20_new () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),//^^ @LOCAL @LOCAL>,/^ @LOCAL]> @LOCAL = new <.1 [<.1>,new <.1 [<.1>,<.0>]>]>
             set x\!1.2 = <.0>
             output std x
@@ -232,7 +217,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b24_double () {
-        val out = all("""
+        val out = test(true, """
             var n = <.0>: /<</^^>>
             output std n
         """.trimIndent())
@@ -241,7 +226,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun b27_self () {
-        val out = all("""
+        val out = test(true, """
             var x: /< [<(),/^^>,_int,/^]>
             var z: /< [<(),/^^>,_int,/^]> = <.0>
             var o: <(),/< [<(),/^^>,_int,/^]>> = <.1>
@@ -259,7 +244,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d02_clo () {
-        val out = all("""
+        val out = test(true, """
             var f: func () -> (func @a1->()->())
         """.trimIndent()
         )
@@ -271,7 +256,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d04_clo () {
-        val out = all("""
+        val out = test(true, """
             var g: func () -> (func @a1->()->())
             var f: func @LOCAL -> () -> ()
         """.trimIndent()
@@ -285,7 +270,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d05_clo () {
-        val out = all("""
+        val out = test(true, """
             var g: func () -> (func @a1->()->())
             var f: func @LOCAL -> () -> ()
             set f = g ()
@@ -301,7 +286,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d06_clo () {
-        val out = all("""
+        val out = test(true, """
             var g: func () -> (func @a1->()->())
             var f: func @LOCAL -> () -> ()
             set f = g ()
@@ -319,7 +304,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d07_clo () {
-        val out = all("""
+        val out = test(true, """
             var cnst = func @[a1]->/_int@a1 -> (func @a1->()->/_int@a1) {
                 var x: /_int@a1 = arg
                 return func @a1->()->/_int@a1 {
@@ -349,7 +334,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d08_clo () {
-        val out = all("""
+        val out = test(true, """
             var g: func @[a]->/_int@a -> (func @a->()->/_int@a)
             var five: _int
             var f: func @LOCAL->()->/_int@LOCAL = g /five
@@ -368,7 +353,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_d09_clo () {
-        val out = all("""
+        val out = test(true, """
             var g: func @[a]->/_int@a -> (func @a->()->/_int@a)
             {
                 var five: _int
@@ -391,7 +376,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_e03_clo () {
-        val out = all(
+        val out = test(true, 
             """
             var f: func (func ()->()) -> (func @GLOBAL->()->())
         """.trimIndent()
@@ -401,7 +386,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_f02 () {
-        val out = all(
+        val out = test(true, 
             """
             type List = </List>
             var g = func @[a1] -> () -> (func @a1->()->()) {
@@ -420,7 +405,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_f03 () {
-        val out = all(
+        val out = test(true, 
             """
             var cnst = func @[a1]->/_int@a1 -> (func @a1->()->/_int@a1) {
                 var x: /_int@a1 = arg
@@ -442,7 +427,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_f04 () {
-        val out = all(
+        val out = test(true, 
             """
             var f = func (func ()->()) -> (func @GLOBAL->()->()) {
                 var ff = arg
@@ -463,7 +448,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_a06_par2 () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var build = func @[r1] -> () -> task @r1->()->()->() {
                 set ret = task @r1->()->()->() {
@@ -487,7 +472,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_c10_func_ret () {
-        val out = all(
+        val out = test(true, 
             """
             var g = func () -> (func ()->()) {
                 var f = func () -> () {
@@ -506,7 +491,7 @@ class TXDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_addc_pg12() {
-        val out = all("""
+        val out = test(true, """
             $X.nums
             $X.clone
             $add
@@ -528,7 +513,7 @@ class TXDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_quad_pg12() {
-        val out = all(
+        val out = test(true, 
             """
             $X.nums
             $X.clone
@@ -553,7 +538,7 @@ class TXDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_curry_pg13() {
-        val out = all(
+        val out = test(true, 
             """
             $X.nums
             $X.clone
@@ -578,7 +563,7 @@ class TXDisabled {
     @Disabled
     @Test
     fun noclo_ch_01_04_curry_pg13_xxx() {
-        val out = all(
+        val out = test(true, 
             """
             type Num @[s] = </Num @[s] @s>
             var add: func [/Num@[a]@a, /Num@[b]@b] -> /Num@[r]@r
@@ -592,7 +577,7 @@ class TXDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_composition_pg15() {
-        val out = all(
+        val out = test(true, 
             """
             $X.nums
             $X.clone
@@ -619,7 +604,7 @@ class TXDisabled {
     @Disabled   // no more full closures
     @Test
     fun ch_01_04_currying_pg11() {
-        val out = all(
+        val out = test(true, 
             """
             $X.nums
             $X.clone

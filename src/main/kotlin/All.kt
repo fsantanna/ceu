@@ -1,3 +1,4 @@
+import java.io.File
 import java.io.PushbackReader
 import java.io.StringReader
 import java.lang.AssertionError
@@ -170,4 +171,20 @@ fun exec (cmds: List<String>): Pair<Boolean,String> {
 
 fun exec (cmd: String): Pair<Boolean,String> {
     return exec(cmd.split(' '))
+}
+
+fun test (infer: Boolean, inp: String): String {
+    INFER = infer
+    val (ok1,out1) = ce2c(null, inp)
+    if (!ok1) {
+        return out1
+    }
+    File("out.c").writeText(out1)
+    val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
+    if (!ok2) {
+        return out2
+    }
+    val (_,out3) = exec("$VALGRIND./out.exe")
+    //println(out3)
+    return out3
 }

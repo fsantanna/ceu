@@ -1,32 +1,15 @@
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 @TestMethodOrder(Alphanumeric::class)
 class TXPar {
-
-    fun all (inp: String): String {
-        INFER = true
-        val (ok1,out1) = ce2c(null, inp)
-        if (!ok1) {
-            return out1
-        }
-        File("out.c").writeText(out1)
-        val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
-        if (!ok2) {
-            return out2
-        }
-        val (_,out3) = exec("$VALGRIND./out.exe")
-        //println(out3)
-        return out3
-    }
 
     // SPAWN
 
     @Test
     fun a01_spawn () {
-        val out = all("""
+        val out = test(true, """
             spawn {
                 output std ()
             }
@@ -39,7 +22,7 @@ class TXPar {
     }
     @Test
     fun a02_spawn_var () {
-        val out = all("""
+        val out = test(true, """
             var x = ()
             spawn {
                 output std x
@@ -53,7 +36,7 @@ class TXPar {
     }
     @Test
     fun a03_spawn_spawn_var () {
-        val out = all("""
+        val out = test(true, """
             spawn {
                 var x = ()
                 spawn {
@@ -69,7 +52,7 @@ class TXPar {
     }
     @Test
     fun a04_spawn_spawn_spawn_var () {
-        val out = all("""
+        val out = test(true, """
             spawn {
                 var x = ()
                 spawn {
@@ -87,7 +70,7 @@ class TXPar {
     }
     @Test
     fun a05_spawn_task () {
-        val out = all("""
+        val out = test(true, """
             var t = spawn {
                 output std ()
             }
@@ -97,7 +80,7 @@ class TXPar {
     }
     @Test
     fun a6_dollar () {
-        val out = all("""
+        val out = test(true, """
             spawn {
                 var x: _int
                 set x = _10:_int
@@ -110,7 +93,7 @@ class TXPar {
     }
     @Test
     fun a7_anon () {
-        val out = all("""
+        val out = test(true, """
             var t = task () -> _int -> () {
                 spawn {
                     set pub = _10
@@ -126,7 +109,7 @@ class TXPar {
 
     @Test
     fun b01_par () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             spawn {
                 par {
@@ -142,7 +125,7 @@ class TXPar {
     }
     @Test
     fun b02_parand () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 parand {
@@ -162,7 +145,7 @@ class TXPar {
     }
     @Test
     fun b03_paror () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 paror {
@@ -183,7 +166,7 @@ class TXPar {
     }
     @Test
     fun b04_watching () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 watching evt?3 {
@@ -198,7 +181,7 @@ class TXPar {
     }
     @Test
     fun b05_spawn_every () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 every evt?3 {
@@ -215,7 +198,7 @@ class TXPar {
 
     @Test
     fun c01_clk () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,(),(),_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
@@ -238,7 +221,7 @@ class TXPar {
     }
     @Test
     fun c02_clk () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,(),(),_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
@@ -262,7 +245,7 @@ class TXPar {
 
     @Test
     fun d01_pause () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int,()>
             spawn {
                 pauseif evt?3 {

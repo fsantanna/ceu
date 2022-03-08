@@ -1,30 +1,13 @@
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 @TestMethodOrder(Alphanumeric::class)
 class TTask {
 
-    fun all (inp: String): String {
-        INFER = false
-        val (ok1,out1) = ce2c(null, inp)
-        if (!ok1) {
-            return out1
-        }
-        File("out.c").writeText(out1)
-        val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
-        if (!ok2) {
-            return out2
-        }
-        val (_,out3) = exec("$VALGRIND./out.exe")
-        //println(out3)
-        return out3
-    }
-
     @Test
     fun a01_output () {
-        val out = all("""
+        val out = test(false, """
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
@@ -37,7 +20,7 @@ class TTask {
     }
     @Test
     fun a01_output_anon () {
-        val out = all("""
+        val out = test(false, """
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
@@ -49,14 +32,14 @@ class TTask {
     }
     @Test
     fun a02_await_err2 () {
-        val out = all("""
+        val out = test(false, """
             await ()
         """.trimIndent())
         assert(out.startsWith("(ln 1, col 1): invalid condition : type mismatch")) { out }
     }
     @Test
     fun a02_emit_err () {
-        val out = all("""
+        val out = test(false, """
             emit @GLOBAL _1:_int
         """.trimIndent())
         //assert(out == "(ln 1, col 1): invalid `emit` : type mismatch : expected Event : have _int") { out }
@@ -64,7 +47,7 @@ class TTask {
     }
     @Test
     fun a02_await () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -82,7 +65,7 @@ class TTask {
     }
     @Test
     fun a02_await_err () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -103,7 +86,7 @@ class TTask {
     }
     @Test
     fun a03_var () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -121,7 +104,7 @@ class TTask {
     }
     @Test
     fun a04_vars () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -149,7 +132,7 @@ class TTask {
     }
     @Test
     fun a05_args_err () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->()->()
             var x : active task @[]->[()]->()->()
             set x = spawn f ()
@@ -158,7 +141,7 @@ class TTask {
     }
     @Test
     fun a05_args () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->_(char*)->()->()
             set f = task @[]->_(char*)->()->() {
@@ -179,7 +162,7 @@ class TTask {
     }
     @Test
     fun a05_args2 () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->_int->()->_int
             set f = task @[]->_int->()->_int {
@@ -194,7 +177,7 @@ class TTask {
     }
     @Test
     fun a06_par_err () {
-        val out = all("""
+        val out = test(false, """
             var build : func @[] -> () -> task @[]->()->()->()
             set build = func @[] -> () -> task @[]->()->()->() {
                 set ret = task @[]->()->()->() {    -- ERR: not the same @LOCAL
@@ -208,7 +191,7 @@ class TTask {
     }
     @Test
     fun a06_par1 () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var build : task @[]->()->()->()
             set build = task @[]->()->()->() {
@@ -232,7 +215,7 @@ class TTask {
     }
     @Test
     fun a07_bcast () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -262,7 +245,7 @@ class TTask {
     }
     @Test
     fun a08_bcast_block () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -298,7 +281,7 @@ class TTask {
     }
     @Test
     fun a08_bcast_block2 () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             {
                 var f : task @[]->()->()->()
@@ -334,7 +317,7 @@ class TTask {
     }
     @Test
     fun a09_nest () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -363,7 +346,7 @@ class TTask {
     }
     @Test
     fun a10_block_out () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -406,7 +389,7 @@ class TTask {
     }
     @Test
     fun a11_self_kill () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var g : task @[]->()->()->()
             set g = task @[]->()->()->() {
@@ -435,7 +418,7 @@ class TTask {
     }
     @Test
     fun a12_self_kill () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var g : task @[]->()->()->()
             set g = task @[]->()->()->() {
@@ -471,7 +454,7 @@ class TTask {
 
     @Test
     fun b01_defer () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -495,7 +478,7 @@ class TTask {
     }
     @Test
     fun b02_defer_block () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -524,7 +507,7 @@ class TTask {
 
     @Test
     fun c00_catch () {
-        val out = all("""
+        val out = test(false, """
            catch {
            }
         """.trimIndent())
@@ -533,7 +516,7 @@ class TTask {
 
     @Test
     fun c00_err () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->()->()
             var x : task @[]->()->()->()
             set x = spawn f ()
@@ -542,7 +525,7 @@ class TTask {
     }
     @Test
     fun c00_throw () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var h : task @[]->()->()->()
             set h = task @[]->()->()->() {
@@ -566,7 +549,7 @@ class TTask {
     }
     @Test
     fun c01_throw () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var h : task @[]->()->()->()
             set h = task @[]->()->()->() {
@@ -599,7 +582,7 @@ class TTask {
     }
     @Test
     fun c02_throw_par2 () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var main : task @[]->()->()->()
             set main = task @[]->()->()->() {
@@ -644,7 +627,7 @@ class TTask {
     }
     @Test
     fun c03_throw_func () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var err : func @[]->()->()
             set err = func @[]->()->() {
@@ -676,7 +659,7 @@ class TTask {
 
     @Test
     fun d00_err () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->_int->()
             set f.pub = _4:_int
         """.trimIndent())
@@ -684,7 +667,7 @@ class TTask {
     }
     @Test
     fun d01_field () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->_int->()
             set f = task @[]->()->_int->() {
                 set pub = _3:_int
@@ -704,7 +687,7 @@ class TTask {
 
     @Test
     fun e01_spawn () {
-        val out = all("""
+        val out = test(false, """
             spawn task @[]->()->()->() {
                 output std ()
             } ()
@@ -714,7 +697,7 @@ class TTask {
     }
     @Test
     fun e01_spawn_err2 () {
-        val out = all("""
+        val out = test(false, """
             var f : func @[]->()->()
             var fs : active {} task @[]->()->()->()
             spawn f () in fs
@@ -723,7 +706,7 @@ class TTask {
     }
     @Test
     fun e01_spawn_err3 () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->()->()
             spawn f () in ()
         """.trimIndent())
@@ -731,7 +714,7 @@ class TTask {
     }
     @Test
     fun e01_spawn_err4 () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->()->()
             var fs : active {} task @[]->[()]->()->()
             spawn f () in fs
@@ -740,7 +723,7 @@ class TTask {
     }
     @Test
     fun e02_spawn_free () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -758,7 +741,7 @@ class TTask {
     }
     @Test
     fun e03_spawn_anon () {
-        val out = all("""
+        val out = test(false, """
             var t: task @[] -> () -> [_int] -> ()
             set t = task @[] -> () -> [_int] -> () {
                 var xxx: _int
@@ -778,7 +761,7 @@ class TTask {
 
     @Test
     fun f01_err () {
-        val out = all("""
+        val out = test(false, """
             var xs: active {} task @[]->()->_int->()
             var x:  task @[]->()->_int->()
             loop x in xs {
@@ -789,7 +772,7 @@ class TTask {
     }
     @Test
     fun f02_err () {
-        val out = all("""
+        val out = test(false, """
             var xs: active {} task @[]->[()]->_int->()
             var x:  active task  @[]->()->_int->()
             loop x in xs {
@@ -800,7 +783,7 @@ class TTask {
     }
     @Test
     fun f03_err () {
-        val out = all("""
+        val out = test(false, """
             var x: ()
             loop x in () {
             }
@@ -809,7 +792,7 @@ class TTask {
     }
     @Test
     fun f04_err () {
-        val out = all("""
+        val out = test(false, """
             var x: active task @[]->()->_int->()
             loop x in () {
             }
@@ -819,7 +802,7 @@ class TTask {
 
     @Test
     fun f05_loop () {
-        val out = all("""
+        val out = test(false, """
             var fs: active {} task @[]->()->_int->()
             var f: active task @[]->()->_int->()
             loop f in fs {
@@ -831,7 +814,7 @@ class TTask {
 
     @Test
     fun f06_pub () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->_int->()
             set f = task @[]->()->_int->() {
@@ -851,7 +834,7 @@ class TTask {
 
     @Test
     fun f07_kill () {
-        val out = all("""
+        val out = test(false, """
             var f : task @[]->()->_int->()
             set f = task @[]->()->_int->() {
                 set pub = _3:_int
@@ -869,7 +852,7 @@ class TTask {
 
     @Test
     fun f07_valgrind () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -885,7 +868,7 @@ class TTask {
 
     @Test
     fun f08_natural () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->_int->_int->()
             set f = task @[]->_int->_int->() {
@@ -923,7 +906,7 @@ class TTask {
 
     @Test
     fun f09_dloop_kill () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->_int->()
             set f = task @[]->()->_int->() {
@@ -944,7 +927,7 @@ class TTask {
 
     @Test
     fun f10_track () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->_int->()
             set f = task @[]->()->_int->() {
@@ -968,7 +951,7 @@ class TTask {
 
     @Test
     fun g01_state () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -996,7 +979,7 @@ class TTask {
 
     @Test
     fun g02_kill () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             spawn (task @[]->()->()->() {
                 loop {
@@ -1030,7 +1013,7 @@ class TTask {
 
     @Test
     fun g03_kill () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             spawn (task @[]->()->()->() {
                 loop {
@@ -1053,7 +1036,7 @@ class TTask {
     }
     @Test
     fun g03_kill_return () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             spawn (task @[]->()->()->() {
                 loop {
@@ -1076,7 +1059,7 @@ class TTask {
 
     @Test
     fun g03_f_kill () {
-        val out = all("""
+        val out = test(false, """
             var fff: func () -> () {}
             set fff = func () -> () {}
             spawn (task @[]->()->()->() {
@@ -1092,7 +1075,7 @@ class TTask {
 
     @Test
     fun g04_err () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,()>
             
             spawn (task  @[] -> () -> () -> () {
@@ -1125,7 +1108,7 @@ class TTask {
 
     @Test
     fun g05_spawn_abort () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,(),()>
             var t: task @[] -> () -> () -> ()
             set t = task @[] -> () -> () -> () {
@@ -1158,7 +1141,7 @@ class TTask {
 
     @Test
     fun h01_type_task () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,()>
             type Bird = task  @[] -> () -> () -> ()
             
@@ -1177,7 +1160,7 @@ class TTask {
 
     @Test
     fun h02_task_type () {
-        val out = all("""
+        val out = test(false, """
             type Xask = task ()->_int->()
             var t : Xask
             set t = task ()->_int->() {
@@ -1195,7 +1178,7 @@ class TTask {
 
     @Test
     fun h03_task_type () {
-        val out = all("""
+        val out = test(false, """
             type Event = <()>
             type Xask @[] = task @[] -> () -> _int -> ()
             var t: Xask
@@ -1214,7 +1197,7 @@ class TTask {
     }
     @Test
     fun h04_task_type () {
-        val out = all("""
+        val out = test(false, """
             type Event = <()>
 
             var n: _int
@@ -1239,7 +1222,7 @@ class TTask {
 
     @Test
     fun h05_task_type () {
-        val out = all("""
+        val out = test(false, """
             type Event = <()>
 
             var n: _int
@@ -1266,7 +1249,7 @@ class TTask {
 
     @Test
     fun i01_local () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
@@ -1286,7 +1269,7 @@ class TTask {
 
     @Test
     fun i02_err () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var x1 : active task @[]->()->()->()
             emit @GLOBAL x1 ()
@@ -1298,7 +1281,7 @@ class TTask {
 
     @Test
     fun j01_pause () {
-        val out = all("""
+        val out = test(false, """
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {

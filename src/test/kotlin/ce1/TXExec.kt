@@ -5,31 +5,14 @@ import java.io.File
 
 @TestMethodOrder(Alphanumeric::class)
 class TXExec {
-
-    fun all (inp: String): String {
-        INFER = true
-        val (ok1,out1) = ce2c(null, inp)
-        if (!ok1) {
-            return out1
-        }
-        File("out.c").writeText(out1)
-        val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
-        if (!ok2) {
-            return out2
-        }
-        val (_,out3) = exec("$VALGRIND./out.exe")
-        //println(out3)
-        return out3
-    }
-
     @Test
     fun a01_output () {
-        val out = all("output std ()")
+        val out = test(true, "output std ()")
         assert(out == "()\n") { out }
     }
     @Test
     fun a02_int_abs () {
-        val out = all("""
+        val out = test(true, """
             var x: _int
             set x = _abs _(-1)
             output std x
@@ -38,7 +21,7 @@ class TXExec {
     }
     @Test
     fun a03_tuple () {
-        val out = all("""
+        val out = test(true, """
             var v = [(),()]
             output std /v
         """.trimIndent())
@@ -46,7 +29,7 @@ class TXExec {
     }
     @Test
     fun a04_tuples () {
-        val out = all("""
+        val out = test(true, """
             var v = [(),()]
             var x = [(),v]
             var y = x.2
@@ -58,7 +41,7 @@ class TXExec {
     }
     @Test
     fun a05_nat () {
-        val out = all("""
+        val out = test(true, """
             var y: _(char*) = _{"hello"}
             var n: _{int} = _10
             var x = [n,y]
@@ -68,7 +51,7 @@ class TXExec {
     }
     @Test
     fun a06_call () {
-        val out = all("""
+        val out = test(true, """
             var f = func _int -> _int {
                 return arg
             }
@@ -79,7 +62,7 @@ class TXExec {
     }
     @Test
     fun a07_call_fg () {
-        val out = all("""
+        val out = test(true, """
             var f = func ()->() {
                 var x = _10:_int
                 output std x
@@ -93,7 +76,7 @@ class TXExec {
     }
     @Test
     fun a08_union () {
-        val out = all("""
+        val out = test(true, """
             var a = <.1>:<(),()>
             var b : <(),()> = <.2>
             output std /a
@@ -103,7 +86,7 @@ class TXExec {
     }
     @Test
     fun a09_func_if () {
-        val out = all("""
+        val out = test(true, """
         var inv = func <(),()> -> <(),()> {
             if arg?1 {
                 return <.2>
@@ -119,7 +102,7 @@ class TXExec {
     }
     @Test
     fun a10_loop () {
-        val out = all("""
+        val out = test(true, """
         var i: _int = _1
         var n = _0: _int
         loop {
@@ -135,7 +118,7 @@ class TXExec {
     }
     @Test
     fun a11_unions () {
-        val out = all("""
+        val out = test(true, """
             var z = <.1()>:<()>
             var y : <<()>> = <.1 z>
             var x = <.1 y>:<<<()>>>
@@ -147,7 +130,7 @@ class TXExec {
     }
     @Test
     fun a12_tuple_nat () {
-        val out = all("""
+        val out = test(true, """
             var s: [_int,_int,_int,_int] = [_1,_2,_3,_4]
             output std /s
         """.trimIndent())
@@ -155,7 +138,7 @@ class TXExec {
     }
     @Test
     fun a13_union_nat () {
-        val out = all("""
+        val out = test(true, """
             var s: <[_int,_int,_int,_int],_int,_int> = <.1 [_1,_2,_3,_4]>
             output std /s
         """.trimIndent())
@@ -163,7 +146,7 @@ class TXExec {
     }
     @Test
     fun a14_pred () {
-        val out = all("""
+        val out = test(true, """
             var z = <.1>: <()>
             output std z?1
         """.trimIndent())
@@ -171,7 +154,7 @@ class TXExec {
     }
     @Test
     fun a15_disc () {
-        val out = all("""
+        val out = test(true, """
             var z: <(),()> = <.2>
             output std z!2
         """.trimIndent())
@@ -179,7 +162,7 @@ class TXExec {
     }
     @Test
     fun a16_dots () {
-        val out = all("""
+        val out = test(true, """
             var x: <<<()>>> = <.1 <.1 <.1>>>
             output std x!1!1!1
         """.trimIndent())
@@ -187,7 +170,7 @@ class TXExec {
     }
     @Test
     fun a17_if () {
-        val out = all("""
+        val out = test(true, """
             var x: <(),()> = <.2>
             if x?2 { output std () } else { }
         """.trimIndent())
@@ -195,7 +178,7 @@ class TXExec {
     }
     @Test
     fun a18_loop () {
-        val out = all("""
+        val out = test(true, """
         loop {
            break
         }
@@ -205,7 +188,7 @@ class TXExec {
     }
     @Test
     fun a19_ptr () {
-        val out = all("""
+        val out = test(true, """
             var y: _int = _10
             var x = /y
             output std x\
@@ -214,7 +197,7 @@ class TXExec {
     }
     @Test
     fun i05_ptr_block_err () {
-        val out = all("""
+        val out = test(true, """
             var p1: /_int
             var p2: /_int
             {
@@ -230,7 +213,7 @@ class TXExec {
 
     @Test
     fun b09_union () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var x: /List = <.0>
             var y: <//List> = <.1 /x>
@@ -242,7 +225,7 @@ class TXExec {
     }
     @Test
     fun b12_new_self () {
-        val out = all("""
+        val out = test(true, """
             type List = <[(),/List]>
             var x: /List = new <.1 [(),<.0>]>
             var y: [(),/List] = [(), new <.1 [(),<.0>]>]
@@ -253,7 +236,7 @@ class TXExec {
     }
     @Test
     fun b13_new_self () {
-        val out = all("""
+        val out = test(true, """
             type List = <[//List,/List]>
             var x: /List = new <.1 [_(&printf),<.0>]>
             set x\!1.1 = /x
@@ -264,7 +247,7 @@ class TXExec {
     }
     @Test
     fun b16_new () {
-        val out = all("""
+        val out = test(true, """
             type List = <(),/List>
             var l: /List = new <.2 new <.1>>
             var t1 = [l]
@@ -275,7 +258,7 @@ class TXExec {
     }
     @Test
     fun b17_new () {
-        val out = all("""
+        val out = test(true, """
             type List = <(),/List>
             var l: /List = new <.2 new <.1>>
             var t1 = [(), l]
@@ -286,7 +269,7 @@ class TXExec {
     }
     @Test
     fun b21_new () {
-        val out = all("""
+        val out = test(true, """
             type List = <(),/List>
             var x: /List = new <.2 new <.1>>
             var y = x
@@ -297,7 +280,7 @@ class TXExec {
     }
     @Test
     fun b22_new () {
-        val out = all("""
+        val out = test(true, """
             type List = <(),[(),/List]>
             var x: /List = new <.2 [(),new <.1>]>
             var y = [(), x\!2.2]
@@ -308,7 +291,7 @@ class TXExec {
     }
     @Test
     fun b23_new () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var z: /List = <.0>
             var one: /List = new <.1 z>
@@ -323,7 +306,7 @@ class TXExec {
     }
     @Test
     fun b25_new () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var l1: /List = new <.1 <.0>>
             var l2 = new List.1 l1
@@ -338,7 +321,7 @@ class TXExec {
 
     @Test
     fun c01 () {
-        val out = all("""
+        val out = test(true, """
         var f = func /_int@k1 -> () {
            set arg\ = _(*${D}arg+1)
            return
@@ -351,7 +334,7 @@ class TXExec {
     }
     @Test
     fun c02_fact () {
-        val out = all(
+        val out = test(true, 
             """
             var fact : func [/_int,_int] -> ()
             set fact = func [/_int,_int] -> () {
@@ -371,7 +354,7 @@ class TXExec {
     }
     @Test
     fun c03 () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var f = func /List->() {
                 var pf = arg
@@ -387,7 +370,7 @@ class TXExec {
     }
     @Test
     fun c04_ptr_arg () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var f = func /List->() {
                 set arg\!1 = new <.1 <.0>>
@@ -403,7 +386,7 @@ class TXExec {
     }
     @Test
     fun c05_ptr_arg_two () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var f = func [/List,/List]->() {
                 set arg.1\!1 = new <.1 <.0>>
@@ -419,7 +402,7 @@ class TXExec {
     }
     @Test
     fun c06_ptr_call_err () {
-        val out = all("""
+        val out = test(true, """
             var f = func /() -> /() {
                 return arg
             }
@@ -430,7 +413,7 @@ class TXExec {
     }
     @Test
     fun c07_ptr_arg_ret () {
-        val out = all("""
+        val out = test(true, """
             var f = func /_int@a1 -> /_int@a1 {
                 return arg
             }
@@ -443,7 +426,7 @@ class TXExec {
     }
     @Test
     fun c08_call_call () {
-        val out = all("""
+        val out = test(true, """
             var f = func /_int@k1 -> /()@k1 {
                 return arg
             }
@@ -459,7 +442,7 @@ class TXExec {
     }
     @Test
     fun c09_func_arg () {
-        val out = all(
+        val out = test(true, 
             """
             var f = func () -> () {
                 return arg
@@ -477,7 +460,7 @@ class TXExec {
 
     @Test
     fun todo_d01 () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
@@ -497,7 +480,7 @@ class TXExec {
     }
     @Test
     fun todo_d02 () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
@@ -517,7 +500,7 @@ class TXExec {
     }
     @Test
     fun d03_err () {
-        val out = all("""
+        val out = test(true, """
             var f: func () -> _int          -- 1. `f` is a reference to a function
             {
                 var x: _int = _10
@@ -536,7 +519,7 @@ class TXExec {
 
     @Test
     fun e01_type () {
-        val out = all("""
+        val out = test(true, """
             type List = </List @LOCAL>
             var l: /List = <.0>
             output std l
@@ -545,7 +528,7 @@ class TXExec {
     }
     @Test
     fun e02_type () {
-        val out = all("""
+        val out = test(true, """
             type List = </List @LOCAL>
             var l: /List = new <.1 <.0>>
             output std l
@@ -555,7 +538,7 @@ class TXExec {
     }
     @Test
     fun e03_type () {
-        val out = all("""
+        val out = test(true, """
             type List = </List @LOCAL>
             var l: /List
             var z: /List = <.0>
@@ -567,7 +550,7 @@ class TXExec {
     }
     @Test
     fun e04_type () {
-        val out = all("""
+        val out = test(true, """
             type List = </List>
             var l: /List = new <.1 <.0>>
             output std l
@@ -577,7 +560,7 @@ class TXExec {
     }
     @Test
     fun e07_type () {
-        val out = all("""
+        val out = test(true, """
             native _{
                 void output_pico (TPico arg) {}
             }
@@ -594,7 +577,7 @@ class TXExec {
     }
     @Test
     fun e08_ptr_num() {
-        val out = all("""
+        val out = test(true, """
             type Num = /<Num>    
             var zero:  Num = <.0>
             var one:   Num = new <.1 zero>
@@ -606,7 +589,7 @@ class TXExec {
     }
     @Test
     fun e09_bool() {
-        val out = all("""
+        val out = test(true, """
             type Bool = <(),()>
             var v: Bool = <.1>
             output std /v
@@ -615,7 +598,7 @@ class TXExec {
     }
     @Test
     fun e10_rect() {
-        val out = all("""
+        val out = test(true, """
             type Unit  = ()
             type Int   = _int
             type Point = [Int,Int]
@@ -634,7 +617,7 @@ class TXExec {
     }
     @Test
     fun e11_rect_dot() {
-        val out = all("""
+        val out = test(true, """
             type Int   = _int
             type Point = [Int,Int]
             type Rect  = [Point,Point]
@@ -645,7 +628,7 @@ class TXExec {
     }
     @Test
     fun e12_ucons_type () {
-        val out = all("""
+        val out = test(true, """
             type TPico = <(),[_int,_int]>
             spawn {
                 var t1 = TPico.1
@@ -658,7 +641,7 @@ class TXExec {
     }
     @Test
     fun exx_func_alias () {
-        val out = all("""
+        val out = test(true, """
             type Int2Int = func @[] -> () -> ()
             var f: Int2Int
             set f = Int2Int {} 
@@ -668,7 +651,7 @@ class TXExec {
     }
     @Test
     fun eyy_func_alias () {
-        val out = all("""
+        val out = test(true, """
             type Int2Int = func @[] -> () -> ()
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {}
@@ -678,7 +661,7 @@ class TXExec {
     }
     @Test
     fun e13_func_alias () {
-        val out = all("""
+        val out = test(true, """
             type Int2Int = func @[] -> _int -> _int
             
             var f: Int2Int
@@ -698,7 +681,7 @@ class TXExec {
 
     @Test
     fun f01_where () {
-        val out = all("""
+        val out = test(true, """
             output std x where { var x = ()  }
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
@@ -706,7 +689,7 @@ class TXExec {
     }
     @Test
     fun f02_until () {
-        val out = all("""
+        val out = test(true, """
             output std () until _1
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
@@ -714,14 +697,14 @@ class TXExec {
     }
     @Test
     fun f03_err () {
-        val out = all("""
+        val out = test(true, """
             output std () until ()
         """.trimIndent())
         assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()") { out }
     }
     @Test
     fun f05_err () {
-        val out = all("""
+        val out = test(true, """
             output std v where {
                 var v = ()
             } until z where {

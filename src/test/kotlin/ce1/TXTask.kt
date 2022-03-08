@@ -2,30 +2,12 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 @TestMethodOrder(Alphanumeric::class)
 class TXTask {
-
-    fun all (inp: String): String {
-        INFER = true
-        val (ok1,out1) = ce2c(null, inp)
-        if (!ok1) {
-            return out1
-        }
-        File("out.c").writeText(out1)
-        val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
-        if (!ok2) {
-            return out2
-        }
-        val (_,out3) = exec("$VALGRIND./out.exe")
-        //println(out3)
-        return out3
-    }
-
     @Test
     fun a01_output () {
-        val out = all("""
+        val out = test(true, """
             var f = task ()->()->() {
                 output std _1:_int
             }
@@ -36,14 +18,14 @@ class TXTask {
     }
     @Test
     fun a02_await_err2 () {
-        val out = all("""
+        val out = test(true, """
             await ()
         """.trimIndent())
         assert(out.startsWith("(ln 1, col 1): invalid condition : type mismatch")) { out }
     }
     @Test
     fun a02_await () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 output std _1:_int
@@ -59,7 +41,7 @@ class TXTask {
     }
     @Test
     fun a02_await_err () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 output std _1:_int
@@ -76,7 +58,7 @@ class TXTask {
     }
     @Test
     fun a03_var () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 var x = _10:_int
@@ -90,7 +72,7 @@ class TXTask {
     }
     @Test
     fun a04_vars () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task @[]->()->()->() {
                 {
@@ -112,7 +94,7 @@ class TXTask {
     }
     @Test
     fun a05_args_err () {
-        val out = all("""
+        val out = test(true, """
             var f : task ()->()->()
             var x : active task [()]->()->() = spawn f ()
         """.trimIndent())
@@ -120,7 +102,7 @@ class TXTask {
     }
     @Test
     fun a05_args () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task @[]->_(char*)->()->() {
                 output std arg
@@ -137,7 +119,7 @@ class TXTask {
     }
     @Test
     fun a06_par_err () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var build = func () -> task ()->()->() {
                 set ret = task ()->()->() {    -- ERR: not the same @LOCAL
@@ -151,7 +133,7 @@ class TXTask {
     }
     @Test
     fun a06_par1 () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var build = task ()->()->() {
                 output std _1:_int
@@ -169,7 +151,7 @@ class TXTask {
     }
     @Test
     fun a07_emit () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task ()->()->() {
                 await evt?3
@@ -195,7 +177,7 @@ class TXTask {
     }
     @Test
     fun a08_emit_block () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task ()->()->() {
                 await evt?1
@@ -222,7 +204,7 @@ class TXTask {
     }
     @Test
     fun a09_nest () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 output std _1:_int
@@ -247,7 +229,7 @@ class TXTask {
     }
     @Test
     fun a10_block_out () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 output std _10:_int
@@ -284,7 +266,7 @@ class TXTask {
     }
     @Test
     fun a11_self_kill () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var g = task ()->()->() {
                 var f = task ()->()->() {
@@ -309,7 +291,7 @@ class TXTask {
     }
     @Test
     fun a12_self_kill () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var g = task ()->()->() {
                 var f = task ()->()->() {
@@ -340,7 +322,7 @@ class TXTask {
 
     @Test
     fun b01_defer () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 var defer = task ()->()->() {
@@ -359,7 +341,7 @@ class TXTask {
     }
     @Test
     fun b02_defer_block () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 {
@@ -383,7 +365,7 @@ class TXTask {
 
     @Test
     fun c00_err () {
-        val out = all("""
+        val out = test(true, """
             var f : task ()->()->()
             var x : task ()->()->()
             set x = spawn f ()
@@ -392,7 +374,7 @@ class TXTask {
     }
     @Test
     fun c00_throw () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var h = task ()->()->() {
                catch {
@@ -412,7 +394,7 @@ class TXTask {
     }
     @Test
     fun c01_throw () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var h = task ()->()->() {
                 catch {
@@ -439,7 +421,7 @@ class TXTask {
     }
     @Test
     fun c02_throw_par2 () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var main = task ()->()->() {
                 var fg = task ()->()->() {
@@ -476,7 +458,7 @@ class TXTask {
     }
     @Test
     fun c03_throw_func () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var err = func ()->() {
                 throw
@@ -504,7 +486,7 @@ class TXTask {
 
     @Test
     fun d01_field () {
-        val out = all("""
+        val out = test(true, """
             var f = task ()->_int->() {
                 set pub = _3
                 output std _1:_int
@@ -522,7 +504,7 @@ class TXTask {
 
     @Test
     fun e01_spawn () {
-        val out = all("""
+        val out = test(true, """
             spawn task @[]->()->()->() {
                 output std ()
             } ()
@@ -532,7 +514,7 @@ class TXTask {
     }
     @Test
     fun e01_spawn_err2 () {
-        val out = all("""
+        val out = test(true, """
             var f : func ()->()
             var fs : active {} task ()->()->()
             spawn f () in fs
@@ -541,7 +523,7 @@ class TXTask {
     }
     @Test
     fun e01_spawn_err3 () {
-        val out = all("""
+        val out = test(true, """
             var f : task ()->()->()
             spawn f () in ()
         """.trimIndent())
@@ -549,7 +531,7 @@ class TXTask {
     }
     @Test
     fun e01_spawn_err4 () {
-        val out = all("""
+        val out = test(true, """
             var f : task ()->()->()
             var fs : active {} task [()]->()->()
             spawn f () in fs
@@ -558,7 +540,7 @@ class TXTask {
     }
     @Test
     fun e02_spawn_free () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
                 output std _1:_int
@@ -578,7 +560,7 @@ class TXTask {
 
     @Test
     fun f01_err () {
-        val out = all("""
+        val out = test(true, """
             var xs: active {} task ()->_int->()
             var x:  task ()->_int->()
             loop x in xs {
@@ -589,7 +571,7 @@ class TXTask {
     }
     @Test
     fun f02_err () {
-        val out = all("""
+        val out = test(true, """
             var xs: active {} task [()]->_int->()
             var x:  active task ()->_int->()
             loop x in xs {
@@ -600,7 +582,7 @@ class TXTask {
     }
     @Test
     fun f03_err () {
-        val out = all("""
+        val out = test(true, """
             var x: ()
             loop x in () {
             }
@@ -609,7 +591,7 @@ class TXTask {
     }
     @Test
     fun f04_err () {
-        val out = all("""
+        val out = test(true, """
             var x: active task ()->_int->()
             loop x in () {
             }
@@ -619,7 +601,7 @@ class TXTask {
 
     @Test
     fun f05_loop () {
-        val out = all("""
+        val out = test(true, """
             var fs: active {} task ()->_int->()
             var f: active task ()->_int->()
             loop f in fs {
@@ -631,7 +613,7 @@ class TXTask {
 
     @Test
     fun f06_pub () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task ()->_int->() {
                 set pub = _3
@@ -650,7 +632,7 @@ class TXTask {
 
     @Test
     fun f07_kill () {
-        val out = all("""
+        val out = test(true, """
             var f : task ()->_int->()
             set f = task ()->_int->() {
                 set pub = _3
@@ -668,7 +650,7 @@ class TXTask {
 
     @Test
     fun f08_natural () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task _int->_int->() {
                 set pub = arg
@@ -705,7 +687,7 @@ class TXTask {
     @Disabled
     @Test
     fun c03_try_catch () {
-        val out = all("""
+        val out = test(true, """
             catch (file not found) {
                 var f = open ()
                 defer {
@@ -722,7 +704,7 @@ class TXTask {
 
     @Test
     fun f09_dloop_kill () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task ()->_int->() {
                 set pub = _10
@@ -742,7 +724,7 @@ class TXTask {
     }
     @Test
     fun f09_dloop_kill2 () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_int,_int>
             var f = task ()->_int->() {
                 set pub = _10
@@ -766,7 +748,7 @@ class TXTask {
 
     @Test
     fun f10_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Xask = task ()->_int->()
             var t : Xask
             set t = Xask {
@@ -784,7 +766,7 @@ class TXTask {
     }
     @Test
     fun fxx_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Xask = task ()->()->()
             var t = Xask {}
             output std ()
@@ -793,7 +775,7 @@ class TXTask {
     }
     @Test
     fun f11_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Xask = task ()->()->()
             var t : Xask
             set t = Xask {
@@ -809,7 +791,7 @@ class TXTask {
     }
     @Test
     fun f12_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Event = <()>
             type Pair = [_int,_int]
             type Xask = task @[] -> () -> Pair -> ()
@@ -828,7 +810,7 @@ class TXTask {
     }
     @Test
     fun f13_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Xunc = func ()->()
             var f = Xunc {
                 output std _1:_int
@@ -846,7 +828,7 @@ class TXTask {
 
     @Test
     fun f14_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Event = <()>
             var n = _0:_int
             type Xask = task () -> () -> ()
@@ -866,7 +848,7 @@ class TXTask {
     }
     @Test
     fun f15_task_type () {
-        val out = all("""
+        val out = test(true, """
             type Event = <()>
             type Pair = [_int,_int]
             type Xask = task @[] -> () -> _int -> ()
@@ -890,7 +872,7 @@ class TXTask {
 
     @Test
     fun g01_local () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             var f = task @[]->()->()->() {
                 output std _1:_int
@@ -909,7 +891,7 @@ class TXTask {
 
     @Test
     fun h01_ret () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             var f = task @[]->_int->()->_int {
                 return arg
@@ -923,7 +905,7 @@ class TXTask {
     }
     @Test
     fun h02_ret () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             var f = task @[]->_int->()->_int {
                 --var v = arg
@@ -945,7 +927,7 @@ class TXTask {
     }
     @Test
     fun h03_ret () {
-        val out = all("""
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             var f = task @[]->_int->()->_int {
                 var v = arg
