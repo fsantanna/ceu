@@ -1,13 +1,5 @@
 open class Parser
 {
-    fun event (): String {
-        return if (alls.accept(TK.XCLK)) {
-            "" + (alls.tk0 as Tk.Clk).ms + "ms"
-        } else {
-            this.expr().tostr(true)
-        }
-    }
-
     open fun type (id: Tk.Id? = null): Type {
         return when {
             (id!=null || alls.accept(TK.XID)) -> {
@@ -76,6 +68,7 @@ open class Parser
                 val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
                 if (haseq) {
                     if (istup) id.asvar() else id.astype()
+                    assert(CE1)
                 }
 
                 val tp = this.type(if (hasid && !haseq) (id as Tk.Id) else null)
@@ -129,7 +122,37 @@ open class Parser
         }
     }
 
-    open fun expr_one (): Expr {
+    fun scp1s (f: (Tk) -> Tk.Id): List<Tk.Id> {
+        val scps = mutableListOf<Tk.Id>()
+        while (alls.accept(TK.XID)) {
+            scps.add(f(alls.tk0))
+            if (!alls.accept(TK.CHAR, ',')) {
+                break
+            }
+        }
+        return scps
+    }
+    fun scopepars (): Pair<List<Tk.Id>, List<Pair<String, String>>> {
+        alls.accept_err(TK.ATBRACK)
+        val scps = this.scp1s { it.asscopepar() }
+        val ctrs = mutableListOf<Pair<String, String>>()
+        if (alls.accept(TK.CHAR, ':')) {
+            while (alls.accept(TK.XID)) {
+                val id1 = alls.tk0.asscopepar().id
+                alls.accept_err(TK.CHAR, '>')
+                alls.accept_err(TK.XID)
+                val id2 = alls.tk0.asscopepar().id
+                ctrs.add(Pair(id1, id2))
+                if (!alls.accept(TK.CHAR, ',')) {
+                    break
+                }
+            }
+        }
+        alls.accept_err(TK.CHAR, ']')
+        return Pair(scps, ctrs)
+    }
+
+    fun expr_one (): Expr {
         return when {
             alls.tk1.istype() -> {
                 val id = alls.tk1 as Tk.Id
@@ -171,31 +194,32 @@ open class Parser
                 All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
                     "invalid discriminator : expected index or type identifier"
                 }
+                assert(CE1 || dsc is Tk.Num || dsc.istask())
 
                 val cons = when {
-                    dsc.isNull() -> null
+                    dsc.isnull() -> null
                     alls.checkExpr() -> this.expr()
                     else -> Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                 }
                 alls.accept_err(TK.CHAR, '>')
                 val tp = if (!alls.accept(TK.CHAR, ':')) null else {
                     val tp = this.type()
-                    if (dsc.isNull()) {
+                    if (dsc.isnull()) {
                         All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Alias) {
                             "invalid type : expected pointer to alias type"
                         }
                     } else {
                         All_assert_tk(tp.tk,tp is Type.Union) {
-                                "invalid type : expected union type"
+                            "invalid type : expected union type"
                         }
                     }
                     tp
                 }
                 when {
-                    dsc.isNull() -> Expr.UNull(dsc, tp as Type.Pointer?)
+                    dsc.isnull() -> Expr.UNull(dsc, tp as Type.Pointer?)
                     (tp != null) -> Expr.UCons(dsc, tp as Type.Union?, cons!!)
                     else -> {
-                        assert(INFER)
+                        assert(CE1)
                         Expr.Pak (
                             Tk.Sym(TK.XAS,dsc.lin,dsc.col,":+"),
                             Expr.UCons(dsc, tp as Type.Union?, cons!!),
@@ -208,7 +232,7 @@ open class Parser
             alls.accept(TK.NEW) -> {
                 val tk0 = alls.tk0
                 val e = this.expr()
-                All_assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons && !e.tk.isNull())) {
+                All_assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons && !e.tk.isnull())) {
                     "invalid `new` : expected constructor"
                 }
 
@@ -252,7 +276,7 @@ open class Parser
                 }
                 alls.accept_err(TK.CHAR, ']')
                 val ret = Expr.TCons(tk0, es)
-                if (!INFER) ret else {
+                if (!CE1) ret else {
                     Expr.Pak(
                         Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
                         ret,
@@ -273,8 +297,7 @@ open class Parser
             }
         }
     }
-
-    open fun expr (): Expr {
+    fun expr (): Expr {
         var e = this.expr_dots()
         // call
         if (alls.checkExpr() || alls.check(TK.ATBRACK)) {
@@ -290,7 +313,7 @@ open class Parser
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
-                if (e is Expr.Unpak || !INFER) e else {
+                if (e is Expr.Unpak || !CE1) e else {
                     Expr.Unpak(Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"), true, e)
                 },
                 arg,
@@ -299,7 +322,7 @@ open class Parser
                     if (oscp==null) null else Scope(oscp,null)
                 )
             )
-            if (!INFER) e else {
+            if (!CE1) e else {
                 e = Expr.Pak(
                     Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":+"),
                     e,
@@ -310,8 +333,256 @@ open class Parser
         }
         return e
     }
+    fun expr_as (e: Expr): Expr {
+        return if (!alls.accept(TK.XAS)) e else {
+            val tk0 = alls.tk0 as Tk.Sym
+            if (tk0.sym == ":+") {
+                val isact = alls.accept(TK.ACTIVE)
+                val type = this.type()
+                All_assert_tk(alls.tk0, type is Type.Alias) {
+                    "expected alias type"
+                }
+                Expr.Pak(tk0, e, isact, type as Type.Alias)
+            } else {
+                Expr.Unpak(tk0, false, e)
+            }
+        }
+    }
+    fun expr_dots (): Expr {
+        var e = this.expr_as(this.expr_one())
 
-    open fun stmt (): Stmt {
+        // one!1\.2?1
+        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!') || alls.accept(
+                TK.CHAR,
+                '?'
+            )
+        ) {
+            val chr = alls.tk0 as Tk.Chr
+            e = if (chr.chr == '\\') {
+                All_assert_tk(
+                    alls.tk0,
+                    e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
+                ) {
+                    "unexpected operand to `\\´"
+                }
+                Expr.Dnref(chr, e)
+            } else {
+                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                val fld = alls.tk0
+
+                if (chr.chr == '?' || chr.chr == '!') {
+                    All_assert_tk(alls.tk0, !fld.isnull() || e is Expr.Dnref) {
+                        "invalid discriminator : union cannot be null"
+                    }
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                        "invalid discriminator : expected index or type identifier"
+                    }
+                } else {
+                    assert(chr.chr == '.')
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
+                        "invalid field : expected index or variable identifier"
+                    }
+                }
+                val xas = if (!CE1 || fld.isnull()) e else {
+                    Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
+                }
+                when {
+                    (chr.chr == '?') -> Expr.UPred(fld, xas)
+                    (chr.chr == '!') -> Expr.UDisc(fld, xas)
+                    (chr.chr == '.') -> {
+                        if (fld is Tk.Id && fld.istask()) {
+                            Expr.Field(fld, xas)
+                        } else {
+                            Expr.TDisc(fld, xas)
+                        }
+                    }
+                    else -> error("impossible case")
+                }
+            }
+            e = this.expr_as(e)
+        }
+        return e
+    }
+    fun where (s: Stmt): Stmt {
+        alls.accept_err(TK.WHERE)
+        val tk0 = alls.tk0
+        val blk = this.block()
+        assert(!blk.iscatch && blk.scp1.isanon()) { "TODO" }
+        return when {
+            (s !is Stmt.Seq) -> {
+                All_nest("""
+                    {
+                        ${blk.body.tostr(true)}
+                        ${s.tostr(true)}
+                    }
+                    
+                """.trimIndent()) {
+                    this.stmt()
+                } as Stmt
+            }
+            (s.s1 is Stmt.Var) -> {
+                /*
+                    val old = All_nest("""
+                        ${until.s1.tostr(true)}        // this wouldn't work b/c var has no type yet
+                        {
+                            ${blk.body.tostr(true)}
+                            ${until.s2.tostr(true)}
+                        }
+                    """.trimIndent())
+                 */
+                Stmt.Seq(
+                    tk0, s.s1,
+                    Stmt.Block(
+                        blk.tk_, blk.iscatch, blk.scp1,
+                        Stmt.Seq(tk0, blk.body, s.s2)
+                    )
+                )
+            }
+            (s.s2 is Stmt.Return) -> {
+                All_nest("""
+                    {
+                        ${blk.body.tostr(true)}
+                        ${s.s1.tostr(true)}
+                    }
+                    ${s.s2.tostr(true)}
+                    
+                """.trimIndent()) {
+                    this.stmt()
+                } as Stmt
+            }
+            else -> error("bug found")
+        }
+    }
+
+    fun attr_unpak (e: Attr): Attr {
+        return if (!alls.accept(TK.XAS)) e else {
+            val tk0 = alls.tk0 as Tk.Sym
+            Attr.Unpak(tk0, false, e)
+        }
+    }
+    fun attr (): Attr {
+        var e = when {
+            alls.accept(TK.XID) -> Attr.Var(alls.tk0 as Tk.Id)
+            alls.accept(TK.XNAT) -> {
+                alls.accept_err(TK.CHAR, ':')
+                val tp = this.type()
+                Attr.Nat(alls.tk0 as Tk.Nat, tp)
+            }
+            alls.accept(TK.CHAR, '\\') -> {
+                val tk0 = alls.tk0 as Tk.Chr
+                val e = this.attr()
+                All_assert_tk(
+                    alls.tk0,
+                    e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
+                ) {
+                    "unexpected operand to `\\´"
+                }
+                Attr.Dnref(tk0, e)
+            }
+            alls.accept(TK.CHAR, '(') -> {
+                val e = this.attr()
+                alls.accept_err(TK.CHAR, ')')
+                e
+            }
+            else -> {
+                alls.err_expected("expression")
+                error("unreachable")
+            }
+        }
+
+        e = this.attr_unpak(e)
+
+        // one.1!\.2.1?
+        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!')) {
+            val chr = alls.tk0 as Tk.Chr
+            e = if (chr.chr == '\\') {
+                All_assert_tk(
+                    alls.tk0,
+                    e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
+                ) {
+                    "unexpected operand to `\\´"
+                }
+                Attr.Dnref(chr, e)
+            } else {
+                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                val fld = alls.tk0
+                assert(CE1 || fld is Tk.Num || fld.istask())
+
+                if (chr.chr == '!') {
+                    All_assert_tk(alls.tk0, !fld.isnull() || e is Attr.Dnref) {
+                        "invalid discriminator : union cannot be null"
+                    }
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
+                        "invalid discriminator : expected index or type identifier"
+                    }
+                } else {
+                    assert(chr.chr == '.')
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
+                        "invalid field : expected index or variable identifier"
+                    }
+                }
+                val xas = if (!CE1 || fld.isnull()) e else {
+                    Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
+                }
+                when {
+                    (chr.chr == '!') -> Attr.UDisc(fld, xas)
+                    (chr.chr == '.') -> {
+                        if (fld is Tk.Id && fld.istask()) {
+                            Attr.Field(fld, xas)
+                        } else {
+                            Attr.TDisc(fld, xas)
+                        }
+                    }
+                    else -> error("impossible case")
+                }
+            }
+            e = this.attr_unpak(e)
+        }
+        return e
+    }
+
+    fun block (): Stmt.Block {
+        val iscatch = (alls.tk0.enu == TK.CATCH)
+        alls.accept_err(TK.CHAR, '{')
+        val tk0 = alls.tk0 as Tk.Chr
+        val scp1 = if (!alls.accept(TK.CHAR, '@')) null else {
+            alls.accept_err(TK.XID)
+            alls.tk0.asscopecst()
+        }
+        val ss = this.stmts()
+        alls.accept_err(TK.CHAR, '}')
+        return Stmt.Block(tk0, iscatch, scp1, ss)
+    }
+    fun stmts (): Stmt {
+        fun enseq(s1: Stmt, s2: Stmt): Stmt {
+            return when {
+                (s1 is Stmt.Nop) -> s2
+                (s2 is Stmt.Nop) -> s1
+                else -> Stmt.Seq(s1.tk, s1, s2)
+            }
+        }
+
+        var ret: Stmt = Stmt.Nop(alls.tk0)
+        while (true) {
+            alls.accept(TK.CHAR, ';')
+            val isend = alls.check(TK.CHAR, '}') || alls.check(TK.EOF)
+            if (!isend) {
+                val s = this.stmt()
+                ret = enseq(ret, s)
+            } else {
+                break
+            }
+        }
+        return ret
+    }
+    fun event (): String {
+        return if (alls.accept(TK.XCLK)) {
+            "" + (alls.tk0 as Tk.Clk).ms + "ms"
+        } else {
+            this.expr().tostr(true)
+        }
+    }
+    fun stmt (): Stmt {
         return when {
             alls.accept(TK.SET) -> {
                 val dst = this.attr().toExpr()
@@ -720,281 +991,5 @@ open class Parser
             //println(it3.tostr(true))
             it3
         }
-    }
-
-    fun scp1s (f: (Tk) -> Tk.Id): List<Tk.Id> {
-        val scps = mutableListOf<Tk.Id>()
-        while (alls.accept(TK.XID)) {
-            scps.add(f(alls.tk0))
-            if (!alls.accept(TK.CHAR, ',')) {
-                break
-            }
-        }
-        return scps
-    }
-
-    fun scopepars (): Pair<List<Tk.Id>, List<Pair<String, String>>> {
-        alls.accept_err(TK.ATBRACK)
-        val scps = this.scp1s { it.asscopepar() }
-        val ctrs = mutableListOf<Pair<String, String>>()
-        if (alls.accept(TK.CHAR, ':')) {
-            while (alls.accept(TK.XID)) {
-                val id1 = alls.tk0.asscopepar().id
-                alls.accept_err(TK.CHAR, '>')
-                alls.accept_err(TK.XID)
-                val id2 = alls.tk0.asscopepar().id
-                ctrs.add(Pair(id1, id2))
-                if (!alls.accept(TK.CHAR, ',')) {
-                    break
-                }
-            }
-        }
-        alls.accept_err(TK.CHAR, ']')
-        return Pair(scps, ctrs)
-    }
-
-    fun expr_as (e: Expr): Expr {
-        return if (!alls.accept(TK.XAS)) e else {
-            val tk0 = alls.tk0 as Tk.Sym
-            if (tk0.sym == ":+") {
-                val isact = alls.accept(TK.ACTIVE)
-                val type = this.type()
-                All_assert_tk(alls.tk0, type is Type.Alias) {
-                    "expected alias type"
-                }
-                Expr.Pak(tk0, e, isact, type as Type.Alias)
-            } else {
-                Expr.Unpak(tk0, false, e)
-            }
-        }
-    }
-
-    fun expr_dots (): Expr {
-        var e = this.expr_as(this.expr_one())
-
-        // one!1\.2?1
-        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!') || alls.accept(
-                TK.CHAR,
-                '?'
-            )
-        ) {
-            val chr = alls.tk0 as Tk.Chr
-            e = if (chr.chr == '\\') {
-                All_assert_tk(
-                    alls.tk0,
-                    e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
-                ) {
-                    "unexpected operand to `\\´"
-                }
-                Expr.Dnref(chr, e)
-            } else {
-                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
-                val fld = alls.tk0
-
-                if (chr.chr == '?' || chr.chr == '!') {
-                    All_assert_tk(alls.tk0, !fld.isNull() || e is Expr.Dnref) {
-                        "invalid discriminator : union cannot be null"
-                    }
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
-                        "invalid discriminator : expected index or type identifier"
-                    }
-                } else {
-                    assert(chr.chr == '.')
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
-                        "invalid field : expected index or variable identifier"
-                    }
-                }
-                val xas = if (!INFER || fld.isNull()) e else {
-                    Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
-                }
-                when {
-                    (chr.chr == '?') -> Expr.UPred(fld, xas)
-                    (chr.chr == '!') -> Expr.UDisc(fld, xas)
-                    (chr.chr == '.') -> {
-                        if (fld is Tk.Id && fld.isTask()) {
-                            Expr.Field(fld, xas)
-                        } else {
-                            Expr.TDisc(fld, xas)
-                        }
-                    }
-                    else -> error("impossible case")
-                }
-            }
-            e = this.expr_as(e)
-        }
-        return e
-    }
-
-    fun where (s: Stmt): Stmt {
-        alls.accept_err(TK.WHERE)
-        val tk0 = alls.tk0
-        val blk = this.block()
-        assert(!blk.iscatch && blk.scp1.isanon()) { "TODO" }
-        return when {
-            (s !is Stmt.Seq) -> {
-                All_nest("""
-                    {
-                        ${blk.body.tostr(true)}
-                        ${s.tostr(true)}
-                    }
-                    
-                """.trimIndent()) {
-                    this.stmt()
-                } as Stmt
-            }
-            (s.s1 is Stmt.Var) -> {
-                /*
-                    val old = All_nest("""
-                        ${until.s1.tostr(true)}        // this wouldn't work b/c var has no type yet
-                        {
-                            ${blk.body.tostr(true)}
-                            ${until.s2.tostr(true)}
-                        }
-                    """.trimIndent())
-                 */
-                Stmt.Seq(
-                    tk0, s.s1,
-                    Stmt.Block(
-                        blk.tk_, blk.iscatch, blk.scp1,
-                        Stmt.Seq(tk0, blk.body, s.s2)
-                    )
-                )
-            }
-            (s.s2 is Stmt.Return) -> {
-                All_nest("""
-                    {
-                        ${blk.body.tostr(true)}
-                        ${s.s1.tostr(true)}
-                    }
-                    ${s.s2.tostr(true)}
-                    
-                """.trimIndent()) {
-                    this.stmt()
-                } as Stmt
-            }
-            else -> error("bug found")
-        }
-    }
-    fun attr_unpak (e: Attr): Attr {
-        return if (!alls.accept(TK.XAS)) e else {
-            val tk0 = alls.tk0 as Tk.Sym
-            Attr.Unpak(tk0, false, e)
-        }
-    }
-
-    fun attr (): Attr {
-        var e = when {
-            alls.accept(TK.XID) -> Attr.Var(alls.tk0 as Tk.Id)
-            alls.accept(TK.XNAT) -> {
-                alls.accept_err(TK.CHAR, ':')
-                val tp = this.type()
-                Attr.Nat(alls.tk0 as Tk.Nat, tp)
-            }
-            alls.accept(TK.CHAR, '\\') -> {
-                val tk0 = alls.tk0 as Tk.Chr
-                val e = this.attr()
-                All_assert_tk(
-                    alls.tk0,
-                    e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
-                ) {
-                    "unexpected operand to `\\´"
-                }
-                Attr.Dnref(tk0, e)
-            }
-            alls.accept(TK.CHAR, '(') -> {
-                val e = this.attr()
-                alls.accept_err(TK.CHAR, ')')
-                e
-            }
-            else -> {
-                alls.err_expected("expression")
-                error("unreachable")
-            }
-        }
-
-        e = this.attr_unpak(e)
-
-        // one.1!\.2.1?
-        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!')) {
-            val chr = alls.tk0 as Tk.Chr
-            e = if (chr.chr == '\\') {
-                All_assert_tk(
-                    alls.tk0,
-                    e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
-                ) {
-                    "unexpected operand to `\\´"
-                }
-                Attr.Dnref(chr, e)
-            } else {
-                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
-                val fld = alls.tk0
-
-                if (chr.chr == '!') {
-                    All_assert_tk(alls.tk0, !fld.isNull() || e is Attr.Dnref) {
-                        "invalid discriminator : union cannot be null"
-                    }
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
-                        "invalid discriminator : expected index or type identifier"
-                    }
-                } else {
-                    assert(chr.chr == '.')
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.isvar()) {
-                        "invalid field : expected index or variable identifier"
-                    }
-                }
-                val xas = if (!INFER || fld.isNull()) e else {
-                    Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
-                }
-                when {
-                    (chr.chr == '!') -> Attr.UDisc(fld, xas)
-                    (chr.chr == '.') -> {
-                        if (fld is Tk.Id && fld.isTask()) {
-                            Attr.Field(fld, xas)
-                        } else {
-                            Attr.TDisc(fld, xas)
-                        }
-                    }
-                    else -> error("impossible case")
-                }
-            }
-            e = this.attr_unpak(e)
-        }
-        return e
-    }
-
-    fun block (): Stmt.Block {
-        val iscatch = (alls.tk0.enu == TK.CATCH)
-        alls.accept_err(TK.CHAR, '{')
-        val tk0 = alls.tk0 as Tk.Chr
-        val scp1 = if (!alls.accept(TK.CHAR, '@')) null else {
-            alls.accept_err(TK.XID)
-            alls.tk0.asscopecst()
-        }
-        val ss = this.stmts()
-        alls.accept_err(TK.CHAR, '}')
-        return Stmt.Block(tk0, iscatch, scp1, ss)
-    }
-
-    fun stmts (): Stmt {
-        fun enseq(s1: Stmt, s2: Stmt): Stmt {
-            return when {
-                (s1 is Stmt.Nop) -> s2
-                (s2 is Stmt.Nop) -> s1
-                else -> Stmt.Seq(s1.tk, s1, s2)
-            }
-        }
-
-        var ret: Stmt = Stmt.Nop(alls.tk0)
-        while (true) {
-            alls.accept(TK.CHAR, ';')
-            val isend = alls.check(TK.CHAR, '}') || alls.check(TK.EOF)
-            if (!isend) {
-                val s = this.stmt()
-                ret = enseq(ret, s)
-            } else {
-                break
-            }
-        }
-        return ret
     }
 }
