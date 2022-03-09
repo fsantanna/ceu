@@ -70,7 +70,7 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.Loop -> "Loop\n" + this.block.dump(spc+4)
         is Stmt.Block -> "Block" +
                 (if (this.iscatch) " (catch)" else "") +
-                (if (this.scp1.isanon()) "" else " @" + this.scp1!!.id) +
+                (if (this.scp1?.id.isanon()) "" else " @" + this.scp1!!.id) +
                 "\n" +
                 this.body.dump(spc+4)
         is Stmt.SSpawn -> "SSpawn\n" +
@@ -80,7 +80,7 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.Await -> "Await\n" + this.e.dump(spc+4)
         is Stmt.Pause -> "Pause\n" + this.tsk.dump(spc+4)
         is Stmt.Emit -> "Emit" + when (this.tgt) {
-            is Scope -> " @" + this.tgt.scp1.anon2local() + "\n"
+            is Scope -> " @" + this.tgt.scp1.id.anon2local() + "\n"
             is Expr -> this.tgt.dump(spc+4)
             else -> error("bug found")
         } + this.e.dump(spc+4)

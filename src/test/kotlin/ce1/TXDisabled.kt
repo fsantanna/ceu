@@ -249,7 +249,7 @@ class TXDisabled {
         """.trimIndent()
         )
         assert(out == """
-            var f: func @[a1] -> () -> func @a1 -> @[] -> () -> ()
+            var f: func @[@a1] -> () -> func @a1 -> @[] -> () -> ()
             
         """.trimIndent()) { out }
     }
@@ -262,7 +262,7 @@ class TXDisabled {
         """.trimIndent()
         )
         assert(out == """
-            var g: func @[a1] -> () -> func @a1 -> @[] -> () -> ()
+            var g: func @[@a1] -> () -> func @a1 -> @[] -> () -> ()
             var f: func @GLOBAL -> @[] -> () -> ()
             
         """.trimIndent()) { out }
@@ -277,9 +277,9 @@ class TXDisabled {
         """.trimIndent()
         )
         assert(out == """
-            var g: func @[a1] -> () -> func @a1 -> @[] -> () -> ()
+            var g: func @[@a1] -> () -> func @a1 -> @[] -> () -> ()
             var f: func @GLOBAL -> @[] -> () -> ()
-            set f = (g @[GLOBAL] (): @GLOBAL)
+            set f = (g @[@GLOBAL] (): @GLOBAL)
             
         """.trimIndent()) { out }
     }
@@ -294,9 +294,9 @@ class TXDisabled {
         """.trimIndent()
         )
         assert(out == """
-            var g: func @[a1] -> () -> func @a1 -> @[] -> () -> ()
+            var g: func @[@a1] -> () -> func @a1 -> @[] -> () -> ()
             var f: func @GLOBAL -> @[] -> () -> ()
-            set f = (g @[GLOBAL] (): @GLOBAL)
+            set f = (g @[@GLOBAL] (): @GLOBAL)
             call (f @[] ())
             
         """.trimIndent()) { out }
@@ -305,7 +305,7 @@ class TXDisabled {
     @Test
     fun noclo_d07_clo () {
         val out = test(true, """
-            var cnst = func @[a1]->/_int@a1 -> (func @a1->()->/_int@a1) {
+            var cnst = func @[@a1]->/_int@a1 -> (func @a1->()->/_int@a1) {
                 var x: /_int@a1 = arg
                 return func @a1->()->/_int@a1 {
                     return x
@@ -315,8 +315,8 @@ class TXDisabled {
         assert(out == "(ln 7, col 11): undeclared variable \"x\"") { out }
         /*
         assert(out == """
-            var cnst: func @[a1] -> /_int @a1 -> func @a1 -> @[] -> () -> /_int @a1
-            set cnst = func @[a1] -> /_int @a1 -> func @a1 -> @[] -> () -> /_int @a1 {
+            var cnst: func @[@a1] -> /_int @a1 -> func @a1 -> @[] -> () -> /_int @a1
+            set cnst = func @[@a1] -> /_int @a1 -> func @a1 -> @[] -> () -> /_int @a1 {
             var x: /_int @a1
             set x = arg
             set ret = func @a1 -> @[] -> () -> /_int @a1 {
@@ -335,13 +335,13 @@ class TXDisabled {
     @Test
     fun noclo_d08_clo () {
         val out = test(true, """
-            var g: func @[a]->/_int@a -> (func @a->()->/_int@a)
+            var g: func @[@a]->/_int@a -> (func @a->()->/_int@a)
             var five: _int
             var f: func @LOCAL->()->/_int@LOCAL = g /five
             var v: /_int = f ()
         """.trimIndent())
         assert(out == """
-            var g: func @[a] -> /_int @a -> func @a -> @[] -> () -> /_int @a
+            var g: func @[@a] -> /_int @a -> func @a -> @[] -> () -> /_int @a
             var five: _int
             var f: func @GLOBAL -> @[] -> () -> /_int @GLOBAL
             set f = (g @[GLOBAL] (/five): @GLOBAL)

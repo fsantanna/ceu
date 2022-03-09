@@ -98,14 +98,14 @@ class TEnv {
         val out = inp2env("""
             var x: _int @a
         """.trimIndent())
-        assert(out == "(ln 1, col 13): expected statement : have `@´") { out }
+        assert(out == "(ln 1, col 13): expected statement : have \"@a\"") { out }
     }
     @Test
     fun b07_user_rec_up () {
         val out = inp2env("""
             var x: /_int @a
         """.trimIndent())
-        assert(out == "(ln 1, col 15): undeclared scope \"a\"") { out }
+        assert(out == "(ln 1, col 14): undeclared scope \"@a\"") { out }
     }
     @Test
     fun todo_b09_user_err () {
@@ -157,7 +157,7 @@ class TEnv {
             var l: @aaa
         """.trimIndent())
         //assert(out == "(ln 1, col 8): undeclared scope \"@aaa\"") { out }
-        assert(out == "(ln 1, col 8): expected type : have `@´") { out }
+        assert(out == "(ln 1, col 8): expected type : have \"@aaa\"") { out }
     }
     @Test
     fun b16_pool_err () {
@@ -173,7 +173,7 @@ class TEnv {
         val out = inp2env("""
             call _f:func@[a]->()->() @[aaa] ()
         """.trimIndent())
-        assert(out == "(ln 1, col 28): undeclared scope \"aaa\"") { out }
+        assert(out == "(ln 1, col 28): undeclared scope \"@aaa\"") { out }
     }
     @Test
     fun b17_pool_err () {
@@ -181,7 +181,7 @@ class TEnv {
             var f: func @[] -> () -> ()
             call f @[] (): @aaa
         """.trimIndent())
-        assert(out == "(ln 2, col 17): undeclared scope \"aaa\"") { out }
+        assert(out == "(ln 2, col 16): undeclared scope \"@aaa\"") { out }
     }
     @Test
     fun b18_pool_err () {
@@ -560,7 +560,7 @@ class TEnv {
             var a: ()
             { @A }
         """.trimIndent())
-        assert(out == "(ln 2, col 4): invalid scope : \"A\" is already declared (ln 1)") { out }
+        assert(out == "(ln 2, col 3): invalid scope : \"@A\" is already declared (ln 1)") { out }
         //assert(out == "OK") { out }
     }
     @Test
@@ -592,7 +592,7 @@ class TEnv {
         val out = inp2env("""
             var pin: /_int @A
         """.trimIndent())
-        assert(out == "(ln 1, col 17): undeclared scope \"A\"") { out }
+        assert(out == "(ln 1, col 16): undeclared scope \"@A\"") { out }
     }
     @Test
     fun noclo_e07_ptr_err () {
@@ -649,7 +649,7 @@ class TEnv {
             var f: func @a->@[]->()->()
         """.trimIndent())
         //assert(out == "(ln 1, col 14): undeclared scope \"a\"") { out }
-        assert(out == "(ln 1, col 13): expected type : have `@´") { out }
+        assert(out == "(ln 1, col 13): expected type : have \"@a\"") { out }
     }
     @Test
     fun e08_ptr_ok () {
@@ -964,7 +964,7 @@ class TEnv {
             set y = x
         """.trimIndent())
         //assert(out == "OK") { out }
-        assert(out == "(ln 1, col 8): expected type : have `@´") { out }
+        assert(out == "(ln 1, col 8): expected type : have \"@LOCAL\"") { out }
     }
 
     // POINTERS - DOUBLE
@@ -1880,7 +1880,7 @@ class TEnv {
         //assert(out == "(ln 1, col 10): invalid pool : expected `_N´ depth") { out }
         //assert(out == "(ln 1, col 3): invalid pool : unexpected `_1´ depth") { out }
         //assert(out == "(ln 1, col 3): expected statement : have `@i´") { out }
-        assert(out == "(ln 1, col 4): invalid scope constant identifier") { out }
+        assert(out == "(ln 1, col 3): invalid scope constant identifier") { out }
     }
     @Test
     fun p11_pool_err () {
@@ -1892,7 +1892,7 @@ class TEnv {
         )
         //assert(out == "(ln 1, col 8): invalid pool : unexpected `_1´ depth") { out }
         //assert(out == "(ln 2, col 12): undeclared scope \"@a1\"") { out }
-        assert(out == "(ln 2, col 12): expected type : have `@´") { out }
+        assert(out == "(ln 2, col 12): expected type : have \"@a1\"") { out }
     }
     @Test
     fun p11_pool_err2 () {
@@ -1904,7 +1904,7 @@ class TEnv {
         )
         //assert(out == "(ln 1, col 3): invalid pool : unexpected `_1´ depth") { out }
         //assert(out == "(ln 2, col 12): undeclared scope \"@a1\"") { out }
-        assert(out == "(ln 2, col 12): expected type : have `@´") { out }
+        assert(out == "(ln 2, col 12): expected type : have \"@A\"") { out }
     }
     @Test
     fun p12_pool_ff() {
@@ -2018,7 +2018,7 @@ class TEnv {
             }
         """.trimIndent()
         )
-        assert(out == "(ln 3, col 8): invalid scope : \"A\" is already declared (ln 1)") { out }
+        assert(out == "(ln 3, col 7): invalid scope : \"@A\" is already declared (ln 1)") { out }
     }
     @Test
     fun p27_pool_err() {
@@ -2032,7 +2032,7 @@ class TEnv {
             }
         """.trimIndent()
         )
-        assert(out == "(ln 4, col 13): invalid scope : \"a1\" is already declared (ln 2)") { out }
+        assert(out == "(ln 4, col 13): invalid scope : \"@a1\" is already declared (ln 2)") { out }
     }
     @Test
     fun p28_pool_ff1() {

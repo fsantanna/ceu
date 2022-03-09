@@ -140,11 +140,22 @@ object Lexer {
             }
             (x1 == '@') -> {
                 all().read().let { c1 = it.first; x1 = it.second }
-                if (x1 == '[') {
-                    alls.tk1 = Tk.Sym(TK.ATBRACK, lin(), col(), "@[")
-                } else {
-                    all().unread(c1)
-                    alls.tk1 = Tk.Chr(TK.CHAR, lin(), col(), '@')
+                when {
+                    (x1 == '[') -> {
+                        alls.tk1 = Tk.Sym(TK.ATBRACK, lin(), col(), "@[")
+                    }
+                    x1.isLetter() -> {
+                        var pay = ""
+                        do {
+                            pay += x1
+                            all().read().let { c1 = it.first; x1 = it.second }
+                        } while (x1.isLetterOrDigit() || x1 == '_')
+                        all().unread(c1)
+                        alls.tk1 = Tk.Scp(TK.XSCP, lin(), col(), pay)
+                    }
+                    else -> {
+                        alls.tk1 = Tk.Err(TK.ERR, lin(), col(), "@")
+                    }
                 }
             }
             (x1 == '_') -> {
@@ -247,10 +258,12 @@ object Lexer {
                 all().unread(c1)
 
                 alls.tk1 = key2tk[pay].let {
-                    if (it != null) {
-                        Tk.Key(it, lin(), col(), pay)
-                    } else {
-                        Tk.ide(TK.Xide, lin(), col(), pay)
+                    when {
+                        (it != null) -> Tk.Key(it, lin(), col(), pay)
+                        pay[0].isLowerCase() -> Tk.ide(TK.Xide, lin(), col(), pay)
+                        pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Ide(TK.XIde, lin(), col(), pay)
+                        pay.none { it.isLowerCase() } -> Tk.IDE(TK.XIDE, lin(), col(), pay)
+                        else -> Tk.Err(TK.ERR, lin(), col(), pay)
                     }
                 }
             }

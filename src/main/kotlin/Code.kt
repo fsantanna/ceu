@@ -255,13 +255,14 @@ fun String.out_mem (up: Any): String {
 }
 
 fun Scope.toce (up: Any): String {
+    val id = this.scp1.id
     return when {
         // @GLOBAL is never an argument
-        (this.scp1.id == "GLOBAL") -> "GLOBAL"
+        (id == "GLOBAL") -> "GLOBAL"
         // @i_1 is always an argument (must be after closure test)
-        this.scp1.isscopepar() -> "(task1->${this.scp1.id})"
+        this.scp1.isscopepar() -> "(task1->$id)"
         // otherwise depends (calls mem)
-        else -> "(&" + this.scp1.id.out_mem(up) + ")"
+        else -> "(&" + id.out_mem(up) + ")"
     }
 }
 

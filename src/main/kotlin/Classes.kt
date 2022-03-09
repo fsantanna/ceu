@@ -2,7 +2,7 @@ var N = 1
 
 enum class TK {
     ERR, EOF, CHAR,
-    Xide, XIde, XIDE, XNAT, XNUM, XAS, XCLK,
+    Xide, XIde, XIDE, XSCP, XNAT, XNUM, XAS, XCLK,
     UNIT, ARROW, ATBRACK,
     ACTIVE, AWAIT, BREAK, CALL, CATCH, ELSE, EMIT, EVERY, FUNC, IF, IN, INPUT,
     LOOP, NATIVE, NEW, OUTPUT, PAUSE, PAUSEIF, RESUME, PAR, PARAND, PAROR, RETURN, SET, SPAWN, TASK,
@@ -57,6 +57,7 @@ sealed class Tk (
     data class ide (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
     data class Ide (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
     data class IDE (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
+    data class Scp (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
     data class Nat (val enu_: TK, val lin_: Int, val col_: Int, val chr: Char?, val src: String): Tk(enu_,lin_,col_)
     data class Num (val enu_: TK, val lin_: Int, val col_: Int, val num: Int):    Tk(enu_,lin_,col_)
     data class Clk (val enu_: TK, val lin_: Int, val col_: Int, val ms: Int):     Tk(enu_,lin_,col_)
@@ -76,7 +77,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         val inp: Type, val pub: Type?, val out: Type
     ): Type(tk_, null, null)
     data class Alias (
-        val tk_: Tk.ide,
+        val tk_: Tk.Ide,
         var xisrec: Boolean,
         var xscps: List<Scope>?,
     ): Type(tk_, null, null)
@@ -132,10 +133,10 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Loop   (val tk_: Tk.Key, val block: Block) : Stmt(N++, tk_, null, null)
     data class DLoop  (val tk_: Tk.Key, val i: Expr.Var, val tsks: Expr, val block: Block) : Stmt(N++, tk_, null, null)
     data class Break  (val tk_: Tk.Key) : Stmt(N++, tk_, null, null)
-    data class Block  (val tk_: Tk.Chr, val iscatch: Boolean, var scp1: Tk.ide?, val body: Stmt) : Stmt(N++, tk_, null, null)
+    data class Block  (val tk_: Tk.Chr, val iscatch: Boolean, var scp1: Tk.Scp?, val body: Stmt) : Stmt(N++, tk_, null, null)
     data class Typedef (
-        val tk_: Tk.ide,
-        var xscp1s: Pair<List<Tk.ide>?,List<Pair<String,String>>?>,
+        val tk_: Tk.Ide,
+        var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
         val type: Type
     ) : Stmt(N++, tk_, null, null)
 }

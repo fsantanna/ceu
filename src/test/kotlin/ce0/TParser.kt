@@ -25,8 +25,8 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            //assert(e.message == "(ln 1, col 1): expected type : have \"xxx\"") { e.message!! }
-            assert(e.message == "(ln 1, col 1): invalid type identifier") { e.message!! }
+            assert(e.message == "(ln 1, col 1): expected type : have \"xxx\"") { e.message!! }
+            //assert(e.message == "(ln 1, col 1): invalid type identifier") { e.message!! }
         }
     }
 
@@ -600,7 +600,7 @@ class TParser {
             Parser.stmts()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 11): expected statement : have `@´") { e.message!! }
+            assert(e.message == "(ln 1, col 11): expected statement : have \"@a\"") { e.message!! }
         }
     }
 
@@ -613,7 +613,8 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 11): expected `@´ : have \"@\"") { e.message!! }
-            assert(e.message == "(ln 1, col 12): expected identifier : have 1") { e.message!! }
+            //assert(e.message == "(ln 1, col 12): expected identifier : have 1") { e.message!! }
+            assert(e.message == "(ln 1, col 11): expected statement : have \"@\"") { e.message!! }
         }
     }
 
@@ -943,12 +944,16 @@ class TParser {
     fun d07_error() {
         All_restart(null, PushbackReader(StringReader("x.y"), 2))
         Lexer.lex()
+        val e = Parser.expr()
+        assert(e is Expr.TDisc && e.tup is Expr.Var && e.tk_.id()=="y")
+        /*
         try {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 3): unexpected \"y\"") { e.message!! }
         }
+         */
     }
 
     @Test

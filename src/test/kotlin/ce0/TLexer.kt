@@ -138,20 +138,21 @@ class TLexer {
 
     @Test
     fun c01_scope () {
-        All_restart(null, PushbackReader(StringReader("GLOBAL"), 2))
-        Lexer.lex(); assert(alls.tk1.isscopecst() && (alls.tk1.asscopecst()).id=="GLOBAL")
+        All_restart(null, PushbackReader(StringReader("@GLOBAL"), 2))
+        Lexer.lex()
+        assert((alls.tk1 as Tk.Scp).id=="GLOBAL")
     }
     @Test
     fun c02_scope () {
-        All_restart(null, PushbackReader(StringReader("i1"), 2))
+        All_restart(null, PushbackReader(StringReader("@i1"), 2))
         Lexer.lex()
-        //assert(alls.tk1.enu==TK.ERR && (alls.tk1 as Tk.Err).err=="@")
-        assert(alls.tk1.isscopepar() && (alls.tk1.asscopepar().id=="i1"))
+        assert((alls.tk1 as Tk.Scp).id=="i1")
     }
     @Test
     fun c03_scope () {
-        All_restart(null, PushbackReader(StringReader("x11"), 2))
-        Lexer.lex(); assert(alls.tk1.isscopepar() && (alls.tk1.asscopepar().id=="x11"))
+        All_restart(null, PushbackReader(StringReader("@x11"), 2))
+        Lexer.lex()
+        assert((alls.tk1 as Tk.Scp).id=="x11")
     }
     @Test
     fun c04_scope () {

@@ -419,7 +419,7 @@ class TExec {
             output () ()
         """.trimIndent())
         //assert(out == "(ln 1, col 8): invalid `output` : expected identifier") { out }
-        assert(out == "(ln 1, col 8): expected identifier : have `()´") { out }
+        assert(out == "(ln 1, col 8): expected variable identifier : have `()´") { out }
     }
     @Test
     fun e02_out () {
@@ -1690,7 +1690,8 @@ class TExec {
             type T2 @[] = [T1]
             output std ()
         """.trimIndent())
-        assert(out == "(ln 1, col 6): invalid type identifier") { out }
+        //assert(out == "(ln 1, col 6): invalid type identifier") { out }
+        assert(out == "(ln 1, col 6): expected type identifier : have \"T1\"") { out }
     }
     @Test
     fun o10_type_pln () {

@@ -1,20 +1,21 @@
 fun Scope.check (up: Any) {
+    val id = this.scp1.id
     val ok = when {
-        (this.scp1.id == "GLOBAL") -> true
-        (this.scp1.id == "LOCAL") -> true
+        (id == "GLOBAL") -> true
+        (id == "LOCAL") -> true
         (up.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> true  // (@i1 -> ...)
-        up.env(this.scp1.id).let {                              // { @aaa ... @aaa }
-            it is Stmt.Block && (this.scp1.id==it.scp1?.id || this.scp1.id=="B"+it.n) ||
-            it is Stmt.Var   && this.scp1.id==it.tk_.id.toUpperCase()
+        up.env(id).let {                              // { @aaa ... @aaa }
+            it is Stmt.Block && (id==it.scp1?.id || id=="B"+it.n) ||
+            it is Stmt.Var   && id==it.tk_.id.toUpperCase()
         } -> true
         (up.ups_first {                                     // [@i1, ...] { @i1 }
-            it is Stmt.Typedef && (it.xscp1s.first!!.any { it.id==this.scp1.id })
-         || it is Expr.Func    && (it.ftp()?.xscps?.second?.any { it.scp1.id==this.scp1.id } ?: false)
+            it is Stmt.Typedef && (it.xscp1s.first!!.any { it.id==id })
+         || it is Expr.Func    && (it.ftp()?.xscps?.second?.any { it.scp1.id==id } ?: false)
         } != null) -> true
         else -> false
     }
     All_assert_tk(this.scp1, ok) {
-        "undeclared scope \"${this.scp1.id}\""
+        "undeclared scope \"@$id\""
     }
 }
 
@@ -36,14 +37,14 @@ fun check_01_before_tps (s: Stmt) {
             is Type.Func -> {
                 val ptrs = (tp.inp.flattenLeft() + tp.out.flattenLeft()).filter { it is Type.Pointer } as List<Type.Pointer>
                 val ok = ptrs.all {
-                    val ptr = it.xscp!!
+                    val ptr = it.xscp!!.scp1.id
                     when {
-                        (ptr.scp1.id == "GLOBAL") -> true
+                        (ptr == "GLOBAL") -> true
                         (
-                            tp.xscps.second?.any { ptr.scp1.id==it.scp1.id } ?: false      // (@i1 -> ...@i1...)
+                            tp.xscps.second?.any { ptr==it.scp1.id } ?: false      // (@i1 -> ...@i1...)
                         ) -> true
                         (tp.ups_first {                     // { @aaa \n ...@aaa... }
-                            it is Stmt.Block && it.scp1.let { it!=null && it.id==ptr.scp1.id }
+                            it is Stmt.Block && it.scp1.let { it!=null && it.id==ptr }
                         } != null) -> true
                         else -> false
                     }
@@ -69,7 +70,7 @@ fun check_01_before_tps (s: Stmt) {
                 }
                 val err = outers.find { out -> e?.ftp()?.xscps?.second!!.any { it.scp1.id==out.scp1.id } }
                 All_assert_tk(e.tk, err==null) {
-                    "invalid scope : \"${err!!.scp1.id}\" is already declared (ln ${err!!.scp1.lin})"
+                    "invalid scope : \"@${err!!.scp1.id}\" is already declared (ln ${err!!.scp1.lin})"
                 }
             }
 

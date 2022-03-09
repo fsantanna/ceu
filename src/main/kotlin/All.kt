@@ -123,6 +123,9 @@ fun Alls.err_expected (str: String) {
             (this is Tk.Chr)     -> "`" + this.chr + "´"
             (this is Tk.Sym)     -> '`' + this.sym + '´'
             (this is Tk.ide)     -> '"' + this.id + '"'
+            (this is Tk.Ide)     -> '"' + this.id + '"'
+            (this is Tk.IDE)     -> '"' + this.id + '"'
+            (this is Tk.Scp)     -> "\"@" + this.id + '"'
             (this is Tk.Num)     -> "" + this.num
             (this is Tk.Clk)     -> "time constant"
             (this is Tk.Key)     -> '`' + this.key + '`'
@@ -150,7 +153,7 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 fun Alls.checkExpr (): Boolean {
     return this.check(TK.CHAR, '(') || this.check(TK.UNIT) || this.check(TK.Xide) || this.check(TK.XNAT)
         || this.check(TK.CHAR, '[') || this.check(TK.CHAR, '<') || this.check(TK.NEW)
-        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK) || alls.tk1.istype()
+        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK) || alls.tk1 is Tk.Ide
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {

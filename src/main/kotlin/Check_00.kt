@@ -62,7 +62,7 @@ fun check_00_after_envs (s: Stmt) {
                 s.scp1?.let {
                     val dcl = s.env(it.id)
                     All_assert_tk(it, dcl == null) {
-                        "invalid scope : \"${it.id}\" is already declared (ln ${dcl!!.toTk().lin})"
+                        "invalid scope : \"@${it.id}\" is already declared (ln ${dcl!!.toTk().lin})"
                     }
                 }
                 if (s.iscatch) {

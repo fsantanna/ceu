@@ -1,47 +1,18 @@
-fun Tk.astype (): Tk.ide {
-    val id = this as Tk.ide
-    All_assert_tk(this, this.istype()) { "invalid type identifier" }
-    return id
-}
-fun Tk.istype (): Boolean {
-    return (this is Tk.ide) && this.id.istype()
-}
 fun String.istype (): Boolean {
     return this.length>1 && this[0].isUpperCase() && this.any { it.isLowerCase() }
 }
 
-fun Tk.asvar (): Tk.ide {
-    val id = this as Tk.ide
-    All_assert_tk(this, this.isvar()) { "invalid variable identifier" }
-    return id
-}
-fun Tk.isvar (): Boolean {
-    return (this is Tk.ide) && this.id.isvar()
-}
-fun String.isvar (): Boolean {
-    return this.length>0 && this[0].isLowerCase()
+fun Tk.Scp.isscopepar (): Boolean {
+    return this.id.none { it.isUpperCase() }
 }
 
-fun Tk.asscope (): Tk.ide {
-    val id = this as Tk.ide
-    All_assert_tk(this, id.isscopecst() || id.isscopepar()) { "invalid scope identifier" }
-    return id
-}
-fun Tk.isscopepar (): Boolean {
-    val id = this as Tk.ide
-    return id.id.none { it.isUpperCase() }
-}
-fun Tk.asscopepar (): Tk.ide {
-    All_assert_tk(this, this.isscopepar()) { "invalid scope parameter identifier" }
-    return this as Tk.ide
-}
-fun Tk.isscopecst (): Boolean {
-    val id = this as Tk.ide
-    return id.id.none { it.isLowerCase() }
-}
-fun Tk.asscopecst (): Tk.ide {
-    All_assert_tk(this, this.isscopecst()) { "invalid scope constant identifier" }
-    return this as Tk.ide
+fun Tk.id (): String {
+    return when (this) {
+        is Tk.ide -> this.id
+        is Tk.Ide -> this.id
+        is Tk.IDE -> this.id
+        else -> error("bug found")
+    }
 }
 
 fun Tk.Nat.toce (): String {
@@ -87,7 +58,9 @@ fun TK.toErr (chr: Char?): String {
         TK.EOF     -> "end of file"
         TK.CHAR    -> "`" + chr!! + "´"
         TK.XNAT    -> "`_´"
-        TK.Xide     -> "identifier"
+        TK.Xide    -> "variable identifier"
+        TK.XIde    -> "type identifier"
+        TK.XIDE    -> "uppercase identifier"
         TK.XNUM    -> "number"
         TK.ARROW   -> "`->´"
         TK.ATBRACK -> "`@[´"

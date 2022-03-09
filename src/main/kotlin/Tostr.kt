@@ -18,23 +18,23 @@ fun Type.tostr (lc: Boolean = false): String {
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk_.toce()
-        is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.anon2local() }
+        is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.id.anon2local() }
         is Type.Alias   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
-            if (it.size == 0) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]"
+            if (it.size == 0) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + "]"
         }}
         is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
         is Type.Union   -> "<" + this.vec.mapIndexed { i,v -> this.yids.idx(i,'=') + v.tostr(lc) }.joinToString(",") + ">"
         is Type.Active  -> "active " + this.tsk.tostr(lc)
         is Type.Actives -> "active {${this.len?.num ?: ""}} " + this.tsk.tostr(lc)
         is Type.Alias   -> this.tk_.id + this.xscps!!.let {
-            if (it.size == 0) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]"
+            if (it.size == 0) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + "]"
         }
         is Type.Func    -> {
             val ctrs = this.xscps.third.let {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }
                     .joinToString(",")
             }
-            val scps = this.xscps.second.let { if (it==null) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + ctrs + "] -> " }
+            val scps = this.xscps.second.let { if (it==null) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + ctrs + "] -> " }
             this.tk_.key + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
         }
     }.let {
@@ -60,10 +60,10 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk_.id})"
         is Expr.UDisc -> "(" + this.uni.tostr(lc) + "!" + this.tk.tostr() + ")"
         is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk.tostr() + ")"
-        is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.anon2local() } + ")"
+        is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.id.anon2local() } + ")"
         is Expr.Call -> {
-            val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]" }
-            val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.anon2local() }
+            val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + "]" }
+            val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.id.anon2local() }
             "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
         }
         is Expr.Func -> this.ftp()!!.tostr(lc) + " " + this.block.tostr(lc)
@@ -90,13 +90,13 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Output -> "output " + this.lib.id + " " + this.arg.tostr(lc) + "\n"
         is Stmt.If -> "if " + this.tst.tostr(lc) + "\n" + this.true_.tostr(lc) + "else\n" + this.false_.tostr(lc)
         is Stmt.Loop -> "loop " + this.block.tostr(lc)
-        is Stmt.Block -> (if (this.iscatch) "catch " else "") + "{" + (if (this.scp1.isanon()) "" else " @" + this.scp1!!.id) + "\n" + this.body.tostr(lc) + "}\n"
+        is Stmt.Block -> (if (this.iscatch) "catch " else "") + "{" + (if (this.scp1?.id.isanon()) "" else " @" + this.scp1!!.id) + "\n" + this.body.tostr(lc) + "}\n"
         is Stmt.SSpawn -> (if (this.dst == null) "" else "set " + this.dst.tostr(lc) + " = ") + "spawn " + this.call.tostr(lc) + "\n"
         is Stmt.DSpawn -> "spawn " + this.call.tostr(lc) + " in " + this.dst.tostr(lc) + "\n"
         is Stmt.Await -> "await " + this.e.tostr(lc) + "\n"
         is Stmt.Pause -> (if (this.pause) "pause " else "resume ") + this.tsk.tostr(lc) + "\n"
         is Stmt.Emit -> when (this.tgt) {
-            is Scope -> "emit @" + this.tgt.scp1.anon2local() + " " + this.e.tostr(lc) + "\n"
+            is Scope -> "emit @" + this.tgt.scp1.id.anon2local() + " " + this.e.tostr(lc) + "\n"
             is Expr  -> "emit " + this.tgt.tostr(lc) + " " + this.e.tostr(lc) + "\n"
             else -> error("bug found")
         }
