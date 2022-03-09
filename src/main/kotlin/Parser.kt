@@ -61,7 +61,7 @@ object Parser
                 val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
                 assert(CE1 || !haseq)
 
-                val tp = this.type(if (hasid && id is Tk.Ide) id else null)
+                val tp = this.type(if (hasid && istup) id as Tk.Ide else null)
                 val tps = arrayListOf(tp)
                 val ids = if (haseq) arrayListOf(id) else null
 
@@ -72,11 +72,11 @@ object Parser
                     if (haseq) {
                         if (istup) {
                             alls.accept_err(TK.Xide)
-                            ids!!.add(id as Tk.ide)
+                            ids!!.add(alls.tk0 as Tk.ide)
                             alls.accept_err(TK.CHAR,':')
                         } else {
                             alls.accept_err(TK.XIde)
-                            ids!!.add(id as Tk.Ide)
+                            ids!!.add(alls.tk0 as Tk.Ide)
                             alls.accept_err(TK.CHAR,'=')
                         }
                     }
@@ -88,7 +88,7 @@ object Parser
                     Type.Tuple(tk0, tps, ids as List<Tk.ide>?)
                 } else {
                     alls.accept_err(TK.CHAR, '>')
-                    Type.Union(tk0, tps, ids as List<Tk.ide>?)
+                    Type.Union(tk0, tps, ids as List<Tk.Ide>?)
                 }
             }
             alls.accept(TK.ACTIVE) -> {
@@ -188,12 +188,12 @@ object Parser
             alls.accept(TK.CHAR, '<') -> {
                 alls.accept_err(TK.CHAR, '.')
 
-                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
+                alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
                 val dsc = alls.tk0
                 All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
                     "invalid discriminator : expected index or type identifier"
                 }
-                assert(CE1 || dsc is Tk.Num || dsc.istask())
+                assert(CE1 || dsc is Tk.Num)
 
                 val cons = when {
                     dsc.isnull() -> null

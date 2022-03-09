@@ -12,8 +12,8 @@ fun Tk.lincol (src: String): String {
 }
 
 fun Type.tostr (lc: Boolean = false): String {
-    fun List<Tk.ide>?.idx (i: Int, c: Char): String {
-        return if (this == null) "" else this[i].id+c
+    fun List<Tk>?.idx (i: Int, c: Char): String {
+        return if (this == null) "" else this[i].id()+c
     }
     return when (this) {
         is Type.Unit    -> "()"

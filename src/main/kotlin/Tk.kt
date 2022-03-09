@@ -24,10 +24,10 @@ fun Tk.Nat.toce (): String {
     return "_" + op + this.src + cl
 }
 
-fun Tk.field2num (ids: List<Tk.ide>?): Int {
+fun Tk.field2num (ids: List<Tk>?): Int {
     return when (this) {
         is Tk.Num -> this.num
-        is Tk.ide  -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id==this.id}+1
+        is Tk.Ide -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id()==this.id}+1
         else -> error("bug found")
     }
 }
@@ -35,7 +35,8 @@ fun Tk.field2num (ids: List<Tk.ide>?): Int {
 fun Tk.tostr (): String {
     return when (this) {
         is Tk.Num -> this.num.toString()
-        is Tk.ide  -> this.id
+        is Tk.Ide -> this.id
+        is Tk.ide -> this.id
         else -> error("bug found")
     }
 }
@@ -44,7 +45,7 @@ fun Tk?.isnull (): Boolean {
     return when (this) {
         null      -> false
         is Tk.Num -> (this.num == 0)
-        is Tk.ide  -> (this.id == "Null")
+        is Tk.Ide -> (this.id == "Null")
         else      -> error("bug found")
     }
 }
