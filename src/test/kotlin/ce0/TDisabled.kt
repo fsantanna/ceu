@@ -13,7 +13,7 @@ class TDisabled {
         All_restart(null, PushbackReader(StringReader(inp), 2))
         Lexer.lex()
         try {
-            val s = Parser().stmts()
+            val s = Parser.stmts()
             s.setUps(null)
             s.setScp1s()
             s.setEnvs(null)
@@ -37,7 +37,7 @@ class TDisabled {
     fun a11_parser_type_issupof () {
         All_restart(null, PushbackReader(StringReader("<(),<(),^^>>"), 2))
         Lexer.lex()
-        val tp1 = Parser().type()
+        val tp1 = Parser.type()
         tp1.visit({ it.wup = Any() }, null)
         val tp2 = (tp1 as Type.Union).vec[1]
         // <(),<(),^^>> = <(),<(),<(),^^>>>
@@ -656,7 +656,7 @@ class TDisabled {
     fun noclo_d01_type_task () {
         All_restart(null, PushbackReader(StringReader("task @LOCAL->@[]->()->()->() {}"), 2))
         Lexer.lex()
-        val tp = Parser().type()
+        val tp = Parser.type()
         assert(tp is Type.Func && tp.tk.enu== TK.TASK)
     }
     @Test
@@ -664,7 +664,7 @@ class TDisabled {
         All_restart(null, PushbackReader(StringReader("active tasks @[]->()->()->()"), 2))
         Lexer.lex()
         try {
-            Parser().type()
+            Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 14): expected `@´ : have `@[´") { e.message!! }

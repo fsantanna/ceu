@@ -39,7 +39,7 @@ class TXParser {
     fun c01_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x: () = ()"), 2))
         Lexer.lex()
-        val s = Parser().stmt()
+        val s = Parser.stmt()
         assert(s is Stmt.Seq && s.s1 is Stmt.Var && s.s2 is Stmt.Set)
         assert(s.tostr() == "var x: ()\nset x = ()\n") { s.tostr() }
     }
@@ -47,7 +47,7 @@ class TXParser {
     fun c02_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x: ()"), 2))
         Lexer.lex()
-        val s = Parser().stmt()
+        val s = Parser.stmt()
         assert(s is Stmt.Var)
         assert(s.tostr() == "var x: ()\n") { s.tostr() }
     }
@@ -55,7 +55,7 @@ class TXParser {
     fun c03_parser_var () {
         All_restart(null, PushbackReader(StringReader("var x = ()"), 2))
         Lexer.lex()
-        val s = Parser().stmt()
+        val s = Parser.stmt()
         assert(s is Stmt.Seq && s.s1 is Stmt.Var && s.s2 is Stmt.Set)
     }
     @Test
@@ -63,7 +63,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("var x"), 2))
         Lexer.lex()
         try {
-            Parser().stmt()
+            Parser.stmt()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 6): expected type declaration : have end of file")
@@ -76,14 +76,14 @@ class TXParser {
     fun d01_pak_ucons () {
         All_restart(null, PushbackReader(StringReader("List.1 ()"), 2))
         Lexer.lex()
-        val e = Parser().expr()
+        val e = Parser.expr()
         assert(e is Expr.Pak && e.xtype is Type.Alias && e.e is Expr.UCons && !e.isact!!)
     }
     @Test
     fun d02_pak () {
         All_restart(null, PushbackReader(StringReader("Unit ()"), 2))
         Lexer.lex()
-        val e = Parser().expr()
+        val e = Parser.expr()
         //println(e.dump())
         assert(e is Expr.Pak && e.xtype is Type.Alias && e.e is Expr.Unit)
     }
@@ -91,7 +91,7 @@ class TXParser {
     fun d03_typedef () {
         All_restart(null, PushbackReader(StringReader("<Cons=/List,Unit=()>"), 2))
         Lexer.lex()
-        val tp = Parser().type()
+        val tp = Parser.type()
         assert(tp is Type.Union && tp.vec[1] is Type.Unit && tp.yids!![0].id=="Cons")
     }
     @Test
@@ -99,7 +99,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("<xxx=/List,Unit=()>"), 2))
         Lexer.lex()
         try {
-            Parser().type()
+            Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 2): invalid type identifier")
@@ -109,7 +109,7 @@ class TXParser {
     fun d05_typedef () {
         All_restart(null, PushbackReader(StringReader("[xxx:/List,yyy:()]"), 2))
         Lexer.lex()
-        val tp = Parser().type()
+        val tp = Parser.type()
         assert(tp is Type.Tuple && tp.vec[1] is Type.Unit && tp.yids!![0].id=="xxx")
     }
     @Test
@@ -117,7 +117,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("[xxx:/List,Yyy:()]"), 2))
         Lexer.lex()
         try {
-            val tp = Parser().type()
+            val tp = Parser.type()
             println(tp)
             error("impossible case")
         } catch (e: Throwable) {
@@ -129,7 +129,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("[xxx:/List,yyy=()]"), 2))
         Lexer.lex()
         try {
-            Parser().type()
+            Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
             assert(e.message == "(ln 1, col 15): expected `:´ : have `=´") { e.message!! }

@@ -12,7 +12,7 @@ class TEnv {
         All_restart(null, PushbackReader(StringReader(inp), 2))
         Lexer.lex()
         try {
-            val s = Parser().stmts()
+            val s = Parser.stmts()
             s.setUps(null)
             s.setScp1s()
             s.setEnvs(null)

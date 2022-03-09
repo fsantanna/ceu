@@ -9,7 +9,7 @@ fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
     All_restart(file, PushbackReader(StringReader(ce), 2))
     Lexer.lex()
     try {
-        val s = Parser().stmts()
+        val s = Parser.stmts()
         s.setUps(null)
         s.setScp1s()
         s.setEnvs(null)

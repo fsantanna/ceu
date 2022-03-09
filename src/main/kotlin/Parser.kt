@@ -1,6 +1,6 @@
-open class Parser
+object Parser
 {
-    open fun type (id: Tk.Id? = null): Type {
+    fun type (id: Tk.Id? = null): Type {
         return when {
             (id!=null || alls.accept(TK.XID)) -> {
                 val tk0 = (id ?: alls.tk0).astype()

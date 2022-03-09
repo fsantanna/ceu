@@ -14,7 +14,7 @@ class TXInfer {
         N = 1
         Lexer.lex()
         try {
-            val s = Parser().stmts()
+            val s = Parser.stmts()
             s.setUps(null)
             s.setScp1s()
             s.setEnvs(null)
