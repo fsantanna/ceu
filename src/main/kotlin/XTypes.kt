@@ -373,7 +373,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.dst.xinfTypes(null)
                 this.src.xinfTypes(this.dst.wtype!!)
             } catch (e: Throwable){
-                if (!e.message!!.contains("invalid inference")) {
+                if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e
                 }
                 this.src.xinfTypes(null)
@@ -386,7 +386,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.dst!!.xinfTypes(null)
                 this.call.xinfTypes(this.dst!!.wtype!!)
             } catch (e: Throwable) {
-                if (!e.message!!.contains("invalid inference")) {
+                if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e
                 }
                 this.call.xinfTypes(null)

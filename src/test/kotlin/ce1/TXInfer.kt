@@ -220,7 +220,7 @@ class TXInfer {
             type Xx = <()>
             var y = Xx.2 ()
         """.trimIndent())
-        assert(out == "(ln 2, col 12): invalid union constructor : out of bounds") { out }
+        assert(out == "(ln 2, col 12): invalid constructor : out of bounds") { out }
     }
     @Test
     fun a13_input_ptr () {
@@ -1383,7 +1383,7 @@ class TXInfer {
             var b: <False=(), True=()>
             set b = <.Maybe ()>: <False=(), True=()>
         """.trimIndent())
-        assert(out == "(ln 2, col 11): invalid union constructor : unknown discriminator \"Maybe\"") { out }
+        assert(out == "(ln 2, col 11): invalid constructor : unknown discriminator \"Maybe\"") { out }
     }
     @Test
     fun d05_union () {

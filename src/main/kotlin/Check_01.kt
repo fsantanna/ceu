@@ -26,11 +26,11 @@ fun Expr.UCons.check (tp: Type) {
     val uni = tp as Type.Union
     val idx = this.tk.field2num(uni.yids)
     All_assert_tk(this.tk, idx != null) {
-        "invalid union constructor : unknown discriminator \"${this.tk.id()}\""
+        "invalid constructor : unknown discriminator \"${this.tk.id()}\""
     }
     val ok = (uni.vec.size >= idx!!)
     All_assert_tk(this.tk, ok) {
-        "invalid union constructor : out of bounds"
+        "invalid constructor : out of bounds"
     }
 }
 

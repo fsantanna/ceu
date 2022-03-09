@@ -139,7 +139,7 @@ class TEnv {
             set l = <.1 ()>:</_int @GLOBAL>
         """.trimIndent())
         //assert(out == "(ln 2, col 7): invalid assignment : type mismatch") { out }
-        assert(out.startsWith("(ln 2, col 11): invalid union constructor : type mismatch")) { out }
+        assert(out.startsWith("(ln 2, col 11): invalid constructor : type mismatch")) { out }
         //assert(out == "(ln 2, col 11): invalid union constructor : expected `new`") { out }
     }
     @Test
@@ -450,7 +450,8 @@ class TEnv {
             var t: [(),()]
             set t = [(),(),()]
         """.trimIndent())
-        assert(out.startsWith("(ln 2, col 7): invalid assignment : type mismatch")) { out }
+        //assert(out.startsWith("(ln 2, col 7): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("(ln 2, col 9): invalid constructor : out of bounds")) { out }
     }
     @Test
     fun c23_list_zero_err () {
@@ -477,7 +478,7 @@ class TEnv {
         val out = inp2env("""
             output std <.2 ()>: <()>
         """.trimIndent())
-        assert(out == "(ln 1, col 14): invalid union constructor : out of bounds") { out }
+        assert(out == "(ln 1, col 14): invalid constructor : out of bounds") { out }
     }
 
     // POINTERS / SCOPE / @GLOBAL
@@ -1386,7 +1387,7 @@ class TEnv {
                 set p = <.1 /v>: </_int @GLOBAL>
             }
         """.trimIndent())
-        assert(out.startsWith("(ln 4, col 15): invalid union constructor : type mismatch")) { out }
+        assert(out.startsWith("(ln 4, col 15): invalid constructor : type mismatch")) { out }
     }
     @Test
     fun h09_ptr_type_err3 () {

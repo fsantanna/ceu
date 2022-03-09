@@ -49,7 +49,7 @@ fun check_02_after_tps (s: Stmt) {
                 val sup = e.xtype!!.vec[e.tk.field2num(e.xtype!!.yids)!! - 1]
                 val sub = e.arg.wtype!!
                 All_assert_tk(e.tk, sup.isSupOf(sub)) {
-                    "invalid union constructor : ${mismatch(sup,sub)}"
+                    "invalid constructor : ${mismatch(sup,sub)}"
                 }
             }
             is Expr.New -> {
