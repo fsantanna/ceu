@@ -20,7 +20,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
                     this
                 } else {
                     // TODO: scp2 = null
-                    val scp = Scope(Tk.Id(TK.XID, this.tk.lin, this.tk.col, id), null)
+                    val scp = Scope(Tk.ide(TK.Xide, this.tk.lin, this.tk.col, id), null)
                     Type.Pointer(this.tk_, scp, this.pln.aux())
                 }
             }

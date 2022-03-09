@@ -1,8 +1,8 @@
 object Parser
 {
-    fun type (id: Tk.Id? = null): Type {
+    fun type (id: Tk.ide? = null): Type {
         return when {
-            (id!=null || alls.accept(TK.XID)) -> {
+            (id!=null || alls.accept(TK.Xide)) -> {
                 val tk0 = (id ?: alls.tk0).astype()
                 val scps = if (alls.accept(TK.ATBRACK)) {
                     val ret = this.scp1s { it.asscope() }
@@ -17,7 +17,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Chr
                 val pln = this.type()
                 val scp = if (alls.accept(TK.CHAR, '@')) {
-                    alls.accept_err(TK.XID)
+                    alls.accept_err(TK.Xide)
                     alls.tk0.asscope()
                 } else {
                     null
@@ -46,7 +46,7 @@ object Parser
 
                 Type.Func(tk0,
                     Triple(
-                        Scope(Tk.Id(TK.XID, tk0.lin, tk0.col, "LOCAL"),null),
+                        Scope(Tk.ide(TK.Xide, tk0.lin, tk0.col, "LOCAL"),null),
                         if (scps==null) null else scps.map { Scope(it,null) },
                         ctrs
                     ),
@@ -63,7 +63,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Chr
                 val istup = (tk0.chr == '[')
 
-                val hasid = alls.accept(TK.XID)
+                val hasid = alls.accept(TK.Xide)
                 val id = alls.tk0
                 val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
                 if (haseq) {
@@ -71,7 +71,7 @@ object Parser
                     assert(CE1)
                 }
 
-                val tp = this.type(if (hasid && !haseq) (id as Tk.Id) else null)
+                val tp = this.type(if (hasid && !haseq) (id as Tk.ide) else null)
                 val tps = arrayListOf(tp)
                 val ids = if (haseq) arrayListOf(id) else null
 
@@ -80,7 +80,7 @@ object Parser
                         break
                     }
                     if (haseq) {
-                        alls.accept_err(TK.XID)
+                        alls.accept_err(TK.Xide)
                         val id = if (istup) alls.tk0.asvar() else alls.tk0.astype()
                         alls.accept_err(TK.CHAR,if (istup) ':' else '=')
                         ids!!.add(id)
@@ -90,10 +90,10 @@ object Parser
                 }
                 if (istup) {
                     alls.accept_err(TK.CHAR, ']')
-                    Type.Tuple(tk0, tps, ids as List<Tk.Id>?)
+                    Type.Tuple(tk0, tps, ids as List<Tk.ide>?)
                 } else {
                     alls.accept_err(TK.CHAR, '>')
-                    Type.Union(tk0, tps, ids as List<Tk.Id>?)
+                    Type.Union(tk0, tps, ids as List<Tk.ide>?)
                 }
             }
             alls.accept(TK.ACTIVE) -> {
@@ -122,9 +122,9 @@ object Parser
         }
     }
 
-    fun scp1s (f: (Tk) -> Tk.Id): List<Tk.Id> {
-        val scps = mutableListOf<Tk.Id>()
-        while (alls.accept(TK.XID)) {
+    fun scp1s (f: (Tk) -> Tk.ide): List<Tk.ide> {
+        val scps = mutableListOf<Tk.ide>()
+        while (alls.accept(TK.Xide)) {
             scps.add(f(alls.tk0))
             if (!alls.accept(TK.CHAR, ',')) {
                 break
@@ -132,15 +132,15 @@ object Parser
         }
         return scps
     }
-    fun scopepars (): Pair<List<Tk.Id>, List<Pair<String, String>>> {
+    fun scopepars (): Pair<List<Tk.ide>, List<Pair<String, String>>> {
         alls.accept_err(TK.ATBRACK)
         val scps = this.scp1s { it.asscopepar() }
         val ctrs = mutableListOf<Pair<String, String>>()
         if (alls.accept(TK.CHAR, ':')) {
-            while (alls.accept(TK.XID)) {
+            while (alls.accept(TK.Xide)) {
                 val id1 = alls.tk0.asscopepar().id
                 alls.accept_err(TK.CHAR, '>')
-                alls.accept_err(TK.XID)
+                alls.accept_err(TK.Xide)
                 val id2 = alls.tk0.asscopepar().id
                 ctrs.add(Pair(id1, id2))
                 if (!alls.accept(TK.CHAR, ',')) {
@@ -155,11 +155,11 @@ object Parser
     fun expr_one (): Expr {
         return when {
             alls.tk1.istype() -> {
-                val id = alls.tk1 as Tk.Id
+                val id = alls.tk1 as Tk.ide
                 val tp = this.type() as Type.Alias
                 val e = when {
                     alls.accept(TK.CHAR,'.') -> {
-                        alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                        alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
                         val dsc = alls.tk0
                         All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
                             "invalid discriminator : expected index or type identifier"
@@ -189,7 +189,7 @@ object Parser
             alls.accept(TK.CHAR, '<') -> {
                 alls.accept_err(TK.CHAR, '.')
 
-                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
                 val dsc = alls.tk0
                 All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0.istype()) {
                     "invalid discriminator : expected index or type identifier"
@@ -238,7 +238,7 @@ object Parser
 
                 val scp = if (alls.accept(TK.CHAR, ':')) {
                     alls.accept_err(TK.CHAR, '@')
-                    alls.accept_err(TK.XID)
+                    alls.accept_err(TK.Xide)
                     alls.tk0.asscope()
                 } else {
                     null
@@ -246,7 +246,7 @@ object Parser
                 Expr.New(tk0 as Tk.Key, if (scp==null) null else Scope(scp,null), e)
             }
             alls.accept(TK.UNIT) -> Expr.Unit(alls.tk0 as Tk.Sym)
-            alls.tk1.isvar() && alls.accept(TK.XID) -> Expr.Var(alls.tk0 as Tk.Id)
+            alls.tk1.isvar() && alls.accept(TK.Xide) -> Expr.Var(alls.tk0 as Tk.ide)
             alls.accept(TK.CHAR, '/') -> {
                 val tk0 = alls.tk0 as Tk.Chr
                 val e = this.expr()
@@ -309,7 +309,7 @@ object Parser
             val arg = this.expr()
             val oscp = if (!alls.accept(TK.CHAR, ':')) null else {
                 alls.accept_err(TK.CHAR, '@')
-                alls.accept_err(TK.XID)
+                alls.accept_err(TK.Xide)
                 alls.tk0.asscope()
             }
             e = Expr.Call(e.tk,
@@ -367,7 +367,7 @@ object Parser
                 }
                 Expr.Dnref(chr, e)
             } else {
-                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
                 val fld = alls.tk0
 
                 if (chr.chr == '?' || chr.chr == '!') {
@@ -390,7 +390,7 @@ object Parser
                     (chr.chr == '?') -> Expr.UPred(fld, xas)
                     (chr.chr == '!') -> Expr.UDisc(fld, xas)
                     (chr.chr == '.') -> {
-                        if (fld is Tk.Id && fld.istask()) {
+                        if (fld is Tk.ide && fld.istask()) {
                             Expr.Field(fld, xas)
                         } else {
                             Expr.TDisc(fld, xas)
@@ -462,7 +462,7 @@ object Parser
     }
     fun attr (): Attr {
         var e = when {
-            alls.accept(TK.XID) -> Attr.Var(alls.tk0 as Tk.Id)
+            alls.accept(TK.Xide) -> Attr.Var(alls.tk0 as Tk.ide)
             alls.accept(TK.XNAT) -> {
                 alls.accept_err(TK.CHAR, ':')
                 val tp = this.type()
@@ -504,7 +504,7 @@ object Parser
                 }
                 Attr.Dnref(chr, e)
             } else {
-                alls.accept(TK.XID) || alls.accept_err(TK.XNUM)
+                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
                 val fld = alls.tk0
                 assert(CE1 || fld is Tk.Num || fld.istask())
 
@@ -527,7 +527,7 @@ object Parser
                 when {
                     (chr.chr == '!') -> Attr.UDisc(fld, xas)
                     (chr.chr == '.') -> {
-                        if (fld is Tk.Id && fld.istask()) {
+                        if (fld is Tk.ide && fld.istask()) {
                             Attr.Field(fld, xas)
                         } else {
                             Attr.TDisc(fld, xas)
@@ -546,7 +546,7 @@ object Parser
         alls.accept_err(TK.CHAR, '{')
         val tk0 = alls.tk0 as Tk.Chr
         val scp1 = if (!alls.accept(TK.CHAR, '@')) null else {
-            alls.accept_err(TK.XID)
+            alls.accept_err(TK.Xide)
             alls.tk0.asscopecst()
         }
         val ss = this.stmts()
@@ -609,8 +609,8 @@ object Parser
                     }
                     alls.accept(TK.INPUT) -> {
                         val tk = alls.tk0 as Tk.Key
-                        alls.accept_err(TK.XID)
-                        val lib = (alls.tk0 as Tk.Id)
+                        alls.accept_err(TK.Xide)
+                        val lib = (alls.tk0 as Tk.ide)
                         val arg = this.expr()
                         alls.accept_err(TK.CHAR, ':')
                         val tp = this.type()
@@ -629,8 +629,8 @@ object Parser
                 }
             }
             alls.accept(TK.VAR) -> {
-                alls.accept_err(TK.XID)
-                val tk_id = alls.tk0 as Tk.Id
+                alls.accept_err(TK.Xide)
+                val tk_id = alls.tk0 as Tk.ide
                 val tp = if (!alls.accept(TK.CHAR, ':')) null else {
                     this.type()
                 }
@@ -650,8 +650,8 @@ object Parser
                     val src = when {
                         alls.accept(TK.INPUT) -> {
                             val tk = alls.tk0 as Tk.Key
-                            alls.accept_err(TK.XID)
-                            val lib = (alls.tk0 as Tk.Id)
+                            alls.accept_err(TK.Xide)
+                            val lib = (alls.tk0 as Tk.ide)
                             val arg = this.expr()
                             val inp = if (!alls.accept(TK.CHAR, ':')) null else this.type()
                             Stmt.Input(tk, inp, dst, lib, arg)
@@ -691,8 +691,8 @@ object Parser
             }
             alls.accept(TK.INPUT) -> {
                 val tk = alls.tk0 as Tk.Key
-                alls.accept_err(TK.XID)
-                val lib = (alls.tk0 as Tk.Id)
+                alls.accept_err(TK.Xide)
+                val lib = (alls.tk0 as Tk.ide)
                 val arg = this.expr()
                 val tp = if (!alls.accept(TK.CHAR, ':')) null else this.type()
                 Stmt.Input(tk, tp, null, lib, arg)
@@ -729,7 +729,7 @@ object Parser
                 }
             }
             alls.accept(TK.TYPE) -> {
-                alls.accept_err(TK.XID)
+                alls.accept_err(TK.Xide)
                 val id = alls.tk0.astype()
                 val scps = if (alls.check(TK.ATBRACK)) this.scopepars() else Pair(null, null)
                 alls.accept_err(TK.CHAR, '=')
@@ -909,7 +909,7 @@ object Parser
             alls.accept(TK.EMIT) -> {
                 val tk0 = alls.tk0 as Tk.Key
                 val tgt = if (alls.accept(TK.CHAR, '@')) {
-                    alls.accept_err(TK.XID)
+                    alls.accept_err(TK.Xide)
                     Scope(alls.tk0.asscope(), null)
                 } else {
                     this.expr_dots()
@@ -948,8 +948,8 @@ object Parser
             alls.accept(TK.CATCH) || alls.check(TK.CHAR, '{') -> this.block()
             alls.accept(TK.OUTPUT) -> {
                 val tk = alls.tk0 as Tk.Key
-                alls.accept_err(TK.XID)
-                val lib = (alls.tk0 as Tk.Id)
+                alls.accept_err(TK.Xide)
+                val lib = (alls.tk0 as Tk.ide)
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
             }

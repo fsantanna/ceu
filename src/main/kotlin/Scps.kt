@@ -1,11 +1,11 @@
 // Triple<lvl,par,depth>
-data class Scope (var scp1: Tk.Id, var scp2: Triple<Int,String?,Int?>?)
+data class Scope (var scp1: Tk.ide, var scp2: Triple<Int,String?,Int?>?)
 
-fun Tk.Id?.isanon (): Boolean {
+fun Tk.ide?.isanon (): Boolean {
     return this.let { (it==null || (it.id.length>=2 && it.id[0]=='B' && it.id[1].isDigit())) }
 }
 
-fun Tk.Id.anon2local (): String {
+fun Tk.ide.anon2local (): String {
     return if (this.isanon()) "LOCAL" else this.id
 }
 
@@ -16,7 +16,7 @@ fun Any.localBlockScp1Id (): String {
 fun Stmt.setScp1s () {
     fun fx (up: Any, scp: Scope) {
         scp.scp1 = if (scp.scp1.id != "LOCAL") scp.scp1 else {
-            Tk.Id(TK.XID, scp.scp1.lin, scp.scp1.col, up.localBlockScp1Id())
+            Tk.ide(TK.Xide, scp.scp1.lin, scp.scp1.col, up.localBlockScp1Id())
         }
     }
     this.visit(null, null, null, ::fx)

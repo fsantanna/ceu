@@ -250,7 +250,7 @@ object Lexer {
                     if (it != null) {
                         Tk.Key(it, lin(), col(), pay)
                     } else {
-                        Tk.Id(TK.XID, lin(), col(), pay)
+                        Tk.ide(TK.Xide, lin(), col(), pay)
                     }
                 }
             }

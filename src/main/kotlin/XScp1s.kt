@@ -13,7 +13,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                         if (toinc) {
                             c += 1  // infer implicit scope incrementally
                         }
-                        Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, c + ""), null)
+                        Scope(Tk.ide(TK.Xide, tp.tk.lin, tp.tk.col, c + ""), null)
                     }
                     listOf(tp.xscp!!)
                 }
@@ -29,7 +29,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                             val def = tp.env(tp.tk_.id)!! as Stmt.Typedef
                             tp.xscps = tp.xscps ?: def.xscp1s.first!!.map {
                                 c += 1  // infer implicit scope incrementally
-                                Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, c + ""), null)
+                                Scope(Tk.ide(TK.Xide, tp.tk.lin, tp.tk.col, c + ""), null)
                             }
                             tp.xscps!!
                         }
@@ -75,7 +75,7 @@ fun Stmt.xinfScp1s () {
                     (tp.ups_first { it is Stmt.Typedef || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
-                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
+                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.ide(TK.Xide, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
                     }
                 }
             }
@@ -91,7 +91,7 @@ fun Stmt.xinfScp1s () {
                     // do not infer to LOCAL if inside function/typedef declaration
                     (tp.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> {}
                     else -> {
-                        tp.xscp = Scope(Tk.Id(TK.XID, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null)
+                        tp.xscp = Scope(Tk.ide(TK.Xide, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null)
                     }
                 }
             }
@@ -127,7 +127,7 @@ fun Stmt.xinfScp1s () {
                 }
                 val lvlF = 1 + e.ups_tolist().count { it is Stmt.Block }
                 var lvlM  = Int.MAX_VALUE
-                var scp: Tk.Id? = null
+                var scp: Tk.ide? = null
                 fun fx (x: Expr) {
                     when (x) {
                         is Expr.Var -> {
@@ -141,7 +141,7 @@ fun Stmt.xinfScp1s () {
                                 lvlM = lvlV
                                 scp = env.ups_first_block()!!.let {
                                     if (it.scp1.isanon()) {
-                                        it.scp1 = Tk.Id(TK.XID, it.tk.lin, it.tk.col, "X${it.n}")
+                                        it.scp1 = Tk.ide(TK.Xide, it.tk.lin, it.tk.col, "X${it.n}")
                                     }
                                     it.scp1!!
                                 }

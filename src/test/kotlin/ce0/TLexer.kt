@@ -78,10 +78,10 @@ class TLexer {
     @Test
     fun b05_lexer_keys () {
         All_restart(null, PushbackReader(StringReader("xvar var else varx type output //@rec"), 2))
-        Lexer.lex(); assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="xvar")
+        Lexer.lex(); assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="xvar")
         Lexer.lex(); assert(alls.tk1.enu== TK.VAR)
         Lexer.lex(); assert(alls.tk1.enu== TK.ELSE)
-        Lexer.lex(); assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="varx")
+        Lexer.lex(); assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="varx")
         Lexer.lex(); assert(alls.tk1.enu== TK.TYPE)
         Lexer.lex(); assert(alls.tk1.enu== TK.OUTPUT)
         //Lexer.lex() ; assert(alls.tk1.enu==TK.AREC && (alls.tk1 as Tk.Key).key=="@rec")
@@ -92,16 +92,16 @@ class TLexer {
     @Test
     fun b06_lexer_xs () {
         All_restart(null, PushbackReader(StringReader("c1\nc2 c3  \n    \nc4"), 2))
-        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c1")
-        Lexer.lex(); assert(alls.tk1.lin==2 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c2")
-        Lexer.lex(); assert(alls.tk1.lin==2 && alls.tk1.col==4) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c3")
-        Lexer.lex(); assert(alls.tk1.lin==4 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c4")
+        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c1")
+        Lexer.lex(); assert(alls.tk1.lin==2 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c2")
+        Lexer.lex(); assert(alls.tk1.lin==2 && alls.tk1.col==4) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c3")
+        Lexer.lex(); assert(alls.tk1.lin==4 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c4")
     }
     @Test
     fun b07_lexer_xs () {
         All_restart(null, PushbackReader(StringReader("c1 a"), 2))
-        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c1")
-        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==4) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="a")
+        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c1")
+        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==4) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="a")
     }
 
     // XNAT
@@ -196,9 +196,9 @@ class TLexer {
     @Test
     fun e01_lincol () {
         All_restart(null, PushbackReader(StringReader("c1 ^[5,10]\na\n^[]\n b"), 2))
-        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c1")
-        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==10) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="a")
-        Lexer.lex(); assert(alls.tk1.lin==4 && alls.tk1.col==2) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="b")
+        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c1")
+        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==10) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="a")
+        Lexer.lex(); assert(alls.tk1.lin==4 && alls.tk1.col==2) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="b")
     }
     @Test
     fun e02_lincol () {
@@ -213,9 +213,9 @@ class TLexer {
     @Test
     fun e03_lincol () {
         All_restart(null, PushbackReader(StringReader("c1 ^[5,10]\na\n^\"test-lincol.ce\"\n^[]\n b"), 2))
-        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="c1")
-        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==10) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="a")
-        Lexer.lex(); assert(all().file=="test-lincol.ce" && alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="inside")
-        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==2) ; assert(alls.tk1.enu== TK.XID && (alls.tk1 as Tk.Id).id=="b")
+        Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c1")
+        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==10) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="a")
+        Lexer.lex(); assert(all().file=="test-lincol.ce" && alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="inside")
+        Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==2) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="b")
     }
 }

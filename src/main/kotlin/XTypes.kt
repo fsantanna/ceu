@@ -4,7 +4,7 @@
 //  var x: <(),()> = <.1>: ?
 //  var x: _int = _v: ?
 
-fun Type.mapScp1 (up: Any, to: Tk.Id): Type {
+fun Type.mapScp1 (up: Any, to: Tk.ide): Type {
     fun Type.aux (): Type {
         return when (this) {
             is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
@@ -72,13 +72,13 @@ fun Expr.xinfTypes (inf: Type?) {
                     (blk == null) -> "GLOBAL"
                     else -> base.tk_.id
                 }
-                val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col, id.toUpperCase())
+                val scp1 = Tk.ide(TK.Xide,this.tk.lin,this.tk.col, id.toUpperCase())
                 Type.Pointer(this.tk_, Scope(scp1,null), this.pln.wtype!!)
             }
         }
         is Expr.Dnref -> {
             this.ptr.xinfTypes(inf?.let {
-                val scp1 = Tk.Id(TK.XID,this.tk.lin,this.tk.col,this.localBlockScp1Id())
+                val scp1 = Tk.ide(TK.Xide,this.tk.lin,this.tk.col,this.localBlockScp1Id())
                 Type.Pointer (
                     Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'/'),
                     Scope(scp1,null),
@@ -138,7 +138,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 if (inf is Type.Pointer) {
                     this.xscp = inf.xscp
                 } else {
-                    this.xscp = Scope(Tk.Id(TK.XID, this.tk.lin, this.tk.col, this.localBlockScp1Id()), null)
+                    this.xscp = Scope(Tk.ide(TK.Xide, this.tk.lin, this.tk.col, this.localBlockScp1Id()), null)
                 }
             }
             Type.Pointer (
@@ -252,7 +252,7 @@ fun Expr.xinfTypes (inf: Type?) {
                         val e = this
 
                         // TODO: remove after change increasing?
-                        this.arg.xinfTypes(ftp.inp.mapScp1(e, Tk.Id(TK.XID, this.tk.lin, this.tk.col,this.localBlockScp1Id())))
+                        this.arg.xinfTypes(ftp.inp.mapScp1(e, Tk.ide(TK.Xide, this.tk.lin, this.tk.col,this.localBlockScp1Id())))
 
                         // Calculates type scopes {...}:
                         //  call f @[...] arg
@@ -262,7 +262,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             //      var f: func {@LOCAL} -> ...     // f will hold env in @LOCAL
                             //      set f = call g {@LOCAL} ()      // pass it for the builder function
 
-                            fun Type.toScp1s (): List<Tk.Id> {
+                            fun Type.toScp1s (): List<Tk.ide> {
                                 return when (this) {
                                     is Type.Pointer -> listOf(this.xscp!!.scp1)
                                     is Type.Alias   -> this.xscps!!.map { it.scp1 }
@@ -271,18 +271,18 @@ fun Expr.xinfTypes (inf: Type?) {
                                 }
                             }
 
-                            val clo: List<Pair<Tk.Id,Tk.Id>> = if (this.upspawn()==null && inf is Type.Func) {
+                            val clo: List<Pair<Tk.ide,Tk.ide>> = if (this.upspawn()==null && inf is Type.Func) {
                                 listOf(Pair((ftp.out as Type.Func).xscps.first.scp1,inf.xscps.first.scp1))
                             } else {
                                 emptyList()
                             }
 
-                            val ret1s: List<Tk.Id> = if (inf == null) {
+                            val ret1s: List<Tk.ide> = if (inf == null) {
                                 // no attribution expected, save to @LOCAL as shortest scope possible
                                 ftp.out.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
-                                    .map { Tk.Id(TK.XID, ftp.tk.lin, ftp.tk.col, ftp.localBlockScp1Id()) }
+                                    .map { Tk.ide(TK.Xide, ftp.tk.lin, ftp.tk.col, ftp.localBlockScp1Id()) }
                             } else {
                                 inf.flattenLeft()
                                    .map { it.toScp1s() }
@@ -291,11 +291,11 @@ fun Expr.xinfTypes (inf: Type?) {
 
                             val inp_out = let {
                                 //assert(ret1s.distinctBy { it.id }.size <= 1) { "TODO: multiple pointer returns" }
-                                val arg1s: List<Tk.Id> = this.arg.wtype!!.flattenLeft()
+                                val arg1s: List<Tk.ide> = this.arg.wtype!!.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
                                 // func inp -> out  ==>  { inp, out }
-                                val inp_out: List<Tk.Id> = (ftp.inp.flattenLeft() + ftp.out.flattenLeft())
+                                val inp_out: List<Tk.ide> = (ftp.inp.flattenLeft() + ftp.out.flattenLeft())
                                     .map { it.toScp1s() }
                                     .flatten()
                                 inp_out.zip(arg1s+ret1s)
@@ -303,7 +303,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
                             // [ (inp,arg), (out,ret) ] ==> remove all repeated inp/out
                             // TODO: what if out/ret are not the same for the removed reps?
-                            val scp1s: List<Tk.Id> = (clo + inp_out)
+                            val scp1s: List<Tk.ide> = (clo + inp_out)
                                 .filter { it.first.isscopepar() }  // ignore constant labels (they not args)
                                 .distinctBy { it.first.id }
                                 .map { it.second }
@@ -390,7 +390,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Alias(Tk.Id(TK.XID, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+            this.e.xinfTypes(Type.Alias(Tk.ide(TK.Xide, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

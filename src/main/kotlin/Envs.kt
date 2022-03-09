@@ -67,7 +67,7 @@ fun Any.env (id: String): Any? {
                     (id == "pub") -> it.ftp()!!.pub!!.nonat_()
                     (id == "ret") -> it.ftp()!!.out.nonat_()
                     (id == "evt") -> Type.Alias (
-                        Tk.Id(TK.XID, it.tk.lin, it.tk.col, "Event"),
+                        Tk.ide(TK.Xide, it.tk.lin, it.tk.col, "Event"),
                         false,
                         emptyList()
                     ).clone(it, it.tk.lin, it.tk.col).nonat_()
