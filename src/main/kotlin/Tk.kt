@@ -24,10 +24,11 @@ fun Tk.Nat.toce (): String {
     return "_" + op + this.src + cl
 }
 
-fun Tk.field2num (ids: List<Tk>?): Int {
+fun Tk.field2num (ids: List<Tk>?): Int? {
     return when (this) {
         is Tk.Num -> this.num
-        is Tk.Ide -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id()==this.id}+1
+        is Tk.ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
+        is Tk.Ide -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
         else -> error("bug found")
     }
 }

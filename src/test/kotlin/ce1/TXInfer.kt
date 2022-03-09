@@ -1363,7 +1363,7 @@ class TXInfer {
             var pt: [x:_int, y:_int]
             set pt.z = _10
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == "(ln 2, col 8): invalid discriminator : unknown \"z\"") { out }
     }
     @Test
     fun d03_union () {
@@ -1383,7 +1383,7 @@ class TXInfer {
             var b: <False=(), True=()>
             set b = <.Maybe ()>: <False=(), True=()>
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == "(ln 2, col 11): invalid union constructor : unknown discriminator \"Maybe\"") { out }
     }
     @Test
     fun d05_union () {

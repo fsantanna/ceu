@@ -235,7 +235,7 @@ class TXExec {
         assert(out == "()\n") { out }
     }
     @Test
-    fun b13_new_self () {
+    fun todo_b13_new_self () {
         val out = test(true, """
             type List = <[//List,/List]>
             var x: /List = new <.1 [_(&printf),<.0>]>
@@ -597,7 +597,7 @@ class TXExec {
         assert(out == "<.1>\n") { out }
     }
     @Test
-    fun e10_rect() {
+    fun todo_e10_rect() {
         val out = test(true, """
             type Unit  = ()
             type Int   = _int

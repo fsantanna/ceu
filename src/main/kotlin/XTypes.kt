@@ -105,7 +105,8 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            val num = ((this.xtype ?: inf) as Type.Union).yids.let { this.tk.field2num(it) }
+            this.check(this.xtype ?: inf!!)
+            val num = ((this.xtype ?: inf) as Type.Union).yids.let { this.tk.field2num(it) }!!
             if (this.xtype != null) {
                 val x = this.xtype!!.vec[num-1]
                 this.arg.xinfTypes(x)
@@ -114,7 +115,6 @@ fun Expr.xinfTypes (inf: Type?) {
                 assert(inf != null)
                     //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
-                this.check(inf!!)
                 val x = (inf as Type.Union).vec[num-1]
                 this.arg.xinfTypes(x)
                 this.xtype = inf.clone(this,this.tk.lin,this.tk.col) as Type.Union
@@ -166,8 +166,11 @@ fun Expr.xinfTypes (inf: Type?) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }
                 val num = this.tk.field2num((this.tup.wtype as Type.Tuple).yids)
+                All_assert_tk(this.tk, num != null) {
+                    "invalid discriminator : unknown \"${this.tk.id()}\""
+                }
                 val (MIN, MAX) = Pair(1, (it as Type.Tuple).vec.size)
-                All_assert_tk(this.tk, MIN <= num && num <= MAX) {
+                All_assert_tk(this.tk, MIN <= num!! && num!! <= MAX) {
                     "invalid discriminator : out of bounds"
                 }
                 it.vec[num - 1]
@@ -208,7 +211,10 @@ fun Expr.xinfTypes (inf: Type?) {
 
             val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
             val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).yids)
-            All_assert_tk(this.tk, MIN <= num && num <= MAX) {
+            All_assert_tk(this.tk, num != null) {
+                "invalid discriminator : unknown discriminator \"${this.tk.id()}\""
+            }
+            All_assert_tk(this.tk, MIN <= num!! && num!! <= MAX) {
                 "invalid $str : out of bounds"
             }
 
@@ -367,6 +373,9 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.dst.xinfTypes(null)
                 this.src.xinfTypes(this.dst.wtype!!)
             } catch (e: Throwable){
+                if (!e.message!!.contains("invalid inference")) {
+                    throw e
+                }
                 this.src.xinfTypes(null)
                 this.dst.xinfTypes(this.src.wtype!!)
             }
@@ -377,6 +386,9 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.dst!!.xinfTypes(null)
                 this.call.xinfTypes(this.dst!!.wtype!!)
             } catch (e: Throwable) {
+                if (!e.message!!.contains("invalid inference")) {
+                    throw e
+                }
                 this.call.xinfTypes(null)
                 this.dst?.xinfTypes(this.call.wtype!!)
             }

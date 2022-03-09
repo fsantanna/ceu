@@ -93,7 +93,7 @@ class TXTask {
         assert(out == "10\n20\n") { out }
     }
     @Test
-    fun a05_args_err () {
+    fun todo_a05_args_err () {
         val out = test(true, """
             var f : task ()->()->()
             var x : active task [()]->()->() = spawn f ()

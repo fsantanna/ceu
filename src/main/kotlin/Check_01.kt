@@ -24,7 +24,11 @@ fun Scope.check (up: Any) {
 fun Expr.UCons.check (tp: Type) {
     All_assert_tk(tp.tk, tp is Type.Union) { "invalid type : expected union" }
     val uni = tp as Type.Union
-    val ok = (uni.vec.size >= this.tk.field2num(uni.yids))
+    val idx = this.tk.field2num(uni.yids)
+    All_assert_tk(this.tk, idx != null) {
+        "invalid union constructor : unknown discriminator \"${this.tk.id()}\""
+    }
+    val ok = (uni.vec.size >= idx!!)
     All_assert_tk(this.tk, ok) {
         "invalid union constructor : out of bounds"
     }
