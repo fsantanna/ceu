@@ -11,8 +11,8 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
         return when (this) {
             is Type.Active, is Type.Actives -> TODO()
             is Type.Unit, is Type.Nat, is Type.Alias -> this
-            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.ids)
-            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.ids)
+            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
+            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> this.xscp.let {
                 val id = MAP[it!!.scp1.id]

@@ -22,8 +22,8 @@ fun Type.tostr (lc: Boolean = false): String {
         is Type.Alias   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.anon2local() }.joinToString(",") + "]"
         }}
-        is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.ids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
-        is Type.Union   -> "<" + this.vec.mapIndexed { i,v -> this.ids.idx(i,'=') + v.tostr(lc) }.joinToString(",") + ">"
+        is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
+        is Type.Union   -> "<" + this.vec.mapIndexed { i,v -> this.yids.idx(i,'=') + v.tostr(lc) }.joinToString(",") + ">"
         is Type.Active  -> "active " + this.tsk.tostr(lc)
         is Type.Actives -> "active {${this.len?.num ?: ""}} " + this.tsk.tostr(lc)
         is Type.Alias   -> this.tk_.id + this.xscps!!.let {

@@ -33,12 +33,12 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
             is Type.Tuple -> Type.Tuple(
                 this.tk_.copy(lin_ = lin, col_ = col),
                 this.vec.map { it.aux(lin, col) },
-                this.ids?.map { it.copy(lin_ = lin,col_ = col) }
+                this.yids?.map { it.copy(lin_ = lin,col_ = col) }
             )
             is Type.Union -> Type.Union(
                 this.tk_.copy(lin_ = lin, col_ = col),
                 this.vec.map { it.aux(lin, col) },
-                this.ids?.map { it.copy(lin_ = lin,col_ = col) }
+                this.yids?.map { it.copy(lin_ = lin,col_ = col) }
             )
             is Type.Func -> Type.Func(
                 this.tk_.copy(lin_ = lin, col_ = col),
@@ -168,8 +168,8 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
     }
     return when (this) {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))
-        is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.ids)
-        is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.ids)
+        is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
+        is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Alias   -> Type.Alias(this.tk_, this.xisrec, this.xscps!!.map { it.idx() })
         is Type.Func -> if (!dofunc) this else {
             Type.Func(

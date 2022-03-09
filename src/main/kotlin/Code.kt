@@ -373,7 +373,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).ids)
+            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)
             val pre = if (e.tk.isNull()) {
                 """
                 assert(&${it.expr} == NULL);
@@ -390,7 +390,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).ids)
+            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)
             val pos = if (e.tk.isNull()) {
                 "(&${it.expr} == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
@@ -426,7 +426,7 @@ fun code_fe (e: Expr) {
             val tp  = CODE.removeFirst()
             val ID  = "_tmp_" + e.n
             val pos = xp.pos()
-            val num = e.tk.field2num(e.xtype!!.ids)
+            val num = e.tk.field2num(e.xtype!!.yids)
             val pre = "$pos $ID = (($pos) { $num , ._$num = ${arg.expr} });\n"
             Code(tp.type+arg.type, tp.struct+arg.struct, tp.func+arg.func, arg.stmt + pre, ID)
         }

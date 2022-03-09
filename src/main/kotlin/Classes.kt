@@ -63,8 +63,8 @@ sealed class Tk (
 sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Unit    (val tk_: Tk.Sym): Type(tk_, null, null)
     data class Nat     (val tk_: Tk.Nat): Type(tk_, null, null)
-    data class Tuple   (val tk_: Tk.Chr, val vec: List<Type>, val ids: List<Tk.Id>?): Type(tk_, null, null)
-    data class Union   (val tk_: Tk.Chr, val vec: List<Type>, val ids: List<Tk.Id>?): Type(tk_, null, null)
+    data class Tuple   (val tk_: Tk.Chr, val vec: List<Type>, val yids: List<Tk.Id>?): Type(tk_, null, null)
+    data class Union   (val tk_: Tk.Chr, val vec: List<Type>, val yids: List<Tk.Id>?): Type(tk_, null, null)
     data class Pointer (val tk_: Tk.Chr, var xscp: Scope?, val pln: Type): Type(tk_, null, null)
     data class Active  (val tk_: Tk.Key, val tsk: Type): Type(tk_, null, null)
     data class Actives (val tk_: Tk.Key, val len: Tk.Num?, val tsk: Type): Type(tk_, null, null)

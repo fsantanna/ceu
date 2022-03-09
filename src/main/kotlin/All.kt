@@ -3,7 +3,7 @@ import java.io.PushbackReader
 import java.io.StringReader
 import java.lang.AssertionError
 
-var INFER = false
+var CE1 = false
 val THROW = false
 var LINES = false
 
@@ -169,7 +169,7 @@ fun exec (cmd: String): Pair<Boolean,String> {
 }
 
 fun test (infer: Boolean, inp: String): String {
-    INFER = infer
+    CE1 = infer
     val (ok1,out1) = ce2c(null, inp)
     if (!ok1) {
         return out1

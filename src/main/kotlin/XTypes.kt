@@ -8,8 +8,8 @@ fun Type.mapScp1 (up: Any, to: Tk.Id): Type {
     fun Type.aux (): Type {
         return when (this) {
             is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
-            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.ids)
-            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.ids)
+            is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
+            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
             is Type.Alias   -> Type.Alias(this.tk_, this.xisrec,
@@ -105,7 +105,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            val num = ((this.xtype ?: inf) as Type.Union).ids.let { this.tk.field2num(it) }
+            val num = ((this.xtype ?: inf) as Type.Union).yids.let { this.tk.field2num(it) }
             if (this.xtype != null) {
                 val x = this.xtype!!.vec[num-1]
                 this.arg.xinfTypes(x)
@@ -165,7 +165,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, it is Type.Tuple) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }
-                val num = this.tk.field2num((this.tup.wtype as Type.Tuple).ids)
+                val num = this.tk.field2num((this.tup.wtype as Type.Tuple).yids)
                 val (MIN, MAX) = Pair(1, (it as Type.Tuple).vec.size)
                 All_assert_tk(this.tk, MIN <= num && num <= MAX) {
                     "invalid discriminator : out of bounds"
@@ -207,7 +207,7 @@ fun Expr.xinfTypes (inf: Type?) {
             assert(!tk_.isNull() || tp.isrec()) { "bug found" }
 
             val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
-            val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).ids)
+            val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).yids)
             All_assert_tk(this.tk, MIN <= num && num <= MAX) {
                 "invalid $str : out of bounds"
             }

@@ -8,7 +8,7 @@ import java.io.StringReader
 class TEnv {
 
     fun inp2env (inp: String): String {
-        INFER = false
+        CE1 = false
         All_restart(null, PushbackReader(StringReader(inp), 2))
         Lexer.lex()
         try {

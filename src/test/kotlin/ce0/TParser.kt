@@ -12,7 +12,7 @@ class TParser {
         @BeforeAll
         @JvmStatic
         internal fun setup() {
-            INFER = false
+            CE1 = false
         }
     }
     // TYPE

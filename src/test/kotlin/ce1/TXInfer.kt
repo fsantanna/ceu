@@ -9,7 +9,7 @@ import java.io.StringReader
 class TXInfer {
 
     fun all (inp: String): String {
-        INFER = true
+        CE1 = true
         All_restart(null, PushbackReader(StringReader(inp), 2))
         N = 1
         Lexer.lex()
