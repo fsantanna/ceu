@@ -374,7 +374,7 @@ fun code_fe (e: Expr) {
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)
-            val pre = if (e.tk.isNull()) {
+            val pre = if (e.tk.isnull()) {
                 """
                 assert(&${it.expr} == NULL);
 
@@ -391,7 +391,7 @@ fun code_fe (e: Expr) {
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)
-            val pos = if (e.tk.isNull()) {
+            val pos = if (e.tk.isnull()) {
                 "(&${it.expr} == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
                 "(&${it.expr} != NULL) && ($ee.tag == $num)"

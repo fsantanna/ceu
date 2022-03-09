@@ -204,7 +204,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid $str : not an union"
             }
-            assert(!tk_.isNull() || tp.isrec()) { "bug found" }
+            assert(!tk_.isnull() || tp.isrec()) { "bug found" }
 
             val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
             val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).yids)
@@ -213,7 +213,7 @@ fun Expr.xinfTypes (inf: Type?) {
             }
 
             when (this) {
-                is Expr.UDisc -> if (this.tk.isNull()) {
+                is Expr.UDisc -> if (this.tk.isnull()) {
                     Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()"))
                 } else {
                     xtp.vec[num - 1]

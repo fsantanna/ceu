@@ -69,7 +69,7 @@ fun Tk.tostr (): String {
     }
 }
 
-fun Tk?.isNull (): Boolean {
+fun Tk?.isnull (): Boolean {
     return when (this) {
         null      -> false
         is Tk.Num -> (this.num == 0)
@@ -78,8 +78,8 @@ fun Tk?.isNull (): Boolean {
     }
 }
 
-fun Tk.Id.isTask (): Boolean {
-    return this.id in arrayOf("pub","ret","state")
+fun Tk.istask (): Boolean {
+    return this is Tk.Id && this.id in arrayOf("pub","ret","state")
 }
 
 fun TK.toErr (chr: Char?): String {
