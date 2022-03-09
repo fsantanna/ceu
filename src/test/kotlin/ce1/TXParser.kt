@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -7,6 +8,13 @@ import java.io.StringReader
 @TestMethodOrder(Alphanumeric::class)
 class TXParser {
 
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        internal fun setup() {
+            CE1 = true
+        }
+    }
     // TYPE
 
     /*
@@ -102,7 +110,8 @@ class TXParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 2): invalid type identifier")
+            //assert(e.message == "(ln 1, col 2): invalid type identifier") { e.message!! }
+            assert(e.message == "(ln 1, col 2): expected type : have \"xxx\"") { e.message!! }
         }
     }
     @Test
@@ -121,7 +130,8 @@ class TXParser {
             println(tp)
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 12): invalid variable identifier") { e.message!! }
+            //assert(e.message == "(ln 1, col 12): invalid variable identifier") { e.message!! }
+            assert(e.message == "(ln 1, col 12): expected variable identifier : have \"Yyy\"") { e.message!! }
         }
     }
     @Test

@@ -1,9 +1,9 @@
 object Parser
 {
-    fun type (id: Tk.Ide? = null): Type {
+    fun type (preid: Tk.Ide? = null): Type {
         return when {
-            (id!=null || alls.accept(TK.XIde)) -> {
-                val tk0 = id ?: alls.tk0 as Tk.Ide
+            (preid!=null || alls.accept(TK.XIde)) -> {
+                val tk0 = preid ?: alls.tk0 as Tk.Ide
                 val scps = if (!alls.accept(TK.ATBRACK)) null else {
                     val ret = this.scp1s { }
                     alls.accept_err(TK.CHAR, ']')
@@ -61,7 +61,12 @@ object Parser
                 val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
                 assert(CE1 || !haseq)
 
-                val tp = this.type(if (hasid && istup) id as Tk.Ide else null)
+                val tp = when {
+                    !hasid -> this.type(null)
+                    haseq  -> this.type(null)
+                    (id is Tk.ide) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
+                    else -> this.type(id as Tk.Ide)
+                }
                 val tps = arrayListOf(tp)
                 val ids = if (haseq) arrayListOf(id) else null
 
@@ -378,7 +383,7 @@ object Parser
                         "invalid field : expected index or variable identifier"
                     }
                 }
-                val xas = if (!CE1 || fld.isnull()) e else {
+                val xas = if (!CE1 || (chr.chr!='.' && fld.isnull())) e else {
                     Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                 }
                 when {
@@ -516,7 +521,7 @@ object Parser
                         "invalid field : expected index or variable identifier"
                     }
                 }
-                val xas = if (!CE1 || fld.isnull()) e else {
+                val xas = if (!CE1 || (chr.chr=='!' && fld.isnull())) e else {
                     Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
                 }
                 when {

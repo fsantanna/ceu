@@ -15,6 +15,7 @@ class TParser {
             CE1 = false
         }
     }
+
     // TYPE
 
     @Test
