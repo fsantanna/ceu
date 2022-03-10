@@ -59,7 +59,7 @@ class TTask {
             set x = spawn f ()
             output std _2:_int
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
@@ -78,8 +78,8 @@ class TTask {
             output std _2:_int
             --awake x _1:_int
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         //assert(out.endsWith("Assertion `(global.x)->task0.state == TASK_AWAITING' failed.\n")) { out }
         assert(out.endsWith("1\n2\n3\n")) { out }
@@ -98,7 +98,7 @@ class TTask {
             var x : active task @[]->()->()->()
             set x = spawn f ()
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -125,8 +125,8 @@ class TTask {
             set x = spawn f ()
             --awake x _1:_int
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "10\n20\n") { out }
     }
@@ -155,8 +155,8 @@ class TTask {
             set x = spawn f _("hello"):_(char*)
             --awake x _10:_int
             --awake x _20:_int
-            emit @GLOBAL <.3 _10:_int>:<(),_uint64_t,_int>:+ Event
-            emit @GLOBAL <.3 _20:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _10:_int>:<(),_uint64_t,_int>
+            emit @GLOBAL Event <.3 _20:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "\"hello\"\n10\n20\n") { out }
     }
@@ -171,7 +171,7 @@ class TTask {
             }
             var x : active task @[]->_int->()->_int
             set x = spawn f _10:_int
-            emit @GLOBAL <.3 _20:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _20:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -208,7 +208,7 @@ class TTask {
             output std _12:_int
             --awake f _1:_int
             --awake g _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _13:_int
         """.trimIndent())
         assert(out == "10\n1\n11\n1\n12\n2\n2\n13\n") { out }
@@ -238,8 +238,8 @@ class TTask {
             var y : active task @[]->()->()->()
             set y = spawn g ()
             
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-            emit @GLOBAL <.3 _2:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+            emit @GLOBAL Event <.3 _2:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "1\n11\n12\n") { out }
     }
@@ -273,8 +273,8 @@ class TTask {
                 }
                 var y : active task @[]->()->()->()
                 set y = spawn g ()
-                emit @LOCAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-                emit @LOCAL <.3 _2:_int>:<(),_uint64_t,_int>:+ Event
+                emit @LOCAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+                emit @LOCAL Event <.3 _2:_int>:<(),_uint64_t,_int>
             }            
         """.trimIndent())
         assert(out == "11\n12\n0\n") { out }
@@ -308,8 +308,8 @@ class TTask {
                     }
                     var y : active task @[]->()->()->()
                     set y = spawn g ()
-                    emit @LOCAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-                    emit @LOCAL <.3 _2:_int>:<(),_uint64_t,_int>:+ Event
+                    emit @LOCAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+                    emit @LOCAL Event <.3 _2:_int>:<(),_uint64_t,_int>
                 }
             }
         """.trimIndent())
@@ -337,9 +337,9 @@ class TTask {
             var x : active task @[]->()->()->()
             set x = spawn f ()
             output std _10:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _11:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _12:_int
         """.trimIndent())
         assert(out == "1\n10\n2\n11\n3\n4\n12\n") { out }
@@ -382,8 +382,8 @@ class TTask {
             }
             var x : active task @[]->()->()->()
             set x = spawn f ()
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "10\n20\n21\n0\n11\n30\n31\n12\n") { out }
     }
@@ -398,7 +398,7 @@ class TTask {
                     output std _1:_int
                     await evt?3
                     output std _4:_int
-                    emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+                    emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
                     output std _999:_int
                 }
                 var x : active task @[]->()->()->()
@@ -411,7 +411,7 @@ class TTask {
             var y : active task @[]->()->()->()
             set y = spawn g ()
             output std _3:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _6:_int
        """.trimIndent())
         assert(out == "0\n1\n2\n3\n4\n5\n6\n") { out }
@@ -429,7 +429,7 @@ class TTask {
                     output std _4:_int
                     var kkk : func @[]->()->()
                     set kkk = func @[]->()->() {
-                        emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+                        emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
                     }
                     call kkk ()
                     output std _999:_int
@@ -444,7 +444,7 @@ class TTask {
             var y : active task @[]->()->()->()
             set y = spawn g ()
             output std _3:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _6:_int
        """.trimIndent())
         assert(out == "0\n1\n2\n3\n4\n5\n6\n") { out }
@@ -472,7 +472,7 @@ class TTask {
             var x : active task @[]->()->()->()
             set x = spawn f ()
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "0\n1\n2\n") { out }
     }
@@ -498,7 +498,7 @@ class TTask {
             var x : active task @[]->()->()->()
             set x = spawn f ()
             --awake x _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "0\n2\n1\n") { out }
     }
@@ -615,7 +615,7 @@ class TTask {
                 catch {
                     set xfg = spawn fg ()
                     set xh = spawn h ()
-                    emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+                    emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
                     output std _999:_int
                 }
             }
@@ -734,7 +734,7 @@ class TTask {
             var fs : active {} task @[]->()->()->()
             spawn f () in fs
             output std _2:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _4:_int
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n") { out }
@@ -860,7 +860,7 @@ class TTask {
             }
             var xs: active {} task @[]->_int->_int->()
             spawn f () in xs
-            emit @GLOBAL <.3 _10:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _10:_int>:<(),_uint64_t,_int>
             output std ()
         """.trimIndent())
         assert(out == "()\n") { out }
@@ -893,7 +893,7 @@ class TTask {
                 output std x.pub
             }
             
-            emit @GLOBAL <.3 _10:_int>:<(),_uint64_t,_int>:+ Event
+            emit @GLOBAL Event <.3 _10:_int>:<(),_uint64_t,_int>
             
             loop x in xs {
                 output std x.pub
@@ -918,7 +918,7 @@ class TTask {
             spawn f () in fs
             var x: active task @[]->()->_int->()
             loop x in fs {
-                emit @GLOBAL <.3 _10:_int>:<(),_uint64_t,_int>:+ Event
+                emit @GLOBAL Event <.3 _10:_int>:<(),_uint64_t,_int>
                 output std x.pub
             }
         """.trimIndent())
@@ -971,7 +971,7 @@ class TTask {
                 output std _2:_int
             }) ()
             output std _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _3:_int
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -1005,7 +1005,7 @@ class TTask {
                 }
             }) ()
             output std _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _4:_int
        """.trimIndent())
         assert(out == "1\n2\n3\n4\n") { out }
@@ -1029,7 +1029,7 @@ class TTask {
                 }
             }) ()
             output std _1:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
             output std _4:_int
        """.trimIndent())
         assert(out == "1\n2\n3\n4\n") { out }
@@ -1051,7 +1051,7 @@ class TTask {
                     output std x.ret
                 }
             }) ()
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
        """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -1100,7 +1100,7 @@ class TTask {
             } @[] ())
             
             output std _3:_int
-            emit @GLOBAL (<.3 ()>: <(),_uint64_t,()>:+ Event)
+            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,()>
             output std (_7: _int)
        """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n6\n7\n") { out }
@@ -1130,9 +1130,9 @@ class TTask {
                 }
             }) ()
             
-            emit @GLOBAL <.3 ()>: <(),_uint64_t,(),()>:+Event
-            emit @GLOBAL <.4 ()>: <(),_uint64_t,(),()>:+Event
-            emit @GLOBAL <.3 ()>: <(),_uint64_t,(),()>:+Event
+            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
+            emit @GLOBAL Event <.4 ()>: <(),_uint64_t,(),()>
+            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
             
        """.trimIndent())
         assert(out == "1\n2\n1\n2\n") { out }
@@ -1146,13 +1146,13 @@ class TTask {
             type Bird = task  @[] -> () -> () -> ()
             
             var t1: Bird
-            set t1 = task  @[] -> () -> () -> () {
+            set t1 = Bird task  @[] -> () -> () -> () {
                  output std _2:_int
-            } :+ Bird
+            }
             
             var x1: active Bird
             output std _1:_int
-            set x1 = spawn (t1:- ()) :+ active Bird
+            set x1 = spawn active Bird(t1:- ())
              output std _3:_int
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -1163,13 +1163,13 @@ class TTask {
         val out = test(false, """
             type Xask = task ()->_int->()
             var t : Xask
-            set t = task ()->_int->() {
+            set t = Xask task ()->_int->() {
                 set pub = _10:_int
                 output std _2:_int
-            } :+ Xask
+            }
             var x : active Xask
             output std _1:_int
-            set x = spawn (t:- ()) :+ active Xask
+            set x = spawn active Xask (t:- ())
             output std _3:_int
             output std (x:-).pub
         """.trimIndent())
@@ -1182,10 +1182,10 @@ class TTask {
             type Event = <()>
             type Xask @[] = task @[] -> () -> _int -> ()
             var t: Xask
-            set t = task ()->_int->() {
+            set t = Xask task ()->_int->() {
                 set pub = _10:_int
                 await _0:_int
-            } :+ Xask
+            }
             var xs: active {} Xask
             spawn (t:- @[] ()) in xs
             var i: active Xask
@@ -1205,10 +1205,10 @@ class TTask {
 
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
-            set t = task ()->()->() {
+            set t = Xask task ()->()->() {
                 set n = _(${D}n+1):_int
                 await _0:_int
-            } :+ Xask
+            }
             
             var xs: active {2} Xask
             spawn (t:- @[] ()) in xs
@@ -1230,10 +1230,10 @@ class TTask {
 
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
-            set t = task ()->()->() {
+            set t = Xask task ()->()->() {
                 set n = _(${D}n+1):_int
                 --await _0:_int
-            } :+ Xask
+            }
             
             var xs: active {2} Xask
             spawn (t:- @[] ()) in xs
@@ -1261,7 +1261,7 @@ class TTask {
             set x1 = spawn f ()
             var x2 : active task @[]->()->()->()
             set x2 = spawn f ()
-            emit x1 <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit x1 Event<.3 _1:_int>:<(),_uint64_t,_int>
             output std _3:_int
         """.trimIndent())
         assert(out == "1\n1\n2\n3\n") { out }
@@ -1294,10 +1294,10 @@ class TTask {
             output std _2:_int
             pause x
             output std _3:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event<.3 _1:_int>:<(),_uint64_t,_int>
             resume x
             output std _4:_int
-            emit @GLOBAL <.3 _1:_int>:<(),_uint64_t,_int>:+Event
+            emit @GLOBAL Event<.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n") { out }
     }

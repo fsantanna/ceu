@@ -1766,7 +1766,7 @@ class TExec {
             )
             output std (_1: _int)
             var x: active Xask
-            set x = active Xask spawn ((t :- ) @[] ())
+            set x = spawn active Xask ((t :- ) @[] ())
             var y: active task @[] -> () -> _int -> ()
             set y = spawn ((t :- ) @[] ())
             output std ((x :- ).pub)

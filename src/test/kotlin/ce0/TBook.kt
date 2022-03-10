@@ -9,19 +9,19 @@ private val nums = """
     var zero: /(Num @[LOCAL])@LOCAL
     set zero = <.0>: /(Num @[LOCAL]) @LOCAL
     var one: /(Num @[LOCAL])@LOCAL
-    set one = new <.1 zero>:</Num @[LOCAL] @LOCAL>:+(Num @[LOCAL]): @LOCAL
+    set one = new Num @[LOCAL] <.1 zero>:</Num @[LOCAL] @LOCAL>: @LOCAL
     var two: /(Num @[LOCAL])@LOCAL
-    set two = new <.1 one>:</Num @[LOCAL] @LOCAL>:+(Num @[LOCAL]): @LOCAL
+    set two = new Num @[LOCAL] <.1 one>:</Num @[LOCAL] @LOCAL>: @LOCAL
     var three: /(Num @[LOCAL])@LOCAL
-    set three = new <.1 two>:</Num @[LOCAL] @LOCAL>:+(Num @[LOCAL]): @LOCAL
+    set three = new Num @[LOCAL] <.1 two>:</Num @[LOCAL] @LOCAL>: @LOCAL
     var four: /(Num @[LOCAL])@LOCAL
-    set four = new <.1 three>:</Num @[LOCAL] @LOCAL>:+(Num @[LOCAL]): @LOCAL
+    set four = new Num @[LOCAL] <.1 three>:</Num @[LOCAL] @LOCAL>: @LOCAL
     var five: /(Num @[LOCAL])@LOCAL
-    set five = new <.1 four>:</Num @[LOCAL] @LOCAL>:+(Num @[LOCAL]): @LOCAL
+    set five = new Num @[LOCAL] <.1 four>:</Num @[LOCAL] @LOCAL>: @LOCAL
 """.trimIndent()
 
 fun Num (ptr: Boolean, scope: String): String {
-    val ret = "(Num @[$scope])"
+    val ret = "Num @[$scope]"
     return if (!ptr) ret else "/"+ret+"@"+scope
 }
 val NumTL  = Num(true,  "LOCAL")
@@ -31,7 +31,6 @@ val NumB1  = Num(true,  "b1")
 val NumC1  = Num(true,  "c1")
 val NumR1  = Num(true,  "r1")
 val _NumR1 = Num(false, "r1")
-val NumS1  = Num(true,  "s1")
 
 private val clone = """
     var clone : func @[r1,a1]-> $NumA1 -> $NumR1
@@ -39,7 +38,7 @@ private val clone = """
         if arg\?0 {
             set ret = <.0>:$NumR1
         } else {
-            set ret = new <.1 clone @[r1,a1] arg\!1: @r1>:</Num @[r1] @r1>:+$_NumR1: @r1
+            set ret = new $_NumR1 <.1 clone @[r1,a1] arg\!1: @r1>:</Num @[r1] @r1>: @r1
         }
     }
 """.trimIndent()
@@ -54,7 +53,7 @@ private val add = """
         if y\?0 {
             set ret = clone @[r1,a1] x: @r1
         } else {
-            set ret = new <.1 add @[r1,a1,b1] [x,y\!1]: @r1>:</Num @[r1] @r1>:+$_NumR1: @r1
+            set ret = new $_NumR1 <.1 add @[r1,a1,b1] [x,y\!1]: @r1>:</Num @[r1] @r1>: @r1
         }
     }
 """.trimIndent()
@@ -193,9 +192,9 @@ class TBook {
             var zero: /(Num @[LOCAL])@LOCAL
             set zero = <.0>: /(Num @[LOCAL]) @LOCAL
             var one: (Num @[LOCAL])
-            set one = <.1 zero>:</Num @[LOCAL] @LOCAL>:+ (Num @[LOCAL])
+            set one = Num @[LOCAL] <.1 zero>:</Num @[LOCAL] @LOCAL>
             var two: (Num @[LOCAL])
-            set two = <.1 /one>:</Num @[LOCAL] @LOCAL>:+ (Num @[LOCAL])
+            set two = Num @[LOCAL] <.1 /one>:</Num @[LOCAL] @LOCAL>
             output std /two
         """.trimIndent()
         )
@@ -345,7 +344,7 @@ class TBook {
             var infinity: func @[r1]-> () -> $NumR1
             set infinity = func @[r1]-> () -> $NumR1 {
                 output std _10:_int
-                set ret = new <.1 infinity() @r1>:</Num @[r1] @r1>:+$_NumR1 @r1
+                set ret = new $_NumR1 @r1 <.1 infinity() @r1>:</Num @[r1] @r1>
             }
             output std infinity @[LOCAL] ()
         """.trimIndent()
@@ -415,7 +414,7 @@ class TBook {
             var fact: func @[r1,a1]->$NumA1->$NumR1
             set fact = func @[r1,a1]->$NumA1->$NumR1 {
                 if arg\?0 {
-                    set ret = new <.1 <.0>:$NumR1>:</Num @[r1] @r1>:+$_NumR1: @r1
+                    set ret = new $_NumR1 <.1 <.0>:$NumR1>:</Num @[r1] @r1>: @r1
                 } else {
                     var x: $NumTL
                     set x = fact @[LOCAL,a1] arg\!1

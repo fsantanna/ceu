@@ -158,7 +158,9 @@ object Parser
 
     fun expr_one (preid: Tk.ide?): Expr {
         return when {
-            alls.check(TK.XIde) -> {
+            alls.accept(TK.ACTIVE) || alls.check(TK.XIde) -> {
+                val isact = (alls.tk0.enu == TK.ACTIVE)
+                alls.check_err(TK.XIde)
                 val id = alls.tk1
                 val tp = this.type() as Type.Alias
                 val e = when {
@@ -181,7 +183,7 @@ object Parser
                         Expr.Func(id, null, block)
                     }
                 }
-                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, false, tp)
+                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, isact, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
