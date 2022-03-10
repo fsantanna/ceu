@@ -136,7 +136,10 @@ type Event = <
     UDraw    = (),
     UKeyDown = _int,
     UMouse   = Point + <
-        Button = _int + <Up=(), Down=()>,
+        Button = _int + <
+          Up   = (),
+          Down = ()
+        >,
         Motion = ()
     >,
     UCollided        = (),
@@ -144,7 +147,7 @@ type Event = <
     UHide            = _int
 >
 
-
+var e = Event.Mouse.Button.Down [ [x,y], _10 ]
 ```
 
 # Tasks

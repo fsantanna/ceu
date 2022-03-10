@@ -744,4 +744,26 @@ class TXExec {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
+
+    // INCLUDE
+
+    @Test
+    fun g01_include () {
+        val out = test(true, """
+            ^"test-func.ce"
+            output std f _10
+        """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun g02_include () {
+        val out = test(true, """
+            var f = func _int -> _int {
+                return arg
+            }
+            output std f _10
+        """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+
 }

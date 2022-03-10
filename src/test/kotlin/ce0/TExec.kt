@@ -2049,4 +2049,12 @@ class TExec {
         )
         assert(out == "15\n") { out }
     }
+    @Test
+    fun z17_include () {
+        val out = test(true, """
+            ^"test-func.ce"
+            output std f _10:_int
+        """.trimIndent())
+        assert(out == "10\n") { out }
+    }
 }

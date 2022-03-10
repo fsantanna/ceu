@@ -45,6 +45,8 @@ fun All_restart (file: String?, inp: PushbackReader) {
 fun All_nest (src: String, f: ()->Any): Any {
     val old = alls.stack.removeFirst()
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
+    alls.tk0 = Tk.Key(TK.ERR,1,1,"")
+    alls.tk1 = Tk.Err(TK.ERR,1,1,"")
     alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2)))
     all().lin = old.lin
     all().col = 1
