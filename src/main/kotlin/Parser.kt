@@ -183,7 +183,7 @@ object Parser
                         Expr.Func(id, null, block)
                     }
                 }
-                Expr.Pak(Tk.Sym(TK.XAS,id.lin,id.col,":+"), e, isact, tp)
+                Expr.Pak(id, e, isact, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
@@ -226,12 +226,7 @@ object Parser
                     (tp != null) -> Expr.UCons(dsc, tp as Type.Union?, cons!!)
                     else -> {
                         assert(CE1)
-                        Expr.Pak (
-                            Tk.Sym(TK.XAS,dsc.lin,dsc.col,":+"),
-                            Expr.UCons(dsc, tp as Type.Union?, cons!!),
-                            null,
-                            null
-                        )
+                        Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons!!), null, null)
                     }
                 }
             }
@@ -293,12 +288,7 @@ object Parser
                 alls.accept_err(TK.CHAR, ']')
                 val ret = Expr.TCons(tk0, es, ids)
                 if (!CE1) ret else {
-                    Expr.Pak(
-                        Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
-                        ret,
-                        null,
-                        null
-                    )
+                    Expr.Pak(ret.tk, ret, null, null)
                 }
             }
             alls.check(TK.TASK) || alls.check(TK.FUNC) -> {
@@ -338,12 +328,7 @@ object Parser
                 )
             )
             if (!CE1) e else {
-                e = Expr.Pak(
-                    Tk.Sym(TK.XAS, e.tk.lin, e.tk.col, ":+"),
-                    e,
-                    null,
-                    null
-                )
+                e = Expr.Pak(e.tk, e, null, null)
             }
         }
         return e
@@ -360,7 +345,7 @@ object Parser
                 All_assert_tk(alls.tk0, type is Type.Alias) {
                     "expected alias type"
                 }
-                Expr.Pak(tk0, e, isact, type as Type.Alias)
+                Expr.Pak(e.tk, e, isact, type as Type.Alias)
             } else {
                 Expr.Unpak(tk0, false, e)
             }
