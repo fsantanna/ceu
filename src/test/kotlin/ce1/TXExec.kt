@@ -687,6 +687,16 @@ class TXExec {
         """.trimIndent())
         assert(out == "False = 1\nTrue  = 2\n") { out }
     }
+    @Test
+    fun e15_yids () {
+        val out = test(true, """
+            type Bool = <False=(), True=()>
+            var x = Bool.True
+            output std x?False
+            output std x!True
+        """.trimIndent())
+        assert(out == "0\n()\n") { out }
+    }
 
     // WHERE / UNTIL
 

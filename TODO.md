@@ -126,6 +126,27 @@ var m = Player [] + Mage [] + Dark []
 
 ```
 
+```
+type Event = <
+    UKill    = (),
+    UTask    = _uint64_t,
+    UAny     = (),
+    UTimeout = (),
+    UFrame   = _int,
+    UDraw    = (),
+    UKeyDown = _int,
+    UMouse   = Point + <
+        Button = _int + <Up=(), Down=()>,
+        Motion = ()
+    >,
+    UCollided        = (),
+    UPause           = _int,
+    UHide            = _int
+>
+
+
+```
+
 # Tasks
 
 - either assignable or anonymous
