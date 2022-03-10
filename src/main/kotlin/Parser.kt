@@ -319,7 +319,7 @@ object Parser
             }
             e = Expr.Call(e.tk,
                 if (e is Expr.Unpak || !CE1) e else {
-                    Expr.Unpak(Tk.Sym(TK.XAS,e.tk.lin,e.tk.col,":-"), true, e)
+                    Expr.Unpak(Tk.Chr(TK.CHAR,e.tk.lin,e.tk.col,'~'), true, e)
                 },
                 arg,
                 Pair(
@@ -333,76 +333,60 @@ object Parser
         }
         return e
     }
-    fun expr_as (e: Expr): Expr {
-        if (alls.tk1.let { it is Tk.Sym && it.sym==":+" }) {
-            return e
-        }
-        return if (!alls.accept(TK.XAS)) e else {
-            val tk0 = alls.tk0 as Tk.Sym
-            if (tk0.sym == ":+") {
-                val isact = alls.accept(TK.ACTIVE)
-                val type = this.type()
-                All_assert_tk(alls.tk0, type is Type.Alias) {
-                    "expected alias type"
-                }
-                Expr.Pak(e.tk, e, isact, type as Type.Alias)
-            } else {
-                Expr.Unpak(tk0, false, e)
-            }
-        }
-    }
     fun expr_dots (preid: Tk.ide?): Expr {
-        var e = this.expr_as(this.expr_one(preid))
+        var e = this.expr_one(preid)
 
-        // one!1\.2?1
-        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!') || alls.accept(
-                TK.CHAR,
-                '?'
-            )
+        // one!1~\.2?1
+        while (alls.accept(TK.CHAR, '\\') ||
+               alls.accept(TK.CHAR, '~')  ||
+               alls.accept(TK.CHAR, '.')  ||
+               alls.accept(TK.CHAR, '!')  ||
+               alls.accept(TK.CHAR,'?')
         ) {
             val chr = alls.tk0 as Tk.Chr
-            e = if (chr.chr == '\\') {
-                All_assert_tk(
-                    alls.tk0,
-                    e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
-                ) {
-                    "unexpected operand to `\\´"
-                }
-                Expr.Dnref(chr, e)
-            } else {
-                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
-                val fld = alls.tk0
 
-                if (chr.chr == '?' || chr.chr == '!') {
-                    All_assert_tk(alls.tk0, !fld.isnull() || e is Expr.Dnref) {
+            if (chr.chr !in arrayOf('.','!','?')) null else {
+                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
+                if (chr.chr == '.') {
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
+                        "invalid field : expected index or variable identifier"
+                    }
+                } else {
+                    All_assert_tk(alls.tk0, !alls.tk0.isnull() || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be null"
                     }
                     All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
                         "invalid discriminator : expected index or type identifier"
                     }
-                } else {
-                    assert(chr.chr == '.')
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
-                        "invalid field : expected index or variable identifier"
-                    }
                 }
-                val xas = if (!CE1 || (chr.chr!='.' && fld.isnull())) e else {
-                    Expr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
-                }
-                when {
-                    (chr.chr == '?') -> Expr.UPred(fld, xas)
-                    (chr.chr == '!') -> Expr.UDisc(fld, xas)
-                    (chr.chr == '.') -> {
-                        if (fld is Tk.ide && fld.istask()) {
-                            Expr.Field(fld, xas)
-                        } else {
-                            Expr.TDisc(fld, xas)
-                        }
-                    }
-                    else -> error("impossible case")
-                }
+                // automatic unpack only for [.,!,?]
+                //  pt.x, list!1, list?0
+                e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(chr,true,e) else e
             }
-            e = this.expr_as(e)
+
+
+            e = when (chr.chr) {
+                '\\' -> {
+                    All_assert_tk(
+                        alls.tk0,
+                        e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
+                    ) {
+                        "unexpected operand to `\\´"
+                    }
+                    Expr.Dnref(chr, e)
+                }
+                '~' -> Expr.Unpak(chr, false, e)
+                '?' -> Expr.UPred(alls.tk0, e)
+                '!' -> Expr.UDisc(alls.tk0, e)
+                '.' -> {
+                    if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
+                        Expr.Field(alls.tk0 as Tk.ide, e)
+                    } else {
+                        Expr.TDisc(alls.tk0, e)
+                    }
+                }
+                else -> error("bug found")
+            }
         }
         return e
     }
@@ -457,12 +441,6 @@ object Parser
         }
     }
 
-    fun attr_unpak (e: Attr): Attr {
-        return if (!alls.accept(TK.XAS)) e else {
-            val tk0 = alls.tk0 as Tk.Sym
-            Attr.Unpak(tk0, false, e)
-        }
-    }
     fun attr (): Attr {
         var e = when {
             alls.accept(TK.Xide) -> Attr.Var(alls.tk0 as Tk.ide)
@@ -493,53 +471,54 @@ object Parser
             }
         }
 
-        e = this.attr_unpak(e)
-
-        // one.1!\.2.1?
-        while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!')) {
+        // one.1!\~.2.1?
+        while (alls.accept(TK.CHAR, '\\') ||
+               alls.accept(TK.CHAR, '~') ||
+               alls.accept(TK.CHAR, '.') ||
+               alls.accept(TK.CHAR, '!')
+        ) {
             val chr = alls.tk0 as Tk.Chr
-            e = if (chr.chr == '\\') {
-                All_assert_tk(
-                    alls.tk0,
-                    e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
-                ) {
-                    "unexpected operand to `\\´"
-                }
-                Attr.Dnref(chr, e)
-            } else {
-                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
-                val fld = alls.tk0
-                assert(CE1 || fld is Tk.Num || fld.istask())
 
-                if (chr.chr == '!') {
-                    All_assert_tk(alls.tk0, !fld.isnull() || e is Attr.Dnref) {
+            if (chr.chr !in arrayOf('.','!')) null else {
+                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
+                if (chr.chr == '.') {
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
+                        "invalid field : expected index or variable identifier"
+                    }
+                } else {
+                    All_assert_tk(alls.tk0, !alls.tk0.isnull() || e is Attr.Dnref) {
                         "invalid discriminator : union cannot be null"
                     }
                     All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
                         "invalid discriminator : expected index or type identifier"
                     }
-                } else {
-                    assert(chr.chr == '.')
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
-                        "invalid field : expected index or variable identifier"
-                    }
                 }
-                val xas = if (!CE1 || (chr.chr=='!' && fld.isnull())) e else {
-                    Attr.Unpak(Tk.Sym(TK.XAS,alls.tk0.lin,alls.tk0.col,":-"), true, e)
-                }
-                when {
-                    (chr.chr == '!') -> Attr.UDisc(fld, xas)
-                    (chr.chr == '.') -> {
-                        if (fld is Tk.ide && fld.istask()) {
-                            Attr.Field(fld, xas)
-                        } else {
-                            Attr.TDisc(fld, xas)
-                        }
-                    }
-                    else -> error("impossible case")
-                }
+                // automatic unpack only for [.,!,?]
+                //  pt.x, list!1, list?0
+                e = if (CE1 && e !is Attr.Unpak) Attr.Unpak(chr,true,e) else e
             }
-            e = this.attr_unpak(e)
+
+            e = when (chr.chr) {
+                '\\' -> {
+                    All_assert_tk(
+                        alls.tk0,
+                        e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
+                    ) {
+                        "unexpected operand to `\\´"
+                    }
+                    Attr.Dnref(chr, e)
+                }
+                '~' -> Attr.Unpak(chr, true, e)
+                '!' -> Attr.UDisc(alls.tk0, e)
+                '.' -> {
+                    if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
+                        Attr.Field(alls.tk0 as Tk.ide, e)
+                    } else {
+                        Attr.TDisc(alls.tk0, e)
+                    }
+                }
+                else -> error("bug found")
+            }
         }
         return e
     }

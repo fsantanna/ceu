@@ -369,7 +369,7 @@ class TXInfer {
             type List @[x] = </List @[x] @x>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\) :-)!1) = <.0>: /List @[j] @j
+            set (((arg\)~)!1) = <.0>: /List @[j] @j
             }
 
 
@@ -387,7 +387,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\) :-)!1) = <.0>: /List @[j] @j
+            set (((arg\)~)!1) = <.0>: /List @[j] @j
             }
 
 
@@ -405,7 +405,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\) :-)!1) = (new (List @[j] <.1 <.0>: /List @[j] @j>: </List @[j] @j>): @j)
+            set (((arg\)~)!1) = (new (List @[j] <.1 <.0>: /List @[j] @j>: </List @[j] @j>): @j)
             }
 
 
@@ -675,14 +675,14 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var clone: func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k
             set clone = func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k {
-            if ((arg\)?0)
+            if (((arg\)~)?0)
             {
             set ret = <.0>: /List @[l] @k
             return
             }
             else
             {
-            set ret = (new (List @[l] <.1 (clone @[j,j,l,l] (((arg\) :-)!1): @l)>: </List @[l] @l>): @k)
+            set ret = (new (List @[l] <.1 (clone @[j,j,l,l] (((arg\)~)!1): @l)>: </List @[l] @l>): @k)
             return
             }
             }
@@ -751,7 +751,7 @@ class TXInfer {
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
             set pf = (new (List @[A] <.1 <.0>: /List @[A] @A>: </List @[A] @A>): @A)
-            set (((pa\) :-)!1) = pf
+            set (((pa\)~)!1) = pf
             }
             
             call (f @[] ())
@@ -897,10 +897,10 @@ class TXInfer {
             )
             output std (_1: _int)
             var x: active Xask
-            set x = spawn (active Xask ((t :-) @[] (): @GLOBAL))
+            set x = spawn (active Xask ((t~) @[] (): @GLOBAL))
             var y: active task @[] -> () -> _int -> ()
-            set y = spawn ((t :-) @[] ())
-            output std ((x :-).pub)
+            set y = spawn ((t~) @[] ())
+            output std ((x~).pub)
             output std (_3: _int)
             
         """.trimIndent()) { out }
@@ -917,7 +917,7 @@ class TXInfer {
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
             var xs: active {} Xask
-            spawn ((t :-) @[] ()) in xs
+            spawn ((t~) @[] ()) in xs
 
         """.trimIndent()) { out }
     }
@@ -1082,8 +1082,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt :-)?5)
-            set ms_8 = (sub @[] [ms_8,((evt :-)!5)])
+            await ((evt~)?5)
+            set ms_8 = (sub @[] [ms_8,((evt~)!5)])
             if (lte @[] [ms_8,(_0: _int)])
             {
             break
@@ -1127,8 +1127,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt :-)?5)
-            set ms_13 = (sub @[] [ms_13,((evt :-)!5)])
+            await ((evt~)?5)
+            set ms_13 = (sub @[] [ms_13,((evt~)!5)])
             if (lte @[] [ms_13,(_0: _int)])
             {
             break
@@ -1168,7 +1168,7 @@ class TXInfer {
             var xy: Point
             set xy = (Point [(_1: _int),(_2: _int)])
             var x: _int
-            set x = ((xy :-).1)
+            set x = ((xy~).1)
             
         """.trimIndent()) { out }
     }
@@ -1188,7 +1188,7 @@ class TXInfer {
             var r: Rect
             set r = (Rect [(Point [(_1: _int),(_2: _int)]),(Dims [(_1: _int),(_2: _int)])])
             var h: _int
-            set h = ((((r :-).2) :-).2)
+            set h = ((((r~).2)~).2)
             
         """.trimIndent()) { out }
     }
@@ -1274,7 +1274,7 @@ class TXInfer {
             }
             )
             var x: _int
-            set x = ((f :-) @[] (_10: _int))
+            set x = ((f~) @[] (_10: _int))
             output std x
             
         """.trimIndent()) { out }
@@ -1423,7 +1423,7 @@ class TXInfer {
             set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
-            output std ((c :-).x)
+            output std ((c~).x)
 
         """.trimIndent()) { out }
     }
@@ -1441,7 +1441,7 @@ class TXInfer {
             set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
-            output std ((c :-).x)
+            output std ((c~).x)
             
         """.trimIndent()) { out }
     }

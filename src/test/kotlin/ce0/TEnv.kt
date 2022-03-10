@@ -2176,7 +2176,7 @@ class TEnv {
             type Unit @[] = ()
             var x: Unit
             var y: ()
-            set y = x:-
+            set y = x~
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2516,7 +2516,8 @@ class TEnv {
             output std ():+()
         """.trimIndent())
         //assert(out == "(ln 1, col 16): expected alias type") { out }
-        assert(out == "(ln 1, col 14): expected statement : have `:+´") { out }
+        //assert(out == "(ln 1, col 14): expected statement : have `:+´") { out }
+        assert(out == "(ln 1, col 14): expected statement : have `:´") { out }
     }
 
     @Test
@@ -2531,7 +2532,7 @@ class TEnv {
     fun s03_err () {
         val out = inp2env("""
             type Tx = [()]
-            output std ():-
+            output std ()~
         """.trimIndent())
         assert(out == "(ln 2, col 14): invalid type unpack : expected type alias : found ()") { out }
     }
@@ -2542,7 +2543,7 @@ class TEnv {
             var t: Tx
             set t = Tx <.1 ()>:<()>
             var u: <()>
-            set u = t:-
+            set u = t~
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -2567,7 +2568,7 @@ class TEnv {
             }
             
             var x: _int
-            set x = f:- _10:_int
+            set x = f~ _10:_int
             
             output std x
        """.trimIndent())
@@ -2588,7 +2589,7 @@ class TEnv {
         val out = inp2env("""
             type Xask = task ()->()->()
             var t = Xask {}
-            var y = spawn (t:-) ()
+            var y = spawn (t~) ()
         """.trimIndent())
         assert(out == "OK") { out }
     }
