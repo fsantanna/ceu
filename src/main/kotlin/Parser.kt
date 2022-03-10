@@ -274,7 +274,7 @@ object Parser
 
                 val e = this.expr(if (hasid && !haseq) (id as Tk.ide) else null)
                 val es = arrayListOf(e)
-                val ids = if (hasid) arrayListOf(id as Tk.ide) else null
+                val ids = if (haseq) arrayListOf(id as Tk.ide) else null
 
                 while (true) {
                     if (!alls.accept(TK.CHAR, ',')) {

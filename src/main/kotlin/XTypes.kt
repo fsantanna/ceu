@@ -107,12 +107,18 @@ fun Expr.xinfTypes (inf: Type?) {
             }
             inf as Type.Tuple?
             this.arg.forEachIndexed { i,e ->
-                /*
-                val idx = this.tk.field2num(inf.yids)
-                All_assert_tk(this.tk, idx != null) {
-                    "invalid constructor : unknown discriminator \"${this.tk.id()}\""
+                if (inf is Type.Tuple && this.yids!=null) {
+                    val id = this.yids[i]
+                    println(this.dump())
+                    println(this)
+                    val idx = id.field2num(inf.yids)
+                    All_assert_tk(id, idx != null) {
+                        "invalid constructor : unknown discriminator \"${id.id}\""
+                    }
+                    All_assert_tk(id, idx == i+1) {
+                        "invalid constructor : invalid position for \"${id.id}\""
+                    }
                 }
-                 */
                 e.xinfTypes(if (inf==null) null else inf.vec[i])
             }
             Type.Tuple(this.tk_, this.arg.map { it.wtype!! }, null)

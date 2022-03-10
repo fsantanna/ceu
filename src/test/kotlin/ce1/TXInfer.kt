@@ -1453,7 +1453,7 @@ class TXInfer {
             var c = b
             output std c.x
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == "(ln 2, col 23): invalid constructor : unknown discriminator \"z\"") { out }
     }
     @Test
     fun d10_tuple_err () {
@@ -1464,5 +1464,15 @@ class TXInfer {
             output std c.z
         """.trimIndent())
         assert(out == "(ln 4, col 14): invalid discriminator : unknown \"z\"") { out }
+    }
+    @Test
+    fun d11_tuple_err () {
+        val out = all("""
+            type Point = [x:_int,y:_int]
+            var b: Point = [y=_10,x=_10]
+            var c = b
+            output std c.z
+        """.trimIndent())
+        assert(out == "(ln 2, col 17): invalid constructor : invalid position for \"y\"") { out }
     }
 }
