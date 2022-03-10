@@ -156,7 +156,7 @@ object Parser
         return Pair(scps, ctrs)
     }
 
-    fun expr_one (): Expr {
+    fun expr_one (preid: Tk.ide?): Expr {
         return when {
             alls.tk1 is Tk.Ide -> {
                 val id = alls.tk1
@@ -247,7 +247,7 @@ object Parser
                 Expr.New(tk0 as Tk.Key, if (scp==null) null else Scope(scp,null), e)
             }
             alls.accept(TK.UNIT) -> Expr.Unit(alls.tk0 as Tk.Sym)
-            alls.accept(TK.Xide) -> Expr.Var(alls.tk0 as Tk.ide)
+            (preid!=null || alls.accept(TK.Xide)) -> Expr.Var(alls.tk0 as Tk.ide)
             alls.accept(TK.CHAR, '/') -> {
                 val tk0 = alls.tk0 as Tk.Chr
                 val e = this.expr()
@@ -266,17 +266,30 @@ object Parser
             }
             alls.accept(TK.CHAR, '[') -> {
                 val tk0 = alls.tk0 as Tk.Chr
-                val e = this.expr()
+
+                val hasid = alls.accept(TK.Xide)
+                val id = alls.tk0
+                val haseq = alls.accept(TK.CHAR, '=')
+                assert(CE1 || !haseq)
+
+                val e = this.expr(if (hasid && !haseq) (id as Tk.ide) else null)
                 val es = arrayListOf(e)
+                val ids = if (hasid) arrayListOf(id as Tk.ide) else null
+
                 while (true) {
                     if (!alls.accept(TK.CHAR, ',')) {
                         break
+                    }
+                    if (haseq) {
+                        alls.accept_err(TK.Xide)
+                        ids!!.add(alls.tk0 as Tk.ide)
+                        alls.accept(TK.CHAR, '=')
                     }
                     val e2 = this.expr()
                     es.add(e2)
                 }
                 alls.accept_err(TK.CHAR, ']')
-                val ret = Expr.TCons(tk0, es)
+                val ret = Expr.TCons(tk0, es, ids)
                 if (!CE1) ret else {
                     Expr.Pak(
                         Tk.Sym(TK.XAS, tk0.lin, tk0.col, ":+"),
@@ -298,8 +311,8 @@ object Parser
             }
         }
     }
-    fun expr (): Expr {
-        var e = this.expr_dots()
+    fun expr (preid: Tk.ide? = null): Expr {
+        var e = this.expr_dots(preid)
         // call
         if (alls.checkExpr() || alls.check(TK.ATBRACK)) {
             val iscps = if (!alls.accept(TK.ATBRACK)) null else {
@@ -348,8 +361,8 @@ object Parser
             }
         }
     }
-    fun expr_dots (): Expr {
-        var e = this.expr_as(this.expr_one())
+    fun expr_dots (preid: Tk.ide?): Expr {
+        var e = this.expr_as(this.expr_one(preid))
 
         // one!1\.2?1
         while (alls.accept(TK.CHAR, '\\') || alls.accept(TK.CHAR, '.') || alls.accept(TK.CHAR, '!') || alls.accept(
@@ -915,7 +928,7 @@ object Parser
                 val tgt = if (alls.accept(TK.XSCP)) {
                     Scope(alls.tk0 as Tk.Scp, null)
                 } else {
-                    this.expr_dots()
+                    this.expr_dots(null)
                 }
                 val e = this.expr()
                 Stmt.Emit(tk0, tgt, e)

@@ -68,7 +68,8 @@ class TCode {
             listOf(
                 Expr.Unit(Tk.Sym(TK.UNIT, 1, 1, "()")),
                 Expr.Unit(Tk.Sym(TK.UNIT, 1, 1, "()")),
-            )
+            ),
+            null
         )
         e.wtype = Type.Tuple(Tk.Chr(TK.CHAR, 1, 1, '['), listOf(tp_unit, tp_unit), null)
         e.arg[0].wtype = tp_unit

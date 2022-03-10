@@ -99,7 +99,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class Nat   (val tk_: Tk.Nat, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class Pak   (val tk_: Tk.Sym, val e: Expr, var isact: Boolean?, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class Unpak (val tk_: Tk.Sym, val isinf: Boolean, val e: Expr): Expr(N++, tk_, null, null, null)
-    data class TCons (val tk_: Tk.Chr, val arg: List<Expr>): Expr(N++, tk_, null, null, null)
+    data class TCons (val tk_: Tk.Chr, val arg: List<Expr>, val yids: List<Tk.ide>?): Expr(N++, tk_, null, null, null)
     data class UCons (val tk_: Tk, var xtype: Type.Union?, val arg: Expr): Expr(N++, tk_, null, null, xtype)
     data class UNull (val tk_: Tk, var xtype: Type.Pointer?): Expr(N++, tk_, null, null, xtype)
     data class TDisc (val tk_: Tk, val tup: Expr): Expr(N++, tk_, null, null, null)

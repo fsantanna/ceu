@@ -1435,6 +1435,34 @@ class TXInfer {
             var c = b
             output std c.x
         """.trimIndent())
+        assert(out == """
+            type Point @[] = [x:_int,y:_int]
+            var b: Point
+            set b = ([(_10: _int),(_10: _int)] :+ Point)
+            var c: Point
+            set c = b
+            output std ((c :-).x)
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun d09_tuple_err () {
+        val out = all("""
+            type Point = [x:_int,y:_int]
+            var b: Point = [x=_10,z=_10]
+            var c = b
+            output std c.x
+        """.trimIndent())
         assert(out == "OK") { out }
+    }
+    @Test
+    fun d10_tuple_err () {
+        val out = all("""
+            type Point = [x:_int,y:_int]
+            var b: Point = [x=_10,y=_10]
+            var c = b
+            output std c.z
+        """.trimIndent())
+        assert(out == "(ln 4, col 14): invalid discriminator : unknown \"z\"") { out }
     }
 }

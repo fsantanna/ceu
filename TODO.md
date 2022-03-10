@@ -86,6 +86,15 @@ type Bool = <   // Q. use `=´ or `:´ as below? R. `=´ is symmetric to `type`
   False = (),
   True  = ()
 >
+val b1 = Bool True
+
+var b1:<(),()>            = <.1>:<(),()>
+var b1:<False=(),True=()> = <.False>:<False=(),True=()>
+var b1:<False=(),True=()> = False:<False=(),True=()>
+
+var b1: Bool = False:<False=(),True=()> :+ Bool
+var b1: Bool = Bool.False:<False=(),True=()>
+
 ```
 
 ```
@@ -93,11 +102,27 @@ type Player = [
     name: _(char*),
     age:  _int,
     sub:  <
-        Warrior: [mana:_int, guild:_(char*)],
-        Mage: [...],
+        Warrior = [mana:_int, guild:_(char*)],
+        Mage = [...],
     >
 ]
-val x: Player.Warrior = [name="Arthur", age=32, [10,"arcane"]]
+var x = Player.Warrior [name="Arthur", age=32, [10,"arcane"]]
+var x: Player = [name="Arthur", age=32, sub=Warrior[10,"arcane"]]
+
+type Player = [...] + <
+    Warrior = [mana:_int, guild:_(char*)],
+    Mage    = [...] + <
+      Dark = ...
+      Arcane = ...
+    >
+>
+
+var m = Player <...>
+var m = 
+
+var m = Player.Warrior <.Arcane ...>
+var m = Player [] + Mage [] + Dark []
+
 ```
 
 # Tasks

@@ -95,10 +95,26 @@ fun Expr.xinfTypes (inf: Type?) {
             }
         }
         is Expr.TCons -> {
-            All_assert_tk(this.tk, inf==null || inf is Type.Tuple) {
-                "invalid inference : type mismatch"
+
+            if (inf != null) {
+                All_assert_tk(this.tk, inf is Type.Tuple) {
+                    "invalid inference : type mismatch"
+                }
+                inf as Type.Tuple
+                All_assert_tk(this.tk, inf.vec.size >= this.arg.size) {
+                    "invalid constructor : out of bounds"
+                }
             }
-            this.arg.forEachIndexed { i,e -> e.xinfTypes(inf?.let { (it as Type.Tuple).vec[i] }) }
+            inf as Type.Tuple?
+            this.arg.forEachIndexed { i,e ->
+                /*
+                val idx = this.tk.field2num(inf.yids)
+                All_assert_tk(this.tk, idx != null) {
+                    "invalid constructor : unknown discriminator \"${this.tk.id()}\""
+                }
+                 */
+                e.xinfTypes(if (inf==null) null else inf.vec[i])
+            }
             Type.Tuple(this.tk_, this.arg.map { it.wtype!! }, null)
         }
         is Expr.UCons -> {
