@@ -765,5 +765,21 @@ class TXExec {
         """.trimIndent())
         assert(out == "10\n") { out }
     }
+    @Test
+    fun g03_include_err () {
+        val out = test(true, """
+            ^"test-func.ce"
+            output () f _10
+        """.trimIndent())
+        assert(out == "(ln 2, col 8): expected variable identifier : have `()´") { out }
+    }
+    @Test
+    fun g04_include_err () {
+        val out = test(true, """
+            ^"test-lincol.ce"
+            output () f _10
+        """.trimIndent())
+        assert(out == "test-lincol.ce : (ln 1, col 1): expected statement : have \"inside\"") { out }
+    }
 
 }

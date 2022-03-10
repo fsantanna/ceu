@@ -687,7 +687,7 @@ fun code_fs (s: Stmt) {
         is Stmt.Pause -> CODE.removeFirst().let {
             val src = if (s.pause) {
                 """
-                //assert(${it.expr}->task0.state==TASK_AWAITING && "trying to pause non-awaiting task");
+                /*assert(${it.expr}->task0.state==TASK_AWAITING && "trying to pause non-awaiting task");*/
                 ${it.expr}->task0.state = TASK_PAUSED;
                 
                 """.trimIndent()
