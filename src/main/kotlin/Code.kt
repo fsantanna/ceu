@@ -356,7 +356,7 @@ fun code_fe (e: Expr) {
         is Expr.Var   -> Code("", "", "", "", e.tk_.id.out_mem(e))
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
-        is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk.tostr()) }
+        is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk.field2num((e.tup.wtype as Type.Tuple).yids)) }
         is Expr.Pak   -> {
             val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
             val e  = CODE.removeFirst()

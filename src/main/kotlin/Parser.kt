@@ -346,17 +346,17 @@ object Parser
             val chr = alls.tk0 as Tk.Chr
 
             if (chr.chr !in arrayOf('.','!','?')) null else {
-                alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
+                alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
                 if (chr.chr == '.') {
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
-                        "invalid field : expected index or variable identifier"
+                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
+                        "invalid field : unexpected type identifier"
                     }
                 } else {
                     All_assert_tk(alls.tk0, !alls.tk0.isnull() || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be null"
                     }
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
-                        "invalid discriminator : expected index or type identifier"
+                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.ide) {
+                        "invalid discriminator : unexpected variable identifier"
                     }
                 }
                 // automatic unpack only for [.,!,?]

@@ -690,6 +690,16 @@ class TXExec {
     @Test
     fun e15_yids () {
         val out = test(true, """
+            type Point = [x:_int,y:_int]
+            var pt = Point [_10,_20]
+            output std pt.x
+            output std pt.y
+        """.trimIndent())
+        assert(out == "10\n20\n") { out }
+    }
+    @Test
+    fun e16_yids () {
+        val out = test(true, """
             type Bool = <False=(), True=()>
             var x = Bool.True
             output std x?False
