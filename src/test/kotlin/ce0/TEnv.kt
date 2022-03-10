@@ -2151,7 +2151,7 @@ class TEnv {
             """
             type Unit @[] = ()
             var x: Unit
-            set x = ():+ Unit
+            set x = Unit ()
             output std x
         """.trimIndent()
         )
@@ -2319,11 +2319,11 @@ class TEnv {
             type List @[a] = </List @[a] @a>
             { @A
                 var p1: /List @[LOCAL] @LOCAL
-                var p2: /List @[A]     @A
+                var p2: /List @[A] @A
                 set p1 = <.0>: /List @[LOCAL] @LOCAL
-                set p2 = <.0>: /List @[A]     @A
-                set p1 = new <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>:+ List @[LOCAL]: @LOCAL
-                set p2 = new <.1 <.0>: /List @[A]     @A>    : </List @[A]     @A>    :+ List @[A]:         @A
+                set p2 = <.0>: /List @[A] @A
+                set p1 = new List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>: @LOCAL
+                set p2 = new List @[A]     <.1 <.0>: /List @[A]     @A>:     </List @[A]     @A>:     @A
                 set p1 = p2
                 set p2 = p1
             }
@@ -2354,7 +2354,7 @@ class TEnv {
             { @A
                 var x: _int
                 var t1: Tx @[LOCAL]
-                set t1 = [/x]:+ Tx @[LOCAL]
+                set t1 = Tx @[LOCAL] [/x]
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -2366,7 +2366,7 @@ class TEnv {
             { @A
                 var x: _int
                 var t1: Tx @[LOCAL]
-                set t1 = <.1 /x>: </_int>:+ Tx @[LOCAL]
+                set t1 = Tx @[LOCAL] <.1 /x>: </_int>
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -2515,16 +2515,17 @@ class TEnv {
         val out = inp2env("""
             output std ():+()
         """.trimIndent())
-        assert(out == "(ln 1, col 16): expected alias type") { out }
+        //assert(out == "(ln 1, col 16): expected alias type") { out }
+        assert(out == "(ln 1, col 14): expected statement : have `:+´") { out }
     }
 
     @Test
     fun s02_err () {
         val out = inp2env("""
             type Tx = [()]
-            output std ():+Tx
+            output std Tx ()
         """.trimIndent())
-        assert(out.contains("(ln 2, col 14): invalid type pack : type mismatch :")) { out }
+        assert(out.contains("(ln 2, col 12): invalid type pack : type mismatch :")) { out }
     }
     @Test
     fun s03_err () {
@@ -2539,7 +2540,7 @@ class TEnv {
         val out = inp2env("""
             type Tx = <()>
             var t: Tx
-            set t = <.1 ()>:<()> :+ Tx
+            set t = Tx <.1 ()>:<()>
             var u: <()>
             set u = t:-
         """.trimIndent())
@@ -2561,9 +2562,9 @@ class TEnv {
             type Int2Int = func @[] -> _int -> _int
             
             var f: Int2Int
-            set f = func @[] -> _int -> _int {
+            set f = Int2Int func @[] -> _int -> _int {
                 set ret = arg
-            } :+ Int2Int
+            }
             
             var x: _int
             set x = f:- _10:_int

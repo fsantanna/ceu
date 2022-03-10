@@ -158,7 +158,7 @@ object Parser
 
     fun expr_one (preid: Tk.ide?): Expr {
         return when {
-            alls.tk1 is Tk.Ide -> {
+            alls.check(TK.XIde) -> {
                 val id = alls.tk1
                 val tp = this.type() as Type.Alias
                 val e = when {
@@ -347,6 +347,9 @@ object Parser
         return e
     }
     fun expr_as (e: Expr): Expr {
+        if (alls.tk1.let { it is Tk.Sym && it.sym==":+" }) {
+            return e
+        }
         return if (!alls.accept(TK.XAS)) e else {
             val tk0 = alls.tk0 as Tk.Sym
             if (tk0.sym == ":+") {
