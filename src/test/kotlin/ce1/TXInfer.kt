@@ -177,7 +177,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (<.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL> :+ List @[GLOBAL]): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -193,7 +193,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (<.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL> :+ List @[GLOBAL]): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -209,7 +209,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (<.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL> :+ List @[GLOBAL]): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -405,7 +405,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\) :-)!1) = (new (<.1 <.0>: /List @[j] @j>: </List @[j] @j> :+ List @[j]): @j)
+            set (((arg\) :-)!1) = (new (List @[j] <.1 <.0>: /List @[j] @j>: </List @[j] @j>): @j)
             }
 
 
@@ -604,7 +604,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             {
             var pa: /List @[LOCAL] @LOCAL
-            set pa = (new (<.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL> :+ List @[LOCAL]): @LOCAL)
+            set pa = (new (List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
 
@@ -682,7 +682,7 @@ class TXInfer {
             }
             else
             {
-            set ret = (new (<.1 (clone @[j,j,l,l] (((arg\) :-)!1): @l)>: </List @[l] @l> :+ List @[l]): @k)
+            set ret = (new (List @[l] <.1 (clone @[j,j,l,l] (((arg\) :-)!1): @l)>: </List @[l] @l>): @k)
             return
             }
             }
@@ -746,11 +746,11 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             { @A
             var pa: /List @[LOCAL] @LOCAL
-            set pa = (new (<.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL> :+ List @[LOCAL]): @LOCAL)
+            set pa = (new (List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
-            set pf = (new (<.1 <.0>: /List @[A] @A>: </List @[A] @A> :+ List @[A]): @A)
+            set pf = (new (List @[A] <.1 <.0>: /List @[A] @A>: </List @[A] @A>): @A)
             set (((pa\) :-)!1) = pf
             }
             
@@ -891,13 +891,13 @@ class TXInfer {
         assert(out == """
             type Xask @[] = task @[] -> () -> _int -> ()
             var t: Xask
-            set t = (task @[] -> () -> _int -> () {
+            set t = (Xask task @[] -> () -> _int -> () {
             output std (_2: _int)
             }
-             :+ Xask)
+            )
             output std (_1: _int)
             var x: active Xask
-            set x = spawn (((t :-) @[] (): @GLOBAL) :+ active Xask)
+            set x = spawn (active Xask ((t :-) @[] (): @GLOBAL))
             var y: active task @[] -> () -> _int -> ()
             set y = spawn ((t :-) @[] ())
             output std ((x :-).pub)
@@ -1166,7 +1166,7 @@ class TXInfer {
         assert(out == """
             type Point @[] = [_int,_int]
             var xy: Point
-            set xy = ([(_1: _int),(_2: _int)] :+ Point)
+            set xy = (Point [(_1: _int),(_2: _int)])
             var x: _int
             set x = ((xy :-).1)
             
@@ -1186,7 +1186,7 @@ class TXInfer {
             type Dims @[] = [_int,_int]
             type Rect @[] = [Point,Dims]
             var r: Rect
-            set r = ([([(_1: _int),(_2: _int)] :+ Point),([(_1: _int),(_2: _int)] :+ Dims)] :+ Rect)
+            set r = (Rect [(Point [(_1: _int),(_2: _int)]),(Dims [(_1: _int),(_2: _int)])])
             var h: _int
             set h = ((((r :-).2) :-).2)
             
@@ -1203,7 +1203,7 @@ class TXInfer {
         assert(out == """
             type TPico @[] = <()>
             spawn (task @[] -> _ -> _ -> _ {
-            output std (<.1 ()>: <()> :+ TPico)
+            output std (TPico <.1 ()>: <()>)
             }
              @[] ())
             
@@ -1220,7 +1220,7 @@ class TXInfer {
         assert(out == """
             type TPico @[] = <(),[_int,_int]>
             spawn (task @[] -> _ -> _ -> _ {
-            output std (<.2 [(_1: _int),(_2: _int)]>: <(),[_int,_int]> :+ TPico)
+            output std (TPico <.2 [(_1: _int),(_2: _int)]>: <(),[_int,_int]>)
             }
              @[] ())
             
@@ -1269,10 +1269,10 @@ class TXInfer {
         assert(out == """
             type Int2Int @[] = func @[] -> _int -> _int
             var f: Int2Int
-            set f = (func @[] -> _int -> _int {
+            set f = (Int2Int func @[] -> _int -> _int {
             set ret = arg
             }
-             :+ Int2Int)
+            )
             var x: _int
             set x = ((f :-) @[] (_10: _int))
             output std x
@@ -1334,10 +1334,10 @@ class TXInfer {
         assert(out == """
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
-            set t = (task @[] -> () -> () -> () {
+            set t = (Xask task @[] -> () -> () -> () {
             
             }
-             :+ Xask)
+            )
             output std ()
             
         """.trimIndent()) { out }
@@ -1420,7 +1420,7 @@ class TXInfer {
         assert(out == """
             type Point @[] = [x:_int,y:_int]
             var b: Point
-            set b = ([(_10: _int),(_10: _int)] :+ Point)
+            set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
             output std ((c :-).x)
@@ -1438,7 +1438,7 @@ class TXInfer {
         assert(out == """
             type Point @[] = [x:_int,y:_int]
             var b: Point
-            set b = ([(_10: _int),(_10: _int)] :+ Point)
+            set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
             output std ((c :-).x)

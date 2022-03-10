@@ -49,7 +49,7 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Unit  -> "()"
         is Expr.Var   -> this.tk_.id
         is Expr.Nat   -> if (this.xtype==null) this.tk_.toce() else "(" + this.tk_.toce() + ": " + this.xtype!!.tostr(lc) + ")"
-        is Expr.Pak   -> if (this.xtype==null) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + " " + this.tk_.sym + " " + this.xtype!!.tostr(lc) + ")")
+        is Expr.Pak   -> if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc) + " " + this.e.tostr(lc) + ")")
         is Expr.Unpak -> this.e.wtype.let { if (it==null || it.noact() !is Type.Alias) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + " " + this.tk_.sym + ")") }
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
