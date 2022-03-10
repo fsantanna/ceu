@@ -1,4 +1,4 @@
--- need to execute ./out.exe again after ce0
+-- need to execute ./out.exe again after ceu
 var x: _int
 set x = input std (): _int
 output std x

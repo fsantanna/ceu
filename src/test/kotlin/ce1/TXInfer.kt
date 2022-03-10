@@ -1391,7 +1391,12 @@ class TXInfer {
             type Bool = <False=(), True=()>
             var b = Bool.False
         """.trimIndent())
-        assert(out == "OK") { out }
+        assert(out == """
+            type Bool @[] = <False=(),True=()>
+            var b: Bool
+            set b = (Bool <.False ()>: <False=(),True=()>)
+
+        """.trimIndent()) { out }
     }
     @Test
     fun d06_tuple () {

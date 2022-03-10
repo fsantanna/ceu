@@ -165,7 +165,7 @@ object Parser
                 val tp = this.type() as Type.Alias
                 val e = when {
                     alls.accept(TK.CHAR,'.') -> {
-                        alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
+                        alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
                         val dsc = alls.tk0
                         All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
                             "invalid discriminator : expected index or type identifier"
@@ -493,7 +493,7 @@ object Parser
                         "invalid discriminator : expected index or type identifier"
                     }
                 }
-                // automatic unpack only for [.,!,?]
+                // automatic unpack only for [.,!]
                 //  pt.x, list!1, list?0
                 e = if (CE1 && e !is Attr.Unpak) Attr.Unpak(chr,true,e) else e
             }

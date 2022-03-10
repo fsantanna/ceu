@@ -1,3 +1,4 @@
+- Lines=4879, LoC=2945 (2022-03-10)
 - emit EVENT_TASK to correct scope (not GLOBAL)
   - can infer from func signature
 - bugs

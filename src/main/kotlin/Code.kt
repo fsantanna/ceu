@@ -156,6 +156,9 @@ fun code_ft (tp: Type) {
                 struct $ce;
                 void output_std_${ce}_ (${tp.pos()}* v);
                 void output_std_${ce} (${tp.pos()}* v);
+                ${if (tp.yids == null) "" else tp.yids.mapIndexed { i,ide ->
+                    "#define ${ide.id} ${i+1}\n"
+                }.joinToString("")}
 
             """.trimIndent()
 
