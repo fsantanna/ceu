@@ -5,7 +5,7 @@ import java.lang.AssertionError
 
 var CE1 = true
 val THROW = false
-var LINES = false
+var LINES = true
 
 // search in tests output for
 //  definitely|Invalid read|uninitialized
@@ -32,6 +32,7 @@ fun all (): All {
 data class All (
     val file:  String?,
     val inp:   PushbackReader,
+    val isinc: Boolean,
     var lin:   Int = 1,
     var col:   Int = 1,
     val stack: ArrayDeque<Pair<Int,Int>> = ArrayDeque()
@@ -39,7 +40,7 @@ data class All (
 
 fun All_restart (file: String?, inp: PushbackReader) {
     alls = Alls()
-    alls.stack.addFirst(All(file, inp))
+    alls.stack.addFirst(All(file, inp, false))
 }
 
 fun All_nest (src: String, f: ()->Any): Any {
@@ -47,7 +48,7 @@ fun All_nest (src: String, f: ()->Any): Any {
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
     alls.tk0 = Tk.Key(TK.ERR,1,1,"")
     alls.tk1 = Tk.Err(TK.ERR,1,1,"")
-    alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2)))
+    alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2),false))
     all().lin = old.lin
     all().col = 1
     Lexer.lex()

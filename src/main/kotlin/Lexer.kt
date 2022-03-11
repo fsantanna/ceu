@@ -86,7 +86,7 @@ object Lexer {
                 All_assert_tk(all().let{Tk.Err(TK.ERR,lin,col,"")}, f.exists()) {
                     "file not found : $file"
                 }
-                alls.stack.addFirst(All(file, PushbackReader(StringReader(f.readText()), 2)))
+                alls.stack.addFirst(All(file, PushbackReader(StringReader(f.readText()), 2), true))
             }
             else -> TODO()
         }
@@ -267,16 +267,10 @@ object Lexer {
         alls.tk0 = alls.tk1
         blanks(); while (lincol()) { blanks() }
         token()
-        while (alls.tk1.enu == TK.EOF) {
-            if (alls.stack.size == 1) {
-                break
-            } else {
-                assert(alls.stack.size > 1)
-                alls.stack.removeFirst()
-            }
+        while (all().isinc && alls.tk1.enu==TK.EOF) {
+            alls.stack.removeFirst()
             blanks(); while (lincol()) { blanks() }
             token()
         }
-        blanks()
     }
 }

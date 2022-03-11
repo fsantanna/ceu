@@ -2053,8 +2053,8 @@ class TExec {
     fun z17_include () {
         val out = test(true, """
             ^"test-func.ce"
-            output std f _10:_int
+            call g ()
         """.trimIndent())
-        assert(out == "10\n") { out }
+        assert(out == "()\n") { out }
     }
 }

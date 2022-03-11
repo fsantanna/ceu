@@ -36,7 +36,7 @@ class TLexer {
     @Test
     fun b01_lexer_blanks () {
         val inp = PushbackReader(StringReader("-- foobar"),2)
-        alls.stack.addFirst(All(null, inp))
+        alls.stack.addFirst(All(null, inp, false))
         Lexer.blanks()
         assert(inp.read() == 65535)     // for some reason, it returns this value after reading -1
         assert(inp.read() == -1)        // then, it returns -1 correctly
@@ -47,7 +47,7 @@ class TLexer {
     @Test
     fun b02_lexer_blanks () {
         val inp = PushbackReader(StringReader("-- c1\n--c2\n\n"), 2)
-        alls.stack.addFirst(All(null, inp))
+        alls.stack.addFirst(All(null, inp, false))
         Lexer.blanks()
         assert(all().lin == 4)
         assert(all().col == 1)

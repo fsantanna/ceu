@@ -700,7 +700,6 @@ object Parser
                 } else {
                     val tk0 = alls.tk0
                     val e = this.expr()
-                    //println(e.tostr(true))
                     All_nest(
                         tk0.lincol(
                             """

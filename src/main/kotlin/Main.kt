@@ -13,6 +13,7 @@ fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
         s.setUps(null)
         s.setScp1s()
         s.setEnvs(null)
+        //println(s.dump())
         check_00_after_envs(s)
         s.xinfScp1s()
         check_01_before_tps(s)
