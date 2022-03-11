@@ -2052,7 +2052,7 @@ class TExec {
     @Test
     fun z17_include () {
         val out = test(true, """
-            ^"test-func.ce"
+            ^"test-func.ceu"
             call g ()
         """.trimIndent())
         assert(out == "()\n") { out }

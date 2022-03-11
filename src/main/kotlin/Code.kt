@@ -157,7 +157,7 @@ fun code_ft (tp: Type) {
                 void output_std_${ce}_ (${tp.pos()}* v);
                 void output_std_${ce} (${tp.pos()}* v);
                 ${if (tp.yids == null) "" else tp.yids.mapIndexed { i,ide ->
-                    "#define ${ide.id} ${i+1}\n"
+                    "#define ${ide.id.toUpperCase()} ${i+1}\n"
                 }.joinToString("")}
 
             """.trimIndent()
@@ -168,7 +168,14 @@ fun code_ft (tp: Type) {
                     int tag;
                     union {
                         ${tp.vec  // do not filter to keep correct i
-                            .mapIndexed { i,sub -> "${sub.pos()} _${i+1};\n" }
+                            .mapIndexed { i,sub -> """
+                                union {
+                                    ${sub.pos()} _${i+1};
+                                    ${if (tp.yids == null) "" else "${sub.pos()} ${tp.yids[i].id};"}
+                                };
+                                
+                                """.trimIndent()
+                            }
                             .joinToString("")
                         }
                     };

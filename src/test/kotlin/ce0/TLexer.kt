@@ -213,10 +213,10 @@ class TLexer {
     }
     @Test
     fun e03_lincol () {
-        All_restart(null, PushbackReader(StringReader("c1 ^[5,10]\na\n^\"test-lincol.ce\"\n^[]\n b"), 2))
+        All_restart(null, PushbackReader(StringReader("c1 ^[5,10]\na\n^\"test-lincol.ceu\"\n^[]\n b"), 2))
         Lexer.lex(); assert(alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="c1")
         Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==10) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="a")
-        Lexer.lex(); assert(all().file=="test-lincol.ce" && alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="inside")
+        Lexer.lex(); assert(all().file=="test-lincol.ceu" && alls.tk1.lin==1 && alls.tk1.col==1) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="inside")
         Lexer.lex(); assert(alls.tk1.lin==5 && alls.tk1.col==2) ; assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).id=="b")
     }
 }

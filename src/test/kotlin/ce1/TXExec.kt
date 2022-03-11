@@ -693,12 +693,14 @@ class TXExec {
     fun e14_yids () {
         val out = test(true, """
             type Bool = <False=(), True=()>
+            var x = Bool.False
             native _{
-                printf("False = %d\n", False);
-                printf("True  = %d\n", True);
+                printf("False = %d\n", FALSE);
+                printf("True = %d\n", TRUE);
+                printf("x = %d\n", global.x.False);
             }
         """.trimIndent())
-        assert(out == "False = 1\nTrue  = 2\n") { out }
+        assert(out == "False = 1\nTrue = 2\nx = 0\n") { out }
     }
     @Test
     fun e15_yids () {
@@ -772,7 +774,7 @@ class TXExec {
     @Test
     fun g01_include () {
         val out = test(true, """
-            ^"test-func.ce"
+            ^"test-func.ceu"
             output std f _10
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -790,7 +792,7 @@ class TXExec {
     @Test
     fun g03_include_err () {
         val out = test(true, """
-            ^"test-func.ce"
+            ^"test-func.ceu"
             output () f _10
         """.trimIndent())
         assert(out == "(ln 2, col 8): expected variable identifier : have `()´") { out }
@@ -798,10 +800,10 @@ class TXExec {
     @Test
     fun g04_include_err () {
         val out = test(true, """
-            ^"test-lincol.ce"
+            ^"test-lincol.ceu"
             output () f _10
         """.trimIndent())
-        assert(out == "test-lincol.ce : (ln 1, col 1): expected statement : have \"inside\"") { out }
+        assert(out == "test-lincol.ceu : (ln 1, col 1): expected statement : have \"inside\"") { out }
     }
 
 }
