@@ -720,6 +720,15 @@ class TXExec {
         """.trimIndent())
         assert(out == "0\n()\n") { out }
     }
+    @Test
+    fun e17_yids () {
+        val out = test(true, """
+            type Rect  = [()]
+            var r: Rect
+            var x = r.pos
+        """.trimIndent())
+        assert(out == "(ln 3, col 11): invalid discriminator : unknown \"pos\"") { out }
+    }
 
     // WHERE / UNTIL
 
