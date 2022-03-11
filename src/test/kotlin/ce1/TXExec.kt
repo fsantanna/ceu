@@ -637,7 +637,7 @@ class TXExec {
             var pr = Point_Rect.2 r
             output std /pr
         """.trimIndent())
-        assert(out == "3\n") { out }
+        assert(out == "<.2 [[1,2],[3,4]]>\n") { out }
     }
     @Test
     fun e12_ucons_type () {
