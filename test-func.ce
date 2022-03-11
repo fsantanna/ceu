@@ -1,0 +1,7 @@
+var f = func _int -> _int {
+    return arg
+}
+
+var g = func () -> () {
+    output std ()
+}
