@@ -627,6 +627,19 @@ class TXExec {
         assert(out == "3\n") { out }
     }
     @Test
+    fun e11_rect_dot_output() {
+        val out = test(true, """
+            type Int   = _int
+            type Point = [Int,Int]
+            type Rect  = [Point,Point]
+            type Point_Rect = <Point,Rect>
+            var r: Rect  = [[_1,_2],[_3,_4]]
+            var pr = Point_Rect.2 r
+            output std /pr
+        """.trimIndent())
+        assert(out == "3\n") { out }
+    }
+    @Test
     fun e12_ucons_type () {
         val out = test(true, """
             type TPico = <(),[_int,_int]>

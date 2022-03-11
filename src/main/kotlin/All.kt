@@ -5,7 +5,7 @@ import java.lang.AssertionError
 
 var CE1 = true
 val THROW = false
-var LINES = true
+var LINES = false
 
 // search in tests output for
 //  definitely|Invalid read|uninitialized

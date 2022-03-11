@@ -183,7 +183,7 @@ fun code_ft (tp: Type) {
                     switch (v->tag) {
                         ${tp.vec
                             .mapIndexed { i,sub ->
-                                val s = when (sub) {
+                                val s = when (sub.noalias()) {
                                     is Type.Unit -> ""
                                     is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_std("_", "&v->_${i+1}")
                                     else -> "putchar(' ');\n" + sub.output_std("_", "v->_${i+1}")
@@ -539,7 +539,7 @@ fun code_fe (e: Expr) {
 
             val func = """
                 void func_${e.n} (Stack* stack, struct Func_${e.n}* task2, X_${e.xtype!!.toce()} xxx) {
-                    Task*             task0 = &task2->task1.task0;
+                    Task* task0 = &task2->task1.task0;
                     ${e.xtype!!.toce()}* task1 = &task2->task1;
                     ${e.xtype!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
                     assert(task0->state==TASK_UNBORN || task0->state==TASK_AWAITING);

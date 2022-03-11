@@ -109,8 +109,6 @@ fun Expr.xinfTypes (inf: Type?) {
             this.arg.forEachIndexed { i,e ->
                 if (inf is Type.Tuple && this.yids!=null) {
                     val id = this.yids[i]
-                    println(this.dump())
-                    println(this)
                     val idx = id.field2num(inf.yids)
                     All_assert_tk(id, idx != null) {
                         "invalid constructor : unknown discriminator \"${id.id}\""
