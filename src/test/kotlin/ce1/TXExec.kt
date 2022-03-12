@@ -695,8 +695,8 @@ class TXExec {
             type Bool = <False=(), True=()>
             var x = Bool.False
             native _{
-                printf("False = %d\n", FALSE);
-                printf("True = %d\n", TRUE);
+                printf("False = %d\n", BOOL_FALSE);
+                printf("True = %d\n", BOOL_TRUE);
                 printf("x = %d\n", global.x.False);
             }
         """.trimIndent())
@@ -730,6 +730,22 @@ class TXExec {
             var x = r.pos
         """.trimIndent())
         assert(out == "(ln 3, col 11): invalid discriminator : unknown \"pos\"") { out }
+    }
+    @Test
+    fun e18_types_yids () {
+        val out = test(true, """
+            type False = ()
+            type Bool = <False=(), True=()>
+            type Xxx = <True=(), False=()>
+            type Event = <False=False,Bool=Bool,Xxx=Xxx>
+            var b = Bool.False
+            var x = Xxx.False
+            var f = False ()
+            output std _EVENT_FALSE:_int
+            output std _XXX_FALSE:_int
+            output std _BOOL_FALSE:_int
+        """.trimIndent())
+        assert(out == "1\n2\n1\n") { out }
     }
 
     // WHERE / UNTIL

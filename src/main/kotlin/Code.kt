@@ -156,9 +156,6 @@ fun code_ft (tp: Type) {
                 struct $ce;
                 void output_std_${ce}_ (${tp.pos()}* v);
                 void output_std_${ce} (${tp.pos()}* v);
-                ${if (tp.yids == null) "" else tp.yids.mapIndexed { i,ide ->
-                    "#define ${ide.id.toUpperCase()} ${i+1}\n"
-                }.joinToString("")}
 
             """.trimIndent()
 
@@ -595,13 +592,19 @@ fun code_fs (s: Stmt) {
             if (s.tk_.id == "Event") {
                 Event = "Event"
             }
+            fun Type.defs (pre: String): String {
+                return if (this !is Type.Union || this.yids==null) "" else {
+                    this.yids.mapIndexed { i,id -> "#define ${(pre+'_'+id.id).toUpperCase()} ${i+1}\n" }.joinToString("") +
+                    this.vec.mapIndexed { i,sub -> sub.defs(pre+'_'+this.yids[i].id) }.joinToString("")
+                }
+            }
             val src = """
                 //#define output_std_${s.tk_.id}_ output_std_${s.type.toce()}_
                 //#define output_std_${s.tk_.id}  output_std_${s.type.toce()}
                 typedef ${s.type.pos()} ${s.tk_.id};
                 
             """.trimIndent()
-            Code(src+it.type, it.struct, it.func, "", "")
+            Code(src+it.type+s.type.defs(s.tk_.id), it.struct, it.func, "", "")
         }
         is Stmt.Native -> if (s.istype) {
             Code("", s.tk_.src.native(s, s.tk) + "\n", "", "", "")
