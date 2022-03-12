@@ -12,6 +12,11 @@ fun check_00_after_envs (s: Stmt) {
     fun fe (e: Expr) {
         when (e) {
             is Expr.Var -> {
+                if (e.tk_.id == "evt") {
+                    All_assert_tk(e.tk, e.env("Event") != null) {
+                        "undeclared type \"Event"
+                    }
+                }
                 All_assert_tk(e.tk, e.env(e.tk_.id) != null) {
                     "undeclared variable \"${e.tk_.id}\""
                 }

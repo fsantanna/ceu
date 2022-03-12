@@ -38,6 +38,13 @@ class TTask {
         assert(out.startsWith("(ln 1, col 1): invalid condition : type mismatch")) { out }
     }
     @Test
+    fun a02_await_err3 () {
+        val out = test(false, """
+            await evt?1
+        """.trimIndent())
+        assert(out.startsWith("(ln 1, col 7): undeclared variable \"evt\"")) { out }
+    }
+    @Test
     fun a02_emit_err () {
         val out = test(false, """
             emit @GLOBAL _1:_int

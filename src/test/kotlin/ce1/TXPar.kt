@@ -301,4 +301,13 @@ class TXPar {
         """.trimIndent())
         assert(out == "0\n2\n1\n") { out }
     }
+    @Test
+    fun e03_defer_err () {
+        val out = test(true, """
+            defer {
+                output std _2:_int
+            }
+        """.trimIndent())
+        assert(out == "(ln 4, col 31): undeclared type \"Event\"") { out }
+    }
 }
