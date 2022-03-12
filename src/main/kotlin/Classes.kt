@@ -3,7 +3,7 @@ var N = 1
 enum class TK {
     ERR, EOF, CHAR,
     Xide, XIde, XIDE, XSCP, XNAT, XNUM, XCLK,
-    UNIT, ARROW, ATBRACK,
+    CAST, UNIT, ARROW, ATBRACK,
     ACTIVE, AWAIT, BREAK, CALL, CATCH, ELSE, EMIT, FUNC,
     IF, IN, INPUT, LOOP, NATIVE, NEW, OUTPUT, PAUSE,
     RESUME, RETURN, SET, SPAWN, TASK, THROW, TYPE, VAR,
@@ -100,6 +100,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class Unit  (val tk_: Tk.Sym): Expr(N++, tk_, null, null, Type.Unit(tk_))
     data class Var   (val tk_: Tk.ide): Expr(N++, tk_, null, null, null)
     data class Nat   (val tk_: Tk.Nat, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
+    data class Cast  (val tk_: Tk.Sym, val e: Expr, val type: Type): Expr(N++, tk_, null, null, type)
     data class Pak   (val tk_: Tk, val e: Expr, var isact: Boolean?, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class Unpak (val tk_: Tk.Chr, val isinf: Boolean, val e: Expr): Expr(N++, tk_, null, null, null)
     data class TCons (val tk_: Tk.Chr, val arg: List<Expr>, val yids: List<Tk.ide>?): Expr(N++, tk_, null, null, null)

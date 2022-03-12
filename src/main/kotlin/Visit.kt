@@ -30,6 +30,7 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
     when (this) {
         is Expr.Unit, is Expr.Var -> {}
         is Expr.Nat   -> this.xtype?.visit(ft,fx)
+        is Expr.Cast  -> { this.e.visit(fs,fe,ft,fx) ; this.type.visit(ft,fx) }
         is Expr.Pak   -> { this.e.visit(fs,fe,ft,fx) ; this.xtype?.visit(ft,fx) }
         is Expr.Unpak -> this.e.visit(fs,fe,ft,fx)
         is Expr.TCons -> this.arg.forEach { it.visit(fs, fe, ft, fx) }

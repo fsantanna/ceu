@@ -806,4 +806,25 @@ class TXExec {
         assert(out == "test-lincol.ceu : (ln 1, col 1): expected statement : have \"inside\"") { out }
     }
 
+    // CAST
+
+    @Test
+    fun h01_cast_err () {
+        val out = test(true, """
+            var x: [_int,_int]
+            var ptr: _(char*)
+            set x = [ptr,ptr]
+        """.trimIndent())
+        assert(out.contains("error: excess elements in struct initializer")) { out }
+    }
+    @Test
+    fun h02_cast_ok () {
+        val out = test(true, """
+            var x: [_long,_long]
+            var ptr: _(char*)
+            set x = [ptr::_long,ptr::_long]
+            output std ()
+        """.trimIndent())
+        assert(out.contains("()\n")) { out }
+    }
 }

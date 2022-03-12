@@ -29,6 +29,10 @@ fun Expr.xinfTypes (inf: Type?) {
             this.xtype = this.xtype ?: inf!!.clone(this,this.tk.lin,this.tk.col)
             this.xtype!!
         }
+        is Expr.Cast -> {
+            this.e.xinfTypes(inf)
+            this.type
+        }
         is Expr.Pak -> {
             when {
                 (this.xtype != null) -> {

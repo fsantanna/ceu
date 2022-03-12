@@ -50,6 +50,7 @@ fun Expr.setUps (up: Any) {
     when (this) {
         is Expr.Unit, is Expr.Var -> {}
         is Expr.Nat   -> this.xtype?.setUps(this)
+        is Expr.Cast  -> { this.e.setUps(this) ; this.type.setUps(this) }
         is Expr.Pak   -> { this.e.setUps(this) ; this.xtype?.setUps(this) }
         is Expr.Unpak -> this.e.setUps(this)
         is Expr.TCons -> this.arg.forEach { it.setUps(this) }

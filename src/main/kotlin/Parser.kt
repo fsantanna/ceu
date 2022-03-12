@@ -337,17 +337,19 @@ object Parser
         var e = this.expr_one(preid)
 
         // one!1~\.2?1
-        while (alls.accept(TK.CHAR, '\\') ||
+        while (alls.accept(TK.CAST)            ||
+               alls.accept(TK.CHAR, '\\') ||
                alls.accept(TK.CHAR, '~')  ||
                alls.accept(TK.CHAR, '.')  ||
                alls.accept(TK.CHAR, '!')  ||
                alls.accept(TK.CHAR,'?')
         ) {
-            val chr = alls.tk0 as Tk.Chr
+            val tk0 = alls.tk0
+            val chr = if (tk0 is Tk.Chr) tk0 else null
 
-            if (chr.chr !in arrayOf('.','!','?')) null else {
+            if (chr?.chr in arrayOf('.','!','?')) {
                 alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
-                if (chr.chr == '.') {
+                if (chr!!.chr == '.') {
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
                         "invalid field : unexpected type identifier"
                     }
@@ -364,8 +366,12 @@ object Parser
                 e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(chr,true,e) else e
             }
 
-
-            e = when (chr.chr) {
+            e = when (chr?.chr) {
+                null -> {
+                    assert(tk0.enu == TK.CAST)
+                    val tp = this.type()
+                    Expr.Cast(tk0 as Tk.Sym, e, tp)
+                }
                 '\\' -> {
                     All_assert_tk(
                         alls.tk0,
