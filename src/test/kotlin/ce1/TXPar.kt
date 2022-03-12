@@ -269,7 +269,7 @@ class TXPar {
 
     @Test
     fun e01_defer () {
-        val out = test(false, """
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 defer {
@@ -285,12 +285,11 @@ class TXPar {
     }
     @Test
     fun e02_defer_block () {
-        val out = test(false, """
+        val out = test(true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 {
                     defer {
-                        await evt?1
                         output std _2:_int
                     }
                     output std _0:_int

@@ -834,6 +834,21 @@ object Parser
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
             }
+            alls.accept(TK.XDEFER) -> {
+                assert(CE1)
+                val blk = this.block()
+                All_nest(
+                    """
+                    spawn {
+                        await evt?1
+                        ${blk.tostr(true)}
+                    }
+                    
+                """.trimIndent()
+                ) {
+                    this.stmt()
+                } as Stmt
+            }
             alls.accept(TK.XEVERY) -> {
                 assert(CE1)
                 val evt = this.event()
