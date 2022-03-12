@@ -265,4 +265,41 @@ class TXPar {
         assert(out == "1\n2\n3\n4\n5\n") { out }
     }
 
+    // DEFER
+
+    @Test
+    fun e01_defer () {
+        val out = test(false, """
+            type Event = <(),_uint64_t,_int>
+            spawn {
+                defer {
+                    output std _2:_int
+                }
+                output std _0:_int
+                await evt?3
+                output std _1:_int
+            }
+            emit @GLOBAL Event.3 _1
+        """.trimIndent())
+        assert(out == "0\n1\n2\n") { out }
+    }
+    @Test
+    fun e02_defer_block () {
+        val out = test(false, """
+            type Event = <(),_uint64_t,_int>
+            spawn {
+                {
+                    defer {
+                        await evt?1
+                        output std _2:_int
+                    }
+                    output std _0:_int
+                    await evt?3
+                }
+                output std _1:_int
+            }
+            emit @GLOBAL Event.3 _1
+        """.trimIndent())
+        assert(out == "0\n2\n1\n") { out }
+    }
 }

@@ -458,13 +458,13 @@ class TTask {
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
-                var defer : task @[]->()->()->()
-                set defer = task @[]->()->()->() {
+                var defer_ : task @[]->()->()->()
+                set defer_ = task @[]->()->()->() {
                     await evt?1
                     output std _2:_int
                 }
                 var xdefer : active task @[]->()->()->()
-                set xdefer = spawn defer ()
+                set xdefer = spawn defer_ ()
                 output std _0:_int
                 await evt?3
                 output std _1:_int
@@ -483,13 +483,13 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 {
-                    var defer : task @[]->()->()->()
-                    set defer = task @[]->()->()->() {
+                    var defer_ : task @[]->()->()->()
+                    set defer_ = task @[]->()->()->() {
                         await evt?1
                         output std _2:_int
                     }
                     var xdefer : active task @[]->()->()->()
-                    set xdefer = spawn defer ()
+                    set xdefer = spawn defer_ ()
                     output std _0:_int
                     await evt?3
                 }

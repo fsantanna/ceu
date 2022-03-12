@@ -325,11 +325,11 @@ class TXTask {
         val out = test(true, """
             type Event = <(),_int>
             var f = task ()->()->() {
-                var defer = task ()->()->() {
+                var defer_ = task ()->()->() {
                     await evt?1
                     output std _2:_int
                 }
-                var xdefer = spawn defer ()
+                var xdefer = spawn defer_ ()
                 output std _0:_int
                 await evt?2
                 output std _1:_int
@@ -345,11 +345,11 @@ class TXTask {
             type Event = <(),_int>
             var f = task ()->()->() {
                 {
-                    var defer = task ()->()->() {
+                    var defer_ = task ()->()->() {
                         await evt?1
                         output std _2:_int
                     }
-                    var xdefer = spawn defer ()
+                    var xdefer = spawn defer_ ()
                     output std _0:_int
                     await evt?2
                 }

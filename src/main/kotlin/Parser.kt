@@ -391,7 +391,7 @@ object Parser
         return e
     }
     fun where (s: Stmt): Stmt {
-        alls.accept_err(TK.WHERE)
+        alls.accept_err(TK.XWHERE)
         val tk0 = alls.tk0
         val blk = this.block()
         assert(!blk.iscatch && blk.scp1?.id.isanon()) { "TODO" }
@@ -750,109 +750,6 @@ object Parser
                     }
                 }
             }
-            alls.accept(TK.PAUSEIF) -> {
-                val pred = this.expr() as Expr.UPred
-                val blk = this.block()
-                All_nest(
-                    """
-                    {
-                        var tsk_$N = spawn ${blk.tostr(true)}
-                        watching tsk_$N {
-                            loop {
-                                await ${pred.tostr(true)}
-                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.tostr()}
-                                if x_$N {
-                                    pause tsk_$N
-                                } else {
-                                    resume tsk_$N
-                                }
-                            }
-                        }
-                    }
-                    
-                """.trimIndent()
-                ) {
-                    this.stmt()
-                } as Stmt
-            }
-            alls.accept(TK.PAR) -> {
-                val pars = mutableListOf<Stmt.Block>()
-                pars.add(this.block())
-                while (alls.accept(TK.WITH)) {
-                    pars.add(this.block())
-                }
-                val srcs = pars.map { "spawn ${it.tostr(true)}" }.joinToString("\n")
-                All_nest(srcs + "await _0\n") {
-                    this.stmts()
-                } as Stmt
-            }
-            alls.accept(TK.PARAND) || alls.accept(TK.PAROR) -> {
-                val op = if (alls.tk0.enu == TK.PARAND) "&&" else "||"
-                val pars = mutableListOf<Stmt.Block>()
-                pars.add(this.block())
-                while (alls.accept(TK.WITH)) {
-                    pars.add(this.block())
-                }
-                val spws =
-                    pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.tostr(true)} }" }.joinToString("\n")
-                val oks =
-                    pars.mapIndexed { i, _ -> "var ok_${N}_$i: _int = _((${D}tk_${N}_$i->task0.state == TASK_DEAD))" }
-                        .joinToString("\n")
-                val sets =
-                    pars.mapIndexed { i, _ -> "set ok_${N}_$i = _(${D}ok_${N}_$i || (((uint64_t)${D}tk_${N}_$i)==${D}tk_$N))" }
-                        .joinToString("\n")
-                val chks = pars.mapIndexed { i, _ -> "${D}ok_${N}_$i" }.joinToString(" $op ")
-
-                All_nest(
-                    """
-                    {
-                        $spws
-                        $oks
-                        loop {
-                            if _($chks) {
-                                break
-                            }
-                            await evt?2
-                            var tk_$N = evt!2
-                            $sets
-                        }
-                    }
-
-                """.trimIndent()
-                ) {
-                    this.stmt()
-                } as Stmt
-            }
-            alls.accept(TK.EVERY) -> {
-                val evt = this.event()
-                val blk = this.block()
-                All_nest(
-                    """
-                    loop {
-                        await $evt
-                        ${blk.tostr(true)}
-                    }
-                    
-                """.trimIndent()
-                ) {
-                    this.stmt()
-                } as Stmt
-            }
-            alls.accept(TK.WATCHING) -> {
-                val evt = this.event()
-                val blk = this.block()
-                All_nest(
-                    """
-                    paror {
-                        await $evt
-                    } with
-                        ${blk.tostr(true)}
-                    
-                """.trimIndent()
-                ) {
-                    this.stmt()
-                } as Stmt
-            }
             alls.accept(TK.PAUSE) -> {
                 val tk0 = alls.tk0 as Tk.Key
                 val e = this.expr()
@@ -937,13 +834,125 @@ object Parser
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
             }
+            alls.accept(TK.XEVERY) -> {
+                assert(CE1)
+                val evt = this.event()
+                val blk = this.block()
+                All_nest(
+                    """
+                    loop {
+                        await $evt
+                        ${blk.tostr(true)}
+                    }
+                    
+                """.trimIndent()
+                ) {
+                    this.stmt()
+                } as Stmt
+            }
+            alls.accept(TK.XPAR) -> {
+                assert(CE1)
+                val pars = mutableListOf<Stmt.Block>()
+                pars.add(this.block())
+                while (alls.accept(TK.XWITH)) {
+                    pars.add(this.block())
+                }
+                val srcs = pars.map { "spawn ${it.tostr(true)}" }.joinToString("\n")
+                All_nest(srcs + "await _0\n") {
+                    this.stmts()
+                } as Stmt
+            }
+            alls.accept(TK.XPARAND) || alls.accept(TK.XPAROR) -> {
+                assert(CE1)
+                val op = if (alls.tk0.enu == TK.XPARAND) "&&" else "||"
+                val pars = mutableListOf<Stmt.Block>()
+                pars.add(this.block())
+                while (alls.accept(TK.XWITH)) {
+                    pars.add(this.block())
+                }
+                val spws =
+                    pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.tostr(true)} }" }.joinToString("\n")
+                val oks =
+                    pars.mapIndexed { i, _ -> "var ok_${N}_$i: _int = _((${D}tk_${N}_$i->task0.state == TASK_DEAD))" }
+                        .joinToString("\n")
+                val sets =
+                    pars.mapIndexed { i, _ -> "set ok_${N}_$i = _(${D}ok_${N}_$i || (((uint64_t)${D}tk_${N}_$i)==${D}tk_$N))" }
+                        .joinToString("\n")
+                val chks = pars.mapIndexed { i, _ -> "${D}ok_${N}_$i" }.joinToString(" $op ")
+
+                All_nest(
+                    """
+                    {
+                        $spws
+                        $oks
+                        loop {
+                            if _($chks) {
+                                break
+                            }
+                            await evt?2
+                            var tk_$N = evt!2
+                            $sets
+                        }
+                    }
+
+                """.trimIndent()
+                ) {
+                    this.stmt()
+                } as Stmt
+            }
+            alls.accept(TK.XPAUSEIF) -> {
+                assert(CE1)
+                val pred = this.expr() as Expr.UPred
+                val blk = this.block()
+                All_nest(
+                    """
+                    {
+                        var tsk_$N = spawn ${blk.tostr(true)}
+                        watching tsk_$N {
+                            loop {
+                                await ${pred.tostr(true)}
+                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.tostr()}
+                                if x_$N {
+                                    pause tsk_$N
+                                } else {
+                                    resume tsk_$N
+                                }
+                            }
+                        }
+                    }
+                    
+                """.trimIndent()
+                ) {
+                    this.stmt()
+                } as Stmt
+            }
+            alls.accept(TK.XWATCHING) -> {
+                assert(CE1)
+                val evt = this.event()
+                val blk = this.block()
+                All_nest(
+                    """
+                    paror {
+                        await $evt
+                    } with
+                        ${blk.tostr(true)}
+                    
+                """.trimIndent()
+                ) {
+                    this.stmt()
+                } as Stmt
+            }
             else -> {
                 alls.err_expected("statement")
                 error("unreachable")
             }
         }.let { it1 ->
-            val it2 = if (!alls.check(TK.WHERE)) it1 else this.where(it1)
-            val it3 = if (!alls.accept(TK.UNTIL)) it2 else {
+            val it2 = if (!alls.check(TK.XWHERE)) it1 else {
+                assert(CE1)
+                this.where(it1)
+            }
+            val it3 = if (!alls.accept(TK.XUNTIL)) it2 else {
+                assert(CE1)
                 //val tk0 = alls.tk0
                 //All_assert_tk(tk0, stmt !is Stmt.Var) { "unexpected `until`" }
 
@@ -958,7 +967,7 @@ object Parser
                 ) {
                     this.stmt()
                 } as Stmt
-                val if2 = if (!alls.check(TK.WHERE)) if1 else this.where(if1)
+                val if2 = if (!alls.check(TK.XWHERE)) if1 else this.where(if1)
 
                 All_nest(
                     """

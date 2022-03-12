@@ -4,9 +4,11 @@ enum class TK {
     ERR, EOF, CHAR,
     Xide, XIde, XIDE, XSCP, XNAT, XNUM, XCLK,
     UNIT, ARROW, ATBRACK,
-    ACTIVE, AWAIT, BREAK, CALL, CATCH, ELSE, EMIT, EVERY, FUNC, IF, IN, INPUT,
-    LOOP, NATIVE, NEW, OUTPUT, PAUSE, PAUSEIF, RESUME, PAR, PARAND, PAROR, RETURN, SET, SPAWN, TASK,
-    THROW, TYPE, UNTIL, VAR, WATCHING, WHERE, WITH
+    ACTIVE, AWAIT, BREAK, CALL, CATCH, ELSE, EMIT, FUNC,
+    IF, IN, INPUT, LOOP, NATIVE, NEW, OUTPUT, PAUSE,
+    RESUME, RETURN, SET, SPAWN, TASK, THROW, TYPE, VAR,
+    XDEFER, XEVERY, XPAUSEIF, XPAR, XPARAND, XPAROR,
+    XUNTIL, XWATCHING, XWHERE, XWITH
 }
 
 val key2tk: HashMap<String, TK> = hashMapOf (
@@ -17,7 +19,6 @@ val key2tk: HashMap<String, TK> = hashMapOf (
     "catch"  to TK.CATCH,
     "else"   to TK.ELSE,
     "emit"   to TK.EMIT,
-    "every"  to TK.EVERY,
     "func"   to TK.FUNC,
     "if"     to TK.IF,
     "in"     to TK.IN,
@@ -26,11 +27,7 @@ val key2tk: HashMap<String, TK> = hashMapOf (
     "native" to TK.NATIVE,
     "new"    to TK.NEW,
     "output" to TK.OUTPUT,
-    "par"    to TK.PAR,
-    "parand" to TK.PARAND,
-    "paror"  to TK.PAROR,
     "pause"  to TK.PAUSE,
-    "pauseif" to TK.PAUSEIF,
     "resume" to TK.RESUME,
     "return" to TK.RETURN,
     "set"    to TK.SET,
@@ -38,11 +35,17 @@ val key2tk: HashMap<String, TK> = hashMapOf (
     "task"   to TK.TASK,
     "throw"  to TK.THROW,
     "type"   to TK.TYPE,
-    "until"  to TK.UNTIL,
     "var"    to TK.VAR,
-    "watching" to TK.WATCHING,
-    "where"  to TK.WHERE,
-    "with"   to TK.WITH,
+    "defer"  to TK.XDEFER,
+    "every"  to TK.XEVERY,
+    "par"    to TK.XPAR,
+    "parand" to TK.XPARAND,
+    "paror"  to TK.XPAROR,
+    "pauseif" to TK.XPAUSEIF,
+    "until"  to TK.XUNTIL,
+    "watching" to TK.XWATCHING,
+    "where"  to TK.XWHERE,
+    "with"   to TK.XWITH,
 )
 
 sealed class Tk (
