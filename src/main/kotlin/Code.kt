@@ -40,7 +40,8 @@ fun Type.output_std (c: String, arg: String): String {
                 #ifdef $out
                     $out($arg);
                 #else
-                    assert(0 && "$out");
+                    //assert(0 && "$out");
+                    putchar('_');
                 #endif
                 
             """.trimIndent()
