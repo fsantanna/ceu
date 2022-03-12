@@ -40,9 +40,10 @@ class TTask {
     @Test
     fun a02_await_err3 () {
         val out = test(false, """
+            type Event = ()
             await evt?1
         """.trimIndent())
-        assert(out.startsWith("(ln 1, col 7): undeclared variable \"evt\"")) { out }
+        assert(out.startsWith("(ln 2, col 7): undeclared variable \"evt\"")) { out }
     }
     @Test
     fun a02_emit_err () {
