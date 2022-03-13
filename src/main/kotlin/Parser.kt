@@ -59,7 +59,7 @@ object Parser
                 val hasid = (istup && alls.accept(TK.Xide)) || (!istup && alls.accept(TK.XIde))
                 val id = alls.tk0
                 val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
-                assert(CE1 || !haseq)
+                if (!(CE1 || !haseq)) alls.err_unexpected()
 
                 val tp = when {
                     !hasid -> this.type(null)
@@ -158,13 +158,16 @@ object Parser
 
     fun expr_one (preid: Tk.ide?): Expr {
         return when {
+            // Bool.False, Pair [x,y], active Task {},
             alls.accept(TK.ACTIVE) || alls.check(TK.XIde) -> {
                 val isact = (alls.tk0.enu == TK.ACTIVE)
                 alls.check_err(TK.XIde)
                 val id = alls.tk1
                 val tp = this.type() as Type.Alias
-                val e = when {
+                when {
+                    // Bool.False
                     alls.accept(TK.CHAR,'.') -> {
+                        if (!CE1) alls.err_unexpected()
                         alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
                         val dsc = alls.tk0
                         All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
@@ -173,17 +176,27 @@ object Parser
                         val cons = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
-                        Expr.UCons(dsc, null, cons)
+                        Expr.Pak(id, Expr.UCons(dsc,null,cons), isact, tp)
                     }
+                    // Pair [x,y]
                     alls.checkExpr() -> {
-                        this.expr()
+                        val e = this.expr()
+                        Expr.Pak(id, e, isact, tp)
                     }
-                    else -> {
+                    // Func {}
+                    alls.check(TK.CHAR,'{') -> {
                         val block = this.block()
-                        Expr.Func(id, null, block)
+                        Expr.Pak(id, Expr.Func(id,null,block), isact, tp)
+                    }
+                    // [Bool.] False
+                    else -> {
+                        if (!CE1) alls.err_unexpected()
+                        val cons = if (alls.checkExpr()) this.expr() else {
+                            Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
+                        }
+                        Expr.Pak(id, Expr.UCons(id,null,cons), false, null)
                     }
                 }
-                Expr.Pak(id, e, isact, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
@@ -200,7 +213,7 @@ object Parser
                 All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
                     "invalid discriminator : expected index or type identifier"
                 }
-                assert(CE1 || dsc is Tk.Num)
+                if (!(CE1 || dsc is Tk.Num)) alls.err_unexpected()
 
                 val cons = when {
                     dsc.isnull() -> null
@@ -225,7 +238,7 @@ object Parser
                     dsc.isnull() -> Expr.UNull(dsc, tp as Type.Pointer?)
                     (tp != null) -> Expr.UCons(dsc, tp as Type.Union?, cons!!)
                     else -> {
-                        assert(CE1)
+                        if (!CE1) alls.err_unexpected()
                         Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons!!), null, null)
                     }
                 }
@@ -267,7 +280,7 @@ object Parser
                 val hasid = alls.accept(TK.Xide)
                 val id = alls.tk0
                 val haseq = alls.accept(TK.CHAR, '=')
-                assert(CE1 || !haseq)
+                if (!(CE1 || !haseq)) alls.err_unexpected()
 
                 val e = this.expr(if (hasid && !haseq) (id as Tk.ide) else null)
                 val es = arrayListOf(e)
@@ -841,7 +854,7 @@ object Parser
                 Stmt.Output(tk, lib, arg)
             }
             alls.accept(TK.XDEFER) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val blk = this.block()
                 All_nest(
                     """
@@ -856,7 +869,7 @@ object Parser
                 } as Stmt
             }
             alls.accept(TK.XEVERY) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val evt = this.event()
                 val blk = this.block()
                 All_nest(
@@ -872,7 +885,7 @@ object Parser
                 } as Stmt
             }
             alls.accept(TK.XPAR) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
                 while (alls.accept(TK.XWITH)) {
@@ -884,7 +897,7 @@ object Parser
                 } as Stmt
             }
             alls.accept(TK.XPARAND) || alls.accept(TK.XPAROR) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val op = if (alls.tk0.enu == TK.XPARAND) "&&" else "||"
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
@@ -922,7 +935,7 @@ object Parser
                 } as Stmt
             }
             alls.accept(TK.XPAUSEIF) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val pred = this.expr() as Expr.UPred
                 val blk = this.block()
                 All_nest(
@@ -948,7 +961,7 @@ object Parser
                 } as Stmt
             }
             alls.accept(TK.XWATCHING) -> {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 val evt = this.event()
                 val blk = this.block()
                 All_nest(
@@ -969,11 +982,11 @@ object Parser
             }
         }.let { it1 ->
             val it2 = if (!alls.check(TK.XWHERE)) it1 else {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 this.where(it1)
             }
             val it3 = if (!alls.accept(TK.XUNTIL)) it2 else {
-                assert(CE1)
+                if (!CE1) alls.err_unexpected()
                 //val tk0 = alls.tk0
                 //All_assert_tk(tk0, stmt !is Stmt.Var) { "unexpected `until`" }
 

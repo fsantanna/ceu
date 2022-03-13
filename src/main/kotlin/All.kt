@@ -118,26 +118,32 @@ fun Alls.check_err (enu: TK, chr: Char? = null): Boolean {
     return ret
 }
 
-fun Alls.err_expected (str: String) {
-    fun Tk.toPay (): String {
-        return when {
-            (this.enu == TK.EOF) -> "end of file"
-            (this is Tk.Err)     -> '"' + this.err + '"'
-            (this is Tk.Chr)     -> "`" + this.chr + "´"
-            (this is Tk.Sym)     -> '`' + this.sym + '´'
-            (this is Tk.ide)     -> '"' + this.id + '"'
-            (this is Tk.Ide)     -> '"' + this.id + '"'
-            (this is Tk.IDE)     -> '"' + this.id + '"'
-            (this is Tk.Scp)     -> "\"@" + this.id + '"'
-            (this is Tk.Num)     -> "" + this.num
-            (this is Tk.Clk)     -> "time constant"
-            (this is Tk.Key)     -> '`' + this.key + '`'
-            (this is Tk.Nat)     -> '"' + this.src + '"'
-            else -> TODO(this.toString())
-        }
+fun Tk.toPay (): String {
+    return when {
+        (this.enu == TK.EOF) -> "end of file"
+        (this is Tk.Err)     -> '"' + this.err + '"'
+        (this is Tk.Chr)     -> "`" + this.chr + "´"
+        (this is Tk.Sym)     -> '`' + this.sym + '´'
+        (this is Tk.ide)     -> '"' + this.id + '"'
+        (this is Tk.Ide)     -> '"' + this.id + '"'
+        (this is Tk.IDE)     -> '"' + this.id + '"'
+        (this is Tk.Scp)     -> "\"@" + this.id + '"'
+        (this is Tk.Num)     -> "" + this.num
+        (this is Tk.Clk)     -> "time constant"
+        (this is Tk.Key)     -> '`' + this.key + '`'
+        (this is Tk.Nat)     -> '"' + this.src + '"'
+        else -> TODO(this.toString())
     }
+}
+
+fun Alls.err_expected (str: String) {
     val file = all().file.let { if (it==null) "" else it+" : " }
     error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): expected $str : have ${this.tk1.toPay()}")
+}
+
+fun Alls.err_unexpected () {
+    val file = all().file.let { if (it==null) "" else it+" : " }
+    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): ${this.tk1.toPay()}")
 }
 
 fun All_err_tk (tk: Tk, str: String): String {
