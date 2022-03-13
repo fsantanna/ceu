@@ -1,6 +1,6 @@
 data class Code (val type: String, val struct: String, val func: String, val stmt: String, val expr: String)
 val CODE = ArrayDeque<Code>()
-var Event = "_Event"
+var Event = "_CEU_Event"
 
 fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
@@ -8,7 +8,7 @@ fun Any.self_or_null (): String {
 
 fun Type.pos (): String {
     return when (this) {
-        is Type.Alias   -> this.tk_.id
+        is Type.Alias   -> "CEU_"+this.tk_.id
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.src.let { if (it == "") "int" else it }
@@ -91,7 +91,7 @@ fun code_ft (tp: Type) {
                 } ${tp.toce()};
                 
                 typedef union {
-                    _Event* evt;
+                    _CEU_Event* evt;
                     struct {
                         Block* blks[${tp.xscps.second!!.size}];
                         ${tp.inp.pos()} arg;
@@ -591,7 +591,7 @@ fun code_fs (s: Stmt) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> CODE.removeFirst().let {
             if (s.tk_.id == "Event") {
-                Event = "Event"
+                Event = "CEU_Event"
             }
             fun Type.defs (pre: String): String {
                 return if (this !is Type.Union || this.yids==null) "" else {
@@ -602,7 +602,7 @@ fun code_fs (s: Stmt) {
             val src = """
                 //#define output_std_${s.tk_.id}_ output_std_${s.type.toce()}_
                 //#define output_std_${s.tk_.id}  output_std_${s.type.toce()}
-                typedef ${s.type.pos()} ${s.tk_.id};
+                typedef ${s.type.pos()} CEU_${s.tk_.id};
                 
             """.trimIndent()
             Code(src+it.type+s.type.defs(s.tk_.id), it.struct, it.func, "", "")
@@ -720,7 +720,7 @@ fun code_fs (s: Stmt) {
             val cnd = if (s.e.wtype is Type.Nat) {
                 it.expr
             } else {
-                "(task1->evt.tag == 2) && (((_Event*)(&task1->evt))->payload.Task == ((uint64_t)(${it.expr})))"
+                "(task1->evt.tag == 2) && (((_CEU_Event*)(&task1->evt))->payload.Task == ((uint64_t)(${it.expr})))"
             }
 
             val src = """
@@ -730,7 +730,7 @@ fun code_fs (s: Stmt) {
                     return;                 // await (1 = awake ok)
                 case ${s.n}:                // awake here
                     assert(task0->status == TASK_AWAITING);
-                    task1->evt = * (Event*) xxx.evt;
+                    task1->evt = * (CEU_Event*) xxx.evt;
                     ${it.stmt}
                     if (!($cnd)) {
                         return;             // (0 = awake no)
@@ -747,7 +747,7 @@ fun code_fs (s: Stmt) {
                 val src = """
                 {
                     Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    bcast_event_block(&stk, ${s.tgt.toce(s)}, (_Event*) &${evt.expr});
+                    bcast_event_block(&stk, ${s.tgt.toce(s)}, (_CEU_Event*) &${evt.expr});
                     if (stk.block == NULL) {
                         return;
                     }
@@ -760,7 +760,7 @@ fun code_fs (s: Stmt) {
                 val src = """
                 {
                     Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    bcast_event_task(&stk, &${tsk.expr}->task0, (_Event*) &${evt.expr}, 0);
+                    bcast_event_task(&stk, &${tsk.expr}->task0, (_CEU_Event*) &${evt.expr}, 0);
                     if (stk.block == NULL) {
                         return;
                     }
@@ -835,9 +835,9 @@ fun code_fs (s: Stmt) {
                 ${if (up !is Expr.Func || up.tk.enu==TK.FUNC) "" else """
                 {
                     //task0->status = TASK_DYING;
-                    _Event evt = { EVENT_TASK, {.Task=(uint64_t)task0} };
+                    _CEU_Event evt = { EVENT_TASK, {.Task=(uint64_t)task0} };
                     Stack stk = { stack, task0, &$blk };
-                    bcast_event_block(&stk, GLOBAL, (_Event*) &evt);
+                    bcast_event_block(&stk, GLOBAL, (_CEU_Event*) &evt);
                     if (stk.block == NULL) {
                         //task0->status = TASK_DEAD;
 //printf("do not continue %p\n", task0);
@@ -881,7 +881,7 @@ fun code_fs (s: Stmt) {
 }
 
 fun Stmt.code (): String {
-    Event = "_Event"
+    Event = "_CEU_Event"
     TYPEX.clear()
     EXPR_WTYPE = false
     this.visit(::code_fs, ::code_fe, ::code_ft, null)
@@ -936,16 +936,16 @@ fun Stmt.code (): String {
             EVENT_KILL=1, EVENT_TASK //, ...
         } EVENT;
         
-        typedef struct _Event {
+        typedef struct _CEU_Event {
             int tag;
             union {
                 //void Kill;
                 uint64_t Task;  // cast from Task*
             } payload;
-        } _Event;
+        } _CEU_Event;
         
         // stack, task, evt
-        typedef void (*Task_F) (Stack*, struct Task*, _Event*);
+        typedef void (*Task_F) (Stack*, struct Task*, _CEU_Event*);
         
         typedef struct Task {
             TASK_STATE status;
@@ -955,7 +955,7 @@ fun Stmt.code (): String {
                 struct Block* blk_down;     // nested block inside me
             } links;
             int size;
-            Task_F f; // (Stack* stack, Task* task, _Event* evt);
+            Task_F f; // (Stack* stack, Task* task, _CEU_Event* evt);
             int pc;
         } Task;
         
@@ -1110,7 +1110,7 @@ fun Stmt.code (): String {
                     block_bcast_kill(stack, task->links.blk_down);      // 1.1
                 }
                 if (task->status == TASK_AWAITING) {
-                    _Event evt = { EVENT_KILL };            
+                    _CEU_Event evt = { EVENT_KILL };            
                     task->f(stack, task, &evt);                     // 1.2
                 }
             }
@@ -1122,9 +1122,9 @@ fun Stmt.code (): String {
             block_free(block);                                      // X. free myself
         }
         
-        void bcast_event_task (Stack* stack, Task* task, _Event* evt, int gonxt);
+        void bcast_event_task (Stack* stack, Task* task, _CEU_Event* evt, int gonxt);
 
-        void bcast_event_block (Stack* stack, Block* block, _Event* evt) {
+        void bcast_event_block (Stack* stack, Block* block, _CEU_Event* evt) {
             
             Stack stk = { stack, stack->task, block };
             
@@ -1135,7 +1135,7 @@ fun Stmt.code (): String {
             }
         }
 
-        void bcast_event_task (Stack* stack, Task* task, _Event* evt, int gonxt) {
+        void bcast_event_task (Stack* stack, Task* task, _CEU_Event* evt, int gonxt) {
             if (task == NULL) return;
             if (task->status == TASK_PAUSED) return;
             //assert(task->links.blk_down != NULL);

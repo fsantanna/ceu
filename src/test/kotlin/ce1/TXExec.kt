@@ -562,14 +562,14 @@ class TXExec {
     fun e07_type () {
         val out = test(true, """
             native _{
-                void output_pico (TPico arg) {}
+                void output_pico (CEU_Pico arg) {}
             }
-            type THAnchor = <(),(),()>
-            type TVAnchor = <(),(),()>
-            type TPico = <
-                [THAnchor,TVAnchor]
+            type HAnchor = <(),(),()>
+            type VAnchor = <(),(),()>
+            type Pico = <
+                [HAnchor,VAnchor]
             >
-            var x = TPico.1 [<.1>,<.1>] 
+            var x = Pico.1 [<.1>,<.1>] 
             output std /x
             output pico x
         """.trimIndent())
