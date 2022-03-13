@@ -158,13 +158,13 @@ object Parser
 
     fun expr_one (preid: Tk.ide?): Expr {
         return when {
-            // Bool.False, Pair [x,y], active Task {},
+            // Bool.False, Pair [x,y], active Task {}
             alls.accept(TK.ACTIVE) || alls.check(TK.XIde) -> {
                 val isact = (alls.tk0.enu == TK.ACTIVE)
                 alls.check_err(TK.XIde)
                 val id = alls.tk1
                 val tp = this.type() as Type.Alias
-                when {
+                val e = when {
                     // Bool.False
                     alls.accept(TK.CHAR,'.') -> {
                         if (!CE1) alls.err_unexpected()
@@ -176,27 +176,19 @@ object Parser
                         val cons = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
-                        Expr.Pak(id, Expr.UCons(dsc,null,cons), isact, tp)
+                        Expr.UCons(dsc, null, cons)
                     }
                     // Pair [x,y]
                     alls.checkExpr() -> {
-                        val e = this.expr()
-                        Expr.Pak(id, e, isact, tp)
+                        this.expr()
                     }
                     // Func {}
-                    alls.check(TK.CHAR,'{') -> {
+                   else -> {
                         val block = this.block()
-                        Expr.Pak(id, Expr.Func(id,null,block), isact, tp)
-                    }
-                    // [Bool.] False
-                    else -> {
-                        if (!CE1) alls.err_unexpected()
-                        val cons = if (alls.checkExpr()) this.expr() else {
-                            Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
-                        }
-                        Expr.Pak(id, Expr.UCons(id,null,cons), false, null)
+                        Expr.Func(id, null, block)
                     }
                 }
+                Expr.Pak(id, e, isact, tp)
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat

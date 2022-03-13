@@ -748,15 +748,13 @@ class TXExec {
         assert(out == "1\n2\n1\n") { out }
     }
     @Test
-    fun e19_yids () {
+    fun todo_e19_yids () {
         val out = test(true, """
             type Bool = <False=(), True=()>
             var x: Bool = False
-            native _{
-                printf("False = %d\n", CEU_BOOL_FALSE);
-                printf("True = %d\n", CEU_BOOL_TRUE);
-                printf("x = %d\n", global.x.False);
-            }
+            var y: Bool = True ()
+            output std x
+            output std y
         """.trimIndent())
         assert(out == "False = 1\nTrue = 2\nx = 0\n") { out }
     }
