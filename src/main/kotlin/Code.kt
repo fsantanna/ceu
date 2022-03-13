@@ -236,7 +236,7 @@ fun String.loc_mem (up: Any): String {
     val isglb = up.ups_first(true){ it is Expr.Func } == null
     return when {
         isglb -> "(global.$this)"
-        (this in listOf("arg","pub","evt","ret","state")) -> "(task1->$this)"
+        (this in listOf("arg","pub","evt","ret","status")) -> "(task1->$this)"
         else -> "(task2->$this)"
     }
 }
@@ -250,7 +250,7 @@ fun String.out_mem (up: Any): String {
         return "(global.$str)"
     }
 
-    val ispar = this in listOf("arg","pub","evt","ret","state")
+    val ispar = this in listOf("arg","pub","evt","ret","status")
     val jmps = up.ups_tolist().filter { it is Expr.Func }.takeWhile { it != upf }.size
     if (jmps == 0) {
         val tsk = if (ispar) "task1" else "task2"
@@ -378,7 +378,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.Field -> CODE.removeFirst().let {
             val src = when (e.tk_.id) {
-                "state" -> it.expr + "->task0.state"
+                "status" -> it.expr + "->task0.status"
                 "pub"   -> it.expr + "->pub"
                 "ret"   -> it.expr + "->ret"
                 else    -> error("bug found")
@@ -494,7 +494,7 @@ fun code_fe (e: Expr) {
                             block_push($block, frame);
                             frame->task0.links.tsk_up = ${if (e.ups_first { it is Expr.Func }==null) "NULL" else "task0"};
                             task_link($block, &frame->task0);
-                            frame->task0.state = TASK_UNBORN;
+                            frame->task0.status = TASK_UNBORN;
                             ((F_${tpf.toce()})(frame->task0.f)) (
                                 &stk_${e.n},
                                 frame,
@@ -552,10 +552,10 @@ fun code_fe (e: Expr) {
                     Task* task0 = &task2->task1.task0;
                     ${e.xtype!!.toce()}* task1 = &task2->task1;
                     ${e.xtype!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
-                    assert(task0->state==TASK_UNBORN || task0->state==TASK_AWAITING);
+                    assert(task0->status==TASK_UNBORN || task0->status==TASK_AWAITING);
                     switch (task0->pc) {
                         case 0: {                    
-                            assert(task0->state == TASK_UNBORN);
+                            assert(task0->status == TASK_UNBORN);
                             task2->task1.arg = xxx.pars.arg;
                             ${block.stmt}
                             break;
@@ -661,7 +661,7 @@ fun code_fs (s: Stmt) {
                     Stack stk = { stack, (Task*)&${tsks.expr}, NULL };
                     stack = &stk;
                     ${i.expr} = (${s.i.wtype!!.pos()}) ${tsks.expr}.block.links.tsk_first;
-                    while (${i.expr}!=NULL && ${i.expr}->task0.state!=TASK_DEAD) {
+                    while (${i.expr}!=NULL && ${i.expr}->task0.status!=TASK_DEAD) {
                         ${block.stmt}
                         ${i.expr} = (${s.i.wtype!!.pos()}) ${i.expr}->task0.links.tsk_next;
                     }
@@ -703,13 +703,13 @@ fun code_fs (s: Stmt) {
         is Stmt.Pause -> CODE.removeFirst().let {
             val src = if (s.pause) {
                 """
-                /*assert(${it.expr}->task0.state==TASK_AWAITING && "trying to pause non-awaiting task");*/
-                ${it.expr}->task0.state = TASK_PAUSED;
+                /*assert(${it.expr}->task0.status==TASK_AWAITING && "trying to pause non-awaiting task");*/
+                ${it.expr}->task0.status = TASK_PAUSED;
                 
                 """.trimIndent()
             } else {
                 """
-                ${it.expr}->task0.state = TASK_AWAITING;
+                ${it.expr}->task0.status = TASK_AWAITING;
                 
                 """.trimIndent()
 
@@ -718,7 +718,7 @@ fun code_fs (s: Stmt) {
         }
         is Stmt.Await -> CODE.removeFirst().let {
             val cnd = if (s.e.wtype is Type.Nat) {
-                "${it.expr}"
+                it.expr
             } else {
                 "(task1->evt.tag == 2) && (((_Event*)(&task1->evt))->payload.Task == ((uint64_t)(${it.expr})))"
             }
@@ -726,19 +726,20 @@ fun code_fs (s: Stmt) {
             val src = """
                 {
                     task0->pc = ${s.n};      // next awake
-                    task0->state = TASK_AWAITING;
+                    task0->status = TASK_AWAITING;
                     return;                 // await (1 = awake ok)
                 case ${s.n}:                // awake here
-                    assert(task0->state == TASK_AWAITING);
+                    assert(task0->status == TASK_AWAITING);
                     task1->evt = * (Event*) xxx.evt;
+                    ${it.stmt}
                     if (!($cnd)) {
                         return;             // (0 = awake no)
                     }
-                    task0->state = TASK_RUNNING;
+                    task0->status = TASK_RUNNING;
                 }
                 
             """.trimIndent()
-            Code(it.type, it.struct, it.func, it.stmt+src, "")
+            Code(it.type, it.struct, it.func, src, "")
         }
         is Stmt.Emit -> {
             val evt = CODE.removeFirst()
@@ -833,12 +834,12 @@ fun code_fs (s: Stmt) {
                 // task event
                 ${if (up !is Expr.Func || up.tk.enu==TK.FUNC) "" else """
                 {
-                    //task0->state = TASK_DYING;
+                    //task0->status = TASK_DYING;
                     _Event evt = { EVENT_TASK, {.Task=(uint64_t)task0} };
                     Stack stk = { stack, task0, &$blk };
                     bcast_event_block(&stk, GLOBAL, (_Event*) &evt);
                     if (stk.block == NULL) {
-                        //task0->state = TASK_DEAD;
+                        //task0->status = TASK_DEAD;
 //printf("do not continue %p\n", task0);
                         return;
                     }
@@ -861,7 +862,7 @@ fun code_fs (s: Stmt) {
                     //task0->links.tsk_up   = NULL;
                     //task0->links.tsk_next = NULL;
                     task0->links.blk_down = NULL;
-                    task0->state = TASK_DEAD;                        
+                    task0->status = TASK_DEAD;                        
                     """.trimIndent()
                 } else {
                     ""
@@ -947,7 +948,7 @@ fun Stmt.code (): String {
         typedef void (*Task_F) (Stack*, struct Task*, _Event*);
         
         typedef struct Task {
-            TASK_STATE state;
+            TASK_STATE status;
             struct {
                 struct Task*  tsk_up;       // first outer task alive (for upvalues)
                 struct Task*  tsk_next;     // next Task in the same block (for broadcast)
@@ -969,7 +970,7 @@ fun Stmt.code (): String {
         } Block;
         
         typedef struct Tasks {              // task + block
-            TASK_STATE state;
+            TASK_STATE status;
             struct {
                 Task*  tsk_up;              // for upvalues
                 Task*  tsk_next;            // for broadcast
@@ -1033,14 +1034,14 @@ fun Stmt.code (): String {
         }
         
         void pool_maybe_free (Task* pool) {
-            assert(pool->state == TASK_POOL);
+            assert(pool->status == TASK_POOL);
             Task* prv = NULL;
             Task* nxt = pool->links.blk_down->links.tsk_first;
             pool->links.blk_down->links.tsk_first = NULL;
             while (nxt != NULL) {
                 Task* cur = nxt;
                 nxt = cur->links.tsk_next;
-                if (cur->state == TASK_DEAD) {
+                if (cur->status == TASK_DEAD) {
                     __task_free(pool->links.blk_down, cur);
                 } else {
                     if (pool->links.blk_down->links.tsk_first == NULL) {
@@ -1108,7 +1109,7 @@ fun Stmt.code (): String {
                 if (task->links.blk_down != NULL) {
                     block_bcast_kill(stack, task->links.blk_down);      // 1.1
                 }
-                if (task->state == TASK_AWAITING) {
+                if (task->status == TASK_AWAITING) {
                     _Event evt = { EVENT_KILL };            
                     task->f(stack, task, &evt);                     // 1.2
                 }
@@ -1136,19 +1137,19 @@ fun Stmt.code (): String {
 
         void bcast_event_task (Stack* stack, Task* task, _Event* evt, int gonxt) {
             if (task == NULL) return;
-            if (task->state == TASK_PAUSED) return;
+            if (task->status == TASK_PAUSED) return;
             //assert(task->links.blk_down != NULL);
 
             if (task->links.blk_down != NULL) {
                 // prevents nested pool tasks to free themselves while I'm currently traversing them
                 Stack* orig = stack;
                 Stack stk = { stack, task, NULL };
-                if (task->state==TASK_POOL) stack = &stk;
+                if (task->status==TASK_POOL) stack = &stk;
                 bcast_event_block(stack, task->links.blk_down, evt); // 1.1
                 if (orig->block == NULL) return;  // outer block died, cannot continue to next task
-                if (task->state==TASK_POOL) stack = orig;
+                if (task->status==TASK_POOL) stack = orig;
             }
-            if (task->state == TASK_POOL) {
+            if (task->status == TASK_POOL) {
                 int ok = 1;
                 Stack* cur = stack;
                 while (cur != NULL) {
@@ -1161,7 +1162,7 @@ fun Stmt.code (): String {
                 if (ok) {
                     pool_maybe_free(task);
                 }
-            } else if (task->state == TASK_AWAITING) {
+            } else if (task->status == TASK_AWAITING) {
                 task->f(stack, task, evt);                       // 1.2
                 if (stack->block == NULL) return;  // outer block died, cannot continue to next task
             }

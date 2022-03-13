@@ -53,7 +53,7 @@ fun Tk?.isnull (): Boolean {
 }
 
 fun Tk.istask (): Boolean {
-    return this is Tk.ide && this.id in arrayOf("pub","ret","state")
+    return this is Tk.ide && this.id in arrayOf("pub","ret","status")
 }
 
 fun TK.toErr (chr: Char?): String {

@@ -53,7 +53,7 @@ class TXTask {
             emit @GLOBAL <.2 _1>
             emit @GLOBAL <.2 _1>
         """.trimIndent())
-        //assert(out.endsWith("Assertion `(global.x)->task0.state == TASK_AWAITING' failed.\n")) { out }
+        //assert(out.endsWith("Assertion `(global.x)->task0.status == TASK_AWAITING' failed.\n")) { out }
         assert(out.endsWith("1\n2\n3\n")) { out }
     }
     @Test

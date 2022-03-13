@@ -588,7 +588,7 @@ object Parser
                             """
                         {
                             var tsk_$N = spawn ${e.tostr(true)}
-                            var st_$N = tsk_$N.state
+                            var st_$N = tsk_$N.status
                             if _(${D}st_$N == TASK_AWAITING) {
                                 await tsk_$N
                             }
@@ -661,7 +661,7 @@ object Parser
                                 """
                                 {
                                     var tsk_$N = spawn ${e.tostr(true)}
-                                    var st_$N = tsk_$N.state
+                                    var st_$N = tsk_$N.status
                                     if _(${D}st_$N == TASK_AWAITING) {
                                         await tsk_$N
                                     }
@@ -894,7 +894,7 @@ object Parser
                 val spws =
                     pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.tostr(true)} }" }.joinToString("\n")
                 val oks =
-                    pars.mapIndexed { i, _ -> "var ok_${N}_$i: _int = _((${D}tk_${N}_$i->task0.state == TASK_DEAD))" }
+                    pars.mapIndexed { i, _ -> "var ok_${N}_$i: _int = _((${D}tk_${N}_$i->task0.status == TASK_DEAD))" }
                         .joinToString("\n")
                 val sets =
                     pars.mapIndexed { i, _ -> "set ok_${N}_$i = _(${D}ok_${N}_$i || (((uint64_t)${D}tk_${N}_$i)==${D}tk_$N))" }

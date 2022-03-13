@@ -208,7 +208,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
                 val ftp = it.noactnoalias() as Type.Func
                 when (this.tk_.id) {
-                    "state" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
+                    "status" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                     "pub"   -> ftp.pub!!
                     "ret"   -> ftp.out
                     else    -> error("bug found")
