@@ -695,8 +695,8 @@ class TXExec {
             type Bool = <False=(), True=()>
             var x = Bool.False
             native _{
-                printf("False = %d\n", BOOL_FALSE);
-                printf("True = %d\n", BOOL_TRUE);
+                printf("False = %d\n", CEU_BOOL_FALSE);
+                printf("True = %d\n", CEU_BOOL_TRUE);
                 printf("x = %d\n", global.x.False);
             }
         """.trimIndent())
