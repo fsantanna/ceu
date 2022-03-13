@@ -143,7 +143,7 @@ fun Alls.err_expected (str: String) {
 
 fun Alls.err_unexpected () {
     val file = all().file.let { if (it==null) "" else it+" : " }
-    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): ${this.tk1.toPay()}")
+    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): unexpected ${this.tk1.toPay()}")
 }
 
 fun All_err_tk (tk: Tk, str: String): String {
