@@ -741,9 +741,9 @@ class TXExec {
             var b = Bool.False
             var x = Xxx.False
             var f = False ()
-            output std _EVENT_FALSE:_int
-            output std _XXX_FALSE:_int
-            output std _BOOL_FALSE:_int
+            output std _CEU_EVENT_FALSE:_int
+            output std _CEU_XXX_FALSE:_int
+            output std _CEU_BOOL_FALSE:_int
         """.trimIndent())
         assert(out == "1\n2\n1\n") { out }
     }

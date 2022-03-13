@@ -595,7 +595,7 @@ fun code_fs (s: Stmt) {
             }
             fun Type.defs (pre: String): String {
                 return if (this !is Type.Union || this.yids==null) "" else {
-                    this.yids.mapIndexed { i,id -> "#define ${(pre+'_'+id.id).toUpperCase()} ${i+1}\n" }.joinToString("") +
+                    this.yids.mapIndexed { i,id -> "#define CEU_${(pre+'_'+id.id).toUpperCase()} ${i+1}\n" }.joinToString("") +
                     this.vec.mapIndexed { i,sub -> sub.defs(pre+'_'+this.yids[i].id) }.joinToString("")
                 }
             }
