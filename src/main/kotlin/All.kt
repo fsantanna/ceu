@@ -141,9 +141,14 @@ fun Alls.err_expected (str: String) {
     error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): expected $str : have ${this.tk1.toPay()}")
 }
 
-fun Alls.err_unexpected () {
+fun Alls.err_tk0_unexpected (): Boolean {
     val file = all().file.let { if (it==null) "" else it+" : " }
-    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): unexpected ${this.tk1.toPay()}")
+    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): unexpected ${this.tk0.toPay()}")
+}
+
+fun Alls.err_tk1_unexpected (): Boolean {
+    val file = all().file.let { if (it==null) "" else it+" : " }
+    error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): unexpected ${this.tk1.toPay()}")
 }
 
 fun All_err_tk (tk: Tk, str: String): String {
@@ -162,7 +167,8 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 fun Alls.checkExpr (): Boolean {
     return this.check(TK.CHAR, '(') || this.check(TK.UNIT) || this.check(TK.Xide) || this.check(TK.XNAT)
         || this.check(TK.CHAR, '[') || this.check(TK.CHAR, '<') || this.check(TK.NEW)
-        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK) || alls.tk1 is Tk.Ide
+        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK)
+        || alls.tk1 is Tk.Ide || this.check(TK.NULL)
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {

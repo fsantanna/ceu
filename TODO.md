@@ -1,12 +1,19 @@
 - Lines=4879, LoC=2945 (2022-03-10)
 - emit EVENT_TASK to correct scope (not GLOBAL)
   - can infer from func signature
+- Main.kt: EXPR_WTYPE
 - bugs
   - Type.Alias.supOf (check scopes)
+  - :: check isSupOf
+  - atcive currently w/o check scopes (they should be trated as pointers)
+  - access to Dyn out of DLoop should require Watching
+  - check if recursive type is plain union (not pointer to it)
 - List @[...].1 doesnt work
 - command to kill task
 - check pause/resume types
 - ce1:
+  - func f <-- var f = func
+    - () -> [() ->] ()
   - if/until condition
     - _int -> Bool:<(),()>
   - loop 1..5
@@ -36,6 +43,7 @@
 - Never type
 - pico-ce
   - image scale (birds)
+  - zoom x2+1, /2+1
 - change @[@a1,@a2] -> @[a,b: a>b]
   - check constraint in func comparison
 - accept @A vs var a

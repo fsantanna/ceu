@@ -5,7 +5,7 @@ enum class TK {
     Xide, XIde, XIDE, XSCP, XNAT, XNUM, XCLK,
     CAST, UNIT, ARROW, ATBRACK,
     ACTIVE, AWAIT, BREAK, CALL, CATCH, ELSE, EMIT, FUNC,
-    IF, IN, INPUT, LOOP, NATIVE, NEW, OUTPUT, PAUSE,
+    IF, IN, INPUT, LOOP, NATIVE, NEW, NULL, OUTPUT, PAUSE,
     RESUME, RETURN, SET, SPAWN, TASK, THROW, TYPE, VAR,
     XDEFER, XEVERY, XPAUSEIF, XPAR, XPARAND, XPAROR,
     XUNTIL, XWATCHING, XWHERE, XWITH
@@ -26,6 +26,7 @@ val key2tk: HashMap<String, TK> = hashMapOf (
     "loop"   to TK.LOOP,
     "native" to TK.NATIVE,
     "new"    to TK.NEW,
+    "Null"   to TK.NULL,
     "output" to TK.OUTPUT,
     "pause"  to TK.PAUSE,
     "resume" to TK.RESUME,
@@ -105,7 +106,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class Unpak (val tk_: Tk.Chr, val isinf: Boolean, val e: Expr): Expr(N++, tk_, null, null, null)
     data class TCons (val tk_: Tk.Chr, val arg: List<Expr>, val yids: List<Tk.ide>?): Expr(N++, tk_, null, null, null)
     data class UCons (val tk_: Tk, var xtype: Type.Union?, val arg: Expr): Expr(N++, tk_, null, null, xtype)
-    data class UNull (val tk_: Tk, var xtype: Type.Pointer?): Expr(N++, tk_, null, null, xtype)
+    data class UNull (val tk_: Tk.Key, var xtype: Type.Pointer?): Expr(N++, tk_, null, null, xtype)
     data class TDisc (val tk_: Tk, val tup: Expr): Expr(N++, tk_, null, null, null)
     data class UDisc (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)
     data class UPred (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)

@@ -461,7 +461,8 @@ class TEnv {
         """.trimIndent())
         //assert(out == "(ln 2, col 7): invalid assignment : type mismatch") { out }
         //assert(out == "(ln 2, col 11): invalid union constructor : type mismatch") { out }
-        assert(out == "(ln 2, col 13): expected `>´ : have `[´") { out }
+        //assert(out == "(ln 2, col 13): expected `>´ : have `[´") { out }
+        assert(out == "(ln 2, col 11): invalid constructor : out of bounds") { out }
     }
     @Test
     fun c23_list_zero_err2 () {
@@ -471,7 +472,8 @@ class TEnv {
         """.trimIndent())
         //assert(out == "(ln 2, col 7): invalid assignment : type mismatch") { out }
         //assert(out == "(ln 2, col 11): invalid union constructor : type mismatch") { out }
-        assert(out == "(ln 2, col 13): expected `>´ : have `[´") { out }
+        //assert(out == "(ln 2, col 13): expected `>´ : have `[´") { out }
+        assert(out == "(ln 2, col 11): invalid constructor : out of bounds") { out }
     }
     @Test
     fun c24_ucons () {
@@ -2320,10 +2322,10 @@ class TEnv {
             { @A
                 var p1: /List @[LOCAL] @LOCAL
                 var p2: /List @[A] @A
-                set p1 = <.0>: /List @[LOCAL] @LOCAL
-                set p2 = <.0>: /List @[A] @A
-                set p1 = new List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>: @LOCAL
-                set p2 = new List @[A]     <.1 <.0>: /List @[A]     @A>:     </List @[A]     @A>:     @A
+                set p1 = Null: /List @[LOCAL] @LOCAL
+                set p2 = Null: /List @[A] @A
+                set p1 = new List @[LOCAL] <.1 Null: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>: @LOCAL
+                set p2 = new List @[A]     <.1 Null: /List @[A]     @A>:     </List @[A]     @A>:     @A
                 set p1 = p2
                 set p2 = p1
             }

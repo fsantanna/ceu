@@ -319,8 +319,23 @@ class TParser {
     }
 
     @Test
-    fun b08_parser_expr_disc_err() {
+    fun b08_parser_expr_disc() {
         All_restart(null, PushbackReader(StringReader("l!0"), 2))
+        Lexer.lex()
+        val e = Parser.expr()
+        assert(e is Expr.UDisc && (e.tk_ as Tk.Num).num==0)
+        /*
+        try {
+            Parser.expr()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be null") { e.message!! }
+        }
+         */
+    }
+    @Test
+    fun b08_parser_expr_disc_err() {
+        All_restart(null, PushbackReader(StringReader("l!Null"), 2))
         Lexer.lex()
         try {
             Parser.expr()
@@ -332,7 +347,7 @@ class TParser {
 
     @Test
     fun b08_parser_expr_pred_err() {
-        All_restart(null, PushbackReader(StringReader("l?0"), 2))
+        All_restart(null, PushbackReader(StringReader("l?Null"), 2))
         Lexer.lex()
         try {
             Parser.expr()
@@ -411,8 +426,8 @@ class TParser {
     }
 
     @Test
-    fun b15_parser_expr_cons_err() {
-        All_restart(null, PushbackReader(StringReader("<.0>"), 2))
+    fun b15_parser_expr_cons_ok() {
+        All_restart(null, PushbackReader(StringReader("Null"), 2))
         Lexer.lex()
         val e = Parser.expr()
         assert(e is Expr.UNull && e.xtype == null)
@@ -424,6 +439,19 @@ class TParser {
             assert(e.message == "(ln 1, col 5): expected `:´ : have end of file") { e.message!! }
         }
          */
+    }
+    @Test
+    fun b15_parser_expr_cons_err() {
+        All_restart(null, PushbackReader(StringReader("<.0>"), 2))
+        Lexer.lex()
+        //val e = Parser.expr()
+        //assert(e is Expr.UNull && e.xtype == null)
+        try {
+            Parser.expr()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 5): expected `:´ : have end of file") { e.message!! }
+        }
     }
 
     @Test

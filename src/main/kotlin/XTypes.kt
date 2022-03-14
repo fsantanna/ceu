@@ -189,12 +189,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, it is Type.Tuple) {
                     "invalid discriminator : type mismatch : expected tuple : have ${it.tostr()}"
                 }
-                val num = this.tk.field2num((this.tup.wtype as Type.Tuple).yids)
+                it as Type.Tuple
+                val num = this.tk.field2num(it.yids)
                 All_assert_tk(this.tk, num != null) {
                     "invalid discriminator : unknown \"${this.tk.id()}\""
                 }
-                val (MIN, MAX) = Pair(1, (it as Type.Tuple).vec.size)
-                All_assert_tk(this.tk, MIN <= num!! && num!! <= MAX) {
+                All_assert_tk(this.tk, 1 <= num!! && num!! <= it.vec.size) {
                     "invalid discriminator : out of bounds"
                 }
                 it.vec[num - 1]
@@ -231,23 +231,22 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid $str : not an union"
             }
-            assert(!tk_.isnull() || tp.isrec()) { "bug found" }
+            xtp as Type.Union
+            assert(tk_.enu!=TK.NULL || tp.isrec()) { "bug found" }
 
-            val (MIN, MAX) = Pair(if (tp.isrec()) 0 else 1, (xtp as Type.Union).vec.size)
-            val num = this.tk.field2num((uni.wtype!!.noalias() as Type.Union).yids)
-            All_assert_tk(this.tk, num != null) {
-                "invalid discriminator : unknown discriminator \"${this.tk.id()}\""
-            }
-            All_assert_tk(this.tk, MIN <= num!! && num!! <= MAX) {
-                "invalid $str : out of bounds"
+            val num = if (this.tk.enu == TK.NULL) null else {
+                val num = this.tk.field2num(xtp.yids)
+                All_assert_tk(this.tk, num != null) {
+                    "invalid discriminator : unknown discriminator \"${this.tk.id()}\""
+                }
+                All_assert_tk(this.tk, 1 <= num!! && num!! <= xtp.vec.size) {
+                    "invalid $str : out of bounds"
+                }
+                num
             }
 
             when (this) {
-                is Expr.UDisc -> if (this.tk.isnull()) {
-                    Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()"))
-                } else {
-                    xtp.vec[num - 1]
-                }
+                is Expr.UDisc -> xtp.vec[num!! - 1]
                 is Expr.UPred -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                 else -> error("bug found")
             }

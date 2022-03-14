@@ -27,6 +27,7 @@ fun Tk.Nat.toce (): String {
 fun Tk.field2num (ids: List<Tk>?): Int? {
     return when {
         this is Tk.Num -> this.num
+        //this is Tk.Key -> null
         (ids == null)  -> null
         this is Tk.ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
         this is Tk.Ide -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
@@ -40,15 +41,6 @@ fun Tk.tostr (): String {
         is Tk.Ide -> this.id
         is Tk.ide -> this.id
         else -> error("bug found")
-    }
-}
-
-fun Tk?.isnull (): Boolean {
-    return when (this) {
-        null      -> false
-        is Tk.Num -> (this.num == 0)
-        is Tk.Ide -> (this.id == "Null")
-        else      -> error("bug found")
     }
 }
 

@@ -181,7 +181,7 @@ fun code_ft (tp: Type) {
                 void output_std_${ce}_ (${tp.pos()}* v) {
                     // TODO: only if tp.isrec
                     if (v == NULL) {
-                        printf("<.0>");
+                        printf("Null");
                         return;
                     }
                     printf("<.%d", v->tag);
@@ -388,26 +388,19 @@ fun code_fe (e: Expr) {
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-            val pre = if (e.tk.isnull()) {
-                """
-                assert(&${it.expr} == NULL);
-
-                """.trimIndent()
-            } else {
-                """
+            val pre = """
                 assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
                 assert($ee.tag == $num);
 
-                """.trimIndent()
-            }
+            """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
         }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-            val pos = if (e.tk.isnull()) {
+            val pos = if (e.tk.enu == TK.NULL) {
                 "(&${it.expr} == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
+                val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
                 "(&${it.expr} != NULL) && ($ee.tag == $num)"
             }
             Code(it.type, it.struct, it.func, it.stmt, pos)
