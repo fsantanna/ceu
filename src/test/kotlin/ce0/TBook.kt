@@ -170,6 +170,8 @@ class TBook {
         println("or:    ${or.count    { it == '\n' }}")
         println("and:   ${and.count   { it == '\n' }}")
 
+        CE1 = false
+
         val (ok1, out1) = ce2c(null, inp)
         if (!ok1) {
             return out1
