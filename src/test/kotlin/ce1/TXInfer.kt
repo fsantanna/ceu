@@ -141,13 +141,13 @@ class TXInfer {
     fun a10_type1 () {
         val out = all("""
             type List = </List @LOCAL>
-            var l: /List = <.0>
+            var l: /List = Null
             output std l
         """.trimIndent())
         assert(out == """
             type List @[] = </List @GLOBAL>
             var l: /List @GLOBAL
-            set l = <.0>: /List @GLOBAL
+            set l = Null: /List @GLOBAL
             output std l
             
         """.trimIndent()) { out }
@@ -156,13 +156,13 @@ class TXInfer {
     fun a10_type2 () {
         val out = all("""
             type List = </List>
-            var l: /List = <.0>
+            var l: /List = Null
             output std l
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = <.0>: /List @[GLOBAL] @GLOBAL
+            set l = Null: /List @[GLOBAL] @GLOBAL
             output std l
 
         """.trimIndent()) { out }
@@ -171,13 +171,13 @@ class TXInfer {
     fun a10_new () {
         val out = all("""
             type List = </List>
-            var l: /List = new <.1 <.0>>
+            var l: /List = new <.1 Null>
             output std l
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 Null: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -186,14 +186,14 @@ class TXInfer {
     fun a11_new () {
         val out = all("""
             type List = </List>
-            var l = new List.1 <.0>
-            --var l = new <.1 <.0>>:List
+            var l = new List.1 Null
+            --var l = new <.1 Null>:List
             output std l
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 Null: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -202,14 +202,14 @@ class TXInfer {
     fun todo_a12_new () {
         val out = all("""
             type List = <Cons=/List>
-            var l = new List.Cons <.0>
-            --var l = new <.1 <.0>>:List
+            var l = new List.Cons Null
+            --var l = new <.1 Null>:List
             output std l
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (List @[GLOBAL] <.1 <.0>: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
+            set l = (new (List @[GLOBAL] <.1 Null: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -362,14 +362,14 @@ class TXInfer {
         val out = all("""
             type List @[x] = </List @[x] @x>
             var f = func /List->() {
-                set arg\!1 = <.0>
+                set arg\!1 = Null
             }
         """.trimIndent())
         assert(out == """
             type List @[x] = </List @[x] @x>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\)~)!1) = <.0>: /List @[j] @j
+            set (((arg\)~)!1) = Null: /List @[j] @j
             }
 
 
@@ -380,14 +380,14 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var f = func /List->() {
-                set arg\!1 = <.0>
+                set arg\!1 = Null
             }
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\)~)!1) = <.0>: /List @[j] @j
+            set (((arg\)~)!1) = Null: /List @[j] @j
             }
 
 
@@ -398,14 +398,14 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var f = func /List->() {
-                set arg\!1 = new <.1 <.0>>
+                set arg\!1 = new <.1 Null>
             }
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
             set f = func @[i,j] -> /List @[j] @i -> () {
-            set (((arg\)~)!1) = (new (List @[j] <.1 <.0>: /List @[j] @j>: </List @[j] @j>): @j)
+            set (((arg\)~)!1) = (new (List @[j] <.1 Null: /List @[j] @j>: </List @[j] @j>): @j)
             }
 
 
@@ -414,20 +414,20 @@ class TXInfer {
     @Test
     fun c07_null () {
         val out = all("""
-            var v = <.0>
+            var v = Null
         """.trimIndent())
-        assert(out == "(ln 1, col 11): invalid inference : undetermined type") { out }
+        assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
     }
     @Test
     fun c08_null () {
         val out = all("""
             type List = </List>
-            var v: /List = <.0>
+            var v: /List = Null
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var v: /List @[GLOBAL] @GLOBAL
-            set v = <.0>: /List @[GLOBAL] @GLOBAL
+            set v = Null: /List @[GLOBAL] @GLOBAL
 
         """.trimIndent()) { out }
     }
@@ -436,7 +436,7 @@ class TXInfer {
         val out = all("""
             type List @[i] = /</List @[i] @i> @i
             var f : func List -> ()
-            call f <.0>
+            call f Null
         """.trimIndent())
         assert(out == "(ln 1, col 6): invalid recursive type : cannot be a pointer") { out }
     }
@@ -445,14 +445,14 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var f : func /List -> /List
-            var v = f <.0>
+            var v = f Null
             output std f v
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k
             var v: /List @[GLOBAL] @GLOBAL
-            set v = (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] <.0>: /List @[GLOBAL] @GLOBAL: @GLOBAL)
+            set v = (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] Null: /List @[GLOBAL] @GLOBAL: @GLOBAL)
             output std (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] v: @GLOBAL)
 
         """.trimIndent()) { out }
@@ -594,7 +594,7 @@ class TXInfer {
         val out = all("""
             type List = </List>
             {
-                var pa: /List = new <.1 <.0>>
+                var pa: /List = new <.1 Null>
                 var f = func () -> () {
                 }
                 call f ()
@@ -604,7 +604,7 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             {
             var pa: /List @[LOCAL] @LOCAL
-            set pa = (new (List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
+            set pa = (new (List @[LOCAL] <.1 Null: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
 
@@ -664,8 +664,8 @@ class TXInfer {
             type List = </List>
             var clone : func /List -> /List
             set clone = func /List -> /List {
-                if arg\?0 {
-                    return <.0>
+                if arg\?Null {
+                    return Null
                 } else {
                     return new <.1 clone arg\!1>
                 }
@@ -675,9 +675,9 @@ class TXInfer {
             type List @[i] = </List @[i] @i>
             var clone: func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k
             set clone = func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k {
-            if (((arg\)~)?0)
+            if (((arg\)~)?Null)
             {
-            set ret = <.0>: /List @[l] @k
+            set ret = Null: /List @[l] @k
             return
             }
             else
@@ -695,12 +695,12 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var f : func /List -> /List
-            output std f (f <.0>)
+            output std f (f Null)
         """.trimIndent())
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k
-            output std (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] <.0>: /List @[GLOBAL] @GLOBAL: @GLOBAL): @GLOBAL)
+            output std (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] (f @[GLOBAL,GLOBAL,GLOBAL,GLOBAL] Null: /List @[GLOBAL] @GLOBAL: @GLOBAL): @GLOBAL)
 
         """.trimIndent()) { out }
     }
@@ -717,7 +717,7 @@ class TXInfer {
     fun e05_notype() {
         val out = all(
             """
-            var zero: /Num = <.0>
+            var zero: /Num = Null
             var one:   Num = <.1 zero>
         """.trimIndent()
         )
@@ -731,26 +731,26 @@ class TXInfer {
         val out = all("""
             type List = </List>
             { @A
-                var pa: /List = new <.1 <.0>>
+                var pa: /List = new <.1 Null>
                 var f = func ()->() {
-                    var pf: /(List @[A])@A = new <.1 <.0>>
+                    var pf: /(List @[A])@A = new <.1 Null>
                     set pa\!1 = pf
                 }
                 call f ()
                 output std pa
             }
         """.trimIndent())
-        //assert(out == "<.1 <.1 <.0>>>\n") { out }
+        //assert(out == "<.1 <.1 Null>>\n") { out }
         //assert(out == "(ln 6, col 13): undeclared variable \"pa\"") { out }
         assert(out == """
             type List @[i] = </List @[i] @i>
             { @A
             var pa: /List @[LOCAL] @LOCAL
-            set pa = (new (List @[LOCAL] <.1 <.0>: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
+            set pa = (new (List @[LOCAL] <.1 Null: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {
             var pf: /List @[A] @A
-            set pf = (new (List @[A] <.1 <.0>: /List @[A] @A>: </List @[A] @A>): @A)
+            set pf = (new (List @[A] <.1 Null: /List @[A] @A>: </List @[A] @A>): @A)
             set (((pa\)~)!1) = pf
             }
             

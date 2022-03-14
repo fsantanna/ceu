@@ -30,7 +30,7 @@ fun Tk.field2num (ids: List<Tk>?): Int? {
         //this is Tk.Key -> null
         (ids == null)  -> null
         this is Tk.ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
-        this is Tk.Ide -> if (this.id == "Null") 0 else ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
+        this is Tk.Ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
         else -> error("bug found")
     }
 }
@@ -40,6 +40,7 @@ fun Tk.tostr (): String {
         is Tk.Num -> this.num.toString()
         is Tk.Ide -> this.id
         is Tk.ide -> this.id
+        is Tk.Key -> this.key
         else -> error("bug found")
     }
 }

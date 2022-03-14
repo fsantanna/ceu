@@ -28,7 +28,7 @@ fun Expr.UCons.check (tp: Type) {
     All_assert_tk(this.tk, idx != null) {
         "invalid constructor : unknown discriminator \"${this.tk.id()}\""
     }
-    val ok = (0 < idx!! && idx!! <= uni.vec.size)
+    val ok = (1 <= idx!! && idx!! <= uni.vec.size)
     All_assert_tk(this.tk, ok) {
         "invalid constructor : out of bounds"
     }

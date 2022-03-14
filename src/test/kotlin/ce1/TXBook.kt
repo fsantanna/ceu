@@ -6,7 +6,7 @@ import java.io.File
 
 private val nums = """
     type Num = </Num>    
-    var zero:  /Num = <.0>
+    var zero:  /Num = Null
     var one:   /Num = new <.1 zero>
     var two:   /Num = new <.1 one>
     var three: /Num = new <.1 two>
@@ -17,8 +17,8 @@ private val nums = """
 private val clone = """
     var clone : func /Num -> /Num
     set clone = func /Num -> /Num {
-        if arg\?0 {
-            return <.0>
+        if arg\?Null {
+            return Null
         } else {
             return new <.1 clone arg\!1>
         }
@@ -30,7 +30,7 @@ private val add = """
     set add = func [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
-        if y\?0 {
+        if y\?Null {
             return clone x
         } else {
             return new <.1 add [x,y\!1]>
@@ -43,8 +43,8 @@ private val mul = """
     set mul = func [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
-        if y\?0 {
-            return <.0>
+        if y\?Null {
+            return Null
         } else {
             var z = mul [x, y\!1]
             return add [x,z]
@@ -55,10 +55,10 @@ private val mul = """
 private val lt = """
     var lt : func [/Num,/Num] -> _int
     set lt = func [/Num,/Num] -> _int {
-        if arg.2\?0 {
+        if arg.2\?Null {
             return _0
         } else {
-            if arg.1\?0 {
+            if arg.1\?Null {
                 return _1
             } else {
                 return lt [arg.1\!1,arg.2\!1]
@@ -72,10 +72,10 @@ private val sub = """
     set sub = func [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
-        if x\?0 {
-            return <.0>
+        if x\?Null {
+            return Null
         } else {
-            if y\?0 {
+            if y\?Null {
                 return clone x
             } else {
                 return sub [x\!1,y\!1]
@@ -101,10 +101,10 @@ private val eq = """
     set eq = func [/Num,/Num] -> _int {
         var x = arg.1
         var y = arg.2
-        if x\?0 {
-            return y\?0
+        if x\?Null {
+            return y\?Null
         } else {
-            if y\?0 {
+            if y\?Null {
                 return _0
             } else {
                 return eq [x\!1,y\!1]
@@ -146,13 +146,13 @@ class TXBook {
         val out = test(true, 
             """
             type Num = </Num>
-            var zero: /Num = <.0>
+            var zero: /Num = Null
             var one:   Num = <.1 zero>
             var two:   Num = <.1 /one>
             output std /two
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun pre_02_add() {
@@ -164,7 +164,7 @@ class TXBook {
             output std add [two,one]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Test
     fun pre_03_clone() {
@@ -175,7 +175,7 @@ class TXBook {
             output std clone two
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun pre_04_mul() {
@@ -190,7 +190,7 @@ class TXBook {
             --output std mul [two, add [two,one]]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
     @Test
     fun pre_05_lt() {
@@ -215,7 +215,7 @@ class TXBook {
             output std sub [three, two]
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun pre_07_eq() {
@@ -246,7 +246,7 @@ class TXBook {
             output std square two
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.0>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 Null>>>>\n") { out }
     }
 
     @Test
@@ -268,7 +268,7 @@ class TXBook {
             output std smaller [two,one]
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n<.1 Null>\n") { out }
     }
 
     @Test
@@ -289,7 +289,7 @@ class TXBook {
             output std f_three one
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Disabled // TODO: infinite loop
     @Test
@@ -304,7 +304,7 @@ class TXBook {
             output std infinity ()
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
 
     // CHAPTER 1.3
@@ -318,8 +318,8 @@ class TXBook {
             $add
             $mul
             var multiply = func [/Num,/Num] -> /Num {
-                if arg.1\?0 {
-                    return <.0>
+                if arg.1\?Null {
+                    return Null
                 } else {
                     return mul [arg.1,arg.2]
                 }
@@ -327,7 +327,7 @@ class TXBook {
             output std multiply [two,three]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
 
     // CHAPTER 1.4
@@ -349,7 +349,7 @@ class TXBook {
             output std twice [square,two]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>>>>>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>>>>>>>>>>>\n") { out }
     }
 
     // CHAPTER 1.5
@@ -365,8 +365,8 @@ class TXBook {
             
             var fact : func /Num->/Num
             set fact = func /Num->/Num {
-                if arg\?0 {
-                    return new <.1 <.0>>
+                if arg\?Null {
+                    return new <.1 Null>
                 } else {
                     var x = fact arg\!1
                     return mul [arg,x]
@@ -376,7 +376,7 @@ class TXBook {
             output std fact three
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
 
     // CHAPTER 1.6
@@ -547,7 +547,7 @@ class TXBook {
             output std v
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
 
     @Disabled   // TODO: too slow
@@ -575,7 +575,7 @@ class TXBook {
                 var mod4 = mod [arg,four]
                 var mod100 = mod [arg,n100]
                 var mod400 = mod [arg,n400]
-                return or [ntob mod4\?0, and [ntob mod100\?1, ntob mod400\?0]]
+                return or [ntob mod4\?Null, and [ntob mod100\?1, ntob mod400\?Null]]
             }
             
             var n2000 = mul [n400,five]

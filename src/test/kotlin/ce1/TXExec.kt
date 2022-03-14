@@ -215,35 +215,35 @@ class TXExec {
     fun b09_union () {
         val out = test(true, """
             type List = </List>
-            var x: /List = <.0>
+            var x: /List = Null
             var y: <//List> = <.1 /x>
             output std /y
             output std y!1\
         """.trimIndent())
         //assert(out == "(ln 3, col 7): invalid assignment of \"x\" : borrowed in line 2") { out }
-        assert(out == "<.1 _>\n<.0>\n") { out }
+        assert(out == "<.1 _>\nNull\n") { out }
     }
     @Test
     fun b12_new_self () {
         val out = test(true, """
             type List = <[(),/List]>
-            var x: /List = new <.1 [(),<.0>]>
-            var y: [(),/List] = [(), new <.1 [(),<.0>]>]
+            var x: /List = new <.1 [(),Null]>
+            var y: [(),/List] = [(), new <.1 [(),Null]>]
             var z = [(), /x]
-            output std z.2\\!1.2\!0
+            output std z.2\\!1.2
         """.trimIndent())
-        assert(out == "()\n") { out }
+        assert(out == "Null\n") { out }
     }
     @Test
     fun todo_b13_new_self () {
         val out = test(true, """
             type List = <[//List,/List]>
-            var x: /List = new <.1 [_(&printf),<.0>]>
+            var x: /List = new <.1 [_(&printf),Null]>
             set x\!1.1 = /x
             output std x
             output std x\!1.1\
         """.trimIndent())
-        assert(out == "<.1 [_,<.0>]>\n<.1 [_,<.0>]>\n") { out }
+        assert(out == "<.1 [_,Null]>\n<.1 [_,Null]>\n") { out }
     }
     @Test
     fun b16_new () {
@@ -293,7 +293,7 @@ class TXExec {
     fun b23_new () {
         val out = test(true, """
             type List = </List>
-            var z: /List = <.0>
+            var z: /List = Null
             var one: /List = new <.1 z>
             var l: /List = new <.1 one>
             var p: //List
@@ -302,19 +302,19 @@ class TXExec {
             }
             output std p\
         """.trimIndent())
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun b25_new () {
         val out = test(true, """
             type List = </List>
-            var l1: /List = new <.1 <.0>>
+            var l1: /List = new <.1 Null>
             var l2 = new List.1 l1
             var t3 = [(), new List.1 l2\!1]
             output std l1
             output std /t3
         """.trimIndent())
-        assert(out == "<.1 <.0>>\n[(),<.1 <.1 <.0>>>]\n") { out }
+        assert(out == "<.1 Null>\n[(),<.1 <.1 Null>>]\n") { out }
     }
 
     // FUNC / CALL
@@ -362,43 +362,43 @@ class TXExec {
             }
             {
                 var x: /List
-                set x = new <.1 <.0>>
+                set x = new <.1 Null>
                 call f x
             }
         """.trimIndent())
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun c04_ptr_arg () {
         val out = test(true, """
             type List = </List>
             var f = func /List->() {
-                set arg\!1 = new <.1 <.0>>
+                set arg\!1 = new <.1 Null>
             }
             {
                 var x: /List
-                set x = new <.1 <.0>>
+                set x = new <.1 Null>
                 call f x
                 output std x
             }
         """.trimIndent())
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun c05_ptr_arg_two () {
         val out = test(true, """
             type List = </List>
             var f = func [/List,/List]->() {
-                set arg.1\!1 = new <.1 <.0>>
-                set arg.2\!1 = new <.1 <.0>>
+                set arg.1\!1 = new <.1 Null>
+                set arg.2\!1 = new <.1 Null>
             }
             {
-                var x: /List = new <.1 <.0>>
+                var x: /List = new <.1 Null>
                 call f [x,x]
                 output std x
             }
         """.trimIndent())
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun c06_ptr_call_err () {
@@ -464,11 +464,11 @@ class TXExec {
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
-                set pa = new List@[A].1 <.0>: /(List @[A]) @A: @A
+                set pa = new List@[A].1 Null: /(List @[A]) @A: @A
                 var f: func ()->()
                 set f = func @[]-> ()->() {
                     var pf: /List @[A] @A
-                    set pf = new List @[A].1 <.0>: /List @[A] @A: @A
+                    set pf = new List @[A].1 Null: /List @[A] @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -476,7 +476,7 @@ class TXExec {
                 output std pa
             }
         """.trimIndent())
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun todo_d02 () {
@@ -484,11 +484,11 @@ class TXExec {
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
-                set pa = new <.1 <.0>>
+                set pa = new <.1 Null>
                 var f: func ()->()
                 set f = func @[]-> ()->() {
                     var pf: /List @[A] @A
-                    set pf = new List @[A].1 <.0>: /List @[A] @A: @A
+                    set pf = new List @[A].1 Null: /List @[A] @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -496,7 +496,7 @@ class TXExec {
                 output std pa
             }
         """.trimIndent())
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun d03_err () {
@@ -521,42 +521,42 @@ class TXExec {
     fun e01_type () {
         val out = test(true, """
             type List = </List @LOCAL>
-            var l: /List = <.0>
+            var l: /List = Null
             output std l
         """.trimIndent())
-        assert(out == "<.0>\n") { out }
+        assert(out == "Null\n") { out }
     }
     @Test
     fun e02_type () {
         val out = test(true, """
             type List = </List @LOCAL>
-            var l: /List = new <.1 <.0>>
+            var l: /List = new <.1 Null>
             output std l
         """.trimIndent())
         //assert(out == "(ln 1, col 21): invalid assignment : type mismatch") { out }
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun e03_type () {
         val out = test(true, """
             type List = </List @LOCAL>
             var l: /List
-            var z: /List = <.0>
+            var z: /List = Null
             var one: /List = new <.1 z>
             set l = new <.1 one>
             output std l\!1
         """.trimIndent())
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun e04_type () {
         val out = test(true, """
             type List = </List>
-            var l: /List = new <.1 <.0>>
+            var l: /List = new <.1 Null>
             output std l
         """.trimIndent())
         //assert(out == "(ln 1, col 21): invalid assignment : type mismatch") { out }
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun e07_type () {
@@ -579,11 +579,11 @@ class TXExec {
     fun e08_ptr_num() {
         val out = test(true, """
             type Num = /<Num>    
-            var zero:  Num = <.0>
+            var zero:  Num = Null
             var one:   Num = new <.1 zero>
             output std one
         """.trimIndent())
-        //assert(out == "<.1 <.0>>\n") { out }
+        //assert(out == "<.1 Null>\n") { out }
         //assert(out == "(ln 3, col 18): invalid type : expected pointer to alias type\n") { out }
         assert(out == "(ln 1, col 6): invalid recursive type : cannot be a pointer") { out }
     }

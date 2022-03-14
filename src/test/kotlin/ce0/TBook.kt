@@ -7,7 +7,7 @@ import java.io.File
 private val nums = """
     type Num @[s] = </Num @[s] @s>
     var zero: /(Num @[LOCAL])@LOCAL
-    set zero = <.0>: /(Num @[LOCAL]) @LOCAL
+    set zero = Null: /(Num @[LOCAL]) @LOCAL
     var one: /(Num @[LOCAL])@LOCAL
     set one = new Num @[LOCAL] <.1 zero>:</Num @[LOCAL] @LOCAL>: @LOCAL
     var two: /(Num @[LOCAL])@LOCAL
@@ -35,8 +35,8 @@ val _NumR1 = Num(false, "r1")
 private val clone = """
     var clone : func @[r1,a1]-> $NumA1 -> $NumR1
     set clone = func @[r1,a1]-> $NumA1 -> $NumR1 {
-        if arg\?0 {
-            set ret = <.0>:$NumR1
+        if arg\?Null {
+            set ret = Null:$NumR1
         } else {
             set ret = new $_NumR1 <.1 clone @[r1,a1] arg\!1: @r1>:</Num @[r1] @r1>: @r1
         }
@@ -50,7 +50,7 @@ private val add = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if y\?0 {
+        if y\?Null {
             set ret = clone @[r1,a1] x: @r1
         } else {
             set ret = new $_NumR1 <.1 add @[r1,a1,b1] [x,y\!1]: @r1>:</Num @[r1] @r1>: @r1
@@ -65,8 +65,8 @@ private val mul = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if y\?0 {
-            set ret = <.0>: $NumR1
+        if y\?Null {
+            set ret = Null: $NumR1
         } else {
             var z: $NumTL
             set z = mul @[r1,a1,b1] [x, y\!1]
@@ -78,10 +78,10 @@ private val mul = """
 private val lt = """
     var lt : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set lt = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
-        if arg.2\?0 {
+        if arg.2\?Null {
             set ret = _0:_int
         } else {
-            if arg.1\?0 {
+            if arg.1\?Null {
                 set ret = _1:_int
             } else {
                 set ret = lt @[a1,b1] [arg.1\!1,arg.2\!1]
@@ -97,10 +97,10 @@ private val sub = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if x\?0 {
-            set ret = <.0>: $NumR1
+        if x\?Null {
+            set ret = Null: $NumR1
         } else {
-            if y\?0 {
+            if y\?Null {
                 set ret = clone @[r1,a1] x
             } else {
                 set ret = sub @[r1,a1,b1] [x\!1,y\!1]: @r1
@@ -129,10 +129,10 @@ private val eq = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if x\?0 {
-            set ret = y\?0
+        if x\?Null {
+            set ret = y\?Null
         } else {
-            if y\?0 {
+            if y\?Null {
                 set ret = _0:_int
             } else {
                 set ret = eq @[a1,b1] [x\!1,y\!1]
@@ -190,7 +190,7 @@ class TBook {
             """
             type Num @[s] = </Num @[s] @s>
             var zero: /(Num @[LOCAL])@LOCAL
-            set zero = <.0>: /(Num @[LOCAL]) @LOCAL
+            set zero = Null: /(Num @[LOCAL]) @LOCAL
             var one: (Num @[LOCAL])
             set one = Num @[LOCAL] <.1 zero>:</Num @[LOCAL] @LOCAL>
             var two: (Num @[LOCAL])
@@ -198,7 +198,7 @@ class TBook {
             output std /two
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun pre_02_add() {
@@ -210,7 +210,7 @@ class TBook {
             output std add @[LOCAL,LOCAL,LOCAL] [two,one]: @LOCAL
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Test
     fun pre_03_clone() {
@@ -221,7 +221,7 @@ class TBook {
             output std clone @[LOCAL,LOCAL] two: @LOCAL
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.0>>>\n") { out }
+        assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun pre_04_mul() {
@@ -234,7 +234,7 @@ class TBook {
             output std mul @[LOCAL,LOCAL,LOCAL] [two, add @[LOCAL,LOCAL,LOCAL] [two,one]]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
     @Test
     fun pre_05_lt() {
@@ -259,7 +259,7 @@ class TBook {
             output std sub @[LOCAL,LOCAL,LOCAL] [three, two]
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun pre_07_eq() {
@@ -291,7 +291,7 @@ class TBook {
             output std square @[LOCAL,LOCAL] two
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.0>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 Null>>>>\n") { out }
     }
 
     @Test
@@ -312,7 +312,7 @@ class TBook {
             output std smaller @[LOCAL,LOCAL] [two,one]: @LOCAL
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n<.1 Null>\n") { out }
     }
 
     @Test
@@ -334,7 +334,7 @@ class TBook {
             output std f_three @[LOCAL] one
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Disabled // TODO: infinite loop
     @Test
@@ -349,7 +349,7 @@ class TBook {
             output std infinity @[LOCAL] ()
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.0>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
 
     // CHAPTER 1.3
@@ -364,8 +364,8 @@ class TBook {
             $mul
             var multiply: func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
             set multiply = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
-                if arg.1\?0 {
-                    set ret = <.0>:$NumR1
+                if arg.1\?Null {
+                    set ret = Null:$NumR1
                 } else {
                     set ret = mul @[r1,a1,b1] [arg.1,arg.2]: @r1
                 }
@@ -373,7 +373,7 @@ class TBook {
             output std multiply @[LOCAL,LOCAL,LOCAL] [two,three]
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
 
     // CHAPTER 1.4
@@ -397,7 +397,7 @@ class TBook {
             output std twice @[LOCAL,LOCAL] [square,two]: @LOCAL
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>>>>>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>>>>>>>>>>>\n") { out }
     }
 
     // CHAPTER 1.5
@@ -413,8 +413,8 @@ class TBook {
             
             var fact: func @[r1,a1]->$NumA1->$NumR1
             set fact = func @[r1,a1]->$NumA1->$NumR1 {
-                if arg\?0 {
-                    set ret = new $_NumR1 <.1 <.0>:$NumR1>:</Num @[r1] @r1>: @r1
+                if arg\?Null {
+                    set ret = new $_NumR1 <.1 Null:$NumR1>:</Num @[r1] @r1>: @r1
                 } else {
                     var x: $NumTL
                     set x = fact @[LOCAL,a1] arg\!1
@@ -425,7 +425,7 @@ class TBook {
             output std fact @[LOCAL,LOCAL] three
         """.trimIndent()
         )
-        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.0>>>>>>>\n") { out }
+        assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
 
     // CHAPTER 1.6
@@ -615,7 +615,7 @@ class TBook {
             output std v
         """.trimIndent()
         )
-        assert(out == "<.1 <.0>>\n") { out }
+        assert(out == "<.1 Null>\n") { out }
     }
 
     @Disabled
@@ -651,7 +651,7 @@ class TBook {
                 set mod100 = mod @[LOCAL,a1,GLOBAL] [arg,n100]
                 var mod400: $NumTL
                 set mod400 = mod @[LOCAL,a1,GLOBAL] [arg,n400]
-                set ret = or [ntob mod4\?0, and [ntob mod100\?1, ntob mod400\?0]]
+                set ret = or [ntob mod4\?Null, and [ntob mod100\?1, ntob mod400\?Null]]
             }
             
             var n2000: $NumTL
