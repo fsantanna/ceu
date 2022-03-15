@@ -21,7 +21,7 @@ fun Type.dump (spc: Int = 0): String {
         is Type.Nat  -> "Nat '" + this.tk_.src + "'\n"
         is Type.Pointer -> "Pointer " + (this.xscp?.scp1?.id ?: "none") + "\n" + this.pln.dump(spc+4)
         is Type.Tuple -> "Tuple\n" + this.vec.map { it.dump(spc+4) }.joinToString("")
-        is Type.Union -> "Union\n" + this.vec.map { it.dump(spc+4) }.joinToString("")
+        is Type.Union -> "Union\n" + (if (this.common==null) "" else this.common.dump(spc+4)) + this.vec.map { it.dump(spc+4) }.joinToString("")
         is Type.Active -> "Active\n" + this.tsk.dump(spc+4)
         is Type.Actives -> "Actives\n" + this.tsk.dump(spc+4)
         is Type.Alias -> "Alias '" + this.tk_.id + "'\n"

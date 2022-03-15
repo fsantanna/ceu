@@ -16,7 +16,7 @@ fun Type.flattenLeft (): List<Type> {
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Alias -> listOf(this)
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Union   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
+        is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else listOf(it) } + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
         is Type.Active  -> listOf(this) + this.tsk.flattenLeft()
         is Type.Actives -> listOf(this) + this.tsk.flattenLeft()
@@ -37,6 +37,7 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
             )
             is Type.Union -> Type.Union(
                 this.tk_.copy(lin_ = lin, col_ = col),
+                this.common?.aux(lin, col) as Type.Tuple,
                 this.vec.map { it.aux(lin, col) },
                 this.yids?.map { it.copy(lin_ = lin,col_ = col) }
             )
@@ -169,7 +170,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
     return when (this) {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))
         is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
-        is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
+        is Type.Union   -> Type.Union(this.tk_, this.common?.mapScps(dofunc,map) as Type.Tuple, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Alias   -> Type.Alias(this.tk_, this.xisrec, this.xscps!!.map { it.idx() })
         is Type.Func -> if (!dofunc) this else {
             Type.Func(

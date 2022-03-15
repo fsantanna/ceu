@@ -52,13 +52,12 @@ object Parser
                 alls.accept_err(TK.CHAR, ')')
                 tp
             }
-            alls.accept(TK.CHAR, '[') || alls.accept(TK.CHAR, '<') -> {
+            alls.accept(TK.CHAR, '[') -> {
                 val tk0 = alls.tk0 as Tk.Chr
-                val istup = (tk0.chr == '[')
 
-                val hasid = (istup && alls.accept(TK.Xide)) || (!istup && alls.accept(TK.XIde))
+                val hasid = alls.accept(TK.Xide)
                 val id = alls.tk0
-                val haseq = hasid && alls.accept(TK.CHAR, if (istup) ':' else '=')
+                val haseq = hasid && alls.accept(TK.CHAR, ':')
                 if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
 
                 val tp = when {
@@ -75,26 +74,93 @@ object Parser
                         break
                     }
                     if (haseq) {
-                        if (istup) {
-                            alls.accept_err(TK.Xide)
-                            ids!!.add(alls.tk0 as Tk.ide)
-                            alls.accept_err(TK.CHAR,':')
-                        } else {
-                            alls.accept_err(TK.XIde)
-                            ids!!.add(alls.tk0 as Tk.Ide)
-                            alls.accept_err(TK.CHAR,'=')
-                        }
+                        alls.accept_err(TK.Xide)
+                        ids!!.add(alls.tk0 as Tk.ide)
+                        alls.accept_err(TK.CHAR,':')
                     }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
-                if (istup) {
-                    alls.accept_err(TK.CHAR, ']')
-                    Type.Tuple(tk0, tps, ids as List<Tk.ide>?)
-                } else {
-                    alls.accept_err(TK.CHAR, '>')
-                    Type.Union(tk0, tps, ids as List<Tk.Ide>?)
+                alls.accept_err(TK.CHAR, ']')
+                Type.Tuple(tk0, tps, ids as List<Tk.ide>?).let {
+                    if (!alls.accept(TK.CHAR,'+')) it else {
+                        alls.check_err(TK.CHAR,'<')
+                        val uni = this.type() as Type.Union
+
+                        fun Type?.add (inc: Type.Tuple): Type.Tuple {
+                            val inc_ = inc.clone(uni, inc.tk.lin, inc.tk.col) as Type.Tuple
+                            return when (this) {
+                                is Type.Union -> error("bug found")
+                                null, is Type.Unit -> inc_
+                                is Type.Tuple -> {
+                                    val ok = (this.yids==null && inc_.yids==null || this.yids!=null && inc_.yids!=null)
+                                    All_assert_tk(this.tk, ok) {
+                                        "incompatible field names"
+                                    }
+                                    Type.Tuple (
+                                        this.tk_,
+                                        inc_.vec + this.vec,
+                                        if (this.yids == null) null else inc_.yids!!+this.yids!!
+                                    )
+                                }
+                                else -> {
+                                    alls.err_expected("tuple type")
+                                    error("unreachable code")
+                                }
+                                /*Type.Tuple (
+                                    Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'['),
+                                    inc_.vec+this,
+                                    null
+                                )*/
+                            }
+                        }
+                        fun Type.Union.insert (inc: Type.Tuple): Type.Union {
+                            assert(this.yids == null)
+                            val vec = this.vec.map {
+                                if (it is Type.Union) {
+                                    it.insert(inc)
+                                } else {
+                                    it.add(inc)
+                                }
+                            }
+                            return Type.Union(this.tk_, this.common.add(inc), vec, yids) //.let { println(it.dump()); it }
+                        }
+
+                        uni.insert(it)
+                    }
                 }
+            }
+            alls.accept(TK.CHAR, '<') -> {
+                val tk0 = alls.tk0 as Tk.Chr
+
+                val hasid = alls.accept(TK.XIde)
+                val id = alls.tk0
+                val haseq = hasid && alls.accept(TK.CHAR, '=')
+                if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
+
+                val tp = when {
+                    !hasid -> this.type(null)
+                    haseq  -> this.type(null)
+                    (id is Tk.ide) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
+                    else -> this.type(id as Tk.Ide)
+                }
+                val tps = arrayListOf(tp)
+                val ids = if (haseq) arrayListOf(id) else null
+
+                while (true) {
+                    if (!alls.accept(TK.CHAR, ',')) {
+                        break
+                    }
+                    if (haseq) {
+                        alls.accept_err(TK.XIde)
+                        ids!!.add(alls.tk0 as Tk.Ide)
+                        alls.accept_err(TK.CHAR,'=')
+                    }
+                    val tp2 = this.type()
+                    tps.add(tp2)
+                }
+                alls.accept_err(TK.CHAR, '>')
+                Type.Union(tk0, null, tps, ids as List<Tk.Ide>?)
             }
             alls.accept(TK.ACTIVE) -> {
                 val tk0 = alls.tk0 as Tk.Key

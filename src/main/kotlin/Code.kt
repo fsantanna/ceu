@@ -165,6 +165,14 @@ fun code_ft (tp: Type) {
                 struct $ce {
                     int tag;
                     union {
+                        ${if (tp.common == null) "" else { """
+                            union {
+                                ${tp.common.pos()} _0;            
+                                ${tp.common.pos()} common;  
+                            };
+                            
+                        """.trimIndent()
+                        }}
                         ${tp.vec  // do not filter to keep correct i
                             .mapIndexed { i,sub -> """
                                 union {
@@ -212,9 +220,10 @@ fun code_ft (tp: Type) {
             """.trimIndent()
 
             val codes = tp.vec.map { CODE.removeFirst() }.reversed()
+            val common = if (tp.common == null) Code("","","","","") else CODE.removeFirst()
             val types = codes.map { it.type }.joinToString("")
             val structs  = codes.map { it.struct  }.joinToString("")
-            Code(types+type,structs+struct, "", "", "")
+            Code(common.type+types+type,common.struct+structs+struct, "", "", "")
         }
     }.let {
         val ce = tp.toce()
@@ -373,8 +382,8 @@ fun code_fe (e: Expr) {
             Code(tp.type+ex.type, tp.struct+ex.struct, tp.func+ex.func, tp.stmt+ex.stmt, tp.expr+ex.expr)
         }
         is Expr.Unpak -> {
-            val e = CODE.removeFirst()
-            Code(e.type, e.struct, e.func, e.stmt, e.expr)
+            val x = CODE.removeFirst()
+            Code(x.type, x.struct, x.func, x.stmt, x.expr)
         }
         is Expr.Field -> CODE.removeFirst().let {
             val src = when (e.tk_.id) {
@@ -390,7 +399,7 @@ fun code_fe (e: Expr) {
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
             val pre = """
                 assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
-                assert($ee.tag == $num);
+                ${if (num == 0) "" else "assert($ee.tag == $num);"}
 
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)

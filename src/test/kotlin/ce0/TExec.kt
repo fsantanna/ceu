@@ -1811,77 +1811,65 @@ class TExec {
         assert(out == "<.2 10>\n") { out }
     }
     @Test
-    fun p03_type_hier () {
+    fun p03_type_hier_err () {
+        val out = all("""
+        type Button = _int + <(),()> -- ERR: [_int] + ...
+       """.trimIndent())
+        assert(out == "(ln 1, col 20): expected statement : have `+´") { out }
+    }
+    @Test
+    fun p04_type_hier_err () {
+        val out = all("""
+        type Button = [_int] + () -- ERR: ... + <...>
+       """.trimIndent())
+        assert(out == "(ln 1, col 24): expected `<´ : have `()´") { out }
+    }
+    @Test
+    fun p05_type_hier () {
         val out = all("""
         type Button = [_int] + <(),()> -- Up/Down
         var e: Button
         set e = Button <.2 _10:_int>:<_int,_int>
         output std /e
-        output std e.0
        """.trimIndent())
         assert(out == "<.2 10>\n") { out }
     }
-
     @Test
-    fun p04_type_hier () {
+    fun p06_type_hier () {
         val out = all("""
-        type Event = <
-            Frame = _int,
-            Draw  = (),
-            Key   = [_int] + <Up=(),Down=()>,
-            Mouse = [Point] + <
-                Motion = (),
-                Button = [Int] + <Up=(),Down=()>
-            >
-        >
-        type Event = <
-            _int,
-            (),
-            [_int] + <(),()>,
-            [Point] + <
-                (),
-                [_int] + <(),()>
-            >
-        >
-        type Event = <
-            _int,
-            (),
-            <_int,_int>,
-            <
-                [Point],
-                <[Point,_int],[Point,_int]>
-            >
-        >
-        type Event = <
-            _int,
-            (),
-            [_int, <(),()>],
-            [Point, <
-                (),
-                [_int, <(),()>]
-            >]
-        >
-        var e: Event
-        set e = Event.Mouse.Button.Up [[10,10],1]
-        set e = <.4.2.1 [[10,10],1]>
-        set e = <.4 <.2 <.1 [[10,10],1]>>>
-        set e = <.4 [[10,10], <.2 [1,<.1>]>>
-        
-            var t: Xask
-                set t = Xask (task @[] -> () -> _int -> () {
-                output std (_2: _int)
-                set pub = _10:_int
-            }
-            )
-            output std (_1: _int)
-            var x: active Xask
-            set x = spawn active Xask ((t ~ ) @[] ())
-            var y: active task @[] -> () -> _int -> ()
-            set y = spawn ((t ~ ) @[] ())
-            output std ((x ~ ).pub)
-            output std (_3: _int)
+        type Button = [_int] + <[_int,()]+<_int>, ()> -- Up/Down
+        var e: Button
+        set e = Button
+            <.1
+                <.1
+                    [_1:_int,_2:_int,(),_4:_int]
+                >: <[_int,_int,(),_int]>
+            >: <<[_int,_int,(),_int]>,_int>
+        output std /e
        """.trimIndent())
-        assert(out == "1\n2\n2\n10\n3\n") { out }
+        assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
+    }
+    @Test
+    fun p07_type_hier () {
+        val out = all("""
+        type Button = [_int] + <(),()> -- Up/Down
+        var e: Button
+        set e = Button <.2 _10:_int>:<_int,_int>
+        output std /e
+        output std e!0
+       """.trimIndent())
+        assert(out == "<.2 10>\n10\n") { out }
+    }
+    @Test
+    fun p08_type_err () {
+        val out = all("""
+        type Button = <(),()> -- Up/Down
+        var e: Button
+        set e = Button <.2 ()>:<(),()>
+        output std /e
+        output std e!0
+       """.trimIndent())
+        assert(out == "(ln 5, col 14): invalid discriminator : out of bounds") { out }
     }
 
     // ALL

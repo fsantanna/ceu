@@ -9,7 +9,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
         return when (this) {
             is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
-            is Type.Union   -> Type.Union(this.tk_, this.vec.map { it.aux() }, this.yids)
+            is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
             is Type.Alias   -> Type.Alias(this.tk_, this.xisrec,
@@ -239,14 +239,15 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, num != null) {
                     "invalid discriminator : unknown discriminator \"${this.tk.id()}\""
                 }
-                All_assert_tk(this.tk, 1 <= num!! && num!! <= xtp.vec.size) {
+                val MIN = if (xtp.common == null) 1 else 0
+                All_assert_tk(this.tk, MIN <= num!! && num!! <= xtp.vec.size) {
                     "invalid $str : out of bounds"
                 }
                 num
             }
 
             when (this) {
-                is Expr.UDisc -> xtp.vec[num!! - 1]
+                is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
                 is Expr.UPred -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
                 else -> error("bug found")
             }

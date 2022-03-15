@@ -854,4 +854,109 @@ class TXExec {
         """.trimIndent())
         assert(out.contains("()\n")) { out }
     }
+
+    // TYPE / HIER
+
+    @Test
+    fun p01_type_hier () {
+        val out = test(true, """
+        type Point = [_int,_int]
+        type Event = <
+            _int,
+            (),
+            <_int,_int>,    -- Key.Up/Down
+            <               -- Mouse
+                [Point],        -- Motion
+                <               -- Button 
+                    [Point,_int],   -- Up
+                    [Point,_int]    -- Down
+                >
+            >
+        >
+        var e = Event <.4 <.2 <.1 [Point [_10:_int,_10:_int],_1:_int]>:<[Point,_int],[Point,_int]>>:<[Point],<[Point,_int],[Point,_int]>>>:<_int,(),<_int,_int>,<[Point],<[Point,_int],[Point,_int]>>>
+        output std /e
+       """.trimIndent())
+        assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
+    }
+    @Test
+    fun p02_hier_name_err () {
+        val out = test(true, """
+        type Button = [_int] + <(),()>
+        var e = Button <.2 _10:_int>:<_int,_int>
+        output std e!Common
+       """.trimIndent())
+        assert(out == "(ln 3, col 14): invalid discriminator : unknown discriminator \"Common\"") { out }
+    }
+    @Test
+    fun p03_hier_name () {
+        val out = test(true, """
+        type Button = [b:_int] + <(),()>
+        var e = Button <.2 _10:_int>:<_int,_int>
+        output std e!Common
+       """.trimIndent())
+        assert(out == "<.2 10>\n10\n") { out }
+    }
+
+    @Test
+    fun pxx_type_hier () {
+        val out = test(true, """
+        type Event = <
+            Frame = _int,
+            Draw  = (),
+            Key   = [_int] + <Up=(),Down=()>,
+            Mouse = [Point] + <
+                Motion = (),
+                Button = [Int] + <Up=(),Down=()>
+            >
+        >
+        type Event = <
+            _int,
+            (),
+            [_int] + <(),()>,
+            [Point] + <
+                (),
+                [_int] + <(),()>
+            >
+        >
+        type Event = <
+            _int,
+            (),
+            <_int,_int>,
+            <
+                [Point],
+                <[Point,_int],[Point,_int]>
+            >
+        >
+        type Event = <
+            _int,
+            (),
+            [_int, <(),()>],
+            [Point, <
+                (),
+                [_int, <(),()>]
+            >]
+        >
+        var e: Event
+        set e = Event.Mouse.Button.Up [[10,10],1]
+        set e = <.4.2.1 [[10,10],1]>
+        set e = <.4 <.2 <.1 [[10,10],1]>>>
+        set e = <.4 [[10,10], <.2 [1,<.1>]>>
+        
+            var t: Xask
+                set t = Xask (task @[] -> () -> _int -> () {
+                output std (_2: _int)
+                set pub = _10:_int
+            }
+            )
+            output std (_1: _int)
+            var x: active Xask
+            set x = spawn active Xask ((t ~ ) @[] ())
+            var y: active task @[] -> () -> _int -> ()
+            set y = spawn ((t ~ ) @[] ())
+            output std ((x ~ ).pub)
+            output std (_3: _int)
+       """.trimIndent())
+        assert(out == "1\n2\n2\n10\n3\n") { out }
+    }
+
 }

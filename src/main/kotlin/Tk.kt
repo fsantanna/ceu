@@ -30,7 +30,11 @@ fun Tk.field2num (ids: List<Tk>?): Int? {
         //this is Tk.Key -> null
         (ids == null)  -> null
         this is Tk.ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
-        this is Tk.Ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
+        this is Tk.Ide -> {
+            if (this.id == "Common") 0 else {
+                ids!!.indexOfFirst { it.id() == this.id }.let { if (it == -1) null else it + 1 }
+            }
+        }
         else -> error("bug found")
     }
 }

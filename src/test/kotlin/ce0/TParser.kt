@@ -1021,4 +1021,40 @@ class TParser {
         val s = Parser.stmt()
         assert(s is Stmt.Var && s.xtype is Type.Alias && (s.xtype as Type.Alias).tk_.id == "Unit")
     }
+
+    @Test
+    fun e03_type_hier () {
+        val src = """
+            type Button = [_int] + <(),()> -- Up/Down
+       """.trimIndent()
+        All_restart(null, PushbackReader(StringReader(src), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        //println(s.dump())
+        assert(s is Stmt.Typedef && s.type.let { it is Type.Union && it.vec.size==2 && it.vec[0] is Type.Nat})
+    }
+
+    @Test
+    fun e04_type_hier () {
+        val src = """
+            type Button = [_int] + <
+                [_int,()] + <
+                    _int
+                >,
+                ()
+            >
+       """.trimIndent()
+        All_restart(null, PushbackReader(StringReader(src), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        println(s.dump())
+        assert(s is Stmt.Typedef && s.type.let {
+            it is Type.Union && it.vec.size==2 && it.vec[1] is Type.Nat && it.vec[0].let {
+                it is Type.Union && it.vec.size==1  && it.vec[0].let {
+                    it is Type.Tuple && it.vec.size==4 && it.vec[2] is Type.Unit
+                }
+            }
+        })
+    }
+
 }
