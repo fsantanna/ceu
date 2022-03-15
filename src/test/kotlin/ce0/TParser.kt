@@ -1031,7 +1031,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //println(s.dump())
-        assert(s is Stmt.Typedef && s.type.let { it is Type.Union && it.vec.size==2 && it.vec[0] is Type.Nat})
+        assert(s is Stmt.Typedef && s.type.let { it is Type.Union && it.vec.size==2 && (it.vec[0] as Type.Tuple).vec[0] is Type.Nat})
     }
 
     @Test
@@ -1046,10 +1046,29 @@ class TParser {
        """.trimIndent()
         All_restart(null, PushbackReader(StringReader(src), 2))
         Lexer.lex()
+        try {
+            Parser.stmt()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 3, col 9): expected tuple type") { e.message!! }
+        }
+    }
+    @Test
+    fun e05_type_hier () {
+        val src = """
+            type Button = [_int] + <
+                [_int,()] + <
+                    [_int]
+                >,
+                ()
+            >
+       """.trimIndent()
+        All_restart(null, PushbackReader(StringReader(src), 2))
+        Lexer.lex()
         val s = Parser.stmt()
-        println(s.dump())
+        //println(s.dump())
         assert(s is Stmt.Typedef && s.type.let {
-            it is Type.Union && it.vec.size==2 && it.vec[1] is Type.Nat && it.vec[0].let {
+            it is Type.Union && it.vec.size==2 && it.vec[1] is Type.Tuple && it.vec[0].let {
                 it is Type.Union && it.vec.size==1  && it.vec[0].let {
                     it is Type.Tuple && it.vec.size==4 && it.vec[2] is Type.Unit
                 }

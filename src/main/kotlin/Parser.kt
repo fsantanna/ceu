@@ -90,7 +90,6 @@ object Parser
                         fun Type?.add (inc: Type.Tuple): Type.Tuple {
                             val inc_ = inc.clone(uni, inc.tk.lin, inc.tk.col) as Type.Tuple
                             return when (this) {
-                                is Type.Union -> error("bug found")
                                 null, is Type.Unit -> inc_
                                 is Type.Tuple -> {
                                     val ok = (this.yids==null && inc_.yids==null || this.yids!=null && inc_.yids!=null)
@@ -104,7 +103,7 @@ object Parser
                                     )
                                 }
                                 else -> {
-                                    alls.err_expected("tuple type")
+                                    All_err_tk(this.tk, "expected tuple type")
                                     error("unreachable code")
                                 }
                                 /*Type.Tuple (

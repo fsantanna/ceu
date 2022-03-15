@@ -1829,22 +1829,22 @@ class TExec {
         val out = all("""
         type Button = [_int] + <(),()> -- Up/Down
         var e: Button
-        set e = Button <.2 _10:_int>:<_int,_int>
+        set e = Button <.2 [_10:_int]>:<[_int],[_int]>
         output std /e
        """.trimIndent())
-        assert(out == "<.2 10>\n") { out }
+        assert(out == "<.2 [10]>\n") { out }
     }
     @Test
     fun p06_type_hier () {
         val out = all("""
-        type Button = [_int] + <[_int,()]+<_int>, ()> -- Up/Down
+        type Button = [_int]+ <[_int,()]+ <[_int]>, ()> -- Up/Down
         var e: Button
         set e = Button
             <.1
                 <.1
                     [_1:_int,_2:_int,(),_4:_int]
                 >: <[_int,_int,(),_int]>
-            >: <<[_int,_int,(),_int]>,_int>
+            >: <<[_int,_int,(),_int]>,[_int]>
         output std /e
        """.trimIndent())
         assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
@@ -1854,11 +1854,11 @@ class TExec {
         val out = all("""
         type Button = [_int] + <(),()> -- Up/Down
         var e: Button
-        set e = Button <.2 _10:_int>:<_int,_int>
+        set e = Button <.2 [_10:_int]>:<[_int],[_int]>
         output std /e
-        output std e!0
+        output std e!0.1
        """.trimIndent())
-        assert(out == "<.2 10>\n10\n") { out }
+        assert(out == "<.2 [10]>\n10\n") { out }
     }
     @Test
     fun p08_type_err () {
