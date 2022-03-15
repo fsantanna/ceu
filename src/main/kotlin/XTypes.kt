@@ -9,7 +9,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
         return when (this) {
             is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
-            is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple, this.vec.map { it.aux() }, this.yids)
+            is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
             is Type.Alias   -> Type.Alias(this.tk_, this.xisrec,
