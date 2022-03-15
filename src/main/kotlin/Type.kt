@@ -14,7 +14,7 @@ fun Type.flattenRight (): List<Type> {
 fun Type.flattenLeft (): List<Type> {
     // TODO: func/union do not make sense?
     return when (this) {
-        is Type.Unit, is Type.Nat, is Type.Alias -> listOf(this)
+        is Type.Unit, is Type.Nat, is Type.Named -> listOf(this)
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else listOf(it) } + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
@@ -28,7 +28,7 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
     fun Type.aux (lin: Int, col: Int): Type {
         return when (this) {
             is Type.Unit -> Type.Unit(this.tk_.copy(lin_ = lin, col_ = col))
-            is Type.Alias -> Type.Alias(this.tk_.copy(lin_ = lin, col_ = col), this.xisrec, this.xscps)
+            is Type.Named -> Type.Named(this.tk_.copy(lin_ = lin, col_ = col), this.xisrec, this.xscps)
             is Type.Nat -> Type.Nat(this.tk_.copy(lin_ = lin, col_ = col))
             is Type.Tuple -> Type.Tuple(
                 this.tk_.copy(lin_ = lin, col_ = col),
@@ -82,7 +82,7 @@ fun Expr.Func.ftp (): Type.Func? {
 }
 
 fun Type.isrec (): Boolean {
-    return this.flattenLeft().any { it is Type.Alias && it.xisrec }
+    return this.flattenLeft().any { it is Type.Named && it.xisrec }
 }
 
 fun Type.noact (): Type {
@@ -107,7 +107,7 @@ fun Type.react_noalias (up: Expr): Type {
 }
 
 fun Type.noalias (): Type {
-    return if (this !is Type.Alias) this else {
+    return if (this !is Type.Named) this else {
         val def = this.env(this.tk_.id)!! as Stmt.Typedef
 
         // Original constructor:
@@ -127,7 +127,7 @@ fun Type.toce (): String {
     return when (this) {
         is Type.Unit    -> "Unit"
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
-        is Type.Alias   -> this.tk_.id
+        is Type.Named   -> this.tk_.id
         is Type.Nat     -> this.tk_.src.replace('*','_')
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
@@ -171,7 +171,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))
         is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Union   -> Type.Union(this.tk_, this.common?.mapScps(dofunc,map) as Type.Tuple?, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
-        is Type.Alias   -> Type.Alias(this.tk_, this.xisrec, this.xscps!!.map { it.idx() })
+        is Type.Named   -> Type.Named(this.tk_, this.xisrec, this.xscps!!.map { it.idx() })
         is Type.Func -> if (!dofunc) this else {
             Type.Func(
                 this.tk_,

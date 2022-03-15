@@ -66,7 +66,7 @@ fun Any.env (id: String): Any? {
                     (id == "arg") -> it.ftp()!!.inp.nonat_()
                     (id == "pub") -> it.ftp()!!.pub!!.nonat_()
                     (id == "ret") -> it.ftp()!!.out.nonat_()
-                    (id == "evt") -> Type.Alias (
+                    (id == "evt") -> Type.Named (
                         Tk.Ide(TK.XIde, it.tk.lin, it.tk.col, "Event"),
                         false,
                         emptyList()
@@ -86,9 +86,9 @@ fun Stmt.setEnvs (env: Any?): Any? {
     fun ft (tp: Type) { // recursive typedef
         tp.wenv = if (this is Stmt.Typedef) this else env
         when (tp) {
-            is Type.Alias -> {
+            is Type.Named -> {
                 tp.xisrec = tp.env(tp.tk_.id)?.toType()?.let {
-                    it.flattenLeft().any { it is Type.Alias && it.tk_.id==tp.tk_.id }
+                    it.flattenLeft().any { it is Type.Named && it.tk_.id==tp.tk_.id }
                 } ?: false
             }
         }

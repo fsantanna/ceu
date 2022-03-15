@@ -19,7 +19,7 @@ fun Type.tostr (lc: Boolean = false): String {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk_.toce()
         is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.id.anon2local() }
-        is Type.Alias   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
+        is Type.Named   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + "]"
         }}
         is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
@@ -51,7 +51,7 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Nat   -> if (this.xtype==null) this.tk_.toce() else "(" + this.tk_.toce() + ": " + this.xtype!!.tostr(lc) + ")"
         is Expr.Cast  -> this.e.tostr(lc) + " :: " + this.type.tostr(lc)
         is Expr.Pak   -> if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc) + " " + this.e.tostr(lc) + ")")
-        is Expr.Unpak -> this.e.wtype.let { if (it==null || it.noact() !is Type.Alias) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + "~" +
+        is Expr.Unpak -> this.e.wtype.let { if (it==null || it.noact() !is Type.Named) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + "~" +
                 "" + ")") }
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"

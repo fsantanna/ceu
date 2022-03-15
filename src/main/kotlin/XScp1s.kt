@@ -4,7 +4,7 @@
 fun List<Type>.increasing (toinc: Boolean): List<Scope> {
     var c = if (toinc) 'h' else 'i'     // first is 'i'
     return this
-        .filter { it is Type.Pointer || it is Type.Alias }
+        .filter { it is Type.Pointer || it is Type.Named }
         //.let { it as List<Type.Pointer> }
         .map { tp ->
             when (tp) {
@@ -17,7 +17,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                     }
                     listOf(tp.xscp!!)
                 }
-                is Type.Alias -> {
+                is Type.Named -> {
                     //assert(tp.xscp1s == null)
                     val isself = tp.ups_first { it is Stmt.Typedef }.let {
                         (it != null) && ((it as Stmt.Typedef).tk_.id == tp.tk_.id)
@@ -60,7 +60,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
 fun Stmt.xinfScp1s () {
     fun ft (tp: Type) {
         when (tp) {
-            is Type.Alias -> {
+            is Type.Named -> {
                 val def = tp.env(tp.tk_.id)
                 when {
                     (tp.xscps != null) -> {}
@@ -82,7 +82,7 @@ fun Stmt.xinfScp1s () {
             is Type.Pointer -> {
                 when {
                     (tp.xscp != null) -> {}
-                    (tp.pln is Type.Alias && tp.pln.xscps!=null && tp.pln.xscps!!.size>0) -> {
+                    (tp.pln is Type.Named && tp.pln.xscps!=null && tp.pln.xscps!!.size>0) -> {
                         // copy alias scope to enclosing pointer scope
                         // var x: /List @[A] --> /List @[A] @A
                         assert(tp.pln.xscps!!.size == 1) { "can't choose from multiple scopes" }
@@ -165,7 +165,7 @@ fun Stmt.xinfScp1s () {
                     .distinctBy { it.scp1.id }
                     
                 //println(tps)
-                tps.filter { it is Type.Alias && it.xisrec }.let { it as List<Type.Alias> }.forEach {
+                tps.filter { it is Type.Named && it.xisrec }.let { it as List<Type.Named> }.forEach {
                     it.xscps = it.xscps ?: fst
                 }
                 s.xscp1s = Pair (

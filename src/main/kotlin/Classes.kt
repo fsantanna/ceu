@@ -80,7 +80,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         var xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
         val inp: Type, val pub: Type?, val out: Type
     ): Type(tk_, null, null)
-    data class Alias (
+    data class Named (
         val tk_: Tk.Ide,
         var xisrec: Boolean,
         var xscps: List<Scope>?,

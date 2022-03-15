@@ -9,7 +9,7 @@ object Parser
                     alls.accept_err(TK.CHAR, ']')
                     ret
                 }
-                Type.Alias(tk0, false, scps?.map { Scope(it,null) })
+                Type.Named(tk0, false, scps?.map { Scope(it,null) })
             }
             alls.accept(TK.CHAR, '/') -> {
                 val tk0 = alls.tk0 as Tk.Chr
@@ -174,7 +174,7 @@ object Parser
                 //alls.check_err(TK.TASK)
                 val task = this.type()
                 //assert(task is Type.Func && task.tk.enu == TK.TASK)
-                All_assert_tk(tk0, task is Type.Alias || task is Type.Func && task.tk.enu==TK.TASK) {
+                All_assert_tk(tk0, task is Type.Named || task is Type.Func && task.tk.enu==TK.TASK) {
                     "invalid type : expected task type"
                 }
                 if (isdyn) {
@@ -231,7 +231,7 @@ object Parser
                 val isact = (alls.tk0.enu == TK.ACTIVE)
                 alls.check_err(TK.XIde)
                 val id = alls.tk1
-                val tp = this.type() as Type.Alias
+                val tp = this.type() as Type.Named
                 val e = when {
                     // Bool.False
                     alls.accept(TK.CHAR,'.') -> {
@@ -269,7 +269,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Key
                 val tp = if (!alls.accept(TK.CHAR, ':')) null else {
                     val tp = this.type()
-                    All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Alias) {
+                    All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Named) {
                         "invalid type : expected pointer to alias type"
                     }
                     tp

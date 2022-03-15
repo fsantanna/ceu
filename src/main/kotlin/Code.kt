@@ -8,7 +8,7 @@ fun Any.self_or_null (): String {
 
 fun Type.pos (): String {
     return when (this) {
-        is Type.Alias   -> "CEU_"+this.tk_.id
+        is Type.Named   -> "CEU_"+this.tk_.id
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.src.let { if (it == "") "int" else it }
@@ -54,7 +54,7 @@ val TYPEX = mutableSetOf<String>()
 
 fun code_ft (tp: Type) {
     CODE.addFirst(when (tp) {
-        is Type.Nat, is Type.Unit, is Type.Alias -> Code("","","","","")
+        is Type.Nat, is Type.Unit, is Type.Named -> Code("","","","","")
         is Type.Pointer -> CODE.removeFirst()
         is Type.Active  -> CODE.removeFirst()
         is Type.Actives -> CODE.removeFirst()

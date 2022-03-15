@@ -12,7 +12,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
-            is Type.Alias   -> Type.Alias(this.tk_, this.xisrec,
+            is Type.Named   -> Type.Named(this.tk_, this.xisrec,
                 /*listOf(to),*/ this.xscps!!.map{Scope(to,null)})   // TODO: wrong
         }
     }
@@ -48,7 +48,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
                 (inf != null) -> {
                     this.e.xinfTypes(inf.react_noalias(this))
-                    if (inf.noact() is Type.Alias) {
+                    if (inf.noact() is Type.Named) {
                         //this.isact = tp is Type.Active
                         this.xtype = inf
                     }
@@ -295,7 +295,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             fun Type.toScp1s (): List<Tk.Scp> {
                                 return when (this) {
                                     is Type.Pointer -> listOf(this.xscp!!.scp1)
-                                    is Type.Alias   -> this.xscps!!.map { it.scp1 }
+                                    is Type.Named   -> this.xscps!!.map { it.scp1 }
                                     is Type.Func    -> listOf(this.xscps.first.scp1)
                                     else -> emptyList()
                                 }
@@ -426,7 +426,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Alias(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

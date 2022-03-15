@@ -1,7 +1,7 @@
 fun check_00_after_envs (s: Stmt) {
     fun ft (tp: Type) {
         when (tp) {
-            is Type.Alias -> {
+            is Type.Named -> {
                 val def = tp.env(tp.tk_.id)
                 All_assert_tk(tp.tk, def is Stmt.Typedef) {
                     "undeclared type \"${tp.tk_.id}\""
@@ -77,7 +77,7 @@ fun check_00_after_envs (s: Stmt) {
                 }
             }
             is Stmt.Typedef -> {
-                val isrec = s.type.flattenLeft().any { it is Type.Alias && it.tk_.id==s.tk_.id }
+                val isrec = s.type.flattenLeft().any { it is Type.Named && it.tk_.id==s.tk_.id }
                 if (isrec) {
                     All_assert_tk(s.tk, s.type !is Type.Pointer) {
                         "invalid recursive type : cannot be a pointer"

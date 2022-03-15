@@ -1019,7 +1019,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("var x: Unit"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Var && s.xtype is Type.Alias && (s.xtype as Type.Alias).tk_.id == "Unit")
+        assert(s is Stmt.Var && s.xtype is Type.Named && (s.xtype as Type.Named).tk_.id == "Unit")
     }
 
     @Test

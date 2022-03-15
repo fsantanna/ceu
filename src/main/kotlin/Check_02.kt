@@ -14,7 +14,7 @@ fun check_ctrs (up: Any, dcl_scps: Pair<List<Tk.Scp>, List<Pair<String, String>>
 fun check_02_after_tps (s: Stmt) {
     fun ft (tp: Type) {
         when (tp) {
-            is Type.Alias -> {
+            is Type.Named -> {
                 val def = tp.env(tp.tk_.id) as Stmt.Typedef
                 val s1 = def.xscp1s.first!!.size
                 val s2 = tp.xscps!!.size
@@ -40,7 +40,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.Unpak -> {
-                All_assert_tk(e.tk, e.isinf || e.e.wtype?.noact().let { it is Type.Alias || it is Type.Nat }) {
+                All_assert_tk(e.tk, e.isinf || e.e.wtype?.noact().let { it is Type.Named || it is Type.Nat }) {
                     "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
             }
@@ -53,7 +53,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New -> {
-                All_assert_tk(e.tk, ((e.arg as Expr.Pak).xtype!! as Type.Alias).xisrec) {
+                All_assert_tk(e.tk, ((e.arg as Expr.Pak).xtype!! as Type.Named).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
@@ -151,7 +151,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Stmt.Emit -> {
-                All_assert_tk(s.tk, s.e.wtype.let { it is Type.Alias && it.tk_.id=="Event" }) {
+                All_assert_tk(s.tk, s.e.wtype.let { it is Type.Named && it.tk_.id=="Event" }) {
                     "invalid `emit` : type mismatch : expected Event : have ${s.e.wtype!!.tostr()}"
                 }
             }
