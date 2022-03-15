@@ -82,6 +82,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     ): Type(tk_, null, null)
     data class Named (
         val tk_: Tk.Ide,
+        val subs: List<Tk>,
         var xisrec: Boolean,
         var xscps: List<Scope>?,
     ): Type(tk_, null, null)

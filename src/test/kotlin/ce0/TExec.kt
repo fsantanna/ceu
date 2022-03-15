@@ -1871,6 +1871,16 @@ class TExec {
        """.trimIndent())
         assert(out == "(ln 5, col 14): invalid discriminator : out of bounds") { out }
     }
+    @Test
+    fun p09_type_hier () {
+        val out = all("""
+        var e: [_int]+<(),()>
+        set e = <.2 [_10:_int]>:[_int]+<(),()>
+        output std /e
+        output std e!0.1
+       """.trimIndent())
+        assert(out == "<.2 [10]>\n10\n") { out }
+    }
 
     // ALL
 

@@ -459,16 +459,16 @@ class TXExec {
     // CLOSURE
 
     @Test
-    fun todo_d01 () {
+    fun d01 () {
         val out = test(true, """
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
-                set pa = new List@[A].1 Null: /(List @[A]) @A: @A
+                set pa = new List.1@[A] Null: /(List @[A]) @A: @A
                 var f: func ()->()
                 set f = func @[]-> ()->() {
                     var pf: /List @[A] @A
-                    set pf = new List @[A].1 Null: /List @[A] @A: @A
+                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -488,7 +488,7 @@ class TXExec {
                 var f: func ()->()
                 set f = func @[]-> ()->() {
                     var pf: /List @[A] @A
-                    set pf = new List @[A].1 Null: /List @[A] @A: @A
+                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -903,6 +903,17 @@ class TXExec {
         var e = Button <.2 _10:_int>:<[_int],[_int]>
         output std /e
         output std e!Common.b
+       """.trimIndent())
+        assert(out == "<.2 [10]>\n10\n") { out }
+    }
+    @Test
+    fun p05_type_hier () {
+        val out = test(true, """
+        type Button = [b:_int] + <Up=(),Down=()>
+        var e: Button
+        set e = Button <.Down [_10:_int]>
+        output std /e
+        output std e!0.1
        """.trimIndent())
         assert(out == "<.2 [10]>\n10\n") { out }
     }

@@ -4,12 +4,17 @@ object Parser
         return when {
             (preid!=null || alls.accept(TK.XIde)) -> {
                 val tk0 = preid ?: alls.tk0 as Tk.Ide
+                val subs = mutableListOf<Tk>()
+                while (alls.accept(TK.CHAR,'.')) {
+                    alls.accept(TK.XNUM) || alls.accept_err(TK.XIde)
+                    subs.add(alls.tk0)
+                }
                 val scps = if (!alls.accept(TK.ATBRACK)) null else {
                     val ret = this.scp1s { }
                     alls.accept_err(TK.CHAR, ']')
                     ret
                 }
-                Type.Named(tk0, false, scps?.map { Scope(it,null) })
+                Type.Named(tk0, subs, false, scps?.map { Scope(it,null) })
             }
             alls.accept(TK.CHAR, '/') -> {
                 val tk0 = alls.tk0 as Tk.Chr
@@ -234,17 +239,15 @@ object Parser
                 val tp = this.type() as Type.Named
                 val e = when {
                     // Bool.False
-                    alls.accept(TK.CHAR,'.') -> {
+                    (tp.subs.size > 0) -> {
                         if (!CE1) alls.err_tk0_unexpected()
-                        alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
-                        val dsc = alls.tk0
-                        All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
-                            "invalid discriminator : expected index or type identifier"
-                        }
-                        val cons = if (alls.checkExpr()) this.expr() else {
+                        var ret = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
-                        Expr.UCons(dsc, null, cons)
+                        for (tk in tp.subs) {
+                            ret = Expr.UCons(tk, null, ret)
+                        }
+                        ret
                     }
                     // Pair [x,y]
                     alls.checkExpr() -> {

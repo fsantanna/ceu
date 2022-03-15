@@ -68,6 +68,7 @@ fun Any.env (id: String): Any? {
                     (id == "ret") -> it.ftp()!!.out.nonat_()
                     (id == "evt") -> Type.Named (
                         Tk.Ide(TK.XIde, it.tk.lin, it.tk.col, "Event"),
+                        emptyList(),
                         false,
                         emptyList()
                     ).clone(it, it.tk.lin, it.tk.col).nonat_()

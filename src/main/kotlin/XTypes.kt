@@ -12,7 +12,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
-            is Type.Named   -> Type.Named(this.tk_, this.xisrec,
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec,
                 /*listOf(to),*/ this.xscps!!.map{Scope(to,null)})   // TODO: wrong
         }
     }
@@ -426,7 +426,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), emptyList(), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

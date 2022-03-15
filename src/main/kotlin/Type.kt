@@ -25,28 +25,43 @@ fun Type.flattenLeft (): List<Type> {
 }
 
 fun Type.clone (up: Any, lin: Int, col: Int): Type {
+    fun Tk.clone (): Tk {
+        return when (this) {
+            is Tk.Err -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Sym -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Chr -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Key -> this.copy(lin_ = lin, col_ = col)
+            is Tk.ide -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Ide -> this.copy(lin_ = lin, col_ = col)
+            is Tk.IDE -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Scp -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Nat -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Num -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Clk -> this.copy(lin_ = lin, col_ = col)
+        }
+    }
     fun Type.aux (lin: Int, col: Int): Type {
         return when (this) {
-            is Type.Unit -> Type.Unit(this.tk_.copy(lin_ = lin, col_ = col))
-            is Type.Named -> Type.Named(this.tk_.copy(lin_ = lin, col_ = col), this.xisrec, this.xscps)
-            is Type.Nat -> Type.Nat(this.tk_.copy(lin_ = lin, col_ = col))
+            is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Sym)
+            is Type.Named -> Type.Named(this.tk.clone() as Tk.Ide, this.subs.map { it.clone() }, this.xisrec, this.xscps)
+            is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
             is Type.Tuple -> Type.Tuple(
-                this.tk_.copy(lin_ = lin, col_ = col),
+                this.tk.clone() as Tk.Chr,
                 this.vec.map { it.aux(lin, col) },
-                this.yids?.map { it.copy(lin_ = lin,col_ = col) }
+                this.yids?.map { it.clone() as Tk.ide }
             )
             is Type.Union -> Type.Union(
-                this.tk_.copy(lin_ = lin, col_ = col),
+                this.tk.clone() as Tk.Chr,
                 this.common?.aux(lin, col) as Type.Tuple?,
                 this.vec.map { it.aux(lin, col) },
-                this.yids?.map { it.copy(lin_ = lin,col_ = col) }
+                this.yids?.map { it.clone() as Tk.Ide }
             )
             is Type.Func -> Type.Func(
-                this.tk_.copy(lin_ = lin, col_ = col),
+                this.tk.clone() as Tk.Key,
                 this.xscps.let {
                     Triple (
-                        Scope(it.first.scp1.copy(lin_ = lin, col_ = col), it.first.scp2),
-                        it.second?.map { Scope(it.scp1.copy(lin_ = lin, col_ = col), it.scp2) },
+                        Scope(it.first.scp1.clone() as Tk.Scp, it.first.scp2),
+                        it.second?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) },
                         it.third
                     )
                 },
@@ -171,7 +186,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))
         is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Union   -> Type.Union(this.tk_, this.common?.mapScps(dofunc,map) as Type.Tuple?, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
-        is Type.Named   -> Type.Named(this.tk_, this.xisrec, this.xscps!!.map { it.idx() })
+        is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.xscps!!.map { it.idx() })
         is Type.Func -> if (!dofunc) this else {
             Type.Func(
                 this.tk_,
