@@ -106,15 +106,13 @@ object Parser
                                     All_err_tk(this.tk, "expected tuple type")
                                     error("unreachable code")
                                 }
-                                /*Type.Tuple (
-                                    Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'['),
-                                    inc_.vec+this,
-                                    null
-                                )*/
                             }
                         }
                         fun Type.Union.insert (inc: Type.Tuple): Type.Union {
-                            assert(this.yids == null)
+                            val ok = (this.yids==null && inc.yids==null || this.yids!=null && inc.yids!=null)
+                            All_assert_tk(this.tk, ok) {
+                                "missing subtype or field identifiers"
+                            }
                             val vec = this.vec.map {
                                 if (it is Type.Union) {
                                     it.insert(inc)
@@ -122,7 +120,12 @@ object Parser
                                     it.add(inc)
                                 }
                             }
-                            return Type.Union(this.tk_, this.common.add(inc), vec, yids) //.let { println(it.dump()); it }
+                            return Type.Union (
+                                this.tk_,
+                                this.common.add(inc),
+                                vec,
+                                yids
+                            )
                         }
 
                         uni.insert(it)

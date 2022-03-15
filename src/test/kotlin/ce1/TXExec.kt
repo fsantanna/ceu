@@ -894,7 +894,17 @@ class TXExec {
         var e = Button <.2 _10:_int>:<_int,_int>
         output std e!Common
        """.trimIndent())
-        assert(out == "<.2 10>\n10\n") { out }
+        assert(out == "(ln 1, col 26): missing subtype or field identifiers") { out }
+    }
+    @Test
+    fun p04_hier_name () {
+        val out = test(true, """
+        type Button = [b:_int] + <Up=(),Down=()>
+        var e = Button <.2 _10:_int>:<[_int],[_int]>
+        output std /e
+        output std e!Common.b
+       """.trimIndent())
+        assert(out == "<.2 [10]>\n10\n") { out }
     }
 
     @Test
