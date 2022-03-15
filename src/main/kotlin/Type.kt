@@ -24,6 +24,12 @@ fun Type.flattenLeft (): List<Type> {
     }
 }
 
+fun Type.setUpEnv (up: Any): Type {
+    this.wup  = up
+    this.wenv = up.getEnv()
+    return this
+}
+
 fun Type.clone (up: Any, lin: Int, col: Int): Type {
     fun Tk.clone (): Tk {
         return when (this) {
@@ -84,9 +90,7 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
                 this.pln.aux(lin, col)
             )
         }.let {
-            it.wup  = up
-            it.wenv = up.getEnv()
-            it
+            it.setUpEnv(up)
         }
     }
     return this.aux(lin,col)

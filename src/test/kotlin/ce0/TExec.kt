@@ -1881,6 +1881,36 @@ class TExec {
        """.trimIndent())
         assert(out == "<.2 [10]>\n10\n") { out }
     }
+    @Test
+    fun p10_type_hier_sub () {
+        val out = all("""
+        type Button = <(),()> -- Up/Down
+        var dn: Button.2
+        set dn = Button.2 ()
+        output std /dn
+       """.trimIndent())
+        assert(out == "<.2>\n") { out }
+    }
+    @Test
+    fun p11_type_hier_sub_err () {
+        val out = all("""
+        type Button = <(),()> -- Up/Down
+        var dn: Button.2
+        set dn = Button <.2 ()>:<(),()>
+        output std /dn
+       """.trimIndent())
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button") { out }
+    }
+    @Test
+    fun p12_type_hier_sub_err () {
+        val out = all("""
+        type Button = <(),()> -- Up/Down
+        var dn: Button.2
+        set dn = Button.1 ()
+        output std /dn
+       """.trimIndent())
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button.1") { out }
+    }
 
     // ALL
 

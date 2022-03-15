@@ -21,6 +21,7 @@ class TXInfer {
             check_00_after_envs(s)
             s.xinfScp1s()
             check_01_before_tps(s)
+            println(s.dump())
             s.xinfTypes(null)
             s.setScp2s()
             return s.tostr()
@@ -193,7 +194,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (List @[GLOBAL] <.1 Null: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
+            set l = (new (List.1 @[GLOBAL] Null: /List @[GLOBAL] @GLOBAL>: @GLOBAL)
             output std l
 
         """.trimIndent()) { out }
@@ -1203,7 +1204,7 @@ class TXInfer {
         assert(out == """
             type TPico @[] = <()>
             spawn (task @[] -> _ -> _ -> _ {
-            output std (TPico <.1 ()>: <()>)
+            output std (TPico.1 ())
             }
              @[] ())
             
@@ -1394,7 +1395,7 @@ class TXInfer {
         assert(out == """
             type Bool @[] = <False=(),True=()>
             var b: Bool
-            set b = (Bool <.False ()>: <False=(),True=()>)
+            set b = (Bool.False ())
 
         """.trimIndent()) { out }
     }

@@ -98,6 +98,8 @@ sealed class Attr(val tk: Tk) {
     data class Field (val tk_: Tk.ide, val tsk: Attr): Attr(tk_)
 }
 
+// Expr.Pak.xtype is Type.Named [except for Type.Active(Type.Named)]
+
 sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wtype: Type?) {
     data class Unit  (val tk_: Tk.Sym): Expr(N++, tk_, null, null, Type.Unit(tk_))
     data class Var   (val tk_: Tk.ide): Expr(N++, tk_, null, null, null)

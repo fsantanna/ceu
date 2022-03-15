@@ -22,7 +22,7 @@ fun Scope.check (up: Any) {
 // need to check UNull/UCons on check_01 (Ce0) and check_02 (Ce1, b/c no type at check_01)
 
 fun Expr.UCons.check (tp: Type) {
-    All_assert_tk(tp.tk, tp is Type.Union) { "invalid type : expected union" }
+    All_assert_tk(tp.tk, tp is Type.Union) { "invalid type : expected union type" }
     val uni = tp as Type.Union
     val idx = this.tk.field2num(uni.yids)
     All_assert_tk(this.tk, idx != null) {

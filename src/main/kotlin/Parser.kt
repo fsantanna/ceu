@@ -6,7 +6,7 @@ object Parser
                 val tk0 = preid ?: alls.tk0 as Tk.Ide
                 val subs = mutableListOf<Tk>()
                 while (alls.accept(TK.CHAR,'.')) {
-                    alls.accept(TK.XNUM) || alls.accept_err(TK.XIde)
+                    alls.accept(TK.XNUM) || (CE1 && alls.accept(TK.XIde)) || alls.err_expected("field")
                     subs.add(alls.tk0)
                 }
                 val scps = if (!alls.accept(TK.ATBRACK)) null else {
@@ -236,17 +236,19 @@ object Parser
                 val isact = (alls.tk0.enu == TK.ACTIVE)
                 alls.check_err(TK.XIde)
                 val id = alls.tk1
+                //var tp = this.type() as Type.Named
                 val tp = this.type() as Type.Named
                 val e = when {
                     // Bool.False
                     (tp.subs.size > 0) -> {
-                        if (!CE1) alls.err_tk0_unexpected()
                         var ret = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
                         for (tk in tp.subs.reversed()) {
                             ret = Expr.UCons(tk, null, ret)
                         }
+                        // remove subs from UCons
+                        //tp = Type.Named(tp.tk_, emptyList(), tp.xisrec, tp.xscps)
                         ret
                     }
                     // Pair [x,y]

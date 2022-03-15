@@ -8,6 +8,7 @@ fun Tk.Scp.isscopepar (): Boolean {
 
 fun Tk.id (): String {
     return when (this) {
+        is Tk.Num -> this.num.toString()
         is Tk.ide -> this.id
         is Tk.Ide -> this.id
         is Tk.IDE -> this.id

@@ -15,11 +15,16 @@ fun Type.tostr (lc: Boolean = false): String {
     fun List<Tk>?.idx (i: Int, c: Char): String {
         return if (this == null) "" else this[i].id()+c
     }
+    fun Type.Named.pak_subs (): String {
+        return if (this.ups_first { it is Expr.UCons } != null) "" else {
+            this.subs.map { '.' + it.id() }.joinToString("")
+        }
+    }
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk_.toce()
         is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.id.anon2local() }
-        is Type.Named   -> this.tk_.id + this.xscps.let { if (it==null) "" else it.let {
+        is Type.Named   -> this.tk_.id + this.pak_subs() + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.id.anon2local() }.joinToString(",") + "]"
         }}
         is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
@@ -45,6 +50,12 @@ fun Type.tostr (lc: Boolean = false): String {
 }
 
 fun Expr.tostr (lc: Boolean = false): String {
+    // lc: lin/col
+    /*
+    fun Type.pak (): String { // remove subs from Type.Named
+        return (if (this is Type.Active) "active " else "") + (this.noact() as Type.Named).tk_.id
+    }
+     */
     return when (this) {
         is Expr.Unit  -> "()"
         is Expr.Var   -> this.tk_.id
@@ -56,7 +67,18 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
-        is Expr.UCons -> "<." + this.tk.tostr() + " " + this.arg.tostr(lc) + ">" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
+        is Expr.UCons -> {
+            val is_pack_with_subs: Boolean = this.ups_first { it is Expr.Pak }.let {
+                it!=null && (it as Expr.Pak).xtype?.noact().let {
+                    (it is Type.Named) && it.subs.size>0
+                }
+            }
+            if (is_pack_with_subs) this.arg.tostr(lc) else {
+                "<." + this.tk.tostr() + " " + this.arg.tostr(lc) + ">" + this.wtype.let {
+                    if (it == null) "" else ": " + it.tostr(lc)
+                }
+            }
+        }
         is Expr.UNull -> "Null" + this.wtype.let { if (it==null) "" else ": "+it.tostr(lc) }
         is Expr.TDisc -> "(" + this.tup.tostr(lc) + "." + this.tk.tostr() + ")"
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk_.id})"

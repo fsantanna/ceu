@@ -938,6 +938,24 @@ class TXExec {
        """.trimIndent())
         assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
     }
+    @Test
+    fun p07_type_hier_sub () {
+        val out = test(true, """
+        type Button = <(),()> -- Up/Down
+        var dn: Button.2 = Button.2 ()
+        output std /dn
+       """.trimIndent())
+        assert(out == "<.2>\n") { out }
+    }
+    @Test
+    fun p07_type_hier_sub_err () {
+        val out = test(true, """
+        type Button = <(),()> -- Up/Down
+        var dn: Button.1 = Button.1 ()
+        output std /dn
+       """.trimIndent())
+        assert(out == "<.2>\n") { out }
+    }
 
     @Test
     fun pxx_type_hier () {

@@ -24,7 +24,7 @@ fun Type.dump (spc: Int = 0): String {
         is Type.Union -> "Union\n" + (if (this.common==null) "" else this.common.dump(spc+4)) + this.vec.map { it.dump(spc+4) }.joinToString("")
         is Type.Active -> "Active\n" + this.tsk.dump(spc+4)
         is Type.Actives -> "Actives\n" + this.tsk.dump(spc+4)
-        is Type.Named -> "Alias '" + this.tk_.id + "'\n"
+        is Type.Named -> "Alias '" + this.tk_.id + this.subs.map { '.'+it.id() }.joinToString("") + "'\n"
         is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (if (this.pub==null) "" else this.pub?.dump(spc+4)) + this.out.dump(spc+4)
     }
 }
