@@ -479,7 +479,7 @@ class TXExec {
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
-    fun todo_d02 () {
+    fun d02 () {
         val out = test(true, """
             type List = </List>
             { @A
@@ -916,6 +916,27 @@ class TXExec {
         output std e!0.1
        """.trimIndent())
         assert(out == "<.2 [10]>\n10\n") { out }
+    }
+    @Test
+    fun p06_type_hier () {
+        val out = test(true, """
+        type Point = [_int,_int]
+        type Event = <
+            Xxx = _int,
+            Yyy = (),
+            Key = <_int,_int>,  -- Key.Up/Down
+            Mouse = <
+                Motion = [Point],
+                Button = < 
+                    Up = [Point,_int],
+                    Down = [Point,_int]
+                >
+            >
+        >
+        var e = Event.Mouse.Button.Up [Point [_10:_int,_10:_int],_1:_int]
+        output std /e
+       """.trimIndent())
+        assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
     }
 
     @Test

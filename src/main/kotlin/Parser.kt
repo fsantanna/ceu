@@ -244,7 +244,7 @@ object Parser
                         var ret = if (alls.checkExpr()) this.expr() else {
                             Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
                         }
-                        for (tk in tp.subs) {
+                        for (tk in tp.subs.reversed()) {
                             ret = Expr.UCons(tk, null, ret)
                         }
                         ret
