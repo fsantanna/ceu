@@ -918,7 +918,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("set x = spawn f ()"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        println(s.dump())
+        //println(s.dump())
         assert(s is Stmt.SSpawn && (s.call as Expr.Call).f is Expr.Var && s.dst is Expr.Var)
     }
 

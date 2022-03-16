@@ -90,7 +90,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                     Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'/'),
                     Scope(scp1,null),
                     it
-                )
+                ).setUpEnv(inf.getUp()!!)
             })
             this.ptr.wtype!!.let {
                 if (it is Type.Nat) it else {
@@ -271,7 +271,7 @@ fun Expr.xinfTypes (inf_: Type?) {
             ret!!
         }
         is Expr.Call -> {
-            val nat = Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,""))
+            val nat = Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"")).setUpEnv(this)
             this.f.xinfTypes(nat)    // no infer for functions, default _ for nat
 
             this.f.wtype!!.let { ftp ->
@@ -390,7 +390,7 @@ fun Expr.xinfTypes (inf_: Type?) {
 
 fun Stmt.xinfTypes (inf: Type? = null) {
     fun unit (): Type {
-        return Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()")).clone(this, this.tk.lin, this.tk.col)
+        return Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()")).setUpEnv(this)
     }
     when (this) {
         is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Throw, is Stmt.Typedef -> {}
@@ -424,12 +424,12 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.dst.xinfTypes(null)
             this.call.xinfTypes(null)
         }
-        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).clone(this, this.tk.lin, this.tk.col))
+        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).setUpEnv(this))
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), emptyList(), false, emptyList() /*null*/).clone(this,this.tk.lin,this.tk.col))
+            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {
@@ -443,7 +443,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument
         is Stmt.If -> {
-            this.tst.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).clone(this, this.tk.lin, this.tk.col))
+            this.tst.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).setUpEnv(this))
             this.true_.xinfTypes(null)
             this.false_.xinfTypes(null)
         }

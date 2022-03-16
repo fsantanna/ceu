@@ -21,7 +21,7 @@ class TXInfer {
             check_00_after_envs(s)
             s.xinfScp1s()
             check_01_before_tps(s)
-            println(s.dump())
+            //println(s.dump())
             s.xinfTypes(null)
             s.setScp2s()
             return s.tostr()
@@ -1221,7 +1221,7 @@ class TXInfer {
         assert(out == """
             type TPico @[] = <(),[_int,_int]>
             spawn (task @[] -> _ -> _ -> _ {
-            output std (TPico <.2 [(_1: _int),(_2: _int)]>: <(),[_int,_int]>)
+            output std (TPico.2 [(_1: _int),(_2: _int)])
             }
              @[] ())
             

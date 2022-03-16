@@ -44,6 +44,7 @@ fun All_restart (file: String?, inp: PushbackReader) {
 }
 
 fun All_nest (src: String, f: ()->Any): Any {
+    //println(src)
     val old = alls.stack.removeFirst()
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
     alls.tk0 = Tk.Key(TK.ERR,1,1,"")
@@ -53,6 +54,7 @@ fun All_nest (src: String, f: ()->Any): Any {
     all().col = 1
     Lexer.lex()
     val ret = f()
+    //println(ret)
     alls.stack.removeFirst()
     alls.stack.addFirst(old)
     alls.tk0 = tk0
@@ -136,7 +138,7 @@ fun Tk.toPay (): String {
     }
 }
 
-fun Alls.err_expected (str: String) {
+fun Alls.err_expected (str: String): Boolean {
     val file = all().file.let { if (it==null) "" else it+" : " }
     error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): expected $str : have ${this.tk1.toPay()}")
 }

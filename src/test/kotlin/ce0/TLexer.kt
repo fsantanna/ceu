@@ -170,7 +170,7 @@ class TLexer {
     fun d01_clk () {
         All_restart(null, PushbackReader(StringReader("1s"), 2))
         Lexer.lex()
-        println(alls.tk1)
+        //println(alls.tk1)
         assert(alls.tk1.enu== TK.XCLK && (alls.tk1 as Tk.Clk).ms==1000)
     }
     @Test

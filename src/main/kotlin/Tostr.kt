@@ -49,7 +49,7 @@ fun Type.tostr (lc: Boolean = false): String {
     }
 }
 
-fun Expr.tostr (lc: Boolean = false): String {
+fun Expr.tostr (lc: Boolean = false, hassubs: Boolean = false): String {
     // lc: lin/col
     /*
     fun Type.pak (): String { // remove subs from Type.Named
@@ -61,19 +61,17 @@ fun Expr.tostr (lc: Boolean = false): String {
         is Expr.Var   -> this.tk_.id
         is Expr.Nat   -> if (this.xtype==null) this.tk_.toce() else "(" + this.tk_.toce() + ": " + this.xtype!!.tostr(lc) + ")"
         is Expr.Cast  -> this.e.tostr(lc) + " :: " + this.type.tostr(lc)
-        is Expr.Pak   -> if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc) + " " + this.e.tostr(lc) + ")")
+        is Expr.Pak   -> {
+            val hassubs = this.xtype?.noact().let { it!=null && ((it as Type.Named).subs.size > 0) }
+            if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc) + " " + this.e.tostr(lc,hassubs) + ")")
+        }
         is Expr.Unpak -> this.e.wtype.let { if (it==null || it.noact() !is Type.Named) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + "~" +
                 "" + ")") }
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
         is Expr.UCons -> {
-            val is_pack_with_subs: Boolean = this.ups_first { it is Expr.Pak }.let {
-                it!=null && (it as Expr.Pak).xtype?.noact().let {
-                    (it is Type.Named) && it.subs.size>0
-                }
-            }
-            if (is_pack_with_subs) this.arg.tostr(lc) else {
+            if (hassubs) this.arg.tostr(lc) else {
                 "<." + this.tk.tostr() + " " + this.arg.tostr(lc) + ">" + this.wtype.let {
                     if (it == null) "" else ": " + it.tostr(lc)
                 }

@@ -119,8 +119,8 @@ fun Type.noactnoalias (): Type {
 fun Type.react_noalias (up: Expr): Type {
     val noalias = this.noactnoalias().clone(up,up.tk.lin,up.tk.col)
     return when (this) {
-        is Type.Active  -> Type.Active(this.tk_, noalias)
-        is Type.Actives -> Type.Actives(this.tk_, this.len, noalias)
+        is Type.Active  -> Type.Active(this.tk_, noalias).setUpEnv(this.getUp()!!)
+        is Type.Actives -> Type.Actives(this.tk_, this.len, noalias).setUpEnv(this.getUp()!!)
         else            -> noalias
     }
 }

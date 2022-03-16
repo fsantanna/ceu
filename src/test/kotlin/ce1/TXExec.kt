@@ -954,7 +954,7 @@ class TXExec {
         var dn: Button.1 = Button.1 ()
         output std /dn
        """.trimIndent())
-        assert(out == "<.2>\n") { out }
+        assert(out == "<.1>\n") { out }
     }
 
     @Test

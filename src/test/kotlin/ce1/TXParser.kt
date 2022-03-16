@@ -127,7 +127,7 @@ class TXParser {
         Lexer.lex()
         try {
             val tp = Parser.type()
-            println(tp)
+            //println(tp)
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 12): invalid variable identifier") { e.message!! }
