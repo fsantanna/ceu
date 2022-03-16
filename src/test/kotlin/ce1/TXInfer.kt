@@ -194,7 +194,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var l: /List @[GLOBAL] @GLOBAL
-            set l = (new (List.1 @[GLOBAL] Null: /List @[GLOBAL] @GLOBAL>: @GLOBAL)
+            set l = (new (List.1 @[GLOBAL] Null: /List @[GLOBAL] @GLOBAL): @GLOBAL)
             output std l
 
         """.trimIndent()) { out }

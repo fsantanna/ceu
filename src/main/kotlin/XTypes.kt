@@ -19,10 +19,12 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     return this.aux().clone(up, this.tk.lin, this.tk.col)
 }
 
-fun Expr.xinfTypes (inf_: Type?) {
+fun Expr.xinfTypes (inf: Type?) {
+    /*
     val inf = if (inf_ !is Type.Named) inf_ else {
         Type.Named(inf_.tk_, emptyList(), inf_.xisrec, inf_.xscps).setUpEnv(inf_.getUp()!!)
     }
+     */
     this.wtype = when (this) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {

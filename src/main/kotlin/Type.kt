@@ -157,7 +157,7 @@ fun Type.toce (): String {
 }
 
 fun mismatch (sup: Type, sub: Type): String {
-    return "type mismatch :\n    ${sup.tostr()}\n    ${sub.tostr()}"
+    return "type mismatch :\n    ${sup.tostr(ispak=true)}\n    ${sub.tostr(ispak=true)}"
 }
 
 // Original call:
