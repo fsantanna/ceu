@@ -956,6 +956,15 @@ class TXExec {
        """.trimIndent())
         assert(out == "<.1>\n") { out }
     }
+    @Test
+    fun p08_type_hier_evt () {
+        val out = test(true, """
+        type Point = ()
+        type Event = [Point] + <()>
+        output std ()
+       """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 
     @Test
     fun pxx_type_hier () {

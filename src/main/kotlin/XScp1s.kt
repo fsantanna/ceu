@@ -72,7 +72,7 @@ fun Stmt.xinfScp1s () {
                         tp.xscps = tp.xscps ?: listOf((tp.wup as Type.Pointer).xscp!!)
                     }
                     // do not infer inside func/typedef declaration (it is inferred there)
-                    (tp.ups_first { it is Stmt.Typedef || it is Type.Func } != null) -> {}
+                    (tp.ups_first { it is Stmt.Typedef && it==def || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
                         tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Scp(TK.XSCP, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }

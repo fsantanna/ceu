@@ -28,12 +28,16 @@
     - tuples
       x = [1,2,3]
       x.1
+    - lists
+      xs = *[1,2,3]
+      xs?Null, xs!Cons
+      a * xs
     - vector
       x = #[1,2,3,...]
       x?1, x!1
       x?[v], x![v]
     - dicts
-      x = @[x=1,y=2,...]
+      x = %[x=1,y=2,...]
       x?x, x!x
       x?[v], x![v]
 - isSupOf for Nat, make it false against others
