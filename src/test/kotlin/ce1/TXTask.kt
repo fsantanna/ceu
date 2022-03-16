@@ -178,7 +178,7 @@ class TXTask {
     @Test
     fun a08_emit_block () {
         val out = test(true, """
-            type Event = <(),_int,_int>
+            type Event = <(),_uint64_t,_int>
             var f = task ()->()->() {
                 await evt?1
                 var e = evt!1

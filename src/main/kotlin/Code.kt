@@ -1,6 +1,8 @@
 data class Code (val type: String, val struct: String, val func: String, val stmt: String, val expr: String)
 val CODE = ArrayDeque<Code>()
+
 var Event = "_CEU_Event"
+var Event_Size = 8  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
 
 fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
@@ -163,8 +165,8 @@ fun code_ft (tp: Type) {
             val struct = """
                 // Type.Union.struct
                 struct $ce {
-                    int tag;
                     union {
+                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk_.id=="Event" }) "char _ceu[${Event_Size}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -185,6 +187,7 @@ fun code_ft (tp: Type) {
                             .joinToString("")
                         }
                     };
+                    int tag;
                 };
                 void output_std_${ce}_ (${tp.pos()}* v) {
                     // TODO: only if tp.isrec
@@ -443,7 +446,7 @@ fun code_fe (e: Expr) {
             val ID  = "_tmp_" + e.n
             val pos = xp.pos()
             val num = e.tk.field2num(e.xtype!!.yids)!!
-            val pre = "$pos $ID = (($pos) { $num , ._$num = ${arg.expr} });\n"
+            val pre = "$pos $ID = (($pos) { .tag=$num , ._$num = ${arg.expr} });\n"
             Code(tp.type+arg.type, tp.struct+arg.struct, tp.func+arg.func, arg.stmt + pre, ID)
         }
         is Expr.UNull -> CODE.removeFirst().let { Code(it.type, it.struct, it.func,"","NULL") }
@@ -837,7 +840,7 @@ fun code_fs (s: Stmt) {
                 ${if (up !is Expr.Func || up.tk.enu==TK.FUNC) "" else """
                 {
                     //task0->status = TASK_DYING;
-                    _CEU_Event evt = { EVENT_TASK, {.Task=(uint64_t)task0} };
+                    _CEU_Event evt = { .tag=EVENT_TASK, .payload={.Task=(uint64_t)task0} };
                     Stack stk = { stack, task0, &$blk };
                     bcast_event_block(&stk, GLOBAL, (_CEU_Event*) &evt);
                     if (stk.block == NULL) {
@@ -939,11 +942,12 @@ fun Stmt.code (): String {
         } EVENT;
         
         typedef struct _CEU_Event {
-            int tag;
             union {
+                char _ceu[${Event_Size}];  // max payload size
                 //void Kill;
                 uint64_t Task;  // cast from Task*
             } payload;
+            int tag;
         } _CEU_Event;
         
         // stack, task, evt
@@ -1112,7 +1116,7 @@ fun Stmt.code (): String {
                     block_bcast_kill(stack, task->links.blk_down);      // 1.1
                 }
                 if (task->status == TASK_AWAITING) {
-                    _CEU_Event evt = { EVENT_KILL };            
+                    _CEU_Event evt = { .tag=EVENT_KILL };            
                     task->f(stack, task, &evt);                     // 1.2
                 }
             }

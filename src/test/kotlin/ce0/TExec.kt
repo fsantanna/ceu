@@ -1911,6 +1911,16 @@ class TExec {
        """.trimIndent())
         assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button.1") { out }
     }
+    @Test
+    fun p13_type_hier_sub_ok () {
+        val out = all("""
+        type Hier = [_int] + <(),<(),()>>
+        var h: Hier
+        set h = Hier.2.2 [_10:_int]
+        output std h!0.1
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
 
     // ALL
 
