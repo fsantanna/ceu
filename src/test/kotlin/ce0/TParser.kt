@@ -63,7 +63,7 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 8): expected type : have \"end of file\"") {e.message!!}
+            assert(e.message == "(ln 1, col 8): expected type : have end of file") {e.message!!}
         }
     }
 
@@ -83,7 +83,7 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 2): expected type : have \"end of file\"") { e.message!! }
+            assert(e.message == "(ln 1, col 2): expected type : have end of file") { e.message!! }
         }
     }
 
@@ -294,7 +294,7 @@ class TParser {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 3): expected `)´ : have end of file") { e.message!! }
+            assert(e.message == "(ln 1, col 3): expected \")\" : have end of file") { e.message!! }
         }
     }
 

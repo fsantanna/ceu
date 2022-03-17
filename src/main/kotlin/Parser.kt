@@ -418,20 +418,19 @@ object Parser
         var e = this.expr_one(preid)
 
         // one!1~\.2?1
-        while (alls.acceptX("::")            ||
+        while (alls.acceptX("::") ||
                alls.acceptX("\\") ||
                alls.acceptX("~")  ||
                alls.acceptX(".")  ||
                alls.acceptX("!")  ||
                alls.acceptX("?")
         ) {
-            val tk0 = alls.tk0
-            val chr = if (tk0 is Tk.Fix) tk0 else null
+            val tk0 = alls.tk0 as Tk.Fix
 
-            if (chr?.str in arrayOf(".","!","?")) {
+            if (tk0.str in arrayOf(".","!","?")) {
                 alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept(TK.XNUM) || alls.acceptX("Null") || alls.err_tk1_unexpected()
 
-                if (chr!!.str == ".") {
+                if (tk0.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
                         "invalid field : unexpected type identifier"
                     }
@@ -445,12 +444,11 @@ object Parser
                 }
                 // automatic unpack only for [.,!,?]
                 //  pt.x, list!1, list?0
-                e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(chr,true,e) else e
+                e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(tk0,true,e) else e
             }
 
-            e = when (chr?.str) {
-                null -> {
-                    assert(tk0.str == "::")
+            e = when (tk0.str) {
+                "::" -> {
                     val tp = this.type()
                     Expr.Cast(tk0 as Tk.Fix, e, tp)
                 }
@@ -461,9 +459,9 @@ object Parser
                     ) {
                         "unexpected operand to `\\´"
                     }
-                    Expr.Dnref(chr, e)
+                    Expr.Dnref(tk0, e)
                 }
-                "~" -> Expr.Unpak(chr, false, e)
+                "~" -> Expr.Unpak(tk0, false, e)
                 "?" -> Expr.UPred(alls.tk0, e)
                 "!" -> Expr.UDisc(alls.tk0, e)
                 "." -> {

@@ -37,7 +37,7 @@ fun Tk.istask (): Boolean {
 fun TK.toErr (): String {
     return when (this) {
         TK.EOF  -> "end of file"
-        TK.XNAT -> "`_´"
+        TK.XNAT -> "\"_\""
         TK.Xide -> "variable identifier"
         TK.XIde -> "type identifier"
         TK.XIDE -> "uppercase identifier"
