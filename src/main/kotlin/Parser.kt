@@ -44,7 +44,7 @@ object Parser
 
                 Type.Func(tk0,
                     Triple(
-                        Scope(Tk.Scp(TK.SCP, "LOCAL", tk0.lin, tk0.col),null),
+                        Scope(Tk.Scp("LOCAL", tk0.lin, tk0.col),null),
                         if (scps==null) null else scps.map { Scope(it,null) },
                         ctrs
                     ),
@@ -198,7 +198,7 @@ object Parser
     fun scp1s (f: (Tk.Scp) -> Unit): List<Tk.Scp> {
         val scps = mutableListOf<Tk.Scp>()
         while (alls.accept(TK.id) || alls.accept(TK.ID)) {
-            val tk = Tk.Scp(TK.SCP, alls.tk0.str, alls.tk0.lin, alls.tk0.col)
+            val tk = Tk.Scp(alls.tk0.str, alls.tk0.lin, alls.tk0.col)
             f(tk)
             scps.add(tk)
             if (!alls.acceptX(",")) {
@@ -242,7 +242,7 @@ object Parser
                     // Bool.False
                     (tp.subs.size > 0) -> {
                         var ret = if (alls.checkExpr()) this.expr() else {
-                            Expr.Unit(Tk.Fix(TK.FIX, "()", alls.tk1.lin, alls.tk1.col))
+                            Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                         }
                         for (tk in tp.subs.reversed()) {
                             ret = Expr.UCons(tk, null, ret)
@@ -294,7 +294,7 @@ object Parser
                 val cons = if (alls.checkExpr()) {
                     this.expr()
                 } else {
-                    Expr.Unit(Tk.Fix(TK.FIX, "()", alls.tk1.lin, alls.tk1.col))
+                    Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                 }
                 alls.acceptX_err(">")
                 val ok = if (CE1) alls.acceptX(":") else alls.acceptX_err(":")
@@ -400,7 +400,7 @@ object Parser
             }
             e = Expr.Call(e.tk,
                 if (e is Expr.Unpak || !CE1) e else {
-                    Expr.Unpak(Tk.Fix(TK.FIX,"~",e.tk.lin,e.tk.col), true, e)
+                    Expr.Unpak(Tk.Fix("~",e.tk.lin,e.tk.col), true, e)
                 },
                 arg,
                 Pair(
@@ -773,7 +773,7 @@ object Parser
                 val false_ = if (alls.acceptX("else")) {
                     this.block()
                 } else {
-                    Stmt.Block(Tk.Fix(TK.FIX, "{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
+                    Stmt.Block(Tk.Fix("{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }

@@ -40,7 +40,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
             common + "<" + this.vec.mapIndexed { i,v -> this.yids.idx(i,'=') + v.tostr(lc) }.joinToString(",") + ">"
         }
         is Type.Active  -> "active " + this.tsk.tostr(lc)
-        is Type.Actives -> "active {${this.len?.num ?: ""}} " + this.tsk.tostr(lc)
+        is Type.Actives -> "active {${this.len?.str ?: ""}} " + this.tsk.tostr(lc)
         is Type.Func    -> {
             val ctrs = this.xscps.third.let {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }

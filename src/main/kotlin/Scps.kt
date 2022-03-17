@@ -16,7 +16,7 @@ fun Any.localBlockScp1Id (): String {
 fun Stmt.setScp1s () {
     fun fx (up: Any, scp: Scope) {
         scp.scp1 = if (scp.scp1.str != "LOCAL") scp.scp1 else {
-            Tk.Scp(TK.SCP, up.localBlockScp1Id(), scp.scp1.lin, scp.scp1.col)
+            Tk.Scp(up.localBlockScp1Id(), scp.scp1.lin, scp.scp1.col)
         }
     }
     this.visit(null, null, null, ::fx)

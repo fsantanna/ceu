@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder
 @TestMethodOrder(Alphanumeric::class)
 class TCode {
 
-    val tp_unit = Type.Unit(Tk.Fix(TK.FIX, "()", 1, 1))
+    val tp_unit = Type.Unit(Tk.Fix("()", 1, 1))
     // TYPE
 
     companion object {
@@ -24,7 +24,7 @@ class TCode {
     }
     @Test
     fun a02_type_tuple () {
-        val tp = Type.Tuple(Tk.Fix(TK.FIX, "[", 1, 1), listOf(tp_unit, tp_unit), null)
+        val tp = Type.Tuple(Tk.Fix("[", 1, 1), listOf(tp_unit, tp_unit), null)
         assert(tp.toce() == "T_Unit_Unit_T") { tp.toce() }
     }
 
@@ -32,46 +32,46 @@ class TCode {
 
     @Test
     fun b01_expr_unit () {
-        val e = Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1))
+        val e = Expr.Unit(Tk.Fix("()", 1, 1))
         e.wtype = tp_unit
         code_fe(e)
         assert(CODE.removeFirst().expr == "0")
     }
     @Test
     fun b02_expr_var () {
-        val e = Expr.Var(Tk.id(TK.id, "xxx", 1, 1))
+        val e = Expr.Var(Tk.id("xxx", 1, 1))
         e.wenv =
             Stmt.Var(
-                Tk.id(TK.id, "xxx", 1, 1),
-                Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
+                Tk.id("xxx", 1, 1),
+                Type.Nat(Tk.Nat("int", 1, 1, null))
             )
-        e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
+        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
         code_fe(e)
         CODE.removeFirst().let { assert(it.expr == "(global.xxx)") { it.expr } }
     }
     @Test
     fun b03_expr_nat () {
-        val e = Expr.Var(Tk.id(TK.NAT, "xxx", 1, 1))
+        val e = Expr.Var(Tk.id("xxx", 1, 1))
         e.wenv =
             Stmt.Var(
-                Tk.id(TK.id, "xxx", 1, 1),
-                Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
+                Tk.id("xxx", 1, 1),
+                Type.Nat(Tk.Nat("int", 1, 1, null))
             )
-        e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
+        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
         code_fe(e)
         assert(CODE.removeFirst().expr == "(global.xxx)")
     }
     @Test
     fun b04_expr_tuple () {
         val e = Expr.TCons(
-            Tk.Fix(TK.FIX, "(", 0, 0),
+            Tk.Fix("(", 0, 0),
             listOf(
-                Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1)),
-                Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1)),
+                Expr.Unit(Tk.Fix("()", 1, 1)),
+                Expr.Unit(Tk.Fix("()", 1, 1)),
             ),
             null
         )
-        e.wtype = Type.Tuple(Tk.Fix(TK.FIX, "[", 1, 1), listOf(tp_unit, tp_unit), null)
+        e.wtype = Type.Tuple(Tk.Fix("[", 1, 1), listOf(tp_unit, tp_unit), null)
         e.arg[0].wtype = tp_unit
         e.arg[1].wtype = tp_unit
         e.visit(null, ::code_fe, null, null)
@@ -82,16 +82,16 @@ class TCode {
     @Test
     fun b05_expr_index () {
         val e = Expr.TDisc(
-            Tk.Num(TK.NUM, "1", 1, 1, 1),
-            Expr.Var(Tk.id(TK.id, "x", 1, 1))
+            Tk.Num("1", 1, 1,),
+            Expr.Var(Tk.id("x", 1, 1))
         )
         e.tup.wenv =
             Stmt.Var(
-                Tk.id(TK.id, "x", 1, 1),
-                Type.Tuple(Tk.Fix(TK.FIX, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))), null)
+                Tk.id("x", 1, 1),
+                Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("int", 1, 1, null))), null)
             )
-        e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
-        e.tup.wtype = Type.Tuple(Tk.Fix(TK.FIX, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))), null)
+        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
+        e.tup.wtype = Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("int", 1, 1, null))), null)
         e.visit(null, ::code_fe, null, null)
         CODE.removeFirst().expr.let {
             assert(it == "(global.x)._1")
@@ -102,7 +102,7 @@ class TCode {
 
     @Test
     fun c01_stmt_pass () {
-        val s = Stmt.Nop(Tk.Err(TK.ERR, "", 1, 1))
+        val s = Stmt.Nop(Tk.Err("", 1, 1))
         s.visit(::code_fs, null, null, null)
         assert(CODE.removeFirst().stmt == "")
         assert(CODE.size == 0)
@@ -113,7 +113,7 @@ class TCode {
     @Disabled
     @Test
     fun d01 () {
-        val s = Stmt.Nop(Tk.Err(TK.ERR, "", 1, 1))
+        val s = Stmt.Nop(Tk.Err("", 1, 1))
         val out = s.code()
         assert(out == """
             #include <assert.h>

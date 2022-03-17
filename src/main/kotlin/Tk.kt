@@ -17,7 +17,7 @@ fun Tk.Nat.toce (): String {
 
 fun Tk.field2num (ids: List<Tk>?): Int? {
     return when {
-        this is Tk.Num -> this.num
+        this is Tk.Num -> this.str.toInt()
         //this is Tk.Fix -> null
         (ids == null)  -> null
         this is Tk.id -> ids!!.indexOfFirst{it.str==this.str}.let { if (it == -1) null else it+1 }

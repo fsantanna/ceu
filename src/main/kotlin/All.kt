@@ -19,8 +19,8 @@ val D = "\$"
 
 data class Alls (
     val stack: ArrayDeque<All> = ArrayDeque(),
-    var tk0:   Tk = Tk.Fix(TK.ERR,"",1,1),
-    var tk1:   Tk = Tk.Err(TK.ERR,"",1,1)
+    var tk0:   Tk = Tk.Err("",1,1),
+    var tk1:   Tk = Tk.Err("",1,1)
 )
 
 var alls = Alls()
@@ -47,8 +47,8 @@ fun All_nest (src: String, f: ()->Any): Any {
     //println(src)
     val old = alls.stack.removeFirst()
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
-    alls.tk0 = Tk.Fix(TK.ERR,"",1,1)
-    alls.tk1 = Tk.Err(TK.ERR,"",1,1)
+    alls.tk0 = Tk.Err("",1,1)
+    alls.tk1 = Tk.Err("",1,1)
     alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2),false))
     all().lin = old.lin
     all().col = 1
@@ -117,7 +117,17 @@ fun Alls.acceptX_err (str: String): Boolean {
 }
 
 fun Alls.check (enu: TK): Boolean {
-    return (this.tk1.enu == enu)
+    return when (enu) {
+        TK.id  -> this.tk1 is Tk.id
+        TK.Id  -> this.tk1 is Tk.Id
+        TK.ID  -> this.tk1 is Tk.ID
+        TK.SCP -> this.tk1 is Tk.Scp
+        TK.NAT -> this.tk1 is Tk.Nat
+        TK.NUM -> this.tk1 is Tk.Num
+        TK.CLK -> this.tk1 is Tk.Clk
+        TK.EOF -> this.tk1 is Tk.Eof
+        else   -> error("bug found")
+    }
 }
 
 fun Alls.checkX (str: String): Boolean {

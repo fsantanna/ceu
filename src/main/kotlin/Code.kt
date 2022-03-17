@@ -487,7 +487,7 @@ fun code_fe (e: Expr) {
                         {
                             ${if (upspawn !is Stmt.DSpawn) "" else {
                                 val dst = upspawn.dst as Expr.Var
-                                val len = ((dst.env(dst.tk.str) as Stmt.Var).xtype as Type.Actives).len?.num ?: 0
+                                val len = ((dst.env(dst.tk.str) as Stmt.Var).xtype as Type.Actives).len?.str?.toInt() ?: 0
                                 val mem = dst.tk.str.out_mem(e)
                                 "if ($len==0 || pool_size((Task*)&$mem)<$len) {"
                             }}

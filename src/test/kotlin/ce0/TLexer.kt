@@ -131,7 +131,7 @@ class TLexer {
     fun b10_lexer_xnum () {
         All_restart(null, PushbackReader(StringReader(".10"), 2))
         Lexer.lex(); Lexer.lex()
-        assert(alls.tk1 is Tk.Num && (alls.tk1 as Tk.Num).num==10)
+        assert(alls.tk1 is Tk.Num && alls.tk1.str=="10")
     }
 
     // XSCOPE

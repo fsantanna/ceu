@@ -323,7 +323,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("l!0"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.UDisc && (e.tk_ as Tk.Num).num==0)
+        assert(e is Expr.UDisc && (e.tk as Tk.Num).str=="0")
         /*
         try {
             Parser.expr()
@@ -471,7 +471,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("<.1 ()>:<()>"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.UCons && (e.tk as Tk.Num).num == 1 && e.arg is Expr.Unit)
+        assert(e is Expr.UCons && (e.tk as Tk.Num).str=="1" && e.arg is Expr.Unit)
     }
 
     @Test
@@ -479,7 +479,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("<.2 <.1 [(),()]>:<()>>:<()>"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.UCons && (e.tk as Tk.Num).num == 2 && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
+        assert(e is Expr.UCons && (e.tk as Tk.Num).str=="2" && e.arg is Expr.UCons && (e.arg as Expr.UCons).arg is Expr.TCons)
     }
 
     // INDEX
@@ -489,7 +489,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.1"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TDisc && (e.tk as Tk.Num).num==1 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && (e.tk as Tk.Num).str=="1" && e.tup is Expr.Var)
     }
 
     @Test
@@ -557,7 +557,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x!1"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.UDisc && (e.tk as Tk.Num).num==1 && e.uni is Expr.Var)
+        assert(e is Expr.UDisc && (e.tk as Tk.Num).str=="1" && e.uni is Expr.Var)
     }
 
     @Test
@@ -565,7 +565,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x?1"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.UPred && (e.tk as Tk.Num).num==1 && e.uni is Expr.Var)
+        assert(e is Expr.UPred && (e.tk as Tk.Num).str=="1" && e.uni is Expr.Var)
     }
 
     @Test
@@ -573,7 +573,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.10"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TDisc && (e.tk as Tk.Num).num==10 && e.tup is Expr.Var)
+        assert(e is Expr.TDisc && (e.tk as Tk.Num).str=="10" && e.tup is Expr.Var)
     }
 
     @Test
@@ -581,7 +581,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("arg.1\\!1.1"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TDisc && (e.tk as Tk.Num).num==1 && e.tup is Expr.UDisc)
+        assert(e is Expr.TDisc && (e.tk as Tk.Num).str=="1" && e.tup is Expr.UDisc)
     }
 
     // ATTR
@@ -592,7 +592,7 @@ class TParser {
         Lexer.lex()
         val e = Parser.attr()
         //println(e)
-        assert(e is Attr.TDisc && (e.tk as Tk.Num).num == 1)
+        assert(e is Attr.TDisc && (e.tk as Tk.Num).str=="1")
     }
 
     @Test
@@ -601,7 +601,7 @@ class TParser {
         Lexer.lex()
         val e = Parser.attr()
         //println(e)
-        assert(e is Attr.TDisc && (e.tk as Tk.Num).num == 1)
+        assert(e is Attr.TDisc && (e.tk as Tk.Num).str=="1")
     }
 
     // STMT
