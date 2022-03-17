@@ -34,14 +34,23 @@ fun Tk.istask (): Boolean {
     return this is Tk.id && this.str in arrayOf("pub","ret","status")
 }
 
+fun Tk.toPay (): String {
+    return when {
+        (this is Tk.Eof) -> "end of file"
+        (this is Tk.Scp) -> "\"@" + this.str + '"'
+        (this is Tk.Clk) -> "time constant"
+        else             -> '"'+this.str+'"'
+    }
+}
+
 fun TK.toErr (): String {
     return when (this) {
-        TK.EOF  -> "end of file"
+        TK.EOF -> "end of file"
         TK.NAT -> "\"_\""
-        TK.id -> "variable identifier"
-        TK.Id -> "type identifier"
-        TK.ID -> "uppercase identifier"
+        TK.id  -> "variable identifier"
+        TK.Id  -> "type identifier"
+        TK.ID  -> "uppercase identifier"
         TK.NUM -> "number"
-        else -> TODO(this.toString())
+        else   -> TODO(this.toString())
     }
 }

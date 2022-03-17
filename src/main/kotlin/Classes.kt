@@ -23,6 +23,7 @@ sealed class Tk (
     val col: Int,
 ) {
     data class Err (val enu_: TK, val str_: String, val lin_: Int, val col_: Int): Tk(enu_,str_,lin_,col_)
+    data class Eof (val enu_: TK, val str_: String, val lin_: Int, val col_: Int): Tk(enu_,str_,lin_,col_)
     data class Fix (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):   Tk(enu_,str_,lin_,col_)
     data class id  (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)
     data class Id  (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)

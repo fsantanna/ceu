@@ -34,12 +34,11 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
     fun Tk.clone (): Tk {
         return when (this) {
             is Tk.Err -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Eof -> this.copy(lin_ = lin, col_ = col)
             is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
-            is Tk.id -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Id -> this.copy(lin_ = lin, col_ = col)
-            is Tk.ID -> this.copy(lin_ = lin, col_ = col)
+            is Tk.id  -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Id  -> this.copy(lin_ = lin, col_ = col)
+            is Tk.ID  -> this.copy(lin_ = lin, col_ = col)
             is Tk.Scp -> this.copy(lin_ = lin, col_ = col)
             is Tk.Nat -> this.copy(lin_ = lin, col_ = col)
             is Tk.Num -> this.copy(lin_ = lin, col_ = col)

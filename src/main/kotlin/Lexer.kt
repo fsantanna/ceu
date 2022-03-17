@@ -107,7 +107,7 @@ object Lexer {
         var (c1, x1) = all().read()
 
         when {
-            (c1 == -1) -> alls.tk1 = Tk.Fix(TK.EOF, "", lin(), col())
+            (c1 == -1) -> alls.tk1 = Tk.Eof(TK.EOF, "", lin(), col())
             (x1 in listOf(')','{','}','[',']','<','>',';','=',',','\\','/','.','!','~','+')) -> {
                 alls.tk1 = Tk.Fix(TK.FIX, x1.toString(), lin(), col())
             }
@@ -285,7 +285,7 @@ object Lexer {
         alls.tk0 = alls.tk1
         blanks(); while (lincol()) { blanks() }
         token()
-        while (all().isinc && alls.tk1.enu==TK.EOF) {
+        while (all().isinc && alls.tk1 is Tk.Eof) {
             alls.stack.removeFirst()
             blanks(); while (lincol()) { blanks() }
             token()

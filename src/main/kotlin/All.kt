@@ -140,15 +140,6 @@ fun Alls.checkX_err (str: String): Boolean {
     return ret
 }
 
-fun Tk.toPay (): String {
-    return when {
-        (this.enu == TK.EOF) -> "end of file"
-        (this is Tk.Scp)     -> "\"@" + this.str + '"'
-        (this is Tk.Clk)     -> "time constant"
-        else                 -> '"'+this.str+'"'
-    }
-}
-
 fun Alls.err_expected (str: String): Boolean {
     val file = all().file.let { if (it==null) "" else it+" : " }
     error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): expected $str : have ${this.tk1.toPay()}")
