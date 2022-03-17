@@ -409,7 +409,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
-            val pos = if (e.tk.enu == TK.NULL) {
+            val pos = if (e.tk.str == "Null") {
                 "(&${it.expr} == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
                 val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
@@ -837,7 +837,7 @@ fun code_fs (s: Stmt) {
             _BLOCK_${s.n}_:
             
                 // task event
-                ${if (up !is Expr.Func || up.tk.enu==TK.FUNC) "" else """
+                ${if (up !is Expr.Func || up.tk.str=="func") "" else """
                 {
                     //task0->status = TASK_DYING;
                     _CEU_Event evt = { .tag=EVENT_TASK, .payload={.Task=(uint64_t)task0} };

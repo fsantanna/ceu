@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder
 @TestMethodOrder(Alphanumeric::class)
 class TCode {
 
-    val tp_unit = Type.Unit(Tk.Sym(TK.UNIT, "()", 1, 1))
+    val tp_unit = Type.Unit(Tk.Fix(TK.FIX, "()", 1, 1))
     // TYPE
 
     companion object {
@@ -24,7 +24,7 @@ class TCode {
     }
     @Test
     fun a02_type_tuple () {
-        val tp = Type.Tuple(Tk.Chr(TK.CHAR, "[", 1, 1), listOf(tp_unit, tp_unit), null)
+        val tp = Type.Tuple(Tk.Fix(TK.FIX, "[", 1, 1), listOf(tp_unit, tp_unit), null)
         assert(tp.toce() == "T_Unit_Unit_T") { tp.toce() }
     }
 
@@ -32,7 +32,7 @@ class TCode {
 
     @Test
     fun b01_expr_unit () {
-        val e = Expr.Unit(Tk.Sym(TK.UNIT, "()", 1, 1))
+        val e = Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1))
         e.wtype = tp_unit
         code_fe(e)
         assert(CODE.removeFirst().expr == "0")
@@ -64,14 +64,14 @@ class TCode {
     @Test
     fun b04_expr_tuple () {
         val e = Expr.TCons(
-            Tk.Chr(TK.CHAR, "(", 0, 0),
+            Tk.Fix(TK.FIX, "(", 0, 0),
             listOf(
-                Expr.Unit(Tk.Sym(TK.UNIT, "()", 1, 1)),
-                Expr.Unit(Tk.Sym(TK.UNIT, "()", 1, 1)),
+                Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1)),
+                Expr.Unit(Tk.Fix(TK.FIX, "()", 1, 1)),
             ),
             null
         )
-        e.wtype = Type.Tuple(Tk.Chr(TK.CHAR, "[", 1, 1), listOf(tp_unit, tp_unit), null)
+        e.wtype = Type.Tuple(Tk.Fix(TK.FIX, "[", 1, 1), listOf(tp_unit, tp_unit), null)
         e.arg[0].wtype = tp_unit
         e.arg[1].wtype = tp_unit
         e.visit(null, ::code_fe, null, null)
@@ -88,10 +88,10 @@ class TCode {
         e.tup.wenv =
             Stmt.Var(
                 Tk.ide(TK.Xide, "x", 1, 1),
-                Type.Tuple(Tk.Chr(TK.CHAR, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.XNAT, "int", 1, 1, null))), null)
+                Type.Tuple(Tk.Fix(TK.FIX, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.XNAT, "int", 1, 1, null))), null)
             )
         e.wtype = Type.Nat(Tk.Nat(TK.XNAT, "int", 1, 1, null))
-        e.tup.wtype = Type.Tuple(Tk.Chr(TK.CHAR, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.XNAT, "int", 1, 1, null))), null)
+        e.tup.wtype = Type.Tuple(Tk.Fix(TK.FIX, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.XNAT, "int", 1, 1, null))), null)
         e.visit(null, ::code_fe, null, null)
         CODE.removeFirst().expr.let {
             assert(it == "(global.x)._1")

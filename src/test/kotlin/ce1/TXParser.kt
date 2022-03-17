@@ -142,7 +142,7 @@ class TXParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 15): expected `:´ : have `=´") { e.message!! }
+            assert(e.message == "(ln 1, col 15): expected \":\" : have \"=\"") { e.message!! }
         }
     }
 }

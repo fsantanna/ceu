@@ -19,7 +19,7 @@ val D = "\$"
 
 data class Alls (
     val stack: ArrayDeque<All> = ArrayDeque(),
-    var tk0:   Tk = Tk.Key(TK.ERR,"",1,1),
+    var tk0:   Tk = Tk.Fix(TK.ERR,"",1,1),
     var tk1:   Tk = Tk.Err(TK.ERR,"",1,1)
 )
 
@@ -47,7 +47,7 @@ fun All_nest (src: String, f: ()->Any): Any {
     //println(src)
     val old = alls.stack.removeFirst()
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
-    alls.tk0 = Tk.Key(TK.ERR,"",1,1)
+    alls.tk0 = Tk.Fix(TK.ERR,"",1,1)
     alls.tk1 = Tk.Err(TK.ERR,"",1,1)
     alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2),false))
     all().lin = old.lin
@@ -88,34 +88,54 @@ fun All.unread (i: Int) {
     }
 }
 
-fun Alls.accept (enu: TK, chr: Char? = null): Boolean {
-    val ret = this.check(enu, chr)
+fun Alls.accept (enu: TK): Boolean {
+    val ret = this.check(enu)
     if (ret) {
         Lexer.lex()
     }
     return ret
 }
 
-fun Alls.accept_err (enu: TK, chr: Char? = null): Boolean {
-    val ret = this.accept(enu,chr)
-    if (!ret) {
-        this.err_expected(enu.toErr(chr))
+fun Alls.acceptX (str: String): Boolean {
+    val ret = this.checkX(str)
+    if (ret) {
+        Lexer.lex()
     }
+    return ret
+}
+
+fun Alls.accept_err (enu: TK): Boolean {
+    this.check_err(enu)
+    this.accept(enu)
     return true
 }
 
-fun Alls.check (enu: TK, chr: Char? = null): Boolean {
-    return when {
-        (this.tk1.enu != enu) -> false
-        (chr == null)         -> true
-        else -> (this.tk1 as Tk.Chr).str == chr.toString()
-    }
+fun Alls.acceptX_err (str: String): Boolean {
+    this.checkX_err(str)
+    this.acceptX(str)
+    return true
 }
 
-fun Alls.check_err (enu: TK, chr: Char? = null): Boolean {
-    val ret = this.check(enu,chr)
+fun Alls.check (enu: TK): Boolean {
+    return (this.tk1.enu == enu)
+}
+
+fun Alls.checkX (str: String): Boolean {
+    return (alls.tk1.str == str)
+}
+
+fun Alls.check_err (enu: TK): Boolean {
+    val ret = this.check(enu)
     if (!ret) {
-        this.err_expected(enu.toErr(chr))
+        this.err_expected(enu.toErr())
+    }
+    return ret
+}
+
+fun Alls.checkX_err (str: String): Boolean {
+    val ret = this.checkX(str)
+    if (!ret) {
+        this.err_expected('"'+str+'"')
     }
     return ret
 }
@@ -123,18 +143,9 @@ fun Alls.check_err (enu: TK, chr: Char? = null): Boolean {
 fun Tk.toPay (): String {
     return when {
         (this.enu == TK.EOF) -> "end of file"
-        (this is Tk.Err)     -> '"' + this.str + '"'
-        (this is Tk.Chr)     -> "`" + this.str + "´"
-        (this is Tk.Sym)     -> '`' + this.str + '´'
-        (this is Tk.ide)     -> '"' + this.str + '"'
-        (this is Tk.Ide)     -> '"' + this.str + '"'
-        (this is Tk.IDE)     -> '"' + this.str + '"'
         (this is Tk.Scp)     -> "\"@" + this.str + '"'
-        (this is Tk.Num)     -> "" + this.num
         (this is Tk.Clk)     -> "time constant"
-        (this is Tk.Key)     -> '`' + this.str + '`'
-        (this is Tk.Nat)     -> '"' + this.str + '"'
-        else -> TODO(this.toString())
+        else                 -> '"'+this.str+'"'
     }
 }
 
@@ -167,10 +178,10 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 }
 
 fun Alls.checkExpr (): Boolean {
-    return this.check(TK.CHAR, '(') || this.check(TK.UNIT) || this.check(TK.Xide) || this.check(TK.XNAT)
-        || this.check(TK.CHAR, '[') || this.check(TK.CHAR, '<') || this.check(TK.NEW)
-        || this.check(TK.CHAR, '/') || this.check(TK.FUNC) || this.check(TK.TASK)
-        || alls.tk1 is Tk.Ide || this.check(TK.NULL)
+    return this.checkX("(") || this.checkX("()") || this.check(TK.Xide) || this.check(TK.XNAT)
+        || this.checkX("[") || this.checkX("<") || this.checkX("new")
+        || this.checkX("/") || this.checkX("func") || this.checkX("task")
+        || alls.tk1 is Tk.Ide || this.checkX("Null")
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {

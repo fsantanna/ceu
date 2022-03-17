@@ -822,7 +822,7 @@ class TXExec {
             ^"test-func.ceu"
             output () f _10
         """.trimIndent())
-        assert(out == "(ln 2, col 8): expected variable identifier : have `()´") { out }
+        assert(out == "(ln 2, col 8): expected variable identifier : have \"()\"") { out }
     }
     @Test
     fun g04_include_err () {

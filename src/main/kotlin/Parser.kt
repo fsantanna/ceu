@@ -5,29 +5,29 @@ object Parser
             (preid!=null || alls.accept(TK.XIde)) -> {
                 val tk0 = preid ?: alls.tk0 as Tk.Ide
                 val subs = mutableListOf<Tk>()
-                while (alls.accept(TK.CHAR,'.')) {
+                while (alls.acceptX(".")) {
                     alls.accept(TK.XNUM) || (CE1 && alls.accept(TK.XIde)) || alls.err_expected("field")
                     subs.add(alls.tk0)
                 }
-                val scps = if (!alls.accept(TK.ATBRACK)) null else {
+                val scps = if (!alls.acceptX("@[")) null else {
                     val ret = this.scp1s { }
-                    alls.accept_err(TK.CHAR, ']')
+                    alls.acceptX_err("]")
                     ret
                 }
                 Type.Named(tk0, subs, false, scps?.map { Scope(it,null) })
             }
-            alls.accept(TK.CHAR, '/') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("/") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val pln = this.type()
                 val scp = alls.accept(TK.XSCP)
                 Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
             }
-            alls.accept(TK.FUNC) || alls.accept(TK.TASK) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("func") || alls.acceptX("task") -> {
+                val tk0 = alls.tk0 as Tk.Fix
 
-                val (scps, ctrs) = if (alls.check(TK.ATBRACK)) {
+                val (scps, ctrs) = if (alls.checkX("@[")) {
                     val (x, y) = this.scopepars()
-                    alls.accept_err(TK.ARROW)
+                    alls.acceptX_err("->")
                     Pair(x, y)
                 } else {
                     Pair(null, null)
@@ -35,11 +35,11 @@ object Parser
 
                 // input & pub & output
                 val inp = this.type()
-                val pub = if (tk0.enu != TK.FUNC) {
-                    alls.accept_err(TK.ARROW)
+                val pub = if (tk0.str != "func") {
+                    alls.acceptX_err("->")
                     this.type()
                 } else null
-                alls.accept_err(TK.ARROW)
+                alls.acceptX_err("->")
                 val out = this.type() // right associative
 
                 Type.Func(tk0,
@@ -50,19 +50,19 @@ object Parser
                     ),
                     inp, pub, out)
             }
-            alls.accept(TK.UNIT) -> Type.Unit(alls.tk0 as Tk.Sym)
+            alls.acceptX("()") -> Type.Unit(alls.tk0 as Tk.Fix)
             alls.accept(TK.XNAT) -> Type.Nat(alls.tk0 as Tk.Nat)
-            alls.accept(TK.CHAR, '(') -> {
+            alls.acceptX("(") -> {
                 val tp = this.type()
-                alls.accept_err(TK.CHAR, ')')
+                alls.acceptX_err(")")
                 tp
             }
-            alls.accept(TK.CHAR, '[') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("[") -> {
+                val tk0 = alls.tk0 as Tk.Fix
 
                 val hasid = alls.accept(TK.Xide)
                 val id = alls.tk0
-                val haseq = hasid && alls.accept(TK.CHAR, ':')
+                val haseq = hasid && alls.acceptX(":")
                 if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
 
                 val tp = when {
@@ -75,21 +75,21 @@ object Parser
                 val ids = if (haseq) arrayListOf(id) else null
 
                 while (true) {
-                    if (!alls.accept(TK.CHAR, ',')) {
+                    if (!alls.acceptX(",")) {
                         break
                     }
                     if (haseq) {
                         alls.accept_err(TK.Xide)
                         ids!!.add(alls.tk0 as Tk.ide)
-                        alls.accept_err(TK.CHAR,':')
+                        alls.acceptX_err(":")
                     }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
-                alls.accept_err(TK.CHAR, ']')
+                alls.acceptX_err("]")
                 Type.Tuple(tk0, tps, ids as List<Tk.ide>?).let {
-                    if (!alls.accept(TK.CHAR,'+')) it else {
-                        alls.check_err(TK.CHAR,'<')
+                    if (!alls.acceptX("+")) it else {
+                        alls.checkX_err("<")
                         val uni = this.type() as Type.Union
 
                         fun Type?.add (inc: Type.Tuple): Type.Tuple {
@@ -137,12 +137,12 @@ object Parser
                     }
                 }
             }
-            alls.accept(TK.CHAR, '<') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("<") -> {
+                val tk0 = alls.tk0 as Tk.Fix
 
                 val hasid = alls.accept(TK.XIde)
                 val id = alls.tk0
-                val haseq = hasid && alls.accept(TK.CHAR, '=')
+                val haseq = hasid && alls.acceptX("=")
                 if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
 
                 val tp = when {
@@ -155,31 +155,31 @@ object Parser
                 val ids = if (haseq) arrayListOf(id) else null
 
                 while (true) {
-                    if (!alls.accept(TK.CHAR, ',')) {
+                    if (!alls.acceptX(",")) {
                         break
                     }
                     if (haseq) {
                         alls.accept_err(TK.XIde)
                         ids!!.add(alls.tk0 as Tk.Ide)
-                        alls.accept_err(TK.CHAR,'=')
+                        alls.acceptX_err("=")
                     }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
-                alls.accept_err(TK.CHAR, '>')
+                alls.acceptX_err(">")
                 Type.Union(tk0, null, tps, ids as List<Tk.Ide>?)
             }
-            alls.accept(TK.ACTIVE) -> {
-                val tk0 = alls.tk0 as Tk.Key
-                val (isdyn,len) = if (!alls.accept(TK.CHAR,'{')) Pair(false,null) else {
+            alls.acceptX("active") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val (isdyn,len) = if (!alls.acceptX("{")) Pair(false,null) else {
                     val len = if (alls.accept(TK.XNUM)) alls.tk0 as Tk.Num else null
-                    alls.accept_err(TK.CHAR, '}')
+                    alls.acceptX_err("}")
                     Pair(true, len)
                 }
-                //alls.check_err(TK.TASK)
+                //alls.checkX_err("task)
                 val task = this.type()
                 //assert(task is Type.Func && task.tk.enu == TK.TASK)
-                All_assert_tk(tk0, task is Type.Named || task is Type.Func && task.tk.enu==TK.TASK) {
+                All_assert_tk(tk0, task is Type.Named || task is Type.Func && task.tk.str=="task") {
                     "invalid type : expected task type"
                 }
                 if (isdyn) {
@@ -201,39 +201,39 @@ object Parser
             val tk = Tk.Scp(TK.XSCP, alls.tk0.str, alls.tk0.lin, alls.tk0.col)
             f(tk)
             scps.add(tk)
-            if (!alls.accept(TK.CHAR, ',')) {
+            if (!alls.acceptX(",")) {
                 break
             }
         }
         return scps
     }
     fun scopepars (): Pair<List<Tk.Scp>, List<Pair<String, String>>> {
-        alls.accept_err(TK.ATBRACK)
+        alls.acceptX_err("@[")
         val scps = this.scp1s {
             All_assert_tk(it, it.str.none { it.isUpperCase() }) { "invalid scope parameter identifier" }
         }
         val ctrs = mutableListOf<Pair<String, String>>()
-        if (alls.accept(TK.CHAR, ':')) {
+        if (alls.acceptX(":")) {
             while (alls.accept(TK.Xide)) {
                 val id1 = (alls.tk0 as Tk.ide).str
-                alls.accept_err(TK.CHAR, '>')
+                alls.acceptX_err(">")
                 alls.accept_err(TK.Xide)
                 val id2 = (alls.tk0 as Tk.ide).str
                 ctrs.add(Pair(id1, id2))
-                if (!alls.accept(TK.CHAR, ',')) {
+                if (!alls.acceptX(",")) {
                     break
                 }
             }
         }
-        alls.accept_err(TK.CHAR, ']')
+        alls.acceptX_err("]")
         return Pair(scps, ctrs)
     }
 
     fun expr_one (preid: Tk.ide?): Expr {
         return when {
             // Bool.False, Pair [x,y], active Task {}
-            alls.accept(TK.ACTIVE) || alls.check(TK.XIde) -> {
-                val isact = (alls.tk0.enu == TK.ACTIVE)
+            alls.acceptX("active") || alls.check(TK.XIde) -> {
+                val isact = (alls.tk0.str == "active")
                 alls.check_err(TK.XIde)
                 val id = alls.tk1
                 //var tp = this.type() as Type.Named
@@ -242,7 +242,7 @@ object Parser
                     // Bool.False
                     (tp.subs.size > 0) -> {
                         var ret = if (alls.checkExpr()) this.expr() else {
-                            Expr.Unit(Tk.Sym(TK.UNIT, "()", alls.tk1.lin, alls.tk1.col))
+                            Expr.Unit(Tk.Fix(TK.FIX, "()", alls.tk1.lin, alls.tk1.col))
                         }
                         for (tk in tp.subs.reversed()) {
                             ret = Expr.UCons(tk, null, ret)
@@ -265,14 +265,14 @@ object Parser
             }
             alls.accept(TK.XNAT) -> {
                 val tk0 = alls.tk0 as Tk.Nat
-                val tp = if (!alls.accept(TK.CHAR, ':')) null else {
+                val tp = if (!alls.acceptX(":")) null else {
                     this.type()
                 }
                 Expr.Nat(tk0, tp)
             }
-            alls.accept(TK.NULL) -> {
-                val tk0 = alls.tk0 as Tk.Key
-                val tp = if (!alls.accept(TK.CHAR, ':')) null else {
+            alls.acceptX("Null") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val tp = if (!alls.acceptX(":")) null else {
                     val tp = this.type()
                     All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Named) {
                         "invalid type : expected pointer to alias type"
@@ -281,8 +281,8 @@ object Parser
                 }
                 Expr.UNull(tk0, tp as Type.Pointer?)
             }
-            alls.accept(TK.CHAR, '<') -> {
-                alls.accept_err(TK.CHAR, '.')
+            alls.acceptX("<") -> {
+                alls.acceptX_err(".")
 
                 alls.accept(TK.XIde) || alls.accept_err(TK.XNUM)
                 val dsc = alls.tk0
@@ -294,10 +294,10 @@ object Parser
                 val cons = if (alls.checkExpr()) {
                     this.expr()
                 } else {
-                    Expr.Unit(Tk.Sym(TK.UNIT, "()", alls.tk1.lin, alls.tk1.col))
+                    Expr.Unit(Tk.Fix(TK.FIX, "()", alls.tk1.lin, alls.tk1.col))
                 }
-                alls.accept_err(TK.CHAR, '>')
-                val ok = if (CE1) alls.accept(TK.CHAR, ':') else alls.accept_err(TK.CHAR, ':')
+                alls.acceptX_err(">")
+                val ok = if (CE1) alls.acceptX(":") else alls.acceptX_err(":")
                 val tp = if (!ok) null else {
                     val tp = this.type()
                     All_assert_tk(tp.tk,tp is Type.Union) {
@@ -311,23 +311,23 @@ object Parser
                     Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons!!), null, null)
                 }
             }
-            alls.accept(TK.NEW) -> {
+            alls.acceptX("new") -> {
                 val tk0 = alls.tk0
                 val e = this.expr()
                 All_assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons)) {
                     "invalid `new` : expected constructor"
                 }
 
-                val scp = if (!alls.accept(TK.CHAR, ':')) null else {
+                val scp = if (!alls.acceptX(":")) null else {
                     alls.accept_err(TK.XSCP)
                     alls.tk0 as Tk.Scp
                 }
-                Expr.New(tk0 as Tk.Key, if (scp==null) null else Scope(scp,null), e)
+                Expr.New(tk0 as Tk.Fix, if (scp==null) null else Scope(scp,null), e)
             }
-            alls.accept(TK.UNIT) -> Expr.Unit(alls.tk0 as Tk.Sym)
+            alls.acceptX("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
             (preid!=null || alls.accept(TK.Xide)) -> Expr.Var(alls.tk0 as Tk.ide)
-            alls.accept(TK.CHAR, '/') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("/") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
                 All_assert_tk(
                     alls.tk0,
@@ -337,17 +337,17 @@ object Parser
                 }
                 Expr.Upref(tk0, e)
             }
-            alls.accept(TK.CHAR, '(') -> {
+            alls.acceptX("(") -> {
                 val e = this.expr()
-                alls.accept_err(TK.CHAR, ')')
+                alls.acceptX_err(")")
                 e
             }
-            alls.accept(TK.CHAR, '[') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("[") -> {
+                val tk0 = alls.tk0 as Tk.Fix
 
                 val hasid = alls.accept(TK.Xide)
                 val id = alls.tk0
-                val haseq = alls.accept(TK.CHAR, '=')
+                val haseq = alls.acceptX("=")
                 if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
 
                 val e = this.expr(if (hasid && !haseq) (id as Tk.ide) else null)
@@ -355,25 +355,25 @@ object Parser
                 val ids = if (haseq) arrayListOf(id as Tk.ide) else null
 
                 while (true) {
-                    if (!alls.accept(TK.CHAR, ',')) {
+                    if (!alls.acceptX(",")) {
                         break
                     }
                     if (haseq) {
                         alls.accept_err(TK.Xide)
                         ids!!.add(alls.tk0 as Tk.ide)
-                        alls.accept(TK.CHAR, '=')
+                        alls.acceptX("=")
                     }
                     val e2 = this.expr()
                     es.add(e2)
                 }
-                alls.accept_err(TK.CHAR, ']')
+                alls.acceptX_err("]")
                 val ret = Expr.TCons(tk0, es, ids)
                 if (!CE1) ret else {
                     Expr.Pak(ret.tk, ret, null, null)
                 }
             }
-            alls.check(TK.TASK) || alls.check(TK.FUNC) -> {
-                val tk = alls.tk1 as Tk.Key
+            alls.checkX("task") || alls.checkX("func") -> {
+                val tk = alls.tk1 as Tk.Fix
                 val tp = this.type() as Type.Func
                 val block = this.block()
                 Expr.Func(tk, tp, block)
@@ -387,20 +387,20 @@ object Parser
     fun expr (preid: Tk.ide? = null): Expr {
         var e = this.expr_dots(preid)
         // call
-        if (alls.checkExpr() || alls.check(TK.ATBRACK)) {
-            val iscps = if (!alls.accept(TK.ATBRACK)) null else {
+        if (alls.checkExpr() || alls.checkX("@[")) {
+            val iscps = if (!alls.acceptX("@[")) null else {
                 val ret = this.scp1s { }
-                alls.accept_err(TK.CHAR, ']')
+                alls.acceptX_err("]")
                 ret
             }
             val arg = this.expr()
-            val oscp = if (!alls.accept(TK.CHAR, ':')) null else {
+            val oscp = if (!alls.acceptX(":")) null else {
                 alls.accept_err(TK.XSCP)
                 alls.tk0 as Tk.Scp
             }
             e = Expr.Call(e.tk,
                 if (e is Expr.Unpak || !CE1) e else {
-                    Expr.Unpak(Tk.Chr(TK.CHAR,"~",e.tk.lin,e.tk.col), true, e)
+                    Expr.Unpak(Tk.Fix(TK.FIX,"~",e.tk.lin,e.tk.col), true, e)
                 },
                 arg,
                 Pair(
@@ -418,25 +418,25 @@ object Parser
         var e = this.expr_one(preid)
 
         // one!1~\.2?1
-        while (alls.accept(TK.CAST)            ||
-               alls.accept(TK.CHAR, '\\') ||
-               alls.accept(TK.CHAR, '~')  ||
-               alls.accept(TK.CHAR, '.')  ||
-               alls.accept(TK.CHAR, '!')  ||
-               alls.accept(TK.CHAR,'?')
+        while (alls.acceptX("::")            ||
+               alls.acceptX("\\") ||
+               alls.acceptX("~")  ||
+               alls.acceptX(".")  ||
+               alls.acceptX("!")  ||
+               alls.acceptX("?")
         ) {
             val tk0 = alls.tk0
-            val chr = if (tk0 is Tk.Chr) tk0 else null
+            val chr = if (tk0 is Tk.Fix) tk0 else null
 
             if (chr?.str in arrayOf(".","!","?")) {
-                alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept(TK.XNUM) || alls.accept(TK.NULL) || alls.err_tk1_unexpected()
+                alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept(TK.XNUM) || alls.acceptX("Null") || alls.err_tk1_unexpected()
 
                 if (chr!!.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
                         "invalid field : unexpected type identifier"
                     }
                 } else {
-                    All_assert_tk(alls.tk0, alls.tk0.enu!=TK.NULL || e is Expr.Dnref) {
+                    All_assert_tk(alls.tk0, alls.tk0.str!="Null" || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be null"
                     }
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.ide) {
@@ -450,9 +450,9 @@ object Parser
 
             e = when (chr?.str) {
                 null -> {
-                    assert(tk0.enu == TK.CAST)
+                    assert(tk0.str == "::")
                     val tp = this.type()
-                    Expr.Cast(tk0 as Tk.Sym, e, tp)
+                    Expr.Cast(tk0 as Tk.Fix, e, tp)
                 }
                 "\\" -> {
                     All_assert_tk(
@@ -479,7 +479,7 @@ object Parser
         return e
     }
     fun where (s: Stmt): Stmt {
-        alls.accept_err(TK.XWHERE)
+        alls.acceptX_err("where")
         val tk0 = alls.tk0
         val blk = this.block()
         assert(!blk.iscatch && blk.scp1?.str.isanon()) { "TODO" }
@@ -533,12 +533,12 @@ object Parser
         var e = when {
             alls.accept(TK.Xide) -> Attr.Var(alls.tk0 as Tk.ide)
             alls.accept(TK.XNAT) -> {
-                alls.accept_err(TK.CHAR, ':')
+                alls.acceptX_err(":")
                 val tp = this.type()
                 Attr.Nat(alls.tk0 as Tk.Nat, tp)
             }
-            alls.accept(TK.CHAR, '\\') -> {
-                val tk0 = alls.tk0 as Tk.Chr
+            alls.acceptX("\\") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val e = this.attr()
                 All_assert_tk(
                     alls.tk0,
@@ -548,9 +548,9 @@ object Parser
                 }
                 Attr.Dnref(tk0, e)
             }
-            alls.accept(TK.CHAR, '(') -> {
+            alls.acceptX("(") -> {
                 val e = this.attr()
-                alls.accept_err(TK.CHAR, ')')
+                alls.acceptX_err(")")
                 e
             }
             else -> {
@@ -560,12 +560,12 @@ object Parser
         }
 
         // one.1!\~.2.1?
-        while (alls.accept(TK.CHAR, '\\') ||
-               alls.accept(TK.CHAR, '~') ||
-               alls.accept(TK.CHAR, '.') ||
-               alls.accept(TK.CHAR, '!')
+        while (alls.acceptX("\\") ||
+               alls.acceptX("~") ||
+               alls.acceptX(".") ||
+               alls.acceptX("!")
         ) {
-            val chr = alls.tk0 as Tk.Chr
+            val chr = alls.tk0 as Tk.Fix
 
             if (chr.str !in arrayOf(".","!")) null else {
                 alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
@@ -609,9 +609,9 @@ object Parser
     }
 
     fun block (): Stmt.Block {
-        val iscatch = (alls.tk0.enu == TK.CATCH)
-        alls.accept_err(TK.CHAR, '{')
-        val tk0 = alls.tk0 as Tk.Chr
+        val iscatch = (alls.tk0.str == "catch")
+        alls.acceptX_err("{")
+        val tk0 = alls.tk0 as Tk.Fix
         val scp1 = if (!alls.accept(TK.XSCP)) null else {
             val tk = alls.tk0 as Tk.Scp
             All_assert_tk(tk, tk.str.none { it.isLowerCase() }) {
@@ -621,7 +621,7 @@ object Parser
         }
 
         val ss = this.stmts()
-        alls.accept_err(TK.CHAR, '}')
+        alls.acceptX_err("}")
         return Stmt.Block(tk0, iscatch, scp1, ss)
     }
     fun stmts (): Stmt {
@@ -635,8 +635,8 @@ object Parser
 
         var ret: Stmt = Stmt.Nop(alls.tk0)
         while (true) {
-            alls.accept(TK.CHAR, ';')
-            val isend = alls.check(TK.CHAR, '}') || alls.check(TK.EOF)
+            alls.acceptX(";")
+            val isend = alls.checkX("}") || alls.check(TK.EOF)
             if (!isend) {
                 val s = this.stmt()
                 ret = enseq(ret, s)
@@ -655,12 +655,12 @@ object Parser
     }
     fun stmt (): Stmt {
         return when {
-            alls.accept(TK.SET) -> {
+            alls.acceptX("set") -> {
                 val dst = this.attr().toExpr()
-                alls.accept_err(TK.CHAR, '=')
-                val tk0 = alls.tk0 as Tk.Chr
+                alls.acceptX_err("=")
+                val tk0 = alls.tk0 as Tk.Fix
                 when {
-                    alls.accept(TK.AWAIT) -> {
+                    alls.acceptX("await") -> {
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                         All_nest(
@@ -678,16 +678,16 @@ object Parser
                             this.stmts()
                         } as Stmt
                     }
-                    alls.accept(TK.INPUT) -> {
-                        val tk = alls.tk0 as Tk.Key
+                    alls.acceptX("input") -> {
+                        val tk = alls.tk0 as Tk.Fix
                         alls.accept_err(TK.Xide)
                         val lib = (alls.tk0 as Tk.ide)
                         val arg = this.expr()
-                        alls.accept_err(TK.CHAR, ':')
+                        alls.acceptX_err(":")
                         val tp = this.type()
                         Stmt.Input(tk, tp, dst, lib, arg)
                     }
-                    alls.check(TK.SPAWN) -> {
+                    alls.checkX("spawn") -> {
                         val s = this.stmt()
                         All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
                         val ss = s as Stmt.SSpawn
@@ -699,41 +699,41 @@ object Parser
                     }
                 }
             }
-            alls.accept(TK.VAR) -> {
+            alls.acceptX("var") -> {
                 alls.accept_err(TK.Xide)
                 val tk_id = alls.tk0 as Tk.ide
-                val tp = if (!alls.accept(TK.CHAR, ':')) null else {
+                val tp = if (!alls.acceptX(":")) null else {
                     this.type()
                 }
-                if (!alls.accept(TK.CHAR, '=')) {
+                if (!alls.acceptX("=")) {
                     if (tp == null) {
                         alls.err_expected("type declaration")
                     }
                     Stmt.Var(tk_id, tp)
-                } else if (alls.accept(TK.VAR)) {
+                } else if (alls.acceptX("var")) {
                     Stmt.Var(tk_id, null)
                 } else {
                     fun tpor(inf: String): String? {
                         return if (tp == null) inf else null
                     }
-                    val tk0 = alls.tk0 as Tk.Chr
+                    val tk0 = alls.tk0 as Tk.Fix
                     val dst = Expr.Var(tk_id)
                     val src = when {
-                        alls.accept(TK.INPUT) -> {
-                            val tk = alls.tk0 as Tk.Key
+                        alls.acceptX("input") -> {
+                            val tk = alls.tk0 as Tk.Fix
                             alls.accept_err(TK.Xide)
                             val lib = (alls.tk0 as Tk.ide)
                             val arg = this.expr()
-                            val inp = if (!alls.accept(TK.CHAR, ':')) null else this.type()
+                            val inp = if (!alls.acceptX(":")) null else this.type()
                             Stmt.Input(tk, inp, dst, lib, arg)
                         }
-                        alls.check(TK.SPAWN) -> {
+                        alls.checkX("spawn") -> {
                             val s = this.stmt()
                             All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
                             val ss = s as Stmt.SSpawn
                             Stmt.SSpawn(ss.tk_, dst, ss.call)
                         }
-                        alls.accept(TK.AWAIT) -> {
+                        alls.acceptX("await") -> {
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                             val ret = All_nest(
@@ -760,28 +760,28 @@ object Parser
                     Stmt.Seq(tk_id, Stmt.Var(tk_id, tp), src)
                 }
             }
-            alls.accept(TK.INPUT) -> {
-                val tk = alls.tk0 as Tk.Key
+            alls.acceptX("input") -> {
+                val tk = alls.tk0 as Tk.Fix
                 alls.accept_err(TK.Xide)
                 val lib = (alls.tk0 as Tk.ide)
                 val arg = this.expr()
-                val tp = if (!alls.accept(TK.CHAR, ':')) null else this.type()
+                val tp = if (!alls.acceptX(":")) null else this.type()
                 Stmt.Input(tk, tp, null, lib, arg)
             }
-            alls.accept(TK.IF) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("if") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val tst = this.expr()
                 val true_ = this.block()
-                val false_ = if (alls.accept(TK.ELSE)) {
+                val false_ = if (alls.acceptX("else")) {
                     this.block()
                 } else {
-                    Stmt.Block(Tk.Chr(TK.CHAR, "{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
+                    Stmt.Block(Tk.Fix(TK.FIX, "{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }
-            alls.accept(TK.RETURN) -> {
+            alls.acceptX("return") -> {
                 if (!alls.checkExpr()) {
-                    Stmt.Return(alls.tk0 as Tk.Key)
+                    Stmt.Return(alls.tk0 as Tk.Fix)
                 } else {
                     val tk0 = alls.tk0
                     val e = this.expr()
@@ -798,28 +798,28 @@ object Parser
                     } as Stmt
                 }
             }
-            alls.accept(TK.TYPE) -> {
+            alls.acceptX("type") -> {
                 alls.accept_err(TK.XIde)
                 val id = alls.tk0 as Tk.Ide
-                val scps = if (alls.check(TK.ATBRACK)) this.scopepars() else Pair(null, null)
-                alls.accept_err(TK.CHAR, '=')
+                val scps = if (alls.checkX("@[")) this.scopepars() else Pair(null, null)
+                alls.acceptX_err("=")
                 val tp = this.type()
                 Stmt.Typedef(id, scps, tp)
             }
-            alls.accept(TK.NATIVE) -> {
-                val istype = alls.accept(TK.TYPE)
+            alls.acceptX("native") -> {
+                val istype = alls.acceptX("type")
                 alls.accept_err(TK.XNAT)
                 Stmt.Native(alls.tk0 as Tk.Nat, istype)
             }
-            alls.accept(TK.CALL) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("call") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
                 All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
                 Stmt.SCall(tk0, e.unpak() as Expr.Call)
             }
-            alls.accept(TK.SPAWN) -> {
-                val tk0 = alls.tk0 as Tk.Key
-                if (alls.check(TK.CHAR, '{')) {
+            alls.acceptX("spawn") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                if (alls.checkX("{")) {
                     val block = this.block()
                     All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()") {
                         this.stmt()
@@ -827,7 +827,7 @@ object Parser
                 } else {
                     val e = this.expr()
                     All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
-                    if (alls.accept(TK.IN)) {
+                    if (alls.acceptX("in")) {
                         val tsks = this.expr()
                         Stmt.DSpawn(tk0, tsks, e)
                     } else {
@@ -835,18 +835,18 @@ object Parser
                     }
                 }
             }
-            alls.accept(TK.PAUSE) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("pause") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
                 Stmt.Pause(tk0, e, true)
             }
-            alls.accept(TK.RESUME) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("resume") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
                 Stmt.Pause(tk0, e, false)
             }
-            alls.accept(TK.AWAIT) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("await") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 when {
                     alls.accept(TK.XCLK) -> {
                         val clk = alls.tk0 as Tk.Clk
@@ -873,8 +873,8 @@ object Parser
                     }
                 }
             }
-            alls.accept(TK.EMIT) -> {
-                val tk0 = alls.tk0 as Tk.Key
+            alls.acceptX("emit") -> {
+                val tk0 = alls.tk0 as Tk.Fix
                 val tgt = if (alls.accept(TK.XSCP)) {
                     Scope(alls.tk0 as Tk.Scp, null)
                 } else {
@@ -883,12 +883,12 @@ object Parser
                 val e = this.expr()
                 Stmt.Emit(tk0, tgt, e)
             }
-            alls.accept(TK.THROW) -> {
-                Stmt.Throw(alls.tk0 as Tk.Key)
+            alls.acceptX("throw") -> {
+                Stmt.Throw(alls.tk0 as Tk.Fix)
             }
-            alls.accept(TK.LOOP) -> {
-                val tk0 = alls.tk0 as Tk.Key
-                if (alls.check(TK.CHAR, '{')) {
+            alls.acceptX("loop") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                if (alls.checkX("{")) {
                     val block = this.block()
                     // add additional block to break out w/ goto and cleanup
                     Stmt.Block(
@@ -900,7 +900,7 @@ object Parser
                     All_assert_tk(alls.tk0, i is Expr.Var) {
                         "expected variable expression"
                     }
-                    alls.accept_err(TK.IN)
+                    alls.acceptX_err("in")
                     val tsks = this.expr()
                     val block = this.block()
                     // add additional block to break out w/ goto and cleanup
@@ -910,16 +910,16 @@ object Parser
                     )
                 }
             }
-            alls.accept(TK.BREAK) -> Stmt.Break(alls.tk0 as Tk.Key)
-            alls.accept(TK.CATCH) || alls.check(TK.CHAR, '{') -> this.block()
-            alls.accept(TK.OUTPUT) -> {
-                val tk = alls.tk0 as Tk.Key
+            alls.acceptX("break") -> Stmt.Break(alls.tk0 as Tk.Fix)
+            alls.acceptX("catch") || alls.checkX("{") -> this.block()
+            alls.acceptX("output") -> {
+                val tk = alls.tk0 as Tk.Fix
                 alls.accept_err(TK.Xide)
                 val lib = (alls.tk0 as Tk.ide)
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
             }
-            alls.accept(TK.XDEFER) -> {
+            alls.acceptX("defer") -> {
                 if (!CE1) alls.err_tk0_unexpected()
                 val blk = this.block()
                 All_nest(
@@ -934,7 +934,7 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.accept(TK.XEVERY) -> {
+            alls.acceptX("every") -> {
                 if (!CE1) alls.err_tk0_unexpected()
                 val evt = this.event()
                 val blk = this.block()
@@ -950,11 +950,11 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.accept(TK.XPAR) -> {
+            alls.acceptX("par") -> {
                 if (!CE1) alls.err_tk0_unexpected()
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
-                while (alls.accept(TK.XWITH)) {
+                while (alls.acceptX("with")) {
                     pars.add(this.block())
                 }
                 val srcs = pars.map { "spawn ${it.tostr(true)}" }.joinToString("\n")
@@ -962,12 +962,12 @@ object Parser
                     this.stmts()
                 } as Stmt
             }
-            alls.accept(TK.XPARAND) || alls.accept(TK.XPAROR) -> {
+            alls.acceptX("parand") || alls.acceptX("paror") -> {
                 if (!CE1) alls.err_tk0_unexpected()
-                val op = if (alls.tk0.enu == TK.XPARAND) "&&" else "||"
+                val op = if (alls.tk0.str == "parand") "&&" else "||"
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
-                while (alls.accept(TK.XWITH)) {
+                while (alls.acceptX("with")) {
                     pars.add(this.block())
                 }
                 val spws =
@@ -1000,7 +1000,7 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.accept(TK.XPAUSEIF) -> {
+            alls.acceptX("pauseif") -> {
                 if (!CE1) alls.err_tk0_unexpected()
                 val pred = this.expr() as Expr.UPred
                 val blk = this.block()
@@ -1026,7 +1026,7 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.accept(TK.XWATCHING) -> {
+            alls.acceptX("watching") -> {
                 if (!CE1) alls.err_tk0_unexpected()
                 val evt = this.event()
                 val blk = this.block()
@@ -1047,11 +1047,11 @@ object Parser
                 error("unreachable")
             }
         }.let { it1 ->
-            val it2 = if (!alls.check(TK.XWHERE)) it1 else {
+            val it2 = if (!alls.checkX("where")) it1 else {
                 if (!CE1) alls.err_tk0_unexpected()
                 this.where(it1)
             }
-            val it3 = if (!alls.accept(TK.XUNTIL)) it2 else {
+            val it3 = if (!alls.acceptX("until")) it2 else {
                 if (!CE1) alls.err_tk0_unexpected()
                 //val tk0 = alls.tk0
                 //All_assert_tk(tk0, stmt !is Stmt.Var) { "unexpected `until`" }
@@ -1067,7 +1067,7 @@ object Parser
                 ) {
                     this.stmt()
                 } as Stmt
-                val if2 = if (!alls.check(TK.XWHERE)) if1 else this.where(if1)
+                val if2 = if (!alls.checkX("where")) if1 else this.where(if1)
 
                 All_nest(
                     """

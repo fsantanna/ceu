@@ -107,41 +107,41 @@ object Lexer {
         var (c1, x1) = all().read()
 
         when {
-            (c1 == -1) -> alls.tk1 = Tk.Sym(TK.EOF, "", lin(), col())
+            (c1 == -1) -> alls.tk1 = Tk.Fix(TK.EOF, "", lin(), col())
             (x1 in listOf(')','{','}','[',']','<','>',';','=',',','\\','/','.','!','~','+')) -> {
-                alls.tk1 = Tk.Chr(TK.CHAR, x1.toString(), lin(), col())
+                alls.tk1 = Tk.Fix(TK.FIX, x1.toString(), lin(), col())
             }
             (x1 == '?') -> {
                 val (c2, x2) = all().read()
                 if (x2 == '!') {
-                    alls.tk1 = Tk.Sym(TK.UNIT, "?!", lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, "?!", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Chr(TK.CHAR, x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, x1.toString(), lin(), col())
                     all().unread(c2)
                 }
             }
             (x1 == ':') -> {
                 val (c2, x2) = all().read()
                 if (x2 == ':') {
-                    alls.tk1 = Tk.Sym(TK.CAST, "::", lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, "::", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Chr(TK.CHAR, x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, x1.toString(), lin(), col())
                     all().unread(c2)
                 }
             }
             (x1 == '(') -> {
                 val (c2, x2) = all().read()
                 if (x2 == ')') {
-                    alls.tk1 = Tk.Sym(TK.UNIT, "()", lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, "()", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Chr(TK.CHAR, x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, x1.toString(), lin(), col())
                     all().unread(c2)
                 }
             }
             (x1 == '-') -> {
                 val (_, x2) = all().read()
                 if (x2 == '>') {
-                    alls.tk1 = Tk.Sym(TK.ARROW, "->", lin(), col())
+                    alls.tk1 = Tk.Fix(TK.FIX, "->", lin(), col())
                 } else {
                     alls.tk1 = Tk.Err(TK.ERR, "" + x1 + x2, lin(), col())
                 }
@@ -150,7 +150,7 @@ object Lexer {
                 all().read().let { c1 = it.first; x1 = it.second }
                 when {
                     (x1 == '[') -> {
-                        alls.tk1 = Tk.Sym(TK.ATBRACK, "@[", lin(), col())
+                        alls.tk1 = Tk.Fix(TK.FIX, "@[", lin(), col())
                     }
                     x1.isLetter() -> {
                         var pay = ""
@@ -265,9 +265,9 @@ object Lexer {
                 } while (x1.isLetterOrDigit() || x1 == '_')
                 all().unread(c1)
 
-                alls.tk1 = key2tk[pay].let {
+                alls.tk1 = keywords.contains(pay).let {
                     when {
-                        (it != null) -> Tk.Key(it, pay, lin(), col())
+                        it -> Tk.Fix(TK.FIX, pay, lin(), col())
                         pay[0].isLowerCase() -> Tk.ide(TK.Xide, pay, lin(), col())
                         pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Ide(TK.XIde, pay, lin(), col())
                         pay.none { it.isLowerCase() } -> Tk.IDE(TK.XIDE, pay, lin(), col())

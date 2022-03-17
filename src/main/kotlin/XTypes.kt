@@ -46,7 +46,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     this.e.xinfTypes(unpak)
                     if (!this.isact!!) tp else {
                         Type.Active(
-                            Tk.Key(TK.ACTIVE, "active", this.tk.lin, this.tk.col),
+                            Tk.Fix(TK.FIX, "active", this.tk.lin, this.tk.col),
                             tp
                         )
                     }
@@ -89,7 +89,7 @@ fun Expr.xinfTypes (inf: Type?) {
             this.ptr.xinfTypes(inf?.let {
                 val scp1 = Tk.Scp(TK.XSCP,this.localBlockScp1Id(),this.tk.lin,this.tk.col)
                 Type.Pointer (
-                    Tk.Chr(TK.CHAR,"/",this.tk.lin,this.tk.col),
+                    Tk.Fix(TK.FIX,"/",this.tk.lin,this.tk.col),
                     Scope(scp1,null),
                     it
                 ).setUpEnv(inf.getUp()!!)
@@ -171,7 +171,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
             Type.Pointer (
-                Tk.Chr(TK.CHAR, "/", this.tk.lin, this.tk.col),
+                Tk.Fix(TK.FIX, "/", this.tk.lin, this.tk.col),
                 this.xscp!!,
                 this.arg.wtype!!
             )
@@ -237,9 +237,9 @@ fun Expr.xinfTypes (inf: Type?) {
                 "invalid $str : not an union"
             }
             xtp as Type.Union
-            assert(tk_.enu!=TK.NULL || tp.isrec()) { "bug found" }
+            assert(tk.str!="Null" || tp.isrec()) { "bug found" }
 
-            val num = if (this.tk.enu == TK.NULL) null else {
+            val num = if (this.tk.str == "Null") null else {
                 val num = this.tk.field2num(xtp.yids)
                 All_assert_tk(this.tk, num != null) {
                     "invalid discriminator : unknown discriminator \"${this.tk.str}\""
@@ -362,13 +362,13 @@ fun Expr.xinfTypes (inf: Type?) {
                         when {
                             (this.upspawn() != null) -> {
                                 Type.Active (
-                                    Tk.Key(TK.ACTIVE,"active",this.tk.lin,this.tk.col),
+                                    Tk.Fix(TK.FIX,"active",this.tk.lin,this.tk.col),
                                     this.f.wtype!!
                                 )
                             }
                             (ftp.xscps.second!!.size != this.xscps.first!!.size) -> {
                                 // TODO: may fail before check2, return anything
-                                Type.Nat(Tk.Nat(TK.NATIVE, "ERR", this.tk.lin, this.tk.col, null))
+                                Type.Nat(Tk.Nat(TK.FIX, "ERR", this.tk.lin, this.tk.col, null))
                             }
                             else -> {
                                 ftp.out.mapScps(
@@ -392,7 +392,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
 fun Stmt.xinfTypes (inf: Type? = null) {
     fun unit (): Type {
-        return Type.Unit(Tk.Sym(TK.UNIT, "()", this.tk.lin, this.tk.col)).setUpEnv(this)
+        return Type.Unit(Tk.Fix(TK.FIX, "()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
         is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Throw, is Stmt.Typedef -> {}

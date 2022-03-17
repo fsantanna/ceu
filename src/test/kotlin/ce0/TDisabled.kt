@@ -657,7 +657,7 @@ class TDisabled {
         All_restart(null, PushbackReader(StringReader("task @LOCAL->@[]->()->()->() {}"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Func && tp.tk.enu== TK.TASK)
+        assert(tp is Type.Func && tp.tk.str=="task")
     }
     @Test
     fun noclo_d09_tasks () { // task @LOCAL->@[]->()->()->() {}

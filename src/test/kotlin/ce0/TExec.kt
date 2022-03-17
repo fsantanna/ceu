@@ -54,7 +54,7 @@ class TExec {
     @Test
     fun a03_error () {
         val out = all("//output std ()")
-        assert(out == "(ln 1, col 1): expected statement : have `/´")
+        assert(out == "(ln 1, col 1): expected statement : have \"/\"") { out }
     }
     @Test
     fun a05_int () {
@@ -85,7 +85,7 @@ class TExec {
                 putchar('A');
             }
         """.trimIndent())
-        assert(out == "(ln 1, col 8): expected `_´ : have `{´")
+        assert(out == "(ln 1, col 8): expected \"_\" : have \"{\"") { out }
     }
     @Test
     fun a08_int () {
@@ -419,7 +419,7 @@ class TExec {
             output () ()
         """.trimIndent())
         //assert(out == "(ln 1, col 8): invalid `output` : expected identifier") { out }
-        assert(out == "(ln 1, col 8): expected variable identifier : have `()´") { out }
+        assert(out == "(ln 1, col 8): expected variable identifier : have \"()\"") { out }
     }
     @Test
     fun e02_out () {
@@ -1114,7 +1114,7 @@ class TExec {
             set l2 = l1
         """.trimIndent())
         //assert(out == "(ln 4, col 8): invalid assignment : type mismatch") { out }
-        assert(out == "(ln 1, col 11): expected type : have `?´") { out }
+        assert(out == "(ln 1, col 11): expected type : have \"?\"") { out }
     }
     @Test
     fun j08_list_move () {
@@ -1815,14 +1815,14 @@ class TExec {
         val out = all("""
         type Button = _int + <(),()> -- ERR: [_int] + ...
        """.trimIndent())
-        assert(out == "(ln 1, col 20): expected statement : have `+´") { out }
+        assert(out == "(ln 1, col 20): expected statement : have \"+\"") { out }
     }
     @Test
     fun p04_type_hier_err () {
         val out = all("""
         type Button = [_int] + () -- ERR: ... + <...>
        """.trimIndent())
-        assert(out == "(ln 1, col 24): expected `<´ : have `()´") { out }
+        assert(out == "(ln 1, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun p05_type_hier () {

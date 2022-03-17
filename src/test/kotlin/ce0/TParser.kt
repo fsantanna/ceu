@@ -63,7 +63,7 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 8): expected type : have end of file")
+            assert(e.message == "(ln 1, col 8): expected type : have \"end of file\"") {e.message!!}
         }
     }
 
@@ -83,7 +83,7 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 2): expected type : have end of file")
+            assert(e.message == "(ln 1, col 2): expected type : have \"end of file\"") { e.message!! }
         }
     }
 
@@ -95,7 +95,7 @@ class TParser {
             Parser.type()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 4): expected `]´ : have end of file")
+            assert(e.message == "(ln 1, col 4): expected \"]\" : have end of file") { e.message!! }
         }
     }
 
@@ -160,7 +160,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 2): invalid type declaration : unexpected `?´") { e.message!! }
-            assert(e.message == "(ln 1, col 3): expected type : have `?´") { e.message!! }
+            assert(e.message == "(ln 1, col 3): expected type : have \"?\"") { e.message!! }
         }
     }
 
@@ -191,7 +191,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 1): invalid type declaration : unexpected `?´") { e.message!! }
-            assert(e.message == "(ln 1, col 2): expected type : have `?´") { e.message!! }
+            assert(e.message == "(ln 1, col 2): expected type : have \"?\"") { e.message!! }
         }
     }
 
@@ -204,7 +204,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 1): invalid type declaration : unexpected `?´") { e.message!! }
-            assert(e.message == "(ln 1, col 2): expected type : have `?´") { e.message!! }
+            assert(e.message == "(ln 1, col 2): expected type : have \"?\"") { e.message!! }
         }
     }
 
@@ -259,7 +259,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 1): expected expression : have \"Point\"") { e.message!! }
-            assert(e.message == "(ln 1, col 6): expected `{´ : have end of file") { e.message!! }
+            assert(e.message == "(ln 1, col 6): expected \"{\" : have end of file") { e.message!! }
             //assert(e.message == "(ln 1, col 1): unexpected end of file") { e.message!! }
         }
     }
@@ -282,7 +282,7 @@ class TParser {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 2): expected expression : have end of file")
+            assert(e.message == "(ln 1, col 2): expected expression : have end of file") { e.message!! }
         }
     }
 
@@ -294,7 +294,7 @@ class TParser {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 3): expected `)´ : have end of file")
+            assert(e.message == "(ln 1, col 3): expected `)´ : have end of file") { e.message!! }
         }
     }
 
@@ -450,7 +450,7 @@ class TParser {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 5): expected `:´ : have end of file") { e.message!! }
+            assert(e.message == "(ln 1, col 5): expected \":\" : have end of file") { e.message!! }
         }
     }
 
@@ -802,7 +802,7 @@ class TParser {
             Parser.stmt()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 17): expected `->´ : have `{´") { e.message!! }
+            assert(e.message == "(ln 1, col 17): expected \"->\" : have \"{\"") { e.message!! }
         }
     }
 
@@ -952,7 +952,7 @@ class TParser {
             Parser.stmt()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 8): expected `in` : have `{´") { e.message!! }
+            assert(e.message == "(ln 1, col 8): expected \"in\" : have \"{\"") { e.message!! }
         }
     }
 
@@ -964,7 +964,7 @@ class TParser {
             Parser.stmt()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 11): expected expression : have `{´") { e.message!! }
+            assert(e.message == "(ln 1, col 11): expected expression : have \"{\"") { e.message!! }
         }
     }
 
@@ -1001,7 +1001,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("active {} task @[]->()->()->()"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Actives && tp.tsk.tk.enu == TK.TASK && (tp.tsk as Type.Func).xscps.first.scp1.str == "LOCAL")
+        assert(tp is Type.Actives && tp.tsk.tk.str == "task" && (tp.tsk as Type.Func).xscps.first.scp1.str == "LOCAL")
     }
 
     // TYPEDEF

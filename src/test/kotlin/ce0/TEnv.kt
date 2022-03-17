@@ -65,7 +65,7 @@ class TEnv {
     @Test
     fun a04_err_func () {
         val out = inp2env("var x:() ; var x: func @[]()->()")
-        assert(out == "(ln 1, col 27): expected `->´ : have `()´") { out }
+        assert(out == "(ln 1, col 27): expected \"->\" : have \"()\"") { out }
     }
 
     // CONS
@@ -1748,7 +1748,7 @@ class TEnv {
         //assert(out == "OK") { out }
         //assert(out == "(ln 2, col 11): unexpected <.0> : not a pointer") { out }
         //assert(out == "(ln 1, col 8): invalid type declaration : unexpected `?´") { out }
-        assert(out == "(ln 1, col 9): expected type : have `?´") { out }
+        assert(out == "(ln 1, col 9): expected type : have \"?\"") { out }
     }
 
     // POINTER CROSSING UNION
@@ -1999,7 +1999,7 @@ class TEnv {
         """.trimIndent()
         )
         //assert(out == "(ln 1, col 14): expected `}´ : have \"@_a\"") { out }
-        assert(out == "(ln 1, col 15): expected `]´ : have \"a1\"") { out }
+        assert(out == "(ln 1, col 15): expected \"]\" : have \"a1\"") { out }
     }
     @Test
     fun p25_pool_closure_err() {
@@ -2519,7 +2519,7 @@ class TEnv {
         """.trimIndent())
         //assert(out == "(ln 1, col 16): expected alias type") { out }
         //assert(out == "(ln 1, col 14): expected statement : have `:+´") { out }
-        assert(out == "(ln 1, col 14): expected statement : have `:´") { out }
+        assert(out == "(ln 1, col 14): expected statement : have \":\"") { out }
     }
 
     @Test

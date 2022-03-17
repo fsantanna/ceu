@@ -58,19 +58,19 @@ class TLexer {
     @Test
     fun b03_lexer_syms () {
         All_restart(null, PushbackReader(StringReader("{ -> , ()"), 2))
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str=="{")
-        Lexer.lex(); assert(alls.tk1.enu== TK.ARROW)
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str==",")
-        Lexer.lex(); assert(alls.tk1.enu== TK.UNIT)
-        Lexer.lex(); assert(alls.tk1.enu== TK.EOF)
+        Lexer.lex(); assert(alls.tk1.str=="{")
+        Lexer.lex(); assert(alls.tk1.str=="->")
+        Lexer.lex(); assert(alls.tk1.str==",")
+        Lexer.lex(); assert(alls.tk1.str=="()")
+        Lexer.lex(); assert(alls.tk1.enu==TK.EOF)
     }
     @Test
     fun b04_lexer_syms () {
         All_restart(null, PushbackReader(StringReader(": }{ :"), 2))
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str==":")
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str=="}")
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str=="{")
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str==":")
+        Lexer.lex(); assert(alls.tk1.str==":")
+        Lexer.lex(); assert(alls.tk1.str=="}")
+        Lexer.lex(); assert(alls.tk1.str=="{")
+        Lexer.lex(); assert(alls.tk1.str==":")
     }
 
     // KEYWORDS
@@ -79,11 +79,11 @@ class TLexer {
     fun b05_lexer_keys () {
         All_restart(null, PushbackReader(StringReader("xvar var else varx type output //@rec"), 2))
         Lexer.lex(); assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).str=="xvar")
-        Lexer.lex(); assert(alls.tk1.enu== TK.VAR)
-        Lexer.lex(); assert(alls.tk1.enu== TK.ELSE)
+        Lexer.lex(); assert(alls.tk1.str=="var")
+        Lexer.lex(); assert(alls.tk1.str=="else")
         Lexer.lex(); assert(alls.tk1.enu== TK.Xide && (alls.tk1 as Tk.ide).str=="varx")
-        Lexer.lex(); assert(alls.tk1.enu== TK.TYPE)
-        Lexer.lex(); assert(alls.tk1.enu== TK.OUTPUT)
+        Lexer.lex(); assert(alls.tk1.str=="type")
+        Lexer.lex(); assert(alls.tk1.str=="output")
         //Lexer.lex() ; assert(alls.tk1.enu==TK.AREC && (alls.tk1 as Tk.Key).key=="@rec")
     }
 
@@ -124,7 +124,7 @@ class TLexer {
     @Test
     fun b09_lexer_xnum () {
         All_restart(null, PushbackReader(StringReader(".a"), 2))
-        Lexer.lex(); assert(alls.tk1.enu== TK.CHAR && (alls.tk1 as Tk.Chr).str==".")
+        Lexer.lex(); assert(alls.tk1.str==".")
         //Lexer.lex() ; assert(alls.tk1.enu==TK.ERR && (alls.tk1 as Tk.Err).err=="a")
     }
     @Test
@@ -161,7 +161,7 @@ class TLexer {
         //println(alls.tk1)
         //assert(alls.tk1.enu==TK.XSCPCST && (alls.tk1 as Tk.Scp1).lbl=="" && (alls.tk1 as Tk.Scp1).num==null)
         //assert(alls.tk1.enu==TK.ERR && (alls.tk1 as Tk.Err).err=="@")
-        assert(alls.tk1.enu== TK.ATBRACK)
+        assert(alls.tk1.str=="@[")
     }
 
     // WCLOCK

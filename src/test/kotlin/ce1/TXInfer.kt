@@ -41,7 +41,7 @@ class TXInfer {
     @Test
     fun a01_var_err () {
         val out = all("var x; set x=()")
-        assert(out == "(ln 1, col 6): expected type declaration : have `;´") { out }
+        assert(out == "(ln 1, col 6): expected type declaration : have \";\"") { out }
     }
     @Test
     fun a02_var () {

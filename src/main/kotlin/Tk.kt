@@ -18,7 +18,7 @@ fun Tk.Nat.toce (): String {
 fun Tk.field2num (ids: List<Tk>?): Int? {
     return when {
         this is Tk.Num -> this.num
-        //this is Tk.Key -> null
+        //this is Tk.Fix -> null
         (ids == null)  -> null
         this is Tk.ide -> ids!!.indexOfFirst{it.str==this.str}.let { if (it == -1) null else it+1 }
         this is Tk.Ide -> {
@@ -34,21 +34,14 @@ fun Tk.istask (): Boolean {
     return this is Tk.ide && this.str in arrayOf("pub","ret","status")
 }
 
-fun TK.toErr (chr: Char?): String {
+fun TK.toErr (): String {
     return when (this) {
-        TK.EOF     -> "end of file"
-        TK.CHAR    -> "`" + chr!! + "´"
-        TK.XNAT    -> "`_´"
-        TK.Xide    -> "variable identifier"
-        TK.XIde    -> "type identifier"
-        TK.XIDE    -> "uppercase identifier"
-        TK.XNUM    -> "number"
-        TK.ARROW   -> "`->´"
-        TK.ATBRACK -> "`@[´"
-        TK.ELSE    -> "`else`"
-        TK.IN      -> "`in`"
-        TK.INPUT   -> "`input`"
-        TK.TASK    -> "`task`"
+        TK.EOF  -> "end of file"
+        TK.XNAT -> "`_´"
+        TK.Xide -> "variable identifier"
+        TK.XIde -> "type identifier"
+        TK.XIDE -> "uppercase identifier"
+        TK.XNUM -> "number"
         else -> TODO(this.toString())
     }
 }

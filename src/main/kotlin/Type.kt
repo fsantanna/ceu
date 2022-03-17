@@ -34,9 +34,9 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
     fun Tk.clone (): Tk {
         return when (this) {
             is Tk.Err -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Sym -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Chr -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Key -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
             is Tk.ide -> this.copy(lin_ = lin, col_ = col)
             is Tk.Ide -> this.copy(lin_ = lin, col_ = col)
             is Tk.IDE -> this.copy(lin_ = lin, col_ = col)
@@ -48,22 +48,22 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
     }
     fun Type.aux (lin: Int, col: Int): Type {
         return when (this) {
-            is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Sym)
+            is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Fix)
             is Type.Named -> Type.Named(this.tk.clone() as Tk.Ide, this.subs.map { it.clone() }, this.xisrec, this.xscps)
             is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
             is Type.Tuple -> Type.Tuple(
-                this.tk.clone() as Tk.Chr,
+                this.tk.clone() as Tk.Fix,
                 this.vec.map { it.aux(lin, col) },
                 this.yids?.map { it.clone() as Tk.ide }
             )
             is Type.Union -> Type.Union(
-                this.tk.clone() as Tk.Chr,
+                this.tk.clone() as Tk.Fix,
                 this.common?.aux(lin, col) as Type.Tuple?,
                 this.vec.map { it.aux(lin, col) },
                 this.yids?.map { it.clone() as Tk.Ide }
             )
             is Type.Func -> Type.Func(
-                this.tk.clone() as Tk.Key,
+                this.tk.clone() as Tk.Fix,
                 this.xscps.let {
                     Triple (
                         Scope(it.first.scp1.clone() as Tk.Scp, it.first.scp2),
@@ -150,7 +150,7 @@ fun Type.toce (): String {
         is Type.Nat     -> this.tk.str.replace('*','_')
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
-        is Type.Func    -> "F_" + (if (this.tk.enu==TK.TASK) "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
+        is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
         is Type.Active   -> "S_" + this.tsk.toce() + "_S"
         is Type.Actives  -> "SS_" + this.tsk.toce() + "_SS"
     }
