@@ -13,7 +13,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                         if (toinc) {
                             c += 1  // infer implicit scope incrementally
                         }
-                        Scope(Tk.Scp(TK.XSCP, c + "", tp.tk.lin, tp.tk.col), null)
+                        Scope(Tk.Scp(TK.SCP, c + "", tp.tk.lin, tp.tk.col), null)
                     }
                     listOf(tp.xscp!!)
                 }
@@ -29,7 +29,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                             val def = tp.env(tp.tk.str)!! as Stmt.Typedef
                             tp.xscps = tp.xscps ?: def.xscp1s.first!!.map {
                                 c += 1  // infer implicit scope incrementally
-                                Scope(Tk.Scp(TK.Xide, c + "", tp.tk.lin, tp.tk.col), null)
+                                Scope(Tk.Scp(TK.id, c + "", tp.tk.lin, tp.tk.col), null)
                             }
                             tp.xscps!!
                         }
@@ -75,7 +75,7 @@ fun Stmt.xinfScp1s () {
                     (tp.ups_first { it is Stmt.Typedef && it==def || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
-                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Scp(TK.XSCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null) }
+                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Scp(TK.SCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null) }
                     }
                 }
             }
@@ -91,7 +91,7 @@ fun Stmt.xinfScp1s () {
                     // do not infer to LOCAL if inside function/typedef declaration
                     (tp.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> {}
                     else -> {
-                        tp.xscp = Scope(Tk.Scp(TK.XSCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null)
+                        tp.xscp = Scope(Tk.Scp(TK.SCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null)
                     }
                 }
             }
@@ -141,7 +141,7 @@ fun Stmt.xinfScp1s () {
                                 lvlM = lvlV
                                 scp = env.ups_first_block()!!.let {
                                     if (it.scp1?.str.isanon()) {
-                                        it.scp1 = Tk.Scp(TK.XSCP, "X${it.n}", it.tk.lin, it.tk.col)
+                                        it.scp1 = Tk.Scp(TK.SCP, "X${it.n}", it.tk.lin, it.tk.col)
                                     }
                                     it.scp1!!
                                 }

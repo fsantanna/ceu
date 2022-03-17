@@ -4,7 +4,8 @@ var N = 1
 
 enum class TK {
     ERR, EOF, FIX,
-    Xide, XIde, XIDE, XSCP, XNAT, XNUM, XCLK
+    id, Id, ID,
+    SCP, NAT, NUM, CLK
 }
 
 val keywords: SortedSet<String> = sortedSetOf (

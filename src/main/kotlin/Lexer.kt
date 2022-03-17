@@ -159,7 +159,7 @@ object Lexer {
                             all().read().let { c1 = it.first; x1 = it.second }
                         } while (x1.isLetterOrDigit() || x1 == '_')
                         all().unread(c1)
-                        alls.tk1 = Tk.Scp(TK.XSCP, pay, lin(), col())
+                        alls.tk1 = Tk.Scp(TK.SCP, pay, lin(), col())
                     }
                     else -> {
                         alls.tk1 = Tk.Err(TK.ERR, "@", lin(), col())
@@ -199,7 +199,7 @@ object Lexer {
                 if (close == null) {
                     all().unread(c2)
                 }
-                alls.tk1 = Tk.Nat(TK.XNAT, pay, lin(), col(), open)
+                alls.tk1 = Tk.Nat(TK.NAT, pay, lin(), col(), open)
             }
             x1.isDigit() -> {
                 fun digits (): Int {
@@ -215,7 +215,7 @@ object Lexer {
 
                 var num = digits()
                 if (!x1.isLetter()) {
-                    alls.tk1 = Tk.Num(TK.XNUM, num.toString(), lin(), col(), num)
+                    alls.tk1 = Tk.Num(TK.NUM, num.toString(), lin(), col(), num)
                 } else {
                     fun letters(): String {
                         assert(x1.isLetter())
@@ -250,7 +250,7 @@ object Lexer {
                         all().read().let { c1 = it.first; x1 = it.second }
                         if (!x1.isDigit()) {
                             all().unread(c1)
-                            alls.tk1 = Tk.Clk(TK.XCLK, ms.toString(), lin(), col(), ms)
+                            alls.tk1 = Tk.Clk(TK.CLK, ms.toString(), lin(), col(), ms)
                             break
                         }
                         num = digits()
@@ -268,9 +268,9 @@ object Lexer {
                 alls.tk1 = keywords.contains(pay).let {
                     when {
                         it -> Tk.Fix(TK.FIX, pay, lin(), col())
-                        pay[0].isLowerCase() -> Tk.ide(TK.Xide, pay, lin(), col())
-                        pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Ide(TK.XIde, pay, lin(), col())
-                        pay.none { it.isLowerCase() } -> Tk.IDE(TK.XIDE, pay, lin(), col())
+                        pay[0].isLowerCase() -> Tk.ide(TK.id, pay, lin(), col())
+                        pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Ide(TK.Id, pay, lin(), col())
+                        pay.none { it.isLowerCase() } -> Tk.IDE(TK.ID, pay, lin(), col())
                         else -> Tk.Err(TK.ERR, pay, lin(), col())
                     }
                 }
