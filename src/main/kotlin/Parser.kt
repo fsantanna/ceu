@@ -646,7 +646,7 @@ object Parser
     }
     fun event (): String {
         return if (alls.accept(TK.CLK)) {
-            "" + (alls.tk0 as Tk.Clk).ms + "ms"
+            "" + alls.tk0.str + "ms"
         } else {
             this.expr().tostr(true)
         }
@@ -851,7 +851,7 @@ object Parser
                         All_nest(
                             """
                             {
-                                var ms_$N: _int = _${clk.ms}
+                                var ms_$N: _int = _${clk.str}
                                 loop {
                                     await evt?5
                                     set ms_$N = sub [ms_$N, evt!5]

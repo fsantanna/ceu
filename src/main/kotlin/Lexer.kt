@@ -250,7 +250,7 @@ object Lexer {
                         all().read().let { c1 = it.first; x1 = it.second }
                         if (!x1.isDigit()) {
                             all().unread(c1)
-                            alls.tk1 = Tk.Clk(ms.toString(), lin(), col(), ms)
+                            alls.tk1 = Tk.Clk(ms.toString(), lin(), col())
                             break
                         }
                         num = digits()

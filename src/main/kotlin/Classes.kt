@@ -30,7 +30,7 @@ sealed class Tk(
     data class Scp (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Nat (val str_: String, val lin_: Int, val col_: Int, val chr: Char?): Tk(str_, lin_, col_)
     data class Num (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
-    data class Clk (val str_: String, val lin_: Int, val col_: Int, val ms: Int):     Tk(str_, lin_, col_)
+    data class Clk (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
 }
 
 sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {

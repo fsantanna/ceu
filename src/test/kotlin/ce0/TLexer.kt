@@ -171,7 +171,7 @@ class TLexer {
         All_restart(null, PushbackReader(StringReader("1s"), 2))
         Lexer.lex()
         //println(alls.tk1)
-        assert(alls.tk1 is Tk.Clk && (alls.tk1 as Tk.Clk).ms==1000)
+        assert(alls.tk1 is Tk.Clk && alls.tk1.str=="1000")
     }
     @Test
     fun d02_clk () {
@@ -189,7 +189,7 @@ class TLexer {
     fun d04_clk () {
         All_restart(null, PushbackReader(StringReader("1h5min2s20ms"), 2))
         Lexer.lex()
-        assert(alls.tk1 is Tk.Clk && (alls.tk1 as Tk.Clk).ms==3902020)
+        assert(alls.tk1 is Tk.Clk && alls.tk1.str=="3902020")
     }
 
     // LIN / COL
