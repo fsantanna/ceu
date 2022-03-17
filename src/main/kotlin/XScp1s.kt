@@ -13,23 +13,23 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                         if (toinc) {
                             c += 1  // infer implicit scope incrementally
                         }
-                        Scope(Tk.Scp(TK.XSCP, tp.tk.lin, tp.tk.col, c + ""), null)
+                        Scope(Tk.Scp(TK.XSCP, c + "", tp.tk.lin, tp.tk.col), null)
                     }
                     listOf(tp.xscp!!)
                 }
                 is Type.Named -> {
                     //assert(tp.xscp1s == null)
                     val isself = tp.ups_first { it is Stmt.Typedef }.let {
-                        (it != null) && ((it as Stmt.Typedef).tk_.id == tp.tk_.id)
+                        (it != null) && ((it as Stmt.Typedef).tk.str == tp.tk.str)
                     }
                     when {
                         isself -> emptyList()              // do not infer inside self declaration (it is inferred there)
                         (tp.xscps != null) -> tp.xscps!!  // just forward existing? (TODO: assert above failed)
                         else -> {
-                            val def = tp.env(tp.tk_.id)!! as Stmt.Typedef
+                            val def = tp.env(tp.tk.str)!! as Stmt.Typedef
                             tp.xscps = tp.xscps ?: def.xscp1s.first!!.map {
                                 c += 1  // infer implicit scope incrementally
-                                Scope(Tk.Scp(TK.Xide, tp.tk.lin, tp.tk.col, c + ""), null)
+                                Scope(Tk.Scp(TK.Xide, c + "", tp.tk.lin, tp.tk.col), null)
                             }
                             tp.xscps!!
                         }
@@ -49,7 +49,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                     //.let { println(it) ; it }
                     .any {
                         //println(it.toType().tostr())
-                        (it !is Type.Func) || (it.xscps.second?.none { it.scp1.id==scp.scp1.id } ?: true)
+                        (it !is Type.Func) || (it.xscps.second?.none { it.scp1.str==scp.scp1.str } ?: true)
                     }
             }
             //.let {print("222: "); println(it) ; it}
@@ -61,7 +61,7 @@ fun Stmt.xinfScp1s () {
     fun ft (tp: Type) {
         when (tp) {
             is Type.Named -> {
-                val def = tp.env(tp.tk_.id)
+                val def = tp.env(tp.tk.str)
                 when {
                     (tp.xscps != null) -> {}
                     (def !is Stmt.Typedef) -> {} // will be an error in Check_01
@@ -75,7 +75,7 @@ fun Stmt.xinfScp1s () {
                     (tp.ups_first { it is Stmt.Typedef && it==def || it is Type.Func } != null) -> {}
                     else -> {
                         val size = def.xscp1s.first.let { if (it == null) 0 else it.size }
-                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Scp(TK.XSCP, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null) }
+                        tp.xscps = tp.xscps ?: List(size) { Scope(Tk.Scp(TK.XSCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null) }
                     }
                 }
             }
@@ -91,7 +91,7 @@ fun Stmt.xinfScp1s () {
                     // do not infer to LOCAL if inside function/typedef declaration
                     (tp.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> {}
                     else -> {
-                        tp.xscp = Scope(Tk.Scp(TK.XSCP, tp.tk.lin, tp.tk.col, tp.localBlockScp1Id()), null)
+                        tp.xscp = Scope(Tk.Scp(TK.XSCP, tp.localBlockScp1Id(), tp.tk.lin, tp.tk.col), null)
                     }
                 }
             }
@@ -107,11 +107,11 @@ fun Stmt.xinfScp1s () {
                         (es + ts).map { it?.xscps?.second ?: emptyList() }.flatten()
                     }
                     fun noneInUps (x: Scope): Boolean {
-                        return outers.none { it.scp1.id==x.scp1.id }
+                        return outers.none { it.scp1.str==x.scp1.str }
                     }
 
                     ((tp.xscps.second ?: emptyList()) + inp_pub_out.filter(::noneInUps))
-                        .distinctBy { it.scp1.id }
+                        .distinctBy { it.scp1.str }
                         .filter { it.scp1.isscopepar() }
                         
                 }
@@ -131,17 +131,17 @@ fun Stmt.xinfScp1s () {
                 fun fx (x: Expr) {
                     when (x) {
                         is Expr.Var -> {
-                            if (x.tk_.id in arrayOf("arg","pub","ret","evt")) {
+                            if (x.tk.str in arrayOf("arg","pub","ret","evt")) {
                                 return
                             }
-                            val env = x.env(x.tk_.id)!!
+                            val env = x.env(x.tk.str)!!
                             val lvlV = env.ups_tolist().count { it is Stmt.Block }
-                            //println(x.tk_.id + ": $lvlF > $lvlV")
+                            //println(x.tk.str + ": $lvlF > $lvlV")
                             if (lvlV>0 && lvlF>lvlV && lvlV<lvlM) {
                                 lvlM = lvlV
                                 scp = env.ups_first_block()!!.let {
-                                    if (it.scp1?.id.isanon()) {
-                                        it.scp1 = Tk.Scp(TK.XSCP, it.tk.lin, it.tk.col, "X${it.n}")
+                                    if (it.scp1?.str.isanon()) {
+                                        it.scp1 = Tk.Scp(TK.XSCP, "X${it.n}", it.tk.lin, it.tk.col)
                                     }
                                     it.scp1!!
                                 }
@@ -162,7 +162,7 @@ fun Stmt.xinfScp1s () {
                 val tps  = s.type.flattenLeft()
                 val scps = tps.increasing(false)
                 val fst  = ((s.xscp1s.first?.map { Scope(it,null) } ?: emptyList()) + scps)
-                    .distinctBy { it.scp1.id }
+                    .distinctBy { it.scp1.str }
                     
                 //println(tps)
                 tps.filter { it is Type.Named && it.xisrec }.let { it as List<Type.Named> }.forEach {

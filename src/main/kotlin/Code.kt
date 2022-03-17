@@ -10,10 +10,10 @@ fun Any.self_or_null (): String {
 
 fun Type.pos (): String {
     return when (this) {
-        is Type.Named   -> "CEU_"+this.tk_.id
+        is Type.Named   -> "CEU_"+this.tk.str
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
-        is Type.Nat     -> this.tk_.src.let { if (it == "") "int" else it }
+        is Type.Nat     -> this.tk.str.let { if (it == "") "int" else it }
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce() + "*"
@@ -80,7 +80,7 @@ fun code_ft (tp: Type) {
                         Block* blks[${tp.xscps.second!!.size}];
                         struct {
                             ${tp.xscps.second!!.let { if (it.size == 0) "" else
-                                it.map { "Block* ${it.scp1.id};\n" }.joinToString("") }
+                                it.map { "Block* ${it.scp1.str};\n" }.joinToString("") }
                             }
                         };
                     };
@@ -166,7 +166,7 @@ fun code_ft (tp: Type) {
                 // Type.Union.struct
                 struct $ce {
                     union {
-                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk_.id=="Event" }) "char _ceu[${Event_Size}];" else "" }
+                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -179,7 +179,7 @@ fun code_ft (tp: Type) {
                             .mapIndexed { i,sub -> """
                                 union {
                                     ${sub.pos()} _${i+1};
-                                    ${if (tp.yids == null) "" else "${sub.pos()} ${tp.yids[i].id};"}
+                                    ${if (tp.yids == null) "" else "${sub.pos()} ${tp.yids[i].str};"}
                                 };
                                 
                                 """.trimIndent()
@@ -275,7 +275,7 @@ fun String.out_mem (up: Any): String {
 }
 
 fun Scope.toce (up: Any): String {
-    val id = this.scp1.id
+    val id = this.scp1.str
     return when {
         // @GLOBAL is never an argument
         (id == "GLOBAL") -> "GLOBAL"
@@ -327,7 +327,7 @@ fun Stmt.mem_vars (): String {
         is Stmt.Input, is Stmt.Output, is Stmt.Pause, is Stmt.Return, is Stmt.Break,
         is Stmt.Typedef -> ""
 
-        is Stmt.Var -> "${this.xtype!!.pos()} ${this.tk_.id};\n"
+        is Stmt.Var -> "${this.xtype!!.pos()} ${this.tk.str};\n"
         is Stmt.Loop -> this.block.mem_vars()
         is Stmt.DLoop -> this.block.mem_vars()
 
@@ -369,8 +369,8 @@ fun code_fe (e: Expr) {
     val xp = e.wtype!!
     CODE.addFirst(when (e) {
         is Expr.Unit  -> Code("", "", "", "", "0")
-        is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk_.src.native(e, e.tk)) }
-        is Expr.Var   -> Code("", "", "", "", e.tk_.id.out_mem(e))
+        is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk.str.native(e, e.tk)) }
+        is Expr.Var   -> Code("", "", "", "", e.tk.str.out_mem(e))
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
         is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk.field2num((e.tup.wtype as Type.Tuple).yids)) }
@@ -389,7 +389,7 @@ fun code_fe (e: Expr) {
             Code(x.type, x.struct, x.func, x.stmt, x.expr)
         }
         is Expr.Field -> CODE.removeFirst().let {
-            val src = when (e.tk_.id) {
+            val src = when (e.tk.str) {
                 "status" -> it.expr + "->task0.status"
                 "pub"   -> it.expr + "->pub"
                 "ret"   -> it.expr + "->ret"
@@ -457,7 +457,7 @@ fun code_fe (e: Expr) {
             val tpf  = e.f.wtype!!.noact()
             val upspawn = e.upspawn()
             when {
-                (e.f is Expr.Var && e.f.tk_.id=="output_std") -> {
+                (e.f is Expr.Var && e.f.tk.str=="output_std") -> {
                     Code (
                         f.type + arg.type,
                         f.struct + arg.struct,
@@ -469,7 +469,7 @@ fun code_fe (e: Expr) {
                 (tpf is Type.Func) -> {
                     val block = upspawn.let {
                         if (it is Stmt.DSpawn) {
-                            "&" + (it.dst as Expr.Var).tk_.id.out_mem(e) + ".block"
+                            "&" + (it.dst as Expr.Var).tk.str.out_mem(e) + ".block"
                         } else {
                             // always local
                             e.localBlockMem()
@@ -487,8 +487,8 @@ fun code_fe (e: Expr) {
                         {
                             ${if (upspawn !is Stmt.DSpawn) "" else {
                                 val dst = upspawn.dst as Expr.Var
-                                val len = ((dst.env(dst.tk_.id) as Stmt.Var).xtype as Type.Actives).len?.num ?: 0
-                                val mem = dst.tk_.id.out_mem(e)
+                                val len = ((dst.env(dst.tk.str) as Stmt.Var).xtype as Type.Actives).len?.num ?: 0
+                                val mem = dst.tk.str.out_mem(e)
                                 "if ($len==0 || pool_size((Task*)&$mem)<$len) {"
                             }}
                             Stack stk_${e.n} = { stack, ${e.self_or_null()}, ${e.localBlockMem()} };
@@ -595,27 +595,27 @@ fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> CODE.removeFirst().let {
-            if (s.tk_.id == "Event") {
+            if (s.tk.str == "Event") {
                 Event = "CEU_Event"
             }
             fun Type.defs (pre: String): String {
                 return if (this !is Type.Union || this.yids==null) "" else {
-                    this.yids.mapIndexed { i,id -> "#define CEU_${(pre+'_'+id.id).toUpperCase()} ${i+1}\n" }.joinToString("") +
-                    this.vec.mapIndexed { i,sub -> sub.defs(pre+'_'+this.yids[i].id) }.joinToString("")
+                    this.yids.mapIndexed { i,id -> "#define CEU_${(pre+'_'+id.str).toUpperCase()} ${i+1}\n" }.joinToString("") +
+                    this.vec.mapIndexed { i,sub -> sub.defs(pre+'_'+this.yids[i].str) }.joinToString("")
                 }
             }
             val src = """
-                //#define output_std_${s.tk_.id}_ output_std_${s.type.toce()}_
-                //#define output_std_${s.tk_.id}  output_std_${s.type.toce()}
-                typedef ${s.type.pos()} CEU_${s.tk_.id};
+                //#define output_std_${s.tk.str}_ output_std_${s.type.toce()}_
+                //#define output_std_${s.tk.str}  output_std_${s.type.toce()}
+                typedef ${s.type.pos()} CEU_${s.tk.str};
                 
             """.trimIndent()
-            Code(src+it.type+s.type.defs(s.tk_.id), it.struct, it.func, "", "")
+            Code(src+it.type+s.type.defs(s.tk.str), it.struct, it.func, "", "")
         }
         is Stmt.Native -> if (s.istype) {
-            Code("", s.tk_.src.native(s, s.tk) + "\n", "", "", "")
+            Code("", s.tk.str.native(s, s.tk) + "\n", "", "", "")
         } else {
-            Code("", "", "", s.tk_.src.native(s, s.tk) + "\n", "")
+            Code("", "", "", s.tk.str.native(s, s.tk) + "\n", "")
         }
         is Stmt.Seq -> {
             val s2 = CODE.removeFirst()
@@ -624,7 +624,7 @@ fun code_fs (s: Stmt) {
         }
         is Stmt.Var -> CODE.removeFirst().let {
             val src = if (s.xtype is Type.Actives) {
-                s.tk_.id.loc_mem(s).let {
+                s.tk.str.loc_mem(s).let {
                     """
                         $it = (Tasks) { TASK_POOL, { NULL, NULL }, { NULL, 0, { NULL, NULL, NULL } } };
                         task_link(${s.localBlockMem()}, (Task*) &$it);
@@ -794,20 +794,20 @@ fun code_fs (s: Stmt) {
             val arg = CODE.removeFirst()
             if (s.dst == null) {
                 val tp  = CODE.removeFirst()
-                val src = "input_${s.lib.id}_${s.xtype!!.toce()}(${arg.expr});\n"
+                val src = "input_${s.lib.str}_${s.xtype!!.toce()}(${arg.expr});\n"
                 Code(tp.type+arg.type, tp.struct+arg.struct, tp.func+arg.func, arg.stmt + src, "")
             } else {
                 val dst = CODE.removeFirst()
                 val tp  = CODE.removeFirst()
-                val src = "${dst.expr} = input_${s.lib.id}_${s.xtype!!.toce()}(${arg.expr});\n"
+                val src = "${dst.expr} = input_${s.lib.str}_${s.xtype!!.toce()}(${arg.expr});\n"
                 Code(tp.type+arg.type+dst.type, tp.struct+arg.struct+dst.struct, tp.func+arg.func+dst.func, arg.stmt+dst.stmt+src, "")
             }
         }
         is Stmt.Output -> CODE.removeFirst().let {
-            val call = if (s.lib.id == "std") {
+            val call = if (s.lib.str == "std") {
                 s.arg.wtype!!.output_std("", it.expr)
             } else {
-                "output_${s.lib.id}(${it.expr});\n"
+                "output_${s.lib.str}(${it.expr});\n"
             }
             Code(it.type, it.struct, it.func, it.stmt+call, "")
         }

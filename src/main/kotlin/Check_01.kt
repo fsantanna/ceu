@@ -1,16 +1,16 @@
 fun Scope.check (up: Any) {
-    val id = this.scp1.id
+    val id = this.scp1.str
     val ok = when {
         (id == "GLOBAL") -> true
         (id == "LOCAL") -> true
         (up.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> true  // (@i1 -> ...)
         up.env(id).let {                              // { @aaa ... @aaa }
-            it is Stmt.Block && (id==it.scp1?.id || id=="B"+it.n) ||
-            it is Stmt.Var   && id==it.tk_.id.toUpperCase()
+            it is Stmt.Block && (id==it.scp1?.str || id=="B"+it.n) ||
+            it is Stmt.Var   && id==it.tk.str.toUpperCase()
         } -> true
         (up.ups_first {                                     // [@i1, ...] { @i1 }
-            it is Stmt.Typedef && (it.xscp1s.first!!.any { it.id==id })
-         || it is Expr.Func    && (it.ftp()?.xscps?.second?.any { it.scp1.id==id } ?: false)
+            it is Stmt.Typedef && (it.xscp1s.first!!.any { it.str==id })
+         || it is Expr.Func    && (it.ftp()?.xscps?.second?.any { it.scp1.str==id } ?: false)
         } != null) -> true
         else -> false
     }
@@ -26,7 +26,7 @@ fun Expr.UCons.check (tp: Type) {
     val uni = tp as Type.Union
     val idx = this.tk.field2num(uni.yids)
     All_assert_tk(this.tk, idx != null) {
-        "invalid constructor : unknown discriminator \"${this.tk.id()}\""
+        "invalid constructor : unknown discriminator \"${this.tk.str}\""
     }
     val MIN = if (uni.common == null) 1 else 0
     val ok = (MIN <= idx!! && idx!! <= uni.vec.size)
@@ -42,14 +42,14 @@ fun check_01_before_tps (s: Stmt) {
             is Type.Func -> {
                 val ptrs = (tp.inp.flattenLeft() + tp.out.flattenLeft()).filter { it is Type.Pointer } as List<Type.Pointer>
                 val ok = ptrs.all {
-                    val ptr = it.xscp!!.scp1.id
+                    val ptr = it.xscp!!.scp1.str
                     when {
                         (ptr == "GLOBAL") -> true
                         (
-                            tp.xscps.second?.any { ptr==it.scp1.id } ?: false      // (@i1 -> ...@i1...)
+                            tp.xscps.second?.any { ptr==it.scp1.str } ?: false      // (@i1 -> ...@i1...)
                         ) -> true
                         (tp.ups_first {                     // { @aaa \n ...@aaa... }
-                            it is Stmt.Block && it.scp1.let { it!=null && it.id==ptr }
+                            it is Stmt.Block && it.scp1.let { it!=null && it.str==ptr }
                         } != null) -> true
                         else -> false
                     }
@@ -73,9 +73,9 @@ fun check_01_before_tps (s: Stmt) {
                     val ts = it.filter { it is Type.Func }.let { it as List<Type.Func> }
                     (es + ts).map { it?.xscps?.second ?: emptyList() }.flatten()
                 }
-                val err = outers.find { out -> e?.ftp()?.xscps?.second!!.any { it.scp1.id==out.scp1.id } }
+                val err = outers.find { out -> e?.ftp()?.xscps?.second!!.any { it.scp1.str==out.scp1.str } }
                 All_assert_tk(e.tk, err==null) {
-                    "invalid scope : \"@${err!!.scp1.id}\" is already declared (ln ${err!!.scp1.lin})"
+                    "invalid scope : \"@${err!!.scp1.str}\" is already declared (ln ${err!!.scp1.lin})"
                 }
             }
 

@@ -3,17 +3,7 @@ fun String.istype (): Boolean {
 }
 
 fun Tk.Scp.isscopepar (): Boolean {
-    return this.id.none { it.isUpperCase() }
-}
-
-fun Tk.id (): String {
-    return when (this) {
-        is Tk.Num -> this.num.toString()
-        is Tk.ide -> this.id
-        is Tk.Ide -> this.id
-        is Tk.IDE -> this.id
-        else -> error("bug found")
-    }
+    return this.str.none { it.isUpperCase() }
 }
 
 fun Tk.Nat.toce (): String {
@@ -22,7 +12,7 @@ fun Tk.Nat.toce (): String {
         '(' -> Pair("(", ")")
         else -> Pair("", "")
     }
-    return "_" + op + this.src + cl
+    return "_" + op + this.str + cl
 }
 
 fun Tk.field2num (ids: List<Tk>?): Int? {
@@ -30,28 +20,18 @@ fun Tk.field2num (ids: List<Tk>?): Int? {
         this is Tk.Num -> this.num
         //this is Tk.Key -> null
         (ids == null)  -> null
-        this is Tk.ide -> ids!!.indexOfFirst{it.id()==this.id}.let { if (it == -1) null else it+1 }
+        this is Tk.ide -> ids!!.indexOfFirst{it.str==this.str}.let { if (it == -1) null else it+1 }
         this is Tk.Ide -> {
-            if (this.id == "Common") 0 else {
-                ids!!.indexOfFirst { it.id() == this.id }.let { if (it == -1) null else it + 1 }
+            if (this.str == "Common") 0 else {
+                ids!!.indexOfFirst { it.str == this.str }.let { if (it == -1) null else it + 1 }
             }
         }
         else -> error("bug found")
     }
 }
 
-fun Tk.tostr (): String {
-    return when (this) {
-        is Tk.Num -> this.num.toString()
-        is Tk.Ide -> this.id
-        is Tk.ide -> this.id
-        is Tk.Key -> this.key
-        else -> error("bug found")
-    }
-}
-
 fun Tk.istask (): Boolean {
-    return this is Tk.ide && this.id in arrayOf("pub","ret","status")
+    return this is Tk.ide && this.str in arrayOf("pub","ret","status")
 }
 
 fun TK.toErr (chr: Char?): String {

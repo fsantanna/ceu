@@ -51,20 +51,21 @@ val key2tk: HashMap<String, TK> = hashMapOf (
 
 sealed class Tk (
     val enu: TK,
+    val str: String,
     val lin: Int,
     val col: Int,
 ) {
-    data class Err (val enu_: TK, val lin_: Int, val col_: Int, val err: String): Tk(enu_,lin_,col_)
-    data class Sym (val enu_: TK, val lin_: Int, val col_: Int, val sym: String): Tk(enu_,lin_,col_)
-    data class Chr (val enu_: TK, val lin_: Int, val col_: Int, val chr: Char):   Tk(enu_,lin_,col_)
-    data class Key (val enu_: TK, val lin_: Int, val col_: Int, val key: String): Tk(enu_,lin_,col_)
-    data class ide (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
-    data class Ide (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
-    data class IDE (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
-    data class Scp (val enu_: TK, val lin_: Int, val col_: Int, val id: String):  Tk(enu_,lin_,col_)
-    data class Nat (val enu_: TK, val lin_: Int, val col_: Int, val chr: Char?, val src: String): Tk(enu_,lin_,col_)
-    data class Num (val enu_: TK, val lin_: Int, val col_: Int, val num: Int):    Tk(enu_,lin_,col_)
-    data class Clk (val enu_: TK, val lin_: Int, val col_: Int, val ms: Int):     Tk(enu_,lin_,col_)
+    data class Err (val enu_: TK, val str_: String, val lin_: Int, val col_: Int): Tk(enu_,str_,lin_,col_)
+    data class Sym (val enu_: TK, val str_: String, val lin_: Int, val col_: Int): Tk(enu_,str_,lin_,col_)
+    data class Chr (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):   Tk(enu_,str_,lin_,col_)
+    data class Key (val enu_: TK, val str_: String, val lin_: Int, val col_: Int): Tk(enu_,str_,lin_,col_)
+    data class ide (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)
+    data class Ide (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)
+    data class IDE (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)
+    data class Scp (val enu_: TK, val str_: String, val lin_: Int, val col_: Int):  Tk(enu_,str_,lin_,col_)
+    data class Nat (val enu_: TK, val str_: String, val lin_: Int, val col_: Int, val chr: Char?): Tk(enu_,str_,lin_,col_)
+    data class Num (val enu_: TK, val str_: String, val lin_: Int, val col_: Int, val num: Int):    Tk(enu_,str_,lin_,col_)
+    data class Clk (val enu_: TK, val str_: String, val lin_: Int, val col_: Int, val ms: Int):     Tk(enu_,str_,lin_,col_)
 }
 
 sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {

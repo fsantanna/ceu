@@ -100,7 +100,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("<Cons=/List,Unit=()>"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Union && tp.vec[1] is Type.Unit && tp.yids!![0].id=="Cons")
+        assert(tp is Type.Union && tp.vec[1] is Type.Unit && tp.yids!![0].str=="Cons")
     }
     @Test
     fun d04_typedef () {
@@ -119,7 +119,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("[xxx:/List,yyy:()]"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Tuple && tp.vec[1] is Type.Unit && tp.yids!![0].id=="xxx")
+        assert(tp is Type.Tuple && tp.vec[1] is Type.Unit && tp.yids!![0].str=="xxx")
     }
     @Test
     fun d06_typedef () {

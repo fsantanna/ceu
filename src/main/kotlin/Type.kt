@@ -127,7 +127,7 @@ fun Type.react_noalias (up: Expr): Type {
 
 fun Type.noalias (): Type {
     return if (this !is Type.Named) this else {
-        val def = this.env(this.tk_.id)!! as Stmt.Typedef
+        val def = this.env(this.tk.str)!! as Stmt.Typedef
 
         // Original constructor:
         //      typedef Pair @[a] = [/_int@a,/_int@a]
@@ -137,7 +137,7 @@ fun Type.noalias (): Type {
         //      var xy: Pair @[LOCAL] = [/x,/y]
 
         def.toType().mapScps(false,
-            def.xscp1s.first!!.map { it.id }.zip(this.xscps!!).toMap()
+            def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
         ).clone(this,this.tk.lin,this.tk.col)
     }
 }
@@ -146,8 +146,8 @@ fun Type.toce (): String {
     return when (this) {
         is Type.Unit    -> "Unit"
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
-        is Type.Named   -> this.tk_.id
-        is Type.Nat     -> this.tk_.src.replace('*','_')
+        is Type.Named   -> this.tk.str
+        is Type.Nat     -> this.tk.str.replace('*','_')
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.enu==TK.TASK) "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
@@ -184,7 +184,7 @@ fun mismatch (sup: Type, sub: Type): String {
 // zip [[{@scp1a,@scp1b},{@scp2a,@scp2b}],{@a1,@b1}]
 fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
     fun Scope.idx(): Scope {
-        return map[this.scp1.id] ?: this
+        return map[this.scp1.str] ?: this
     }
     return when (this) {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))

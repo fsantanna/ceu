@@ -54,12 +54,12 @@ fun Any.env (id: String): Any? {
     val xid = if (id.istype()) id else id.toUpperCase()
     return this.env_first_map {
         when {
-            (it is Stmt.Typedef && it.tk_.id==xid)                  -> it
-            (it is Stmt.Var     && it.tk_.id.toUpperCase()==xid)    -> it
-            (it is Stmt.Block   && (it.scp1?.id==xid || "B"+it.n==xid)) -> it
+            (it is Stmt.Typedef && it.tk.str==xid)                  -> it
+            (it is Stmt.Var     && it.tk.str.toUpperCase()==xid)    -> it
+            (it is Stmt.Block   && (it.scp1?.str==xid || "B"+it.n==xid)) -> it
             (it is Expr.Func) -> {
                 fun Type.nonat_ (): Type? {
-                    return if (this is Type.Nat && this.tk_.src=="") null else this
+                    return if (this is Type.Nat && this.tk.str=="") null else this
                 }
                 when {
                     (it.ftp() == null) -> if (id in listOf("arg","pub","ret","evt")) true else null
@@ -67,7 +67,7 @@ fun Any.env (id: String): Any? {
                     (id == "pub") -> it.ftp()!!.pub!!.nonat_()
                     (id == "ret") -> it.ftp()!!.out.nonat_()
                     (id == "evt") -> Type.Named (
-                        Tk.Ide(TK.XIde, it.tk.lin, it.tk.col, "Event"),
+                        Tk.Ide(TK.XIde, "Event", it.tk.lin, it.tk.col),
                         emptyList(),
                         false,
                         emptyList()
@@ -88,8 +88,8 @@ fun Stmt.setEnvs (env: Any?): Any? {
         tp.wenv = if (this is Stmt.Typedef) this else env
         when (tp) {
             is Type.Named -> {
-                tp.xisrec = tp.env(tp.tk_.id)?.toType()?.let {
-                    it.flattenLeft().any { it is Type.Named && it.tk_.id==tp.tk_.id }
+                tp.xisrec = tp.env(tp.tk.str)?.toType()?.let {
+                    it.flattenLeft().any { it is Type.Named && it.tk.str==tp.tk.str }
                 } ?: false
             }
         }

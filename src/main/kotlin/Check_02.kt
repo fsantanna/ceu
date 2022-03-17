@@ -1,5 +1,5 @@
 fun check_ctrs (up: Any, dcl_scps: Pair<List<Tk.Scp>, List<Pair<String, String>>>, use_scps: List<Scope>): Boolean {
-    val pairs = dcl_scps.first.map { it.id }.zip(use_scps!!)
+    val pairs = dcl_scps.first.map { it.str }.zip(use_scps!!)
     dcl_scps.second.forEach { ctr ->   // for each constraint
         // check if call args (x,y) respect this contraint
         val x = pairs.find { it.first==ctr.first  }!!.second
@@ -15,7 +15,7 @@ fun check_02_after_tps (s: Stmt) {
     fun ft (tp: Type) {
         when (tp) {
             is Type.Named -> {
-                val def = tp.env(tp.tk_.id) as Stmt.Typedef
+                val def = tp.env(tp.tk.str) as Stmt.Typedef
                 val s1 = def.xscp1s.first!!.size
                 val s2 = tp.xscps!!.size
                 All_assert_tk(tp.tk, s1 == s2) {    // xsc1ps may not be available in Check_01
@@ -79,7 +79,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
 
                 val (inp2,out2) = if (func is Type.Func) {
-                    val map = scp1s.first!!.map { it.scp1.id }.zip(e.xscps.first!!).toMap()
+                    val map = scp1s.first!!.map { it.scp1.str }.zip(e.xscps.first!!).toMap()
                     Pair (
                         inp1.mapScps(false, map).clone(e,e.tk.lin,e.tk.col),
                         out1.mapScps(true,  map).clone(e,e.tk.lin,e.tk.col)
@@ -115,7 +115,7 @@ fun check_02_after_tps (s: Stmt) {
     fun fs (s: Stmt) {
         when (s) {
             is Stmt.Await -> {
-                All_assert_tk(s.tk, s.e.wtype is Type.Active || s.e.wtype.let { it is Type.Nat && it.tk_.src=="int" }) {
+                All_assert_tk(s.tk, s.e.wtype is Type.Active || s.e.wtype.let { it is Type.Nat && it.tk.str=="int" }) {
                     "invalid condition : type mismatch : expected _int : have ${s.e.wtype!!.tostr()}"
                 }
             }
@@ -144,14 +144,14 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid `spawn` : type mismatch : expected task : have ${ftp.tostr()}"
                 }
                 val dst = (s.dst.wtype!! as Type.Actives).tsk
-                //println("invalid `spawn` : type mismatch : ${dst.tostr()} = ${call.tostr()}")
+                //println("invalid `spawn` : type mismatch : ${dst.str} = ${call.str}")
                 val alias = if (call.f !is Expr.Unpak) ftp else call.f.e.wtype!!
                 All_assert_tk(s.tk, dst.isSupOf(alias)) {
                     "invalid `spawn` : ${mismatch(dst,alias)}"
                 }
             }
             is Stmt.Emit -> {
-                All_assert_tk(s.tk, s.e.wtype.let { it is Type.Named && it.tk_.id=="Event" }) {
+                All_assert_tk(s.tk, s.e.wtype.let { it is Type.Named && it.tk.str=="Event" }) {
                     "invalid `emit` : type mismatch : expected Event : have ${s.e.wtype!!.tostr()}"
                 }
             }
@@ -180,7 +180,7 @@ fun check_02_after_tps (s: Stmt) {
                 //println(s.dst) ; println(s.dst.dump()) ; println(dst.dump()) ; println(dst.tostr())
                 //println(s.src) ; println(s.src.dump()) ; println(src.dump()) ; println(src.tostr())
                 All_assert_tk(s.tk, dst.isSupOf(src)) {
-                    val str = if (s.dst is Expr.Var && s.dst.tk_.id == "ret") "return" else "assignment"
+                    val str = if (s.dst is Expr.Var && s.dst.tk.str == "ret") "return" else "assignment"
                     "invalid $str : ${mismatch(dst,src)}"
                 }
             }

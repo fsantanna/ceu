@@ -5,7 +5,7 @@
 fun Type.Func.mapLabels (up: Any): Type.Func {
     val fst = this.xscps.first.let { if (it==null) emptyList() else listOf(it) }
     val snd = this.xscps.second!!.map { it }
-    val scps: List<String> = (fst + snd).map { it.scp1.id }
+    val scps: List<String> = (fst + snd).map { it.scp1.str }
     val MAP: Map<String, String> = scps.zip((1..scps.size).map { 'a'+it-1+"" }).toMap()
     fun Type.aux (): Type {
         return when (this) {
@@ -15,12 +15,12 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> this.xscp.let {
-                val id = MAP[it!!.scp1.id]
+                val id = MAP[it!!.scp1.str]
                 if (id == null) {
                     this
                 } else {
                     // TODO: scp2 = null
-                    val scp = Scope(Tk.Scp(TK.XSCP, this.tk.lin, this.tk.col, id), null)
+                    val scp = Scope(Tk.Scp(TK.XSCP, id, this.tk.lin, this.tk.col), null)
                     Type.Pointer(this.tk_, scp, this.pln.aux())
                 }
             }
@@ -51,7 +51,7 @@ fun Scope.isNestIn (sub: Scope, up: Any): Boolean {
         (sub.scp2!!.second==null && sub.scp2!!.third==0) -> true           // global as source is always ok
         bothcst -> (this.scp2!!.third!! >= sub.scp2!!.third!!)
         bothpar -> this.scp2!!.second!! == sub.scp2!!.second!! || (up.ups_first { it is Expr.Func } as Expr.Func).let {
-            // look for (this.id > sub.id) in constraints
+            // look for (this.str > sub.str) in constraints
             it.ftp()!!.xscps.third!!.any { it.first==this.scp2!!.second!! && it.second==sub.scp2!!.second!! }
         }
         else -> (sub.scp2!!.second!=null && this.scp2!!.first==sub.scp2!!.first)
@@ -67,9 +67,9 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
         (this is Type.Named && sub is Type.Named)    -> {    // TODO: check scopes
             //println(this.dump())
             //println(sub.dump())
-            (this.tk_.id == sub.tk_.id) &&
+            (this.tk.str == sub.tk.str) &&
             (this.subs.size <= sub.subs.size) &&
-            this.subs.zip(sub.subs).all { it.first.id()==it.second.id() }
+            this.subs.zip(sub.subs).all { it.first.str==it.second.str }
         }
         (this::class != sub::class) -> false
         (this is Type.Unit && sub is Type.Unit) -> true
@@ -100,7 +100,7 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
             //println("SUPOF [$isproto] ${this.tk.lin}: ${this.scope()} = ${sub.scope()} /// ${this.scope}")
             */
             val ok = if (isproto) { // comparing func prototypes does not depend on scope calculation
-                (this.xscp!!.scp1.id == sub.xscp!!.scp1.id)
+                (this.xscp!!.scp1.str == sub.xscp!!.scp1.str)
             } else {
                 this.xscp!!.isNestIn(sub.xscp!!, this)
             }

@@ -1921,6 +1921,46 @@ class TExec {
        """.trimIndent())
         assert(out == "10\n") { out }
     }
+    @Test
+    fun p14_type_hier_sub_ok () {
+        val out = all("""
+        type Hier = [_int] + <(),<<(),()>,()>>
+        var h: Hier
+        set h = Hier.2.1.2 [_10:_int]
+        --output std /h
+        output std h?2.1.1      -- h?2 && h!2?1 && h!2!1?1
+        output std h?2.1.2
+        output std h!2.1.2.1    -- h!(2!1!2).1
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun pxx_type_hier_sub_ok () {
+        val out = all("""
+        type Hier = [_int] + <(),<<(),()>,()>>
+        var h: Hier
+        set h = Hier.2.1.2 [_10:_int]
+        --output std /h
+        output std h?!2?!1?1      -- h?2 && h!2?1 && h!2!1?1
+        output std h?!2?!1?2
+        output std h!2.1.2.1    -- h!(2!1!2).1
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun p15_type_hier_sub_ok () {
+        val out = all("""
+        type Hier = [_int] + <(),<<(),()>,()>>
+        var h: Hier
+        set h = Hier.2.1.2 [_10:_int]
+        set h!2.1 = <.1 [_5:_int]>
+        --output std /h
+        output std h?2.1.1
+        output std h?2.1.2
+        output std h!2.1.1
+       """.trimIndent())
+        assert(out == "[_5]\n") { out }
+    }
 
     // ALL
 

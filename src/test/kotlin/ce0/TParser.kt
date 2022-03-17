@@ -44,7 +44,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_char"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Nat && tp.tk_.src == "char")
+        assert(tp is Type.Nat && tp.tk.str == "char")
     }
 
     @Test
@@ -52,7 +52,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("[(),_char]"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Tuple && tp.vec.size == 2 && tp.vec[0] is Type.Unit && tp.vec[1] is Type.Nat && (tp.vec[1].tk as Tk.Nat).src == "char")
+        assert(tp is Type.Tuple && tp.vec.size == 2 && tp.vec[0] is Type.Unit && tp.vec[1] is Type.Nat && (tp.vec[1].tk as Tk.Nat).str == "char")
     }
 
     @Test
@@ -120,7 +120,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()"), 2))
         Lexer.lex()
         val t = Parser.type()
-        //assert(t is Type.Pointer && t.xscp!!.scp1.id=="LOCAL")
+        //assert(t is Type.Pointer && t.xscp!!.scp1.str=="LOCAL")
         assert(t is Type.Pointer && t.xscp == null)
         //assert(e.message == "(ln 1, col 4): expected `@´ : have end of file") { e.message!! }
     }
@@ -130,7 +130,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()@x"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Pointer && tp.xscp!!.scp1.id == "x")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.str == "x")
     }
 
     @Test
@@ -138,7 +138,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("/()@LOCAL"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Pointer && tp.xscp!!.scp1.id == "LOCAL")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.str == "LOCAL")
         /*
         try {
             val s = Parser.type()
@@ -213,7 +213,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("//() @a @b"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Pointer && tp.xscp!!.scp1.id == "b" && tp.pln is Type.Pointer && (tp.pln as Type.Pointer).xscp!!.scp1.id == "a")
+        assert(tp is Type.Pointer && tp.xscp!!.scp1.str == "b" && tp.pln is Type.Pointer && (tp.pln as Type.Pointer).xscp!!.scp1.str == "a")
     }
 
     // EXPR
@@ -231,7 +231,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Var && e.tk_.id == "x")
+        assert(e is Expr.Var && e.tk.str == "x")
     }
 
     @Test
@@ -239,7 +239,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_x:_int"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Nat && e.tk_.src == "x" && e.wtype is Type.Nat)
+        assert(e is Expr.Nat && e.tk.str == "x" && e.wtype is Type.Nat)
     }
 
     @Test
@@ -247,7 +247,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_x:_int"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Nat && e.tk_.src == "x" && e.wtype is Type.Nat)
+        assert(e is Expr.Nat && e.tk.str == "x" && e.wtype is Type.Nat)
     }
 
     @Test
@@ -303,7 +303,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("[(),x,()]"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TCons && e.arg.size == 3 && e.arg[0] is Expr.Unit && e.arg[1] is Expr.Var && (e.arg[1].tk as Tk.ide).id == "x")
+        assert(e is Expr.TCons && e.arg.size == 3 && e.arg[0] is Expr.Unit && e.arg[1] is Expr.Var && (e.arg[1].tk as Tk.ide).str == "x")
     }
 
     @Test
@@ -364,7 +364,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).id == "xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).str == "xxx" && e.arg is Expr.Unit)
     }
 
     @Test
@@ -372,7 +372,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).id == "xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).str == "xxx" && e.arg is Expr.Unit)
     }
 
     @Test
@@ -653,7 +653,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("{ @A }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Block && s.scp1!!.id == "A")
+        assert(s is Stmt.Block && s.scp1!!.str == "A")
     }
 
     // STMT_CALL
@@ -704,7 +704,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
-        assert(s is Stmt.Output && s.lib.id == "std")
+        assert(s is Stmt.Output && s.lib.str == "std")
     }
 
     @Test
@@ -713,7 +713,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
-        assert(s is Stmt.Input && s.lib.id == "std" && s.xtype is Type.Nat && s.dst!! is Expr.Var && s.arg is Expr.Unit)
+        assert(s is Stmt.Input && s.lib.str == "std" && s.xtype is Type.Nat && s.dst!! is Expr.Var && s.arg is Expr.Unit)
     }
 
     @Test
@@ -722,7 +722,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
-        assert(s is Stmt.Input && s.lib.id == "std" && s.xtype is Type.Nat && s.dst == null && s.arg is Expr.Unit)
+        assert(s is Stmt.Input && s.lib.str == "std" && s.xtype is Type.Nat && s.dst == null && s.arg is Expr.Unit)
     }
 
     // STMT_SEQ
@@ -733,10 +733,10 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmts()
         assert(
-            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.tk as Tk.ide).id == "g" &&
+            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.tk as Tk.ide).str == "g" &&
                     (s.s1 as Stmt.Seq).let {
                         it.s1 is Stmt.SCall && (it.s1 as Stmt.SCall).let {
-                            it.e.f is Expr.Var && (it.e.f.tk as Tk.ide).id == "f"
+                            it.e.f is Expr.Var && (it.e.f.tk as Tk.ide).str == "f"
                         }
                     }
         )
@@ -812,7 +812,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         assert(
-            (s is Stmt.Set) && ((s.dst as Expr.Var).tk_.id == "f") &&
+            (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") &&
                     s.src.let {
                         (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.Return
                     }
@@ -833,7 +833,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         assert(
-            (s is Stmt.Set) && ((s.dst as Expr.Var).tk_.id == "f") //&& s.src.let { (it is Expr.Func) && (it.ups.size==2) }
+            (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") //&& s.src.let { (it is Expr.Func) && (it.ups.size==2) }
         )
     }
 
@@ -844,7 +844,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native _{xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk_.src == "xxx" && !s.istype)
+        assert(s is Stmt.Native && s.tk.str == "xxx" && !s.istype)
     }
 
     @Test
@@ -852,7 +852,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native type _{xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk_.src == "xxx" && s.istype)
+        assert(s is Stmt.Native && s.tk.str == "xxx" && s.istype)
     }
 
     @Test
@@ -872,7 +872,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native _{${D}xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk_.src == "${D}xxx")
+        assert(s is Stmt.Native && s.tk.str == "${D}xxx")
     }
 
     // STMT_LOOP
@@ -929,7 +929,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("loop tk in () {}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Block && s.body.let { it is Stmt.DLoop && it.i.tk_.id == "tk" && it.tsks is Expr.Unit })
+        assert(s is Stmt.Block && s.body.let { it is Stmt.DLoop && it.i.tk.str == "tk" && it.tsks is Expr.Unit })
     }
 
     @Test
@@ -975,7 +975,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("x.y"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TDisc && e.tup is Expr.Var && e.tk_.id()=="y")
+        assert(e is Expr.TDisc && e.tup is Expr.Var && e.tk.str=="y")
         /*
         try {
             Parser.expr()
@@ -1001,7 +1001,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("active {} task @[]->()->()->()"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Actives && tp.tsk.tk.enu == TK.TASK && (tp.tsk as Type.Func).xscps.first.scp1.id == "LOCAL")
+        assert(tp is Type.Actives && tp.tsk.tk.enu == TK.TASK && (tp.tsk as Type.Func).xscps.first.scp1.str == "LOCAL")
     }
 
     // TYPEDEF
@@ -1011,7 +1011,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("type Unit = ()"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Typedef && s.tk_.id == "Unit" && s.type is Type.Unit)
+        assert(s is Stmt.Typedef && s.tk.str == "Unit" && s.type is Type.Unit)
     }
 
     @Test
@@ -1019,7 +1019,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("var x: Unit"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Var && s.xtype is Type.Named && (s.xtype as Type.Named).tk_.id == "Unit")
+        assert(s is Stmt.Var && s.xtype is Type.Named && (s.xtype as Type.Named).tk.str == "Unit")
     }
 
     @Test

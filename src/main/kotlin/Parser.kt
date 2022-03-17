@@ -44,7 +44,7 @@ object Parser
 
                 Type.Func(tk0,
                     Triple(
-                        Scope(Tk.Scp(TK.XSCP, tk0.lin, tk0.col, "LOCAL"),null),
+                        Scope(Tk.Scp(TK.XSCP, "LOCAL", tk0.lin, tk0.col),null),
                         if (scps==null) null else scps.map { Scope(it,null) },
                         ctrs
                     ),
@@ -198,7 +198,7 @@ object Parser
     fun scp1s (f: (Tk.Scp) -> Unit): List<Tk.Scp> {
         val scps = mutableListOf<Tk.Scp>()
         while (alls.accept(TK.Xide) || alls.accept(TK.XIDE)) {
-            val tk = Tk.Scp(TK.XSCP, alls.tk0.lin, alls.tk0.col, alls.tk0.id())
+            val tk = Tk.Scp(TK.XSCP, alls.tk0.str, alls.tk0.lin, alls.tk0.col)
             f(tk)
             scps.add(tk)
             if (!alls.accept(TK.CHAR, ',')) {
@@ -210,15 +210,15 @@ object Parser
     fun scopepars (): Pair<List<Tk.Scp>, List<Pair<String, String>>> {
         alls.accept_err(TK.ATBRACK)
         val scps = this.scp1s {
-            All_assert_tk(it, it.id.none { it.isUpperCase() }) { "invalid scope parameter identifier" }
+            All_assert_tk(it, it.str.none { it.isUpperCase() }) { "invalid scope parameter identifier" }
         }
         val ctrs = mutableListOf<Pair<String, String>>()
         if (alls.accept(TK.CHAR, ':')) {
             while (alls.accept(TK.Xide)) {
-                val id1 = (alls.tk0 as Tk.ide).id
+                val id1 = (alls.tk0 as Tk.ide).str
                 alls.accept_err(TK.CHAR, '>')
                 alls.accept_err(TK.Xide)
-                val id2 = (alls.tk0 as Tk.ide).id
+                val id2 = (alls.tk0 as Tk.ide).str
                 ctrs.add(Pair(id1, id2))
                 if (!alls.accept(TK.CHAR, ',')) {
                     break
@@ -242,7 +242,7 @@ object Parser
                     // Bool.False
                     (tp.subs.size > 0) -> {
                         var ret = if (alls.checkExpr()) this.expr() else {
-                            Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
+                            Expr.Unit(Tk.Sym(TK.UNIT, "()", alls.tk1.lin, alls.tk1.col))
                         }
                         for (tk in tp.subs.reversed()) {
                             ret = Expr.UCons(tk, null, ret)
@@ -294,7 +294,7 @@ object Parser
                 val cons = if (alls.checkExpr()) {
                     this.expr()
                 } else {
-                    Expr.Unit(Tk.Sym(TK.UNIT, alls.tk1.lin, alls.tk1.col, "()"))
+                    Expr.Unit(Tk.Sym(TK.UNIT, "()", alls.tk1.lin, alls.tk1.col))
                 }
                 alls.accept_err(TK.CHAR, '>')
                 val ok = if (CE1) alls.accept(TK.CHAR, ':') else alls.accept_err(TK.CHAR, ':')
@@ -400,7 +400,7 @@ object Parser
             }
             e = Expr.Call(e.tk,
                 if (e is Expr.Unpak || !CE1) e else {
-                    Expr.Unpak(Tk.Chr(TK.CHAR,e.tk.lin,e.tk.col,'~'), true, e)
+                    Expr.Unpak(Tk.Chr(TK.CHAR,"~",e.tk.lin,e.tk.col), true, e)
                 },
                 arg,
                 Pair(
@@ -428,9 +428,10 @@ object Parser
             val tk0 = alls.tk0
             val chr = if (tk0 is Tk.Chr) tk0 else null
 
-            if (chr?.chr in arrayOf('.','!','?')) {
+            if (chr?.str in arrayOf(".","!","?")) {
                 alls.accept(TK.Xide) || alls.accept(TK.XIde) || alls.accept(TK.XNUM) || alls.accept(TK.NULL) || alls.err_tk1_unexpected()
-                if (chr!!.chr == '.') {
+
+                if (chr!!.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
                         "invalid field : unexpected type identifier"
                     }
@@ -447,13 +448,13 @@ object Parser
                 e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(chr,true,e) else e
             }
 
-            e = when (chr?.chr) {
+            e = when (chr?.str) {
                 null -> {
                     assert(tk0.enu == TK.CAST)
                     val tp = this.type()
                     Expr.Cast(tk0 as Tk.Sym, e, tp)
                 }
-                '\\' -> {
+                "\\" -> {
                     All_assert_tk(
                         alls.tk0,
                         e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.UDisc || e is Expr.Dnref || e is Expr.Upref || e is Expr.Call
@@ -462,10 +463,10 @@ object Parser
                     }
                     Expr.Dnref(chr, e)
                 }
-                '~' -> Expr.Unpak(chr, false, e)
-                '?' -> Expr.UPred(alls.tk0, e)
-                '!' -> Expr.UDisc(alls.tk0, e)
-                '.' -> {
+                "~" -> Expr.Unpak(chr, false, e)
+                "?" -> Expr.UPred(alls.tk0, e)
+                "!" -> Expr.UDisc(alls.tk0, e)
+                "." -> {
                     if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
                         Expr.Field(alls.tk0 as Tk.ide, e)
                     } else {
@@ -481,7 +482,7 @@ object Parser
         alls.accept_err(TK.XWHERE)
         val tk0 = alls.tk0
         val blk = this.block()
-        assert(!blk.iscatch && blk.scp1?.id.isanon()) { "TODO" }
+        assert(!blk.iscatch && blk.scp1?.str.isanon()) { "TODO" }
         return when {
             (s !is Stmt.Seq) -> {
                 All_nest("""
@@ -566,9 +567,9 @@ object Parser
         ) {
             val chr = alls.tk0 as Tk.Chr
 
-            if (chr.chr !in arrayOf('.','!')) null else {
+            if (chr.str !in arrayOf(".","!")) null else {
                 alls.accept(TK.Xide) || alls.accept_err(TK.XNUM)
-                if (chr.chr == '.') {
+                if (chr.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
                         "invalid field : expected index or variable identifier"
                     }
@@ -582,8 +583,8 @@ object Parser
                 e = if (CE1 && e !is Attr.Unpak) Attr.Unpak(chr,true,e) else e
             }
 
-            e = when (chr.chr) {
-                '\\' -> {
+            e = when (chr.str) {
+                "\\" -> {
                     All_assert_tk(
                         alls.tk0,
                         e is Attr.Nat || e is Attr.Var || e is Attr.TDisc || e is Attr.UDisc || e is Attr.Dnref
@@ -592,9 +593,9 @@ object Parser
                     }
                     Attr.Dnref(chr, e)
                 }
-                '~' -> Attr.Unpak(chr, true, e)
-                '!' -> Attr.UDisc(alls.tk0, e)
-                '.' -> {
+                "~" -> Attr.Unpak(chr, true, e)
+                "!" -> Attr.UDisc(alls.tk0, e)
+                "." -> {
                     if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
                         Attr.Field(alls.tk0 as Tk.ide, e)
                     } else {
@@ -613,7 +614,7 @@ object Parser
         val tk0 = alls.tk0 as Tk.Chr
         val scp1 = if (!alls.accept(TK.XSCP)) null else {
             val tk = alls.tk0 as Tk.Scp
-            All_assert_tk(tk, tk.id.none { it.isLowerCase() }) {
+            All_assert_tk(tk, tk.str.none { it.isLowerCase() }) {
                 "invalid scope constant identifier"
             }
             tk
@@ -743,7 +744,7 @@ object Parser
                                     if _(${D}st_$N == TASK_AWAITING) {
                                         await tsk_$N
                                     }
-                                    set ${tk_id.id} = tsk_$N.ret
+                                    set ${tk_id.str} = tsk_$N.ret
                                 }
                             """.trimIndent()
                             ) {
@@ -774,7 +775,7 @@ object Parser
                 val false_ = if (alls.accept(TK.ELSE)) {
                     this.block()
                 } else {
-                    Stmt.Block(Tk.Chr(TK.CHAR, alls.tk1.lin, alls.tk1.col, '{'), false, null, Stmt.Nop(alls.tk0))
+                    Stmt.Block(Tk.Chr(TK.CHAR, "{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }
@@ -1010,7 +1011,7 @@ object Parser
                         watching tsk_$N {
                             loop {
                                 await ${pred.tostr(true)}
-                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.tostr()}
+                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.str}
                                 if x_$N {
                                     pause tsk_$N
                                 } else {

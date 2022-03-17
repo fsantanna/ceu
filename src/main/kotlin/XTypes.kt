@@ -46,7 +46,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     this.e.xinfTypes(unpak)
                     if (!this.isact!!) tp else {
                         Type.Active(
-                            Tk.Key(TK.ACTIVE, this.tk.lin, this.tk.col, "active"),
+                            Tk.Key(TK.ACTIVE, "active", this.tk.lin, this.tk.col),
                             tp
                         )
                     }
@@ -75,21 +75,21 @@ fun Expr.xinfTypes (inf: Type?) {
             this.pln.xinfTypes((inf as Type.Pointer?)?.pln)
             this.pln.wtype!!.let {
                 val base = this.toBaseVar()
-                val blk  = base?.env(base?.tk_.id)?.ups_first { it is Stmt.Block || it is Expr.Func }
+                val blk  = base?.env(base?.tk.str)?.ups_first { it is Stmt.Block || it is Expr.Func }
                 val id   = when {
                     (base == null) -> "GLOBAL"
                     (blk == null) -> "GLOBAL"
-                    else -> base.tk_.id
+                    else -> base.tk.str
                 }
-                val scp1 = Tk.Scp(TK.XSCP,this.tk.lin,this.tk.col, id.toUpperCase())
+                val scp1 = Tk.Scp(TK.XSCP, id.toUpperCase(),this.tk.lin,this.tk.col)
                 Type.Pointer(this.tk_, Scope(scp1,null), this.pln.wtype!!)
             }
         }
         is Expr.Dnref -> {
             this.ptr.xinfTypes(inf?.let {
-                val scp1 = Tk.Scp(TK.XSCP,this.tk.lin,this.tk.col,this.localBlockScp1Id())
+                val scp1 = Tk.Scp(TK.XSCP,this.localBlockScp1Id(),this.tk.lin,this.tk.col)
                 Type.Pointer (
-                    Tk.Chr(TK.CHAR,this.tk.lin,this.tk.col,'/'),
+                    Tk.Chr(TK.CHAR,"/",this.tk.lin,this.tk.col),
                     Scope(scp1,null),
                     it
                 ).setUpEnv(inf.getUp()!!)
@@ -120,10 +120,10 @@ fun Expr.xinfTypes (inf: Type?) {
                     val id = this.yids[i]
                     val idx = id.field2num(inf.yids)
                     All_assert_tk(id, idx != null) {
-                        "invalid constructor : unknown discriminator \"${id.id}\""
+                        "invalid constructor : unknown discriminator \"${id.str}\""
                     }
                     All_assert_tk(id, idx == i+1) {
-                        "invalid constructor : invalid position for \"${id.id}\""
+                        "invalid constructor : invalid position for \"${id.str}\""
                     }
                 }
                 e.xinfTypes(if (inf==null) null else inf.vec[i])
@@ -167,11 +167,11 @@ fun Expr.xinfTypes (inf: Type?) {
                 if (inf is Type.Pointer) {
                     this.xscp = inf.xscp
                 } else {
-                    this.xscp = Scope(Tk.Scp(TK.XSCP, this.tk.lin, this.tk.col, this.localBlockScp1Id()), null)
+                    this.xscp = Scope(Tk.Scp(TK.XSCP, this.localBlockScp1Id(), this.tk.lin, this.tk.col), null)
                 }
             }
             Type.Pointer (
-                Tk.Chr(TK.CHAR, this.tk.lin, this.tk.col, '/'),
+                Tk.Chr(TK.CHAR, "/", this.tk.lin, this.tk.col),
                 this.xscp!!,
                 this.arg.wtype!!
             )
@@ -197,7 +197,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 it as Type.Tuple
                 val num = this.tk.field2num(it.yids)
                 All_assert_tk(this.tk, num != null) {
-                    "invalid discriminator : unknown \"${this.tk.id()}\""
+                    "invalid discriminator : unknown \"${this.tk.str}\""
                 }
                 All_assert_tk(this.tk, 1 <= num!! && num!! <= it.vec.size) {
                     "invalid discriminator : out of bounds"
@@ -212,8 +212,8 @@ fun Expr.xinfTypes (inf: Type?) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
                 val ftp = it.noactnoalias() as Type.Func
-                when (this.tk_.id) {
-                    "status" -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
+                when (this.tk.str) {
+                    "status" -> Type.Nat(Tk.Nat(TK.XNAT,"int", this.tk.lin, this.tk.col, null))
                     "pub"   -> ftp.pub!!
                     "ret"   -> ftp.out
                     else    -> error("bug found")
@@ -242,7 +242,7 @@ fun Expr.xinfTypes (inf: Type?) {
             val num = if (this.tk.enu == TK.NULL) null else {
                 val num = this.tk.field2num(xtp.yids)
                 All_assert_tk(this.tk, num != null) {
-                    "invalid discriminator : unknown discriminator \"${this.tk.id()}\""
+                    "invalid discriminator : unknown discriminator \"${this.tk.str}\""
                 }
                 val MIN = if (xtp.common == null) 1 else 0
                 All_assert_tk(this.tk, MIN <= num!! && num!! <= xtp.vec.size) {
@@ -253,12 +253,12 @@ fun Expr.xinfTypes (inf: Type?) {
 
             when (this) {
                 is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
-                is Expr.UPred -> Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int"))
+                is Expr.UPred -> Type.Nat(Tk.Nat(TK.XNAT,"int", this.tk.lin, this.tk.col, null))
                 else -> error("bug found")
             }
         }
         is Expr.Var -> {
-            val s = this.env(this.tk_.id)!!
+            val s = this.env(this.tk.str)!!
             val ret = when {
                 (s !is Stmt.Var)  -> s.toType()
                 (s.xtype == null) -> {
@@ -273,7 +273,7 @@ fun Expr.xinfTypes (inf: Type?) {
             ret!!
         }
         is Expr.Call -> {
-            val nat = Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"")).setUpEnv(this)
+            val nat = Type.Nat(Tk.Nat(TK.XNAT,"", this.tk.lin, this.tk.col, null)).setUpEnv(this)
             this.f.xinfTypes(nat)    // no infer for functions, default _ for nat
 
             this.f.wtype!!.let { ftp ->
@@ -287,7 +287,7 @@ fun Expr.xinfTypes (inf: Type?) {
                         val e = this
 
                         // TODO: remove after change increasing?
-                        this.arg.xinfTypes(ftp.inp.mapScp1(e, Tk.Scp(TK.XSCP, this.tk.lin, this.tk.col,this.localBlockScp1Id())))
+                        this.arg.xinfTypes(ftp.inp.mapScp1(e, Tk.Scp(TK.XSCP,this.localBlockScp1Id(), this.tk.lin, this.tk.col)))
 
                         // Calculates type scopes {...}:
                         //  call f @[...] arg
@@ -317,7 +317,7 @@ fun Expr.xinfTypes (inf: Type?) {
                                 ftp.out.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
-                                    .map { Tk.Scp(TK.XSCP, ftp.tk.lin, ftp.tk.col, ftp.localBlockScp1Id()) }
+                                    .map { Tk.Scp(TK.XSCP, ftp.localBlockScp1Id(), ftp.tk.lin, ftp.tk.col) }
                             } else {
                                 inf.flattenLeft()
                                    .map { it.toScp1s() }
@@ -325,7 +325,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             }//.filter { it.isscopepar() }  // ignore constant labels (they not args)
 
                             val inp_out = let {
-                                //assert(ret1s.distinctBy { it.id }.size <= 1) { "TODO: multiple pointer returns" }
+                                //assert(ret1s.distinctBy { it.str }.size <= 1) { "TODO: multiple pointer returns" }
                                 val arg1s: List<Tk.Scp> = this.arg.wtype!!.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
@@ -340,7 +340,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             // TODO: what if out/ret are not the same for the removed reps?
                             val scp1s: List<Tk.Scp> = (clo + inp_out)
                                 .filter { it.first.isscopepar() }  // ignore constant labels (they not args)
-                                .distinctBy { it.first.id }
+                                .distinctBy { it.first.str }
                                 .map { it.second }
 
                             Pair (
@@ -362,18 +362,18 @@ fun Expr.xinfTypes (inf: Type?) {
                         when {
                             (this.upspawn() != null) -> {
                                 Type.Active (
-                                    Tk.Key(TK.ACTIVE,this.tk.lin,this.tk.col,"active"),
+                                    Tk.Key(TK.ACTIVE,"active",this.tk.lin,this.tk.col),
                                     this.f.wtype!!
                                 )
                             }
                             (ftp.xscps.second!!.size != this.xscps.first!!.size) -> {
                                 // TODO: may fail before check2, return anything
-                                Type.Nat(Tk.Nat(TK.NATIVE, this.tk.lin, this.tk.col, null, "ERR"))
+                                Type.Nat(Tk.Nat(TK.NATIVE, "ERR", this.tk.lin, this.tk.col, null))
                             }
                             else -> {
                                 ftp.out.mapScps(
                                     true,
-                                    ftp.xscps.second!!.map { it.scp1.id }.zip(this.xscps.first!!).toMap()
+                                    ftp.xscps.second!!.map { it.scp1.str }.zip(this.xscps.first!!).toMap()
                                 )
                             }
                         }
@@ -392,7 +392,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
 fun Stmt.xinfTypes (inf: Type? = null) {
     fun unit (): Type {
-        return Type.Unit(Tk.Sym(TK.UNIT, this.tk.lin, this.tk.col, "()")).setUpEnv(this)
+        return Type.Unit(Tk.Sym(TK.UNIT, "()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
         is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Throw, is Stmt.Typedef -> {}
@@ -426,12 +426,12 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.dst.xinfTypes(null)
             this.call.xinfTypes(null)
         }
-        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).setUpEnv(this))
+        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT,"int", this.tk.lin, this.tk.col, null)).setUpEnv(this))
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde, this.tk.lin, this.tk.col,"Event"), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
+            this.e.xinfTypes(Type.Named(Tk.Ide(TK.XIde,"Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {
@@ -445,7 +445,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument
         is Stmt.If -> {
-            this.tst.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT, this.tk.lin, this.tk.col, null,"int")).setUpEnv(this))
+            this.tst.xinfTypes(Type.Nat(Tk.Nat(TK.XNAT,"int", this.tk.lin, this.tk.col, null)).setUpEnv(this))
             this.true_.xinfTypes(null)
             this.false_.xinfTypes(null)
         }

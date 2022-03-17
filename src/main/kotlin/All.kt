@@ -19,8 +19,8 @@ val D = "\$"
 
 data class Alls (
     val stack: ArrayDeque<All> = ArrayDeque(),
-    var tk0:   Tk = Tk.Key(TK.ERR,1,1,""),
-    var tk1:   Tk = Tk.Err(TK.ERR,1,1,"")
+    var tk0:   Tk = Tk.Key(TK.ERR,"",1,1),
+    var tk1:   Tk = Tk.Err(TK.ERR,"",1,1)
 )
 
 var alls = Alls()
@@ -47,8 +47,8 @@ fun All_nest (src: String, f: ()->Any): Any {
     //println(src)
     val old = alls.stack.removeFirst()
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
-    alls.tk0 = Tk.Key(TK.ERR,1,1,"")
-    alls.tk1 = Tk.Err(TK.ERR,1,1,"")
+    alls.tk0 = Tk.Key(TK.ERR,"",1,1)
+    alls.tk1 = Tk.Err(TK.ERR,"",1,1)
     alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2),false))
     all().lin = old.lin
     all().col = 1
@@ -108,7 +108,7 @@ fun Alls.check (enu: TK, chr: Char? = null): Boolean {
     return when {
         (this.tk1.enu != enu) -> false
         (chr == null)         -> true
-        else -> (this.tk1 as Tk.Chr).chr == chr
+        else -> (this.tk1 as Tk.Chr).str == chr.toString()
     }
 }
 
@@ -123,17 +123,17 @@ fun Alls.check_err (enu: TK, chr: Char? = null): Boolean {
 fun Tk.toPay (): String {
     return when {
         (this.enu == TK.EOF) -> "end of file"
-        (this is Tk.Err)     -> '"' + this.err + '"'
-        (this is Tk.Chr)     -> "`" + this.chr + "´"
-        (this is Tk.Sym)     -> '`' + this.sym + '´'
-        (this is Tk.ide)     -> '"' + this.id + '"'
-        (this is Tk.Ide)     -> '"' + this.id + '"'
-        (this is Tk.IDE)     -> '"' + this.id + '"'
-        (this is Tk.Scp)     -> "\"@" + this.id + '"'
+        (this is Tk.Err)     -> '"' + this.str + '"'
+        (this is Tk.Chr)     -> "`" + this.str + "´"
+        (this is Tk.Sym)     -> '`' + this.str + '´'
+        (this is Tk.ide)     -> '"' + this.str + '"'
+        (this is Tk.Ide)     -> '"' + this.str + '"'
+        (this is Tk.IDE)     -> '"' + this.str + '"'
+        (this is Tk.Scp)     -> "\"@" + this.str + '"'
         (this is Tk.Num)     -> "" + this.num
         (this is Tk.Clk)     -> "time constant"
-        (this is Tk.Key)     -> '`' + this.key + '`'
-        (this is Tk.Nat)     -> '"' + this.src + '"'
+        (this is Tk.Key)     -> '`' + this.str + '`'
+        (this is Tk.Nat)     -> '"' + this.str + '"'
         else -> TODO(this.toString())
     }
 }
