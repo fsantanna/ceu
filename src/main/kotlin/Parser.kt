@@ -1,9 +1,9 @@
 object Parser
 {
-    fun type (preid: Tk.Ide? = null): Type {
+    fun type (preid: Tk.Id? = null): Type {
         return when {
             (preid!=null || alls.accept(TK.Id)) -> {
-                val tk0 = preid ?: alls.tk0 as Tk.Ide
+                val tk0 = preid ?: alls.tk0 as Tk.Id
                 val subs = mutableListOf<Tk>()
                 while (alls.acceptX(".")) {
                     alls.accept(TK.NUM) || (CE1 && alls.accept(TK.Id)) || alls.err_expected("field")
@@ -68,8 +68,8 @@ object Parser
                 val tp = when {
                     !hasid -> this.type(null)
                     haseq  -> this.type(null)
-                    (id is Tk.ide) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
-                    else -> this.type(id as Tk.Ide)
+                    (id is Tk.id) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
+                    else -> this.type(id as Tk.Id)
                 }
                 val tps = arrayListOf(tp)
                 val ids = if (haseq) arrayListOf(id) else null
@@ -80,14 +80,14 @@ object Parser
                     }
                     if (haseq) {
                         alls.accept_err(TK.id)
-                        ids!!.add(alls.tk0 as Tk.ide)
+                        ids!!.add(alls.tk0 as Tk.id)
                         alls.acceptX_err(":")
                     }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
                 alls.acceptX_err("]")
-                Type.Tuple(tk0, tps, ids as List<Tk.ide>?).let {
+                Type.Tuple(tk0, tps, ids as List<Tk.id>?).let {
                     if (!alls.acceptX("+")) it else {
                         alls.checkX_err("<")
                         val uni = this.type() as Type.Union
@@ -148,8 +148,8 @@ object Parser
                 val tp = when {
                     !hasid -> this.type(null)
                     haseq  -> this.type(null)
-                    (id is Tk.ide) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
-                    else -> this.type(id as Tk.Ide)
+                    (id is Tk.id) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
+                    else -> this.type(id as Tk.Id)
                 }
                 val tps = arrayListOf(tp)
                 val ids = if (haseq) arrayListOf(id) else null
@@ -160,14 +160,14 @@ object Parser
                     }
                     if (haseq) {
                         alls.accept_err(TK.Id)
-                        ids!!.add(alls.tk0 as Tk.Ide)
+                        ids!!.add(alls.tk0 as Tk.Id)
                         alls.acceptX_err("=")
                     }
                     val tp2 = this.type()
                     tps.add(tp2)
                 }
                 alls.acceptX_err(">")
-                Type.Union(tk0, null, tps, ids as List<Tk.Ide>?)
+                Type.Union(tk0, null, tps, ids as List<Tk.Id>?)
             }
             alls.acceptX("active") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -215,10 +215,10 @@ object Parser
         val ctrs = mutableListOf<Pair<String, String>>()
         if (alls.acceptX(":")) {
             while (alls.accept(TK.id)) {
-                val id1 = (alls.tk0 as Tk.ide).str
+                val id1 = (alls.tk0 as Tk.id).str
                 alls.acceptX_err(">")
                 alls.accept_err(TK.id)
-                val id2 = (alls.tk0 as Tk.ide).str
+                val id2 = (alls.tk0 as Tk.id).str
                 ctrs.add(Pair(id1, id2))
                 if (!alls.acceptX(",")) {
                     break
@@ -229,7 +229,7 @@ object Parser
         return Pair(scps, ctrs)
     }
 
-    fun expr_one (preid: Tk.ide?): Expr {
+    fun expr_one (preid: Tk.id?): Expr {
         return when {
             // Bool.False, Pair [x,y], active Task {}
             alls.acceptX("active") || alls.check(TK.Id) -> {
@@ -286,7 +286,7 @@ object Parser
 
                 alls.accept(TK.Id) || alls.accept_err(TK.NUM)
                 val dsc = alls.tk0
-                All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Ide) {
+                All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Id) {
                     "invalid discriminator : expected index or type identifier"
                 }
                 if (!(CE1 || dsc is Tk.Num)) alls.err_tk0_unexpected()
@@ -325,7 +325,7 @@ object Parser
                 Expr.New(tk0 as Tk.Fix, if (scp==null) null else Scope(scp,null), e)
             }
             alls.acceptX("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
-            (preid!=null || alls.accept(TK.id)) -> Expr.Var(alls.tk0 as Tk.ide)
+            (preid!=null || alls.accept(TK.id)) -> Expr.Var(alls.tk0 as Tk.id)
             alls.acceptX("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
@@ -350,9 +350,9 @@ object Parser
                 val haseq = alls.acceptX("=")
                 if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
 
-                val e = this.expr(if (hasid && !haseq) (id as Tk.ide) else null)
+                val e = this.expr(if (hasid && !haseq) (id as Tk.id) else null)
                 val es = arrayListOf(e)
-                val ids = if (haseq) arrayListOf(id as Tk.ide) else null
+                val ids = if (haseq) arrayListOf(id as Tk.id) else null
 
                 while (true) {
                     if (!alls.acceptX(",")) {
@@ -360,7 +360,7 @@ object Parser
                     }
                     if (haseq) {
                         alls.accept_err(TK.id)
-                        ids!!.add(alls.tk0 as Tk.ide)
+                        ids!!.add(alls.tk0 as Tk.id)
                         alls.acceptX("=")
                     }
                     val e2 = this.expr()
@@ -384,7 +384,7 @@ object Parser
             }
         }
     }
-    fun expr (preid: Tk.ide? = null): Expr {
+    fun expr (preid: Tk.id? = null): Expr {
         var e = this.expr_dots(preid)
         // call
         if (alls.checkExpr() || alls.checkX("@[")) {
@@ -414,7 +414,7 @@ object Parser
         }
         return e
     }
-    fun expr_dots (preid: Tk.ide?): Expr {
+    fun expr_dots (preid: Tk.id?): Expr {
         var e = this.expr_one(preid)
 
         // one!1~\.2?1
@@ -431,14 +431,14 @@ object Parser
                 alls.accept(TK.id) || alls.accept(TK.Id) || alls.accept(TK.NUM) || alls.acceptX("Null") || alls.err_tk1_unexpected()
 
                 if (tk0.str == ".") {
-                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.Ide) {
+                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.Id) {
                         "invalid field : unexpected type identifier"
                     }
                 } else {
                     All_assert_tk(alls.tk0, alls.tk0.str!="Null" || e is Expr.Dnref) {
                         "invalid discriminator : union cannot be null"
                     }
-                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.ide) {
+                    All_assert_tk(alls.tk0, alls.tk0 !is Tk.id) {
                         "invalid discriminator : unexpected variable identifier"
                     }
                 }
@@ -465,8 +465,8 @@ object Parser
                 "?" -> Expr.UPred(alls.tk0, e)
                 "!" -> Expr.UDisc(alls.tk0, e)
                 "." -> {
-                    if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
-                        Expr.Field(alls.tk0 as Tk.ide, e)
+                    if (alls.tk0 is Tk.id && alls.tk0.istask()) {
+                        Expr.Field(alls.tk0 as Tk.id, e)
                     } else {
                         Expr.TDisc(alls.tk0, e)
                     }
@@ -529,7 +529,7 @@ object Parser
 
     fun attr (): Attr {
         var e = when {
-            alls.accept(TK.id) -> Attr.Var(alls.tk0 as Tk.ide)
+            alls.accept(TK.id) -> Attr.Var(alls.tk0 as Tk.id)
             alls.accept(TK.NAT) -> {
                 alls.acceptX_err(":")
                 val tp = this.type()
@@ -568,11 +568,11 @@ object Parser
             if (chr.str !in arrayOf(".","!")) null else {
                 alls.accept(TK.id) || alls.accept_err(TK.NUM)
                 if (chr.str == ".") {
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.id) {
                         "invalid field : expected index or variable identifier"
                     }
                 } else {
-                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.ide) {
+                    All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.id) {
                         "invalid discriminator : expected index or type identifier"
                     }
                 }
@@ -594,8 +594,8 @@ object Parser
                 "~" -> Attr.Unpak(chr, true, e)
                 "!" -> Attr.UDisc(alls.tk0, e)
                 "." -> {
-                    if (alls.tk0 is Tk.ide && alls.tk0.istask()) {
-                        Attr.Field(alls.tk0 as Tk.ide, e)
+                    if (alls.tk0 is Tk.id && alls.tk0.istask()) {
+                        Attr.Field(alls.tk0 as Tk.id, e)
                     } else {
                         Attr.TDisc(alls.tk0, e)
                     }
@@ -679,7 +679,7 @@ object Parser
                     alls.acceptX("input") -> {
                         val tk = alls.tk0 as Tk.Fix
                         alls.accept_err(TK.id)
-                        val lib = (alls.tk0 as Tk.ide)
+                        val lib = (alls.tk0 as Tk.id)
                         val arg = this.expr()
                         alls.acceptX_err(":")
                         val tp = this.type()
@@ -699,7 +699,7 @@ object Parser
             }
             alls.acceptX("var") -> {
                 alls.accept_err(TK.id)
-                val tk_id = alls.tk0 as Tk.ide
+                val tk_id = alls.tk0 as Tk.id
                 val tp = if (!alls.acceptX(":")) null else {
                     this.type()
                 }
@@ -720,7 +720,7 @@ object Parser
                         alls.acceptX("input") -> {
                             val tk = alls.tk0 as Tk.Fix
                             alls.accept_err(TK.id)
-                            val lib = (alls.tk0 as Tk.ide)
+                            val lib = (alls.tk0 as Tk.id)
                             val arg = this.expr()
                             val inp = if (!alls.acceptX(":")) null else this.type()
                             Stmt.Input(tk, inp, dst, lib, arg)
@@ -761,7 +761,7 @@ object Parser
             alls.acceptX("input") -> {
                 val tk = alls.tk0 as Tk.Fix
                 alls.accept_err(TK.id)
-                val lib = (alls.tk0 as Tk.ide)
+                val lib = (alls.tk0 as Tk.id)
                 val arg = this.expr()
                 val tp = if (!alls.acceptX(":")) null else this.type()
                 Stmt.Input(tk, tp, null, lib, arg)
@@ -798,7 +798,7 @@ object Parser
             }
             alls.acceptX("type") -> {
                 alls.accept_err(TK.Id)
-                val id = alls.tk0 as Tk.Ide
+                val id = alls.tk0 as Tk.Id
                 val scps = if (alls.checkX("@[")) this.scopepars() else Pair(null, null)
                 alls.acceptX_err("=")
                 val tp = this.type()
@@ -913,7 +913,7 @@ object Parser
             alls.acceptX("output") -> {
                 val tk = alls.tk0 as Tk.Fix
                 alls.accept_err(TK.id)
-                val lib = (alls.tk0 as Tk.ide)
+                val lib = (alls.tk0 as Tk.id)
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
             }

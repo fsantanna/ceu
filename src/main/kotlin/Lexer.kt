@@ -268,9 +268,9 @@ object Lexer {
                 alls.tk1 = keywords.contains(pay).let {
                     when {
                         it -> Tk.Fix(TK.FIX, pay, lin(), col())
-                        pay[0].isLowerCase() -> Tk.ide(TK.id, pay, lin(), col())
-                        pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Ide(TK.Id, pay, lin(), col())
-                        pay.none { it.isLowerCase() } -> Tk.IDE(TK.ID, pay, lin(), col())
+                        pay[0].isLowerCase() -> Tk.id(TK.id, pay, lin(), col())
+                        pay[0].isUpperCase() && pay.any{it.isLowerCase()} -> Tk.Id(TK.Id, pay, lin(), col())
+                        pay.none { it.isLowerCase() } -> Tk.ID(TK.ID, pay, lin(), col())
                         else -> Tk.Err(TK.ERR, pay, lin(), col())
                     }
                 }

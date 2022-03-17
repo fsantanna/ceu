@@ -431,7 +431,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Ide(TK.Id,"Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
+            this.e.xinfTypes(Type.Named(Tk.Id(TK.Id,"Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

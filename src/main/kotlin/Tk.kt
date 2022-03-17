@@ -20,8 +20,8 @@ fun Tk.field2num (ids: List<Tk>?): Int? {
         this is Tk.Num -> this.num
         //this is Tk.Fix -> null
         (ids == null)  -> null
-        this is Tk.ide -> ids!!.indexOfFirst{it.str==this.str}.let { if (it == -1) null else it+1 }
-        this is Tk.Ide -> {
+        this is Tk.id -> ids!!.indexOfFirst{it.str==this.str}.let { if (it == -1) null else it+1 }
+        this is Tk.Id -> {
             if (this.str == "Common") 0 else {
                 ids!!.indexOfFirst { it.str == this.str }.let { if (it == -1) null else it + 1 }
             }
@@ -31,7 +31,7 @@ fun Tk.field2num (ids: List<Tk>?): Int? {
 }
 
 fun Tk.istask (): Boolean {
-    return this is Tk.ide && this.str in arrayOf("pub","ret","status")
+    return this is Tk.id && this.str in arrayOf("pub","ret","status")
 }
 
 fun TK.toErr (): String {

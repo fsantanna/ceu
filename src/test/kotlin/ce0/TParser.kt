@@ -303,7 +303,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("[(),x,()]"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.TCons && e.arg.size == 3 && e.arg[0] is Expr.Unit && e.arg[1] is Expr.Var && (e.arg[1].tk as Tk.ide).str == "x")
+        assert(e is Expr.TCons && e.arg.size == 3 && e.arg[0] is Expr.Unit && e.arg[1] is Expr.Var && (e.arg[1].tk as Tk.id).str == "x")
     }
 
     @Test
@@ -364,7 +364,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).str == "xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.id).str == "xxx" && e.arg is Expr.Unit)
     }
 
     @Test
@@ -372,7 +372,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("xxx ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.ide).str == "xxx" && e.arg is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && (e.f.tk as Tk.id).str == "xxx" && e.arg is Expr.Unit)
     }
 
     @Test
@@ -733,10 +733,10 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmts()
         assert(
-            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.tk as Tk.ide).str == "g" &&
+            s is Stmt.Seq && s.s1 is Stmt.Seq && s.s2 is Stmt.SCall && ((s.s2 as Stmt.SCall).e.f.tk as Tk.id).str == "g" &&
                     (s.s1 as Stmt.Seq).let {
                         it.s1 is Stmt.SCall && (it.s1 as Stmt.SCall).let {
-                            it.e.f is Expr.Var && (it.e.f.tk as Tk.ide).str == "f"
+                            it.e.f is Expr.Var && (it.e.f.tk as Tk.id).str == "f"
                         }
                     }
         )

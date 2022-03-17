@@ -181,7 +181,7 @@ fun Alls.checkExpr (): Boolean {
     return this.checkX("(") || this.checkX("()") || this.check(TK.id) || this.check(TK.NAT)
         || this.checkX("[") || this.checkX("<") || this.checkX("new")
         || this.checkX("/") || this.checkX("func") || this.checkX("task")
-        || alls.tk1 is Tk.Ide || this.checkX("Null")
+        || alls.tk1 is Tk.Id || this.checkX("Null")
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {

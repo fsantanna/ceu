@@ -37,9 +37,9 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
             is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
             is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
             is Tk.Fix -> this.copy(lin_ = lin, col_ = col)
-            is Tk.ide -> this.copy(lin_ = lin, col_ = col)
-            is Tk.Ide -> this.copy(lin_ = lin, col_ = col)
-            is Tk.IDE -> this.copy(lin_ = lin, col_ = col)
+            is Tk.id -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Id -> this.copy(lin_ = lin, col_ = col)
+            is Tk.ID -> this.copy(lin_ = lin, col_ = col)
             is Tk.Scp -> this.copy(lin_ = lin, col_ = col)
             is Tk.Nat -> this.copy(lin_ = lin, col_ = col)
             is Tk.Num -> this.copy(lin_ = lin, col_ = col)
@@ -49,18 +49,18 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
     fun Type.aux (lin: Int, col: Int): Type {
         return when (this) {
             is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Fix)
-            is Type.Named -> Type.Named(this.tk.clone() as Tk.Ide, this.subs.map { it.clone() }, this.xisrec, this.xscps)
+            is Type.Named -> Type.Named(this.tk.clone() as Tk.Id, this.subs.map { it.clone() }, this.xisrec, this.xscps)
             is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
             is Type.Tuple -> Type.Tuple(
                 this.tk.clone() as Tk.Fix,
                 this.vec.map { it.aux(lin, col) },
-                this.yids?.map { it.clone() as Tk.ide }
+                this.yids?.map { it.clone() as Tk.id }
             )
             is Type.Union -> Type.Union(
                 this.tk.clone() as Tk.Fix,
                 this.common?.aux(lin, col) as Type.Tuple?,
                 this.vec.map { it.aux(lin, col) },
-                this.yids?.map { it.clone() as Tk.Ide }
+                this.yids?.map { it.clone() as Tk.Id }
             )
             is Type.Func -> Type.Func(
                 this.tk.clone() as Tk.Fix,

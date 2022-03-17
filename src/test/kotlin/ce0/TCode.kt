@@ -39,10 +39,10 @@ class TCode {
     }
     @Test
     fun b02_expr_var () {
-        val e = Expr.Var(Tk.ide(TK.id, "xxx", 1, 1))
+        val e = Expr.Var(Tk.id(TK.id, "xxx", 1, 1))
         e.wenv =
             Stmt.Var(
-                Tk.ide(TK.id, "xxx", 1, 1),
+                Tk.id(TK.id, "xxx", 1, 1),
                 Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
             )
         e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
@@ -51,10 +51,10 @@ class TCode {
     }
     @Test
     fun b03_expr_nat () {
-        val e = Expr.Var(Tk.ide(TK.NAT, "xxx", 1, 1))
+        val e = Expr.Var(Tk.id(TK.NAT, "xxx", 1, 1))
         e.wenv =
             Stmt.Var(
-                Tk.ide(TK.id, "xxx", 1, 1),
+                Tk.id(TK.id, "xxx", 1, 1),
                 Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
             )
         e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))
@@ -83,11 +83,11 @@ class TCode {
     fun b05_expr_index () {
         val e = Expr.TDisc(
             Tk.Num(TK.NUM, "1", 1, 1, 1),
-            Expr.Var(Tk.ide(TK.id, "x", 1, 1))
+            Expr.Var(Tk.id(TK.id, "x", 1, 1))
         )
         e.tup.wenv =
             Stmt.Var(
-                Tk.ide(TK.id, "x", 1, 1),
+                Tk.id(TK.id, "x", 1, 1),
                 Type.Tuple(Tk.Fix(TK.FIX, "(", 1, 1), listOf(Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))), null)
             )
         e.wtype = Type.Nat(Tk.Nat(TK.NAT, "int", 1, 1, null))

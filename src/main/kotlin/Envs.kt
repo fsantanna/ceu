@@ -67,7 +67,7 @@ fun Any.env (id: String): Any? {
                     (id == "pub") -> it.ftp()!!.pub!!.nonat_()
                     (id == "ret") -> it.ftp()!!.out.nonat_()
                     (id == "evt") -> Type.Named (
-                        Tk.Ide(TK.Id, "Event", it.tk.lin, it.tk.col),
+                        Tk.Id(TK.Id, "Event", it.tk.lin, it.tk.col),
                         emptyList(),
                         false,
                         emptyList()
