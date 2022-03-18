@@ -407,27 +407,16 @@ fun code_fe (e: Expr) {
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, "("+ee+"._"+num+")")
         }
-        /*is Expr.UPeDi -> CODE.removeFirst().let {
-            val ee = it.expr
-            assert(e.tk.str != "Null")
-            // TODO: only if e.uni.wtype!!.isrec()
-            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-            val pos = if (e.uni is Expr.UPeDi) {
-                "($ee.tag == $num)"
-            } else {
-                "((&$ee != NULL) && ($ee.tag == $num))"
-            }
-            Code(it.type, it.struct, it.func, it.stmt, pos + " && "+ee+"._"+num+"")
-        }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
-            val pos = if (e.tk.str == "Null") {
-                "(&$ee == NULL)"
-            } else { // TODO: only if e.uni.wtype!!.isrec()
-                val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-                if (e.uni is Expr.UPeDi) {
-                    "($ee.tag == $num)"
-                } else {
+            val pos = when {
+                (e.tk.str == "Null")  -> "(&$ee == NULL)"
+                (e.uni is Expr.UPred) -> {
+                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+                    "($ee.tag == $num) && $ee._$num"
+                }
+                else -> {
+                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
                     "((&$ee != NULL) && ($ee.tag == $num))"
                 }
             }
