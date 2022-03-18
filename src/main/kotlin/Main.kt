@@ -17,10 +17,11 @@ fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
         check_00_after_envs(s)
         s.xinfScp1s()
         check_01_before_tps(s)
+        //println(s.dump())
+        //println(s.tostr())
         s.xinfTypes(null)
         s.setScp2s()
         check_02_after_tps(s)
-        //println(s.dump())
         return Pair(true, s.code())
     } catch (e: Throwable) {
         CODE.clear()

@@ -946,4 +946,17 @@ class TXTask {
         """.trimIndent())
         assert(out == "10\n20\n") { out }
     }
+    @Test
+    fun h04_ret () {
+        val out = test(true, """
+            type Pico = <<()>>
+            var x = Pico.1.1
+            output std x!1!1
+            spawn {
+                var y = Pico.1.1
+                output std y!1!1
+            }
+        """.trimIndent())
+        assert(out == "()\n()\n") { out }
+    }
 }

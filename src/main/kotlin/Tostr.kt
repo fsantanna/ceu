@@ -78,7 +78,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
         is Expr.UCons -> {
-            if (pakhassubs) this.arg.tostr(lc) else {
+            if (pakhassubs) this.arg.tostr(lc,pakhassubs) else {
                 "<." + this.tk.str + " " + this.arg.tostr(lc) + ">" + this.wtype.let {
                     if (it == null) "" else ": " + it.tostr(lc)
                 }
