@@ -88,7 +88,7 @@ fun All.unread (i: Int) {
     }
 }
 
-fun Alls.accept (enu: TK): Boolean {
+fun Alls.accept (enu: String): Boolean {
     val ret = this.check(enu)
     if (ret) {
         Lexer.lex()
@@ -104,7 +104,7 @@ fun Alls.acceptX (str: String): Boolean {
     return ret
 }
 
-fun Alls.accept_err (enu: TK): Boolean {
+fun Alls.accept_err (enu: String): Boolean {
     this.check_err(enu)
     this.accept(enu)
     return true
@@ -116,17 +116,18 @@ fun Alls.acceptX_err (str: String): Boolean {
     return true
 }
 
-fun Alls.check (enu: TK): Boolean {
+fun Alls.check (enu: String): Boolean {
+    //println(enu)
     return when (enu) {
-        TK.id  -> this.tk1 is Tk.id
-        TK.Id  -> this.tk1 is Tk.Id
-        TK.ID  -> this.tk1 is Tk.ID
-        TK.SCP -> this.tk1 is Tk.Scp
-        TK.NAT -> this.tk1 is Tk.Nat
-        TK.NUM -> this.tk1 is Tk.Num
-        TK.CLK -> this.tk1 is Tk.Clk
-        TK.EOF -> this.tk1 is Tk.Eof
-        else   -> error("bug found")
+        "id"  -> this.tk1 is Tk.id
+        "Id"  -> this.tk1 is Tk.Id
+        "ID"  -> this.tk1 is Tk.ID
+        "Scp" -> this.tk1 is Tk.Scp
+        "Nat" -> this.tk1 is Tk.Nat
+        "Num" -> this.tk1 is Tk.Num
+        "Clk" -> this.tk1 is Tk.Clk
+        "Eof" -> this.tk1 is Tk.Eof
+        else  -> error("bug found")
     }
 }
 
@@ -134,7 +135,7 @@ fun Alls.checkX (str: String): Boolean {
     return (alls.tk1.str == str)
 }
 
-fun Alls.check_err (enu: TK): Boolean {
+fun Alls.check_err (enu: String): Boolean {
     val ret = this.check(enu)
     if (!ret) {
         this.err_expected(enu.toErr())
@@ -179,7 +180,7 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 }
 
 fun Alls.checkExpr (): Boolean {
-    return this.checkX("(") || this.checkX("()") || this.check(TK.id) || this.check(TK.NAT)
+    return this.checkX("(") || this.checkX("()") || this.check("id") || this.check("Nat")
         || this.checkX("[") || this.checkX("<") || this.checkX("new")
         || this.checkX("/") || this.checkX("func") || this.checkX("task")
         || alls.tk1 is Tk.Id || this.checkX("Null")

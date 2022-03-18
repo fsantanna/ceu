@@ -42,14 +42,14 @@ fun Tk.toPay (): String {
     }
 }
 
-fun TK.toErr (): String {
+fun String.toErr (): String {
     return when (this) {
-        TK.EOF -> "end of file"
-        TK.NAT -> "\"_\""
-        TK.id  -> "variable identifier"
-        TK.Id  -> "type identifier"
-        TK.ID  -> "uppercase identifier"
-        TK.NUM -> "number"
+        "Eof" -> "end of file"
+        "Nat" -> "\"_\""
+        "id"  -> "variable identifier"
+        "Id"  -> "type identifier"
+        "ID"  -> "uppercase identifier"
+        "Num" -> "number"
         else   -> TODO(this.toString())
     }
 }

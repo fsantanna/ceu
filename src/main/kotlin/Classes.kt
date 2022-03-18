@@ -2,11 +2,6 @@ import java.util.*
 
 var N = 1
 
-enum class TK {
-    EOF, SCP, NAT, NUM, CLK,
-    id, Id, ID,
-}
-
 val keywords: SortedSet<String> = sortedSetOf (
     "active", "await", "break", "call", "catch", "else", "emit", "func",
     "if", "in", "input", "loop", "native", "new", "Null", "output",
