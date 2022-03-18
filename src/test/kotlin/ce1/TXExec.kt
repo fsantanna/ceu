@@ -967,7 +967,7 @@ class TXExec {
     }
 
     @Test
-    fun pxx_type_hier () {
+    fun todo_pxx_type_hier () {
         val out = test(true, """
         type Event = <
             Frame = _int,
