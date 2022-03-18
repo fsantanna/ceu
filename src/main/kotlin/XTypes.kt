@@ -252,9 +252,8 @@ fun Expr.xinfTypes (inf: Type?) {
             }
 
             when (this) {
-                is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
+                is Expr.UDisc, is Expr.UPeDi -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
                 is Expr.UPred -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
-                is Expr.UPeDi -> TODO()
                 else -> error("bug found")
             }
         }

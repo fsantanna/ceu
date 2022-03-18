@@ -391,9 +391,9 @@ fun code_fe (e: Expr) {
         is Expr.Field -> CODE.removeFirst().let {
             val src = when (e.tk.str) {
                 "status" -> it.expr + "->task0.status"
-                "pub"   -> it.expr + "->pub"
-                "ret"   -> it.expr + "->ret"
-                else    -> error("bug found")
+                "pub"    -> it.expr + "->pub"
+                "ret"    -> it.expr + "->ret"
+                else     -> error("bug found")
             }
             Code(it.type, it.struct, it.func, it.stmt, src)
         }
@@ -401,30 +401,35 @@ fun code_fe (e: Expr) {
             val ee = it.expr
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
             val pre = """
-                assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
+                assert(&$ee != NULL);    // TODO: only if e.uni.wtype!!.isrec()
                 ${if (num == 0) "" else "assert($ee.tag == $num);"}
 
             """.trimIndent()
-            Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
+            Code(it.type, it.struct, it.func, it.stmt+pre, "("+ee+"._"+num+")")
         }
         is Expr.UPeDi -> CODE.removeFirst().let {
-            TODO()
             val ee = it.expr
+            assert(e.tk.str != "Null")
+            // TODO: only if e.uni.wtype!!.isrec()
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-            val pre = """
-                assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
-                ${if (num == 0) "" else "assert($ee.tag == $num);"}
-
-            """.trimIndent()
-            Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
+            val pos = if (e.uni is Expr.UPeDi) {
+                "($ee.tag == $num)"
+            } else {
+                "((&$ee != NULL) && ($ee.tag == $num))"
+            }
+            Code(it.type, it.struct, it.func, it.stmt, pos + " && "+ee+"._"+num+"")
         }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
             val pos = if (e.tk.str == "Null") {
-                "(&${it.expr} == NULL)"
+                "(&$ee == NULL)"
             } else { // TODO: only if e.uni.wtype!!.isrec()
                 val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
-                "(&${it.expr} != NULL) && ($ee.tag == $num)"
+                if (e.uni is Expr.UPeDi) {
+                    "($ee.tag == $num)"
+                } else {
+                    "((&$ee != NULL) && ($ee.tag == $num))"
+                }
             }
             Code(it.type, it.struct, it.func, it.stmt, pos)
         }

@@ -423,7 +423,8 @@ object Parser
                alls.acceptFix("~")  ||
                alls.acceptFix(".")  ||
                alls.acceptFix("!")  ||
-               alls.acceptFix("?")
+               alls.acceptFix("?")  ||
+               alls.acceptFix("?!")
         ) {
             val tk0 = alls.tk0 as Tk.Fix
 
