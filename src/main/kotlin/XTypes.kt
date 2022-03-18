@@ -69,7 +69,6 @@ fun Expr.xinfTypes (inf: Type?) {
             this.e.xinfTypes(inf)
             this.e.wtype!!.react_noalias(this)
         }
-
         is Expr.Upref -> {
             All_assert_tk(this.tk, inf==null || inf is Type.Pointer) { "invalid inference : type mismatch"}
             this.pln.xinfTypes((inf as Type.Pointer?)?.pln)
@@ -247,26 +246,15 @@ fun Expr.xinfTypes (inf: Type?) {
         is Expr.UPred -> {
             // not possible to infer big (union) from small (disc/pred)
             this.uni.xinfTypes(null)
-
-            val xtp = if (this.uni is Expr.UPred) {
-                fun Expr.UPred.xtp (): Type.Union {
-                    return if (this.uni is Expr.UPred) {
-                        this.uni.xtp()
-                    } else {
-                        (this.uni.wtype!! as Type.Union).let {
-                            val num = this.tk.field2num(it.yids)
-                            it.vec[num!! - 1] as Type.Union
-                        }
-                    }
-                }
-                this.xtp()
-            } else {
-                val xtp = this.uni.wtype!!.unpack()
-                All_assert_tk(this.tk, xtp is Type.Union) {
-                    "invalid predicate : not an union"
-                }
-                xtp as Type.Union
+            val xtp = this.uni.wtype!!.unpack()
+            println("-=-=-=-")
+            println(this.dump())
+            println(this.uni.dump())
+            println(this.uni.wtype!!.dump())
+            All_assert_tk(this.tk, xtp is Type.Union) {
+                "invalid predicate : not an union"
             }
+            xtp as Type.Union
 
             if (this.tk.str != "Null") {
                 val num = this.tk.field2num(xtp.yids)
@@ -279,7 +267,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
 
-            Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
+            val num = this.tk.field2num(xtp.yids)
+            when {
+                (this.uni !is Expr.UPred) -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
+                (num == 0) -> xtp.common!!
+                else -> xtp.vec[num!! - 1]
+            }
         }
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!

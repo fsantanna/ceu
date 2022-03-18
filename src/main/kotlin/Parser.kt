@@ -444,7 +444,12 @@ object Parser
                 }
                 // automatic unpack only for [.,!,?]
                 //  pt.x, list!1, list?0
-                e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(tk0,true,e) else e
+                e = when {
+                    !CE1 -> e
+                    (e is Expr.Unpak) -> e
+                    (e is Expr.UPred) -> e
+                    else -> Expr.Unpak(tk0,true,e)
+                }
             }
 
             e = when (tk0.str) {
