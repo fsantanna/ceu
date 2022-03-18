@@ -530,7 +530,7 @@ object Parser
     fun attr (): Attr {
         var e = when {
             alls.accept("id") -> Attr.Var(alls.tk0 as Tk.id)
-            alls.accept("nat") -> {
+            alls.accept("Nat") -> {
                 alls.acceptX_err(":")
                 val tp = this.type()
                 Attr.Nat(alls.tk0 as Tk.Nat, tp)
