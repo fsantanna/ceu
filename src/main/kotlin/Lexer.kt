@@ -116,7 +116,7 @@ object Lexer {
                 if (x2 == '!') {
                     alls.tk1 = Tk.Fix("?!", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Fix(x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix("?", lin(), col())
                     all().unread(c2)
                 }
             }
@@ -125,7 +125,7 @@ object Lexer {
                 if (x2 == ':') {
                     alls.tk1 = Tk.Fix("::", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Fix( x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix(":", lin(), col())
                     all().unread(c2)
                 }
             }
@@ -134,7 +134,7 @@ object Lexer {
                 if (x2 == ')') {
                     alls.tk1 = Tk.Fix("()", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Fix(x1.toString(), lin(), col())
+                    alls.tk1 = Tk.Fix("(", lin(), col())
                     all().unread(c2)
                 }
             }

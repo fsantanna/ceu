@@ -407,6 +407,17 @@ fun code_fe (e: Expr) {
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
         }
+        is Expr.UPrDc -> CODE.removeFirst().let {
+            TODO()
+            val ee = it.expr
+            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
+            val pre = """
+                assert(&${it.expr} != NULL);    // TODO: only if e.uni.wtype!!.isrec()
+                ${if (num == 0) "" else "assert($ee.tag == $num);"}
+
+            """.trimIndent()
+            Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
+        }
         is Expr.UPred -> CODE.removeFirst().let {
             val ee = it.expr
             val pos = if (e.tk.str == "Null") {

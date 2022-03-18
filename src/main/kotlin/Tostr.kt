@@ -89,6 +89,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
         is Expr.Field -> "(" + this.tsk.tostr(lc) + ".${this.tk.str})"
         is Expr.UDisc -> "(" + this.uni.tostr(lc) + "!" + this.tk.str + ")"
         is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk.str + ")"
+        is Expr.UPrDc -> "(" + this.uni.tostr(lc) + "?!" + this.tk.str + ")"
         is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.str.anon2local() } + ")"
         is Expr.Call -> {
             val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]" }

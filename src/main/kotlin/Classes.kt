@@ -69,6 +69,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class TDisc (val tk_: Tk, val tup: Expr): Expr(N++, tk_, null, null, null)
     data class UDisc (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)
     data class UPred (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)
+    data class UPrDc (val tk_: Tk, val uni: Expr): Expr(N++, tk_, null, null, null)
     data class New   (val tk_: Tk.Fix, var xscp: Scope?, val arg: Expr): Expr(N++, tk_, null, null, null)
     data class Dnref (val tk_: Tk,     val ptr: Expr): Expr(N++, tk_, null, null, null)
     data class Upref (val tk_: Tk.Fix, val pln: Expr): Expr(N++, tk_, null, null, null)

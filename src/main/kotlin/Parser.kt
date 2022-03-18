@@ -306,9 +306,9 @@ object Parser
                     tp
                 }
                 if (tp != null) {
-                    Expr.UCons(dsc, tp as Type.Union?, cons!!)
+                    Expr.UCons(dsc, tp as Type.Union?, cons)
                 } else {
-                    Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons!!), null, null)
+                    Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons), null, null)
                 }
             }
             alls.acceptFix("new") -> {
@@ -408,7 +408,7 @@ object Parser
                     if (oscp==null) null else Scope(oscp,null)
                 )
             )
-            if (!CE1) e else {
+            if (CE1) {
                 e = Expr.Pak(e.tk, e, null, null)
             }
         }
@@ -427,7 +427,7 @@ object Parser
         ) {
             val tk0 = alls.tk0 as Tk.Fix
 
-            if (tk0.str in arrayOf(".","!","?")) {
+            if (tk0.str in arrayOf(".","!","?","?!")) {
                 alls.acceptVar("id") || alls.acceptVar("Id") || alls.acceptVar("Num") || alls.acceptFix("Null") || alls.err_tk1_unexpected()
 
                 if (tk0.str == ".") {
@@ -442,7 +442,7 @@ object Parser
                         "invalid discriminator : unexpected variable identifier"
                     }
                 }
-                // automatic unpack only for [.,!,?]
+                // automatic unpack only for [.,!,?,?!]
                 //  pt.x, list!1, list?0
                 e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(tk0,true,e) else e
             }
@@ -450,7 +450,7 @@ object Parser
             e = when (tk0.str) {
                 "::" -> {
                     val tp = this.type()
-                    Expr.Cast(tk0 as Tk.Fix, e, tp)
+                    Expr.Cast(tk0, e, tp)
                 }
                 "\\" -> {
                     All_assert_tk(
@@ -461,10 +461,11 @@ object Parser
                     }
                     Expr.Dnref(tk0, e)
                 }
-                "~" -> Expr.Unpak(tk0, false, e)
-                "?" -> Expr.UPred(alls.tk0, e)
-                "!" -> Expr.UDisc(alls.tk0, e)
-                "." -> {
+                "~"  -> Expr.Unpak(tk0, false, e)
+                "?"  -> Expr.UPred(alls.tk0, e)
+                "!"  -> Expr.UDisc(alls.tk0, e)
+                "?!" -> Expr.UPrDc(alls.tk0, e)
+                "."  -> {
                     if (alls.tk0 is Tk.id && alls.tk0.istask()) {
                         Expr.Field(alls.tk0 as Tk.id, e)
                     } else {
@@ -565,7 +566,7 @@ object Parser
         ) {
             val chr = alls.tk0 as Tk.Fix
 
-            if (chr.str !in arrayOf(".","!")) null else {
+            if (chr.str in arrayOf(".","!")) {
                 alls.acceptVar("id") || alls.acceptVar_err("Num")
                 if (chr.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.id) {

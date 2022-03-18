@@ -104,7 +104,6 @@ fun Expr.xinfTypes (inf: Type?) {
             }
         }
         is Expr.TCons -> {
-
             if (inf != null) {
                 All_assert_tk(this.tk, inf is Type.Tuple) {
                     "invalid inference : type mismatch"
@@ -221,11 +220,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
         }
-        is Expr.UDisc, is Expr.UPred -> {
+        is Expr.UDisc, is Expr.UPred, is Expr.UPrDc -> {
             // not possible to infer big (union) from small (disc/pred)
-            val (tk_,uni) = when (this) {
-                is Expr.UPred -> { this.uni.xinfTypes(null) ; Pair(this.tk_,this.uni) }
-                is Expr.UDisc -> { this.uni.xinfTypes(null) ; Pair(this.tk_,this.uni) }
+            val uni = when (this) {
+                is Expr.UDisc -> { this.uni.xinfTypes(null) ; this.uni }
+                is Expr.UPred -> { this.uni.xinfTypes(null) ; this.uni }
+                is Expr.UPrDc -> { this.uni.xinfTypes(null) ; this.uni }
                 else -> error("impossible case")
             }
             val tp = uni.wtype!!
@@ -254,6 +254,7 @@ fun Expr.xinfTypes (inf: Type?) {
             when (this) {
                 is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
                 is Expr.UPred -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
+                is Expr.UPrDc -> TODO()
                 else -> error("bug found")
             }
         }
