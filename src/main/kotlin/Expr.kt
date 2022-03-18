@@ -10,7 +10,7 @@ fun Expr.flattenRight (): List<Expr> {
         is Expr.Field -> this.tsk.flattenRight() + this
         is Expr.UDisc -> this.uni.flattenRight() + this
         is Expr.UPred -> this.uni.flattenRight() + this
-        is Expr.UPrDc -> this.uni.flattenRight() + this
+        is Expr.UPeDi -> this.uni.flattenRight() + this
         is Expr.New   -> this.arg.flattenRight() + this
         is Expr.Dnref -> this.ptr.flattenRight() + this
         is Expr.Upref -> this.pln.flattenRight() + this

@@ -464,7 +464,7 @@ object Parser
                 "~"  -> Expr.Unpak(tk0, false, e)
                 "?"  -> Expr.UPred(alls.tk0, e)
                 "!"  -> Expr.UDisc(alls.tk0, e)
-                "?!" -> Expr.UPrDc(alls.tk0, e)
+                "?!" -> Expr.UPeDi(alls.tk0, e)
                 "."  -> {
                     if (alls.tk0 is Tk.id && alls.tk0.istask()) {
                         Expr.Field(alls.tk0 as Tk.id, e)

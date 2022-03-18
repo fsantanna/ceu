@@ -220,12 +220,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
         }
-        is Expr.UDisc, is Expr.UPred, is Expr.UPrDc -> {
+        is Expr.UDisc, is Expr.UPred, is Expr.UPeDi -> {
             // not possible to infer big (union) from small (disc/pred)
             val uni = when (this) {
                 is Expr.UDisc -> { this.uni.xinfTypes(null) ; this.uni }
                 is Expr.UPred -> { this.uni.xinfTypes(null) ; this.uni }
-                is Expr.UPrDc -> { this.uni.xinfTypes(null) ; this.uni }
+                is Expr.UPeDi -> { this.uni.xinfTypes(null) ; this.uni }
                 else -> error("impossible case")
             }
             val tp = uni.wtype!!
@@ -254,7 +254,7 @@ fun Expr.xinfTypes (inf: Type?) {
             when (this) {
                 is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
                 is Expr.UPred -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
-                is Expr.UPrDc -> TODO()
+                is Expr.UPeDi -> TODO()
                 else -> error("bug found")
             }
         }

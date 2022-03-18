@@ -407,7 +407,7 @@ fun code_fe (e: Expr) {
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, ee+"._"+num)
         }
-        is Expr.UPrDc -> CODE.removeFirst().let {
+        is Expr.UPeDi -> CODE.removeFirst().let {
             TODO()
             val ee = it.expr
             val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
