@@ -1929,9 +1929,9 @@ class TExec {
         set h = Hier.2.1.2 [_10:_int]
         output std h~?2
         output std h~?2?1
-        --output std h~?2?1?1
-        --output std h~?2?1?2
-        --output std h~!2!1!2.1
+        output std h~?2?1?1
+        output std h~?2?1?2
+        output std h~!2!1!2.1
        """.trimIndent())
         assert(out == "1\n1\n0\n1\n10\n") { out }
     }
@@ -1941,9 +1941,10 @@ class TExec {
         type Hier = [_int] + <(),<<(),()>,()>>
         var h: Hier
         set h = Hier.2.1.2 [_10:_int]
-        output std h?2
+        output std h~?2
        """.trimIndent())
-        assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n") { out }
     }
 
     // ALL

@@ -411,9 +411,13 @@ fun code_fe (e: Expr) {
             val ee = it.expr
             val pos = when {
                 (e.tk.str == "Null")  -> "(&$ee == NULL)"
-                (e.uni is Expr.UPred) -> {
+                (e.wup is Expr.UPred) -> {
                     val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
                     "($ee.tag == $num) && $ee._$num"
+                }
+                (e.uni is Expr.UPred) -> {
+                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+                    "($ee.tag == $num)"
                 }
                 else -> {
                     val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
