@@ -220,42 +220,67 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
         }
-        is Expr.UDisc, is Expr.UPred, is Expr.UPeDi -> {
+        is Expr.UPeDi -> TODO()
+        is Expr.UDisc -> {
             // not possible to infer big (union) from small (disc/pred)
-            val uni = when (this) {
-                is Expr.UDisc -> { this.uni.xinfTypes(null) ; this.uni }
-                is Expr.UPred -> { this.uni.xinfTypes(null) ; this.uni }
-                is Expr.UPeDi -> { this.uni.xinfTypes(null) ; this.uni }
-                else -> error("impossible case")
-            }
-            val tp = uni.wtype!!
-            val xtp = tp.noalias()
-
-            val str = if (this is Expr.UDisc) "discriminator" else "predicate"
-
+            this.uni.xinfTypes(null)
+            val xtp = this.uni.wtype!!.noalias()
             All_assert_tk(this.tk, xtp is Type.Union) {
-                "invalid $str : not an union"
+                "invalid discriminator : not an union"
             }
             xtp as Type.Union
-            assert(tk.str!="Null" || tp.isrec()) { "bug found" }
 
-            val num = if (this.tk.str == "Null") null else {
+            val num = this.tk.field2num(xtp.yids)
+            All_assert_tk(this.tk, num != null) {
+                "invalid discriminator : unknown discriminator \"${this.tk.str}\""
+            }
+            val MIN = if (xtp.common == null) 1 else 0
+            All_assert_tk(this.tk, MIN <= num!! && num!! <= xtp.vec.size) {
+                "invalid discriminator : out of bounds"
+            }
+
+            if (num == 0) {
+                xtp.common!!
+            } else {
+                xtp.vec[num!! - 1]
+            }
+        }
+        is Expr.UPred -> {
+            // not possible to infer big (union) from small (disc/pred)
+            this.uni.xinfTypes(null)
+
+            val xtp = if (this.uni is Expr.UPred) {
+                fun Expr.UPred.xtp (): Type.Union {
+                    return if (this.uni is Expr.UPred) {
+                        this.uni.xtp()
+                    } else {
+                        (this.uni.wtype!! as Type.Union).let {
+                            val num = this.tk.field2num(it.yids)
+                            it.vec[num!! - 1] as Type.Union
+                        }
+                    }
+                }
+                this.xtp()
+            } else {
+                val xtp = this.uni.wtype!!.noalias()
+                All_assert_tk(this.tk, xtp is Type.Union) {
+                    "invalid predicate : not an union"
+                }
+                xtp as Type.Union
+            }
+
+            if (this.tk.str != "Null") {
                 val num = this.tk.field2num(xtp.yids)
                 All_assert_tk(this.tk, num != null) {
-                    "invalid discriminator : unknown discriminator \"${this.tk.str}\""
+                    "invalid predicate : unknown discriminator \"${this.tk.str}\""
                 }
                 val MIN = if (xtp.common == null) 1 else 0
                 All_assert_tk(this.tk, MIN <= num!! && num!! <= xtp.vec.size) {
-                    "invalid $str : out of bounds"
+                    "invalid predicate : out of bounds"
                 }
-                num
             }
 
-            when (this) {
-                is Expr.UDisc, is Expr.UPeDi -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
-                is Expr.UPred -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
-                else -> error("bug found")
-            }
+            Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
         }
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!
