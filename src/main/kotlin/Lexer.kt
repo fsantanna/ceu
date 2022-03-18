@@ -201,7 +201,8 @@ object Lexer {
                     pay = pay.take(pay.length-1)
                     all().unread(c2)
                 }
-                alls.tk1 = Tk.Nat(pay, lin(), col(), open)
+                //println("#$pay#")
+                alls.tk1 = Tk.Nat(pay, lin(), col())
             }
             x1.isDigit() -> {
                 fun digits (): Int {
