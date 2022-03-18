@@ -3,9 +3,8 @@ import java.util.*
 var N = 1
 
 enum class TK {
-    ERR, EOF, FIX,
+    EOF, SCP, NAT, NUM, CLK,
     id, Id, ID,
-    SCP, NAT, NUM, CLK
 }
 
 val keywords: SortedSet<String> = sortedSetOf (
@@ -16,11 +15,7 @@ val keywords: SortedSet<String> = sortedSetOf (
     "watching", "where", "with",
 )
 
-sealed class Tk(
-    val str: String,
-    val lin: Int,
-    val col: Int,
-) {
+sealed class Tk (val str: String, val lin: Int, val col: Int) {
     data class Err (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Eof (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Fix (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
@@ -28,7 +23,7 @@ sealed class Tk(
     data class Id  (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class ID  (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Scp (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
-    data class Nat (val str_: String, val lin_: Int, val col_: Int, val chr: Char?): Tk(str_, lin_, col_)
+    data class Nat (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Num (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
     data class Clk (val str_: String, val lin_: Int, val col_: Int): Tk(str_, lin_, col_)
 }

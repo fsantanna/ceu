@@ -6,13 +6,12 @@ fun Tk.Scp.isscopepar (): Boolean {
     return this.str.none { it.isUpperCase() }
 }
 
-fun Tk.Nat.toce (): String {
-    val (op, cl) = when (this.chr) {
-        '{' -> Pair("{", "}")
-        '(' -> Pair("(", ")")
-        else -> Pair("", "")
+fun Tk.Nat.payload (): String {
+    return when {
+        (this.str.length == 1) -> ""
+        this.str[1].let { it == '{' || it == '(' } -> this.str.drop(2).take(this.str.length - 3)
+        else -> this.str.drop(1)
     }
-    return "_" + op + this.str + cl
 }
 
 fun Tk.field2num (ids: List<Tk>?): Int? {

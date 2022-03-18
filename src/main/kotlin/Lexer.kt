@@ -168,7 +168,7 @@ object Lexer {
             }
             (x1 == '_') -> {
                 var (c2, x2) = all().read()
-                var pay = ""
+                var pay = "_"+x2
 
                 var open: Char? = null
                 var close: Char? = null
@@ -178,6 +178,7 @@ object Lexer {
                     close = if (x2 == '(') ')' else '}'
                     open_close += 1
                     all().read().let { c2 = it.first; x2 = it.second }
+                    pay += x2
                 }
 
                 while ((close != null || x2.isLetterOrDigit() || x2 == '_')) {
@@ -193,10 +194,11 @@ object Lexer {
                             break
                         }
                     }
-                    pay += x2
                     all().read().let { c2 = it.first; x2 = it.second }
+                    pay += x2
                 }
                 if (close == null) {
+                    pay = pay.take(pay.length-1)
                     all().unread(c2)
                 }
                 alls.tk1 = Tk.Nat(pay, lin(), col(), open)

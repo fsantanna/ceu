@@ -43,9 +43,9 @@ class TCode {
         e.wenv =
             Stmt.Var(
                 Tk.id("xxx", 1, 1),
-                Type.Nat(Tk.Nat("int", 1, 1, null))
+                Type.Nat(Tk.Nat("_int", 1, 1))
             )
-        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
+        e.wtype = Type.Nat(Tk.Nat("_int", 1, 1))
         code_fe(e)
         CODE.removeFirst().let { assert(it.expr == "(global.xxx)") { it.expr } }
     }
@@ -55,9 +55,9 @@ class TCode {
         e.wenv =
             Stmt.Var(
                 Tk.id("xxx", 1, 1),
-                Type.Nat(Tk.Nat("int", 1, 1, null))
+                Type.Nat(Tk.Nat("_int", 1, 1))
             )
-        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
+        e.wtype = Type.Nat(Tk.Nat("_int", 1, 1))
         code_fe(e)
         assert(CODE.removeFirst().expr == "(global.xxx)")
     }
@@ -88,10 +88,10 @@ class TCode {
         e.tup.wenv =
             Stmt.Var(
                 Tk.id("x", 1, 1),
-                Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("int", 1, 1, null))), null)
+                Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("_int", 1, 1))), null)
             )
-        e.wtype = Type.Nat(Tk.Nat("int", 1, 1, null))
-        e.tup.wtype = Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("int", 1, 1, null))), null)
+        e.wtype = Type.Nat(Tk.Nat("_int", 1, 1))
+        e.tup.wtype = Type.Tuple(Tk.Fix("(", 1, 1), listOf(Type.Nat(Tk.Nat("_int", 1, 1))), null)
         e.visit(null, ::code_fe, null, null)
         CODE.removeFirst().expr.let {
             assert(it == "(global.x)._1")

@@ -109,14 +109,14 @@ class TLexer {
     @Test
     fun b07_lexer_xnat () {
         All_restart(null, PushbackReader(StringReader("_char _Tp"), 2))
-        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="char")
-        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="Tp")
+        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="_char")
+        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="_Tp")
     }
     @Test
     fun b08_lexer_xnat () {
         All_restart(null, PushbackReader(StringReader("_{(1)} _(2+2)"), 2))
-        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="(1)")
-        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="2+2")
+        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="_{(1)}")
+        Lexer.lex(); assert(alls.tk1 is Tk.Nat && (alls.tk1 as Tk.Nat).str=="_(2+2)")
     }
 
     // XNUM

@@ -1999,7 +1999,7 @@ class TEnv {
         """.trimIndent()
         )
         //assert(out == "(ln 1, col 14): expected `}´ : have \"@_a\"") { out }
-        assert(out == "(ln 1, col 15): expected \"]\" : have \"a1\"") { out }
+        assert(out == "(ln 1, col 15): expected \"]\" : have \"_a1\"") { out }
     }
     @Test
     fun p25_pool_closure_err() {

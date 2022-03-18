@@ -44,7 +44,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_char"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Nat && tp.tk.str == "char")
+        assert(tp is Type.Nat && tp.tk.str == "_char")
     }
 
     @Test
@@ -52,7 +52,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("[(),_char]"), 2))
         Lexer.lex()
         val tp = Parser.type()
-        assert(tp is Type.Tuple && tp.vec.size == 2 && tp.vec[0] is Type.Unit && tp.vec[1] is Type.Nat && (tp.vec[1].tk as Tk.Nat).str == "char")
+        assert(tp is Type.Tuple && tp.vec.size == 2 && tp.vec[0] is Type.Unit && tp.vec[1] is Type.Nat && (tp.vec[1].tk as Tk.Nat).str == "_char")
     }
 
     @Test
@@ -239,7 +239,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_x:_int"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Nat && e.tk.str == "x" && e.wtype is Type.Nat)
+        assert(e is Expr.Nat && e.tk.str == "_x" && e.wtype is Type.Nat)
     }
 
     @Test
@@ -247,7 +247,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("_x:_int"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Nat && e.tk.str == "x" && e.wtype is Type.Nat)
+        assert(e is Expr.Nat && e.tk.str == "_x" && e.wtype is Type.Nat)
     }
 
     @Test
@@ -844,7 +844,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native _{xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk.str == "xxx" && !s.istype)
+        assert(s is Stmt.Native && s.tk.str == "_{xxx}" && !s.istype)
     }
 
     @Test
@@ -852,7 +852,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native type _{xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk.str == "xxx" && s.istype)
+        assert(s is Stmt.Native && s.tk.str == "_{xxx}" && s.istype)
     }
 
     @Test
@@ -872,7 +872,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("native _{${D}xxx}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Native && s.tk.str == "${D}xxx")
+        assert(s is Stmt.Native && s.tk.str == "_{${D}xxx}")
     }
 
     // STMT_LOOP

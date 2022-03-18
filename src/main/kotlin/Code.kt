@@ -13,7 +13,7 @@ fun Type.pos (): String {
         is Type.Named   -> "CEU_"+this.tk.str
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
-        is Type.Nat     -> this.tk.str.let { if (it == "") "int" else it }
+        is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce() + "*"
@@ -369,7 +369,7 @@ fun code_fe (e: Expr) {
     val xp = e.wtype!!
     CODE.addFirst(when (e) {
         is Expr.Unit  -> Code("", "", "", "", "0")
-        is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk.str.native(e, e.tk)) }
+        is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk_.payload().native(e, e.tk)) }
         is Expr.Var   -> Code("", "", "", "", e.tk.str.out_mem(e))
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
@@ -613,9 +613,9 @@ fun code_fs (s: Stmt) {
             Code(src+it.type+s.type.defs(s.tk.str), it.struct, it.func, "", "")
         }
         is Stmt.Native -> if (s.istype) {
-            Code("", s.tk.str.native(s, s.tk) + "\n", "", "", "")
+            Code("", s.tk_.payload().native(s,s.tk) + "\n", "", "", "")
         } else {
-            Code("", "", "", s.tk.str.native(s, s.tk) + "\n", "")
+            Code("", "", "", s.tk_.payload().native(s,s.tk) + "\n", "")
         }
         is Stmt.Seq -> {
             val s2 = CODE.removeFirst()

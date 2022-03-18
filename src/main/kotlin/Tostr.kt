@@ -29,7 +29,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
     }
     return when (this) {
         is Type.Unit    -> "()"
-        is Type.Nat     -> this.tk_.toce()
+        is Type.Nat     -> this.tk.str
         is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.str.anon2local() }
         is Type.Named   -> this.tk.str + this.pak_subs() + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
@@ -66,7 +66,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
     return when (this) {
         is Expr.Unit  -> "()"
         is Expr.Var   -> this.tk.str
-        is Expr.Nat   -> if (this.xtype==null) this.tk_.toce() else "(" + this.tk_.toce() + ": " + this.xtype!!.tostr(lc) + ")"
+        is Expr.Nat   -> if (this.xtype==null) this.tk.str else "(" + this.tk.str + ": " + this.xtype!!.tostr(lc) + ")"
         is Expr.Cast  -> this.e.tostr(lc) + " :: " + this.type.tostr(lc)
         is Expr.Pak   -> {
             val hassubs = this.xtype?.noact().let { it!=null && ((it as Type.Named).subs.size > 0) }
@@ -106,7 +106,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
 fun Stmt.tostr (lc: Boolean = false): String {
     return when (this) {
         is Stmt.Nop -> "\n"
-        is Stmt.Native -> "native " + (if (this.istype) "type " else "") + this.tk_.toce() + "\n"
+        is Stmt.Native -> "native " + (if (this.istype) "type " else "") + this.tk.str + "\n"
         is Stmt.Var -> "var " + this.tk.str + this.xtype.let { if (it==null) " = var" else (": "+it.tostr()) } + "\n"
         is Stmt.Set -> "set " + this.dst.tostr(lc) + " = " + this.src.tostr(lc) + "\n"
         is Stmt.Break -> "break\n"

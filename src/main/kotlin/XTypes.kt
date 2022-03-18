@@ -213,7 +213,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
                 val ftp = it.noactnoalias() as Type.Func
                 when (this.tk.str) {
-                    "status" -> Type.Nat(Tk.Nat("int", this.tk.lin, this.tk.col, null))
+                    "status" -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
                     "pub"   -> ftp.pub!!
                     "ret"   -> ftp.out
                     else    -> error("bug found")
@@ -253,7 +253,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
             when (this) {
                 is Expr.UDisc -> if (num == 0) xtp.common!! else xtp.vec[num!! - 1]
-                is Expr.UPred -> Type.Nat(Tk.Nat("int", this.tk.lin, this.tk.col, null))
+                is Expr.UPred -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
                 else -> error("bug found")
             }
         }
@@ -273,7 +273,7 @@ fun Expr.xinfTypes (inf: Type?) {
             ret!!
         }
         is Expr.Call -> {
-            val nat = Type.Nat(Tk.Nat("", this.tk.lin, this.tk.col, null)).setUpEnv(this)
+            val nat = Type.Nat(Tk.Nat("_", this.tk.lin, this.tk.col)).setUpEnv(this)
             this.f.xinfTypes(nat)    // no infer for functions, default _ for nat
 
             this.f.wtype!!.let { ftp ->
@@ -368,7 +368,7 @@ fun Expr.xinfTypes (inf: Type?) {
                             }
                             (ftp.xscps.second!!.size != this.xscps.first!!.size) -> {
                                 // TODO: may fail before check2, return anything
-                                Type.Nat(Tk.Nat("ERR", this.tk.lin, this.tk.col, null))
+                                Type.Nat(Tk.Nat("_ERR", this.tk.lin, this.tk.col))
                             }
                             else -> {
                                 ftp.out.mapScps(
@@ -426,7 +426,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.dst.xinfTypes(null)
             this.call.xinfTypes(null)
         }
-        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat("int", this.tk.lin, this.tk.col, null)).setUpEnv(this))
+        is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
@@ -445,7 +445,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument
         is Stmt.If -> {
-            this.tst.xinfTypes(Type.Nat(Tk.Nat("int", this.tk.lin, this.tk.col, null)).setUpEnv(this))
+            this.tst.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
             this.true_.xinfTypes(null)
             this.false_.xinfTypes(null)
         }
