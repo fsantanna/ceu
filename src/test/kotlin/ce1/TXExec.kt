@@ -972,9 +972,9 @@ class TXExec {
         var h: Hier
         set h = Hier.Bbb.Ccc.Eee [_10:_int]
         output std h?Bbb
-        output std h?!Bbb?Ccc
-        output std h?!Bbb?!Ccc?Ddd
-        output std h?!Bbb?!Ccc?Eee
+        output std h?Bbb?Ccc
+        output std h?Bbb?Ccc?Ddd
+        output std h?Bbb?Ccc?Eee
         output std h!Bbb!Ccc!Eee.1
        """.trimIndent())
         assert(out == "1\n1\n0\n1\n10\n") { out }

@@ -23,9 +23,9 @@ fun Type.pos (): String {
 }
 
 fun Type.output_std (c: String, arg: String): String {
-    val pln_from_ptr_to_tup_or_uni: Type? = this.noalias().let {
+    val pln_from_ptr_to_tup_or_uni: Type? = this.unpack().let {
         if (it !is Type.Pointer) null else {
-            it.pln.noalias().let {
+            it.pln.unpack().let {
                 if (it is Type.Tuple || it is Type.Union) it else null
             }
         }
@@ -48,7 +48,7 @@ fun Type.output_std (c: String, arg: String): String {
                 
             """.trimIndent()
         }
-        else -> "output_std_${this.noalias().toce()}$c($arg);\n"
+        else -> "output_std_${this.unpack().toce()}$c($arg);\n"
     }
 }
 
@@ -129,7 +129,7 @@ fun code_ft (tp: Type) {
                     printf("[");
                     ${tp.vec
                         .mapIndexed { i,sub ->
-                            val s = when (sub.noalias()) {
+                            val s = when (sub.unpack()) {
                                 is Type.Union, is Type.Tuple -> "&v->_${i + 1}"
                                 else -> "v->_${i + 1}"
                             }
@@ -199,7 +199,7 @@ fun code_ft (tp: Type) {
                     switch (v->tag) {
                         ${tp.vec
                             .mapIndexed { i,sub ->
-                                val s = when (sub.noalias()) {
+                                val s = when (sub.unpack()) {
                                     is Type.Unit -> ""
                                     is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_std("_", "&v->_${i+1}")
                                     else -> "putchar(' ');\n" + sub.output_std("_", "v->_${i+1}")
@@ -399,7 +399,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.noalias() as Type.Union).yids)!!
+            val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
             val pre = """
                 assert(&$ee != NULL);    // TODO: only if e.uni.wtype!!.isrec()
                 ${if (num == 0) "" else "assert($ee.tag == $num);"}
