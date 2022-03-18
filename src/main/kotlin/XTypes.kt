@@ -269,7 +269,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
             val num = this.tk.field2num(xtp.yids)
             when {
-                (this.uni !is Expr.UPred) -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
+                (this.wup !is Expr.UPred) -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
                 (num == 0) -> xtp.common!!
                 else -> xtp.vec[num!! - 1]
             }
