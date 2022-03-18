@@ -222,7 +222,7 @@ fun Expr.xinfTypes (inf: Type?) {
         is Expr.UDisc -> {
             // not possible to infer big (union) from small (disc/pred)
             this.uni.xinfTypes(null)
-            val xtp = this.uni.wtype!!.unpack()
+            val xtp = this.uni.wtype!!
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid discriminator : not an union"
             }
@@ -246,11 +246,11 @@ fun Expr.xinfTypes (inf: Type?) {
         is Expr.UPred -> {
             // not possible to infer big (union) from small (disc/pred)
             this.uni.xinfTypes(null)
-            val xtp = this.uni.wtype!!.unpack()
-            println("-=-=-=-")
-            println(this.dump())
-            println(this.uni.dump())
-            println(this.uni.wtype!!.dump())
+            val xtp = this.uni.wtype!!
+            //println("-=-=-=-")
+            //println(this.dump())
+            //println(this.uni.dump())
+            //println(this.uni.wtype!!.dump())
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid predicate : not an union"
             }

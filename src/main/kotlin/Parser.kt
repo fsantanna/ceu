@@ -435,11 +435,14 @@ object Parser
                         "invalid field : unexpected type identifier"
                     }
                 } else {
-                    All_assert_tk(alls.tk0, alls.tk0.str!="Null" || e is Expr.Dnref) {
-                        "invalid discriminator : union cannot be null"
+                    val str = if (tk0.str == "!") "discriminator" else "predicate"
+                    if (alls.tk0.str == "Null") {
+                        All_assert_tk(alls.tk0, tk0.str=="?" && (e is Expr.Dnref || (e is Expr.Unpak && e.e is Expr.Dnref))) {
+                            "invalid $str : union cannot be null"
+                        }
                     }
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.id) {
-                        "invalid discriminator : unexpected variable identifier"
+                        "invalid $str : unexpected variable identifier"
                     }
                 }
                 // automatic unpack only for [.,!,?]

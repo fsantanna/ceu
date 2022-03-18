@@ -353,7 +353,7 @@ class TParser {
             Parser.expr()
             error("impossible case")
         } catch (e: Throwable) {
-            assert(e.message == "(ln 1, col 3): invalid discriminator : union cannot be null") { e.message!! }
+            assert(e.message == "(ln 1, col 3): invalid predicate : union cannot be null") { e.message!! }
         }
     }
 

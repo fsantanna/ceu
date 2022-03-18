@@ -60,7 +60,7 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _3:_int
             }
             var x : active task @[]->()->()->()
@@ -78,7 +78,7 @@ class TTask {
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _3:_int
             }
             var x : active task @[]->()->()->()
@@ -100,7 +100,7 @@ class TTask {
             set f = task @[]->()->()->() {
                 var x: _int
                 set x = _10:_int
-                await evt?3
+                await evt~?3
                 output std x
             }
             var x : active task @[]->()->()->()
@@ -119,13 +119,13 @@ class TTask {
                 {
                     var x: _int
                     set x = _10:_int
-                    await evt?3
+                    await evt~?3
                     output std x
                 }
                 {
                     var y: _int
                     set y = _20:_int
-                    await evt?3
+                    await evt~?3
                     output std y
                 }
             }
@@ -154,10 +154,10 @@ class TTask {
             var f : task @[]->_(char*)->()->()
             set f = task @[]->_(char*)->()->() {
                 output std arg
-                await evt?3
-                output std evt!3
-                await evt?3
-                output std evt!3
+                await evt~?3
+                output std evt~!3
+                await evt~?3
+                output std evt~!3
             }
             var x : active task @[]->_(char*)->()->()
             set x = spawn f _("hello"):_(char*)
@@ -174,7 +174,7 @@ class TTask {
             type Event = <(),_uint64_t,_int>
             var f : task @[]->_int->()->_int
             set f = task @[]->_int->()->_int {
-                await evt?3
+                await evt~?3
                 output std arg
             }
             var x : active task @[]->_int->()->_int
@@ -204,7 +204,7 @@ class TTask {
             var build : task @[]->()->()->()
             set build = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _2:_int
             }
             output std _10:_int
@@ -227,20 +227,20 @@ class TTask {
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
-                await evt?3
-                output std evt!3
+                await evt~?3
+                output std evt~!3
             }
             var x : active task @[]->()->()->()
             set x = spawn f ()
             
             var g : task @[]->()->()->()
             set g = task @[]->()->()->() {
-                await evt?3
+                await evt~?3
                 var e: _int
-                set e = evt!3
+                set e = evt~!3
                 output std _(${D}e+10):_int
-                await evt?3
-                set e = evt!3
+                await evt~?3
+                set e = evt~!3
                 output std _(${D}e+10):_int
             }
             var y : active task @[]->()->()->()
@@ -260,8 +260,8 @@ class TTask {
                 await _1:_int
                 var iskill: _int
                 var istask: _int
-                set iskill = evt?1
-                set istask = evt?2
+                set iskill = evt~?1
+                set istask = evt~?2
                 native _(assert(${D}iskill || ${D}istask);)
                 output std _0:_int    -- only on kill
             }
@@ -271,12 +271,12 @@ class TTask {
             {
                 var g : task @[]->()->()->()
                 set g = task @[]->()->()->() {
-                    await evt?3
+                    await evt~?3
                     var e: _int
-                    set e = evt!3
+                    set e = evt~!3
                     output std _(${D}e+10):_int
-                    await evt?3
-                    set e = evt!3
+                    await evt~?3
+                    set e = evt~!3
                     output std _(${D}e+10):_int
                 }
                 var y : active task @[]->()->()->()
@@ -296,7 +296,7 @@ class TTask {
                 set f = task @[]->()->()->() {
                     await _1:_int
                     var iskill: _int
-                    set iskill = evt?1
+                    set iskill = evt~?1
                     native _(assert(${D}iskill);)
                     output std _0:_int    -- only on kill
                 }
@@ -307,11 +307,11 @@ class TTask {
                     var g : task @[]->()->()->()
                     set g = task @[]->()->()->() {
                         var e: _int
-                        await evt?3
-                        set e = evt!3
+                        await evt~?3
+                        set e = evt~!3
                         output std _(${D}e+10):_int
-                        await evt?3
-                        set e = evt!3
+                        await evt~?3
+                        set e = evt~!3
                         output std _(${D}e+10):_int
                     }
                     var y : active task @[]->()->()->()
@@ -330,16 +330,16 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 var g : task @[]->()->()->()
                 set g = task @[]->()->()->() {
                     output std _2:_int
-                    await evt?3
+                    await evt~?3
                     output std _3:_int
                 }
                 var xg : active task @[]->()->()->()
                 set xg = spawn g ()
-                await evt?3
+                await evt~?3
                 output std _4:_int
             }
             var x : active task @[]->()->()->()
@@ -366,7 +366,7 @@ class TTask {
                         await _1:_int
                         output std _21:_int
                         await _1:_int
-                        if evt?1 {
+                        if evt~?1 {
                             output std _0:_int      -- only on kill
                         } else {
                             output std _22:_int     -- can't execute this one
@@ -374,18 +374,18 @@ class TTask {
                     }
                     var y : active task @[]->()->()->()
                     set y = spawn g ()
-                    await evt?3
+                    await evt~?3
                 }
                 output std _11:_int
                 var h : task @[]->()->()->()
                 set h = task @[]->()->()->() {
                     output std _30:_int
-                    await evt?3
+                    await evt~?3
                     output std _31:_int
                 }
                 var z : active task @[]->()->()->()
                 set z = spawn h ()
-                await evt?3
+                await evt~?3
                 output std _12:_int
             }
             var x : active task @[]->()->()->()
@@ -404,7 +404,7 @@ class TTask {
                 var f : task @[]->()->()->()
                 set f = task @[]->()->()->() {
                     output std _1:_int
-                    await evt?3
+                    await evt~?3
                     output std _4:_int
                     emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
                     output std _999:_int
@@ -412,7 +412,7 @@ class TTask {
                 var x : active task @[]->()->()->()
                 set x = spawn f ()
                 output std _2:_int
-                await evt?3
+                await evt~?3
                 output std _5:_int
             }
             output std _0:_int
@@ -433,7 +433,7 @@ class TTask {
                 var f : task @[]->()->()->()
                 set f = task @[]->()->()->() {
                     output std _1:_int
-                    await evt?3
+                    await evt~?3
                     output std _4:_int
                     var kkk : func @[]->()->()
                     set kkk = func @[]->()->() {
@@ -445,7 +445,7 @@ class TTask {
                 var x : active task @[]->()->()->()
                 set x = spawn f ()
                 output std _2:_int
-                await evt?3
+                await evt~?3
                 output std _5:_int
             }
             output std _0:_int
@@ -468,13 +468,13 @@ class TTask {
             set f = task @[]->()->()->() {
                 var defer_ : task @[]->()->()->()
                 set defer_ = task @[]->()->()->() {
-                    await evt?1
+                    await evt~?1
                     output std _2:_int
                 }
                 var xdefer : active task @[]->()->()->()
                 set xdefer = spawn defer_ ()
                 output std _0:_int
-                await evt?3
+                await evt~?3
                 output std _1:_int
             }
             var x : active task @[]->()->()->()
@@ -493,13 +493,13 @@ class TTask {
                 {
                     var defer_ : task @[]->()->()->()
                     set defer_ = task @[]->()->()->() {
-                        await evt?1
+                        await evt~?1
                         output std _2:_int
                     }
                     var xdefer : active task @[]->()->()->()
                     set xdefer = spawn defer_ ()
                     output std _0:_int
-                    await evt?3
+                    await evt~?3
                 }
                 output std _1:_int
             }
@@ -540,7 +540,7 @@ class TTask {
                catch {
                     var f : task @[]->()->()->()
                     set f = task @[]->()->()->() {
-                        await evt?1
+                        await evt~?1
                         output std _1:_int
                     }
                     var x : active task @[]->()->()->()
@@ -564,12 +564,12 @@ class TTask {
                 catch {
                     var f : task @[]->()->()->()
                     set f = task @[]->()->()->() {
-                        await evt?3
+                        await evt~?3
                         output std _999:_int
                     }
                     var g : task @[]->()->()->()
                     set g = task @[]->()->()->() {
-                        await evt?1
+                        await evt~?1
                         output std _1:_int
                     }
                     var x : active task @[]->()->()->()
@@ -598,15 +598,15 @@ class TTask {
                 set fg = task @[]->()->()->() {
                     var f : task @[]->()->()->()
                     set f = task @[]->()->()->() {
-                        await evt?3
+                        await evt~?3
                         output std _999:_int
                     }
                     var g: task @[]->()->()->()
                     set g = task @[]->()->()->() {
-                        await evt?1
+                        await evt~?1
                         output std _2:_int
                     }
-                    await evt?3
+                    await evt~?3
                     var xf : active task @[]->()->()->()
                     set xf = spawn f ()
                     var xg : active task @[]->()->()->()
@@ -615,7 +615,7 @@ class TTask {
                 }
                 var h : task @[]->()->()->()
                 set h = task @[]->()->()->() {
-                    await evt?1
+                    await evt~?1
                     output std _1:_int
                 }
                 var xfg : active task @[]->()->()->()
@@ -736,7 +736,7 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _3:_int
             }
             var fs : active {} task @[]->()->()->()
@@ -828,7 +828,7 @@ class TTask {
             set f = task @[]->()->_int->() {
                 set pub = _3:_int
                 output std _1:_int
-                await evt?3
+                await evt~?3
             }
             var fs: active {} task @[]->()->_int->()
             spawn f () in fs
@@ -864,7 +864,7 @@ class TTask {
             type Event = <(),_uint64_t,_int>
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
-                await evt?3
+                await evt~?3
             }
             var xs: active {} task @[]->_int->_int->()
             spawn f () in xs
@@ -882,14 +882,14 @@ class TTask {
             set f = task @[]->_int->_int->() {
                 set pub = arg
                 output std pub
-                await evt?3
+                await evt~?3
             }
             var g : task @[]->_int->_int->()
             set g = task @[]->_int->_int->() {
                 set pub = arg
                 output std pub
-                await evt?3
-                await evt?3
+                await evt~?3
+                await evt~?3
             }
 
             var xs: active {} task @[]->_int->_int->()
@@ -920,7 +920,7 @@ class TTask {
             set f = task @[]->()->_int->() {
                 set pub = _10:_int
                 output std _1:_int
-                await evt?3
+                await evt~?3
             }
             var fs: active {} task @[]->()->_int->()
             spawn f () in fs
@@ -941,7 +941,7 @@ class TTask {
             set f = task @[]->()->_int->() {
                 set pub = _3:_int
                 output std _1:_int
-                await evt?3
+                await evt~?3
             }
             var fs: active {} task @[]->()->_int->()
             spawn f () in fs
@@ -969,9 +969,9 @@ class TTask {
             set x = spawn f ()
             spawn (task @[]->()->()->() {
                 loop {
-                    await evt?2
+                    await evt~?2
                     var t: _uint64_t
-                    set t = evt!2
+                    set t = evt~!2
                     if _(${D}t == ((uint64_t)${D}x)):_int {
                         break
                     } else {}
@@ -995,16 +995,16 @@ class TTask {
                     var f: task @[]->()->()->()
                     set f = task @[]->()->()->() {
 --native _{printf(">>> task %p\n", task0);}
-                        await evt?3
+                        await evt~?3
                         output std _2:_int
 --native _{printf("<<< task %p\n", task0);}
                     }
                     var x : active task @[]->()->()->()
                     set x = spawn f ()
                     loop {
-                        await evt?2
+                        await evt~?2
                         var t: _uint64_t
-                        set t = evt!2
+                        set t = evt~!2
                         if _(${D}t == ((uint64_t)${D}x)):_int {
                             break
                         } else {}
@@ -1027,7 +1027,7 @@ class TTask {
                 loop {
                     var f: task @[]->()->()->()
                     set f = task @[]->()->()->() {
-                        await evt?3
+                        await evt~?3
                         output std _2:_int
                     }
                     var x : active task @[]->()->()->()
@@ -1050,7 +1050,7 @@ class TTask {
                 loop {
                     var f: task @[]->()->()->_int
                     set f = task @[]->()->()->_int {
-                        await evt?3
+                        await evt~?3
                         set ret = _10:_int
                     }
                     var x : active task @[]->()->()->_int
@@ -1124,7 +1124,7 @@ class TTask {
                 set v = _1:_int
                 loop {
                     output std v
-                    await evt?3
+                    await evt~?3
                     set v = _(${D}v+1):_int
                 }
             }
@@ -1134,7 +1134,7 @@ class TTask {
                 loop {
                     var x: active task  @[] -> () -> () -> ()
                     set x = spawn t _1:_int
-                    await evt?4
+                    await evt~?4
                 }
             }) ()
             
@@ -1262,7 +1262,7 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _2:_int
             }
             var x1 : active task @[]->()->()->()
@@ -1294,7 +1294,7 @@ class TTask {
             var f : task @[]->()->()->()
             set f = task @[]->()->()->() {
                 output std _1:_int
-                await evt?3
+                await evt~?3
                 output std _5:_int
             }
             var x : active task @[]->()->()->()

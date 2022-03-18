@@ -1856,7 +1856,7 @@ class TExec {
         var e: Button
         set e = Button <.2 [_10:_int]>:<[_int],[_int]>
         output std /e
-        output std e!0.1
+        output std e~!0.1
        """.trimIndent())
         assert(out == "<.2 [10]>\n10\n") { out }
     }
@@ -1867,9 +1867,9 @@ class TExec {
         var e: Button
         set e = Button <.2 ()>:<(),()>
         output std /e
-        output std e!0
+        output std e~!0
        """.trimIndent())
-        assert(out == "(ln 5, col 14): invalid discriminator : out of bounds") { out }
+        assert(out == "(ln 5, col 15): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun p09_type_hier () {
@@ -1917,7 +1917,7 @@ class TExec {
         type Hier = [_int] + <(),<(),()>>
         var h: Hier
         set h = Hier.2.2 [_10:_int]
-        output std h!0.1
+        output std h~!0.1
        """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -2088,15 +2088,15 @@ class TExec {
             var x1: /(List @[LOCAL]) @LOCAL
             set x1 = Null: /(List @[LOCAL]) @LOCAL
             var z1: _int
-            set z1 = x1\?Null
+            set z1 = x1\~?Null
             var x2: //(List @[LOCAL]) @LOCAL @LOCAL
             set x2 = /x1
             var z2: _int
-            set z2 = x2\\?1
+            set z2 = x2\\~?1
             set x2\ = new List @[LOCAL]<.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
             var f: func@[i1]-> //(List @[i1])@i1@i1->_int
             set f = func@[i1]-> //(List @[i1])@i1@i1->_int {
-                set ret = arg\\?1
+                set ret = arg\\~?1
             }
             var z3: _int
             set z3 = f @[LOCAL] x2
@@ -2115,7 +2115,7 @@ class TExec {
             var x2: //List @LOCAL @LOCAL
             set x2 = /x1
             var y2: _int
-            set y2 = x2\\?1
+            set y2 = x2\\~?1
             output std y2
         """.trimIndent())
         assert(out == "0\n") { out }
@@ -2192,7 +2192,7 @@ class TExec {
             var x: /List @LOCAL
             set x = new List <.2 new List <.1()>:<(),/List@LOCAL>: @LOCAL>:<(),/List@LOCAL>: @LOCAL
             var y: /List @LOCAL
-            set y = x\!2
+            set y = x\~!2
             output std x
             output std y
         """.trimIndent())

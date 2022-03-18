@@ -35,10 +35,10 @@ val _NumR1 = Num(false, "r1")
 private val clone = """
     var clone : func @[r1,a1]-> $NumA1 -> $NumR1
     set clone = func @[r1,a1]-> $NumA1 -> $NumR1 {
-        if arg\?Null {
+        if arg\~?Null {
             set ret = Null:$NumR1
         } else {
-            set ret = new $_NumR1 <.1 clone @[r1,a1] arg\!1: @r1>:</Num @[r1] @r1>: @r1
+            set ret = new $_NumR1 <.1 clone @[r1,a1] arg\~!1: @r1>:</Num @[r1] @r1>: @r1
         }
     }
 """.trimIndent()
@@ -50,10 +50,10 @@ private val add = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if y\?Null {
+        if y\~?Null {
             set ret = clone @[r1,a1] x: @r1
         } else {
-            set ret = new $_NumR1 <.1 add @[r1,a1,b1] [x,y\!1]: @r1>:</Num @[r1] @r1>: @r1
+            set ret = new $_NumR1 <.1 add @[r1,a1,b1] [x,y\~!1]: @r1>:</Num @[r1] @r1>: @r1
         }
     }
 """.trimIndent()
@@ -65,11 +65,11 @@ private val mul = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if y\?Null {
+        if y\~?Null {
             set ret = Null: $NumR1
         } else {
             var z: $NumTL
-            set z = mul @[r1,a1,b1] [x, y\!1]
+            set z = mul @[r1,a1,b1] [x, y\~!1]
             set ret = add @[r1,a1,LOCAL] [x,z]: @r1
         }
     }
@@ -78,13 +78,13 @@ private val mul = """
 private val lt = """
     var lt : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set lt = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
-        if arg.2\?Null {
+        if arg.2\~?Null {
             set ret = _0:_int
         } else {
-            if arg.1\?Null {
+            if arg.1\~?Null {
                 set ret = _1:_int
             } else {
-                set ret = lt @[a1,b1] [arg.1\!1,arg.2\!1]
+                set ret = lt @[a1,b1] [arg.1\~!1,arg.2\~!1]
             }
         }
     }
@@ -97,13 +97,13 @@ private val sub = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if x\?Null {
+        if x\~?Null {
             set ret = Null: $NumR1
         } else {
-            if y\?Null {
+            if y\~?Null {
                 set ret = clone @[r1,a1] x
             } else {
-                set ret = sub @[r1,a1,b1] [x\!1,y\!1]: @r1
+                set ret = sub @[r1,a1,b1] [x\~!1,y\~!1]: @r1
             }
         }
     }
@@ -129,13 +129,13 @@ private val eq = """
         set x = arg.1
         var y: $NumB1
         set y = arg.2
-        if x\?Null {
-            set ret = y\?Null
+        if x\~?Null {
+            set ret = y\~?Null
         } else {
-            if y\?Null {
+            if y\~?Null {
                 set ret = _0:_int
             } else {
-                set ret = eq @[a1,b1] [x\!1,y\!1]
+                set ret = eq @[a1,b1] [x\~!1,y\~!1]
             }
         }
     }
@@ -145,9 +145,9 @@ private val lte = """
     var lte : func @[a1,b1]-> [$NumA1,$NumB1] -> _int
     set lte = func @[a1,b1]-> [$NumA1,$NumB1] -> _int {
         var islt: _int
-        set islt = lt @[a1,b1] [arg.1\!1,arg.2\!1]
+        set islt = lt @[a1,b1] [arg.1\~!1,arg.2\~!1]
         var iseq: _int
-        set iseq = eq @[a1,b1] [arg.1\!1,arg.2\!1]
+        set iseq = eq @[a1,b1] [arg.1\~!1,arg.2\~!1]
         set ret = _(${D}islt || ${D}iseq): _int
     }
 """.trimIndent()
@@ -366,7 +366,7 @@ class TBook {
             $mul
             var multiply: func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1
             set multiply = func @[r1,a1,b1]-> [$NumA1,$NumB1] -> $NumR1 {
-                if arg.1\?Null {
+                if arg.1\~?Null {
                     set ret = Null:$NumR1
                 } else {
                     set ret = mul @[r1,a1,b1] [arg.1,arg.2]: @r1
@@ -415,11 +415,11 @@ class TBook {
             
             var fact: func @[r1,a1]->$NumA1->$NumR1
             set fact = func @[r1,a1]->$NumA1->$NumR1 {
-                if arg\?Null {
+                if arg\~?Null {
                     set ret = new $_NumR1 <.1 Null:$NumR1>:</Num @[r1] @r1>: @r1
                 } else {
                     var x: $NumTL
-                    set x = fact @[LOCAL,a1] arg\!1
+                    set x = fact @[LOCAL,a1] arg\~!1
                     set ret = mul @[r1,a1,LOCAL] [arg,x]: @r1
                 }
             }
