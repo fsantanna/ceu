@@ -88,35 +88,42 @@ fun All.unread (i: Int) {
     }
 }
 
-fun Alls.accept (enu: String): Boolean {
-    val ret = this.check(enu)
+fun Alls.acceptFix (str: String): Boolean {
+    val ret = this.checkFix(str)
     if (ret) {
         Lexer.lex()
     }
     return ret
 }
+fun Alls.acceptFix_err (str: String): Boolean {
+    this.checkFix_err(str)
+    this.acceptFix(str)
+    return true
+}
+fun Alls.checkFix (str: String): Boolean {
+    return (alls.tk1.str == str)
+}
+fun Alls.checkFix_err (str: String): Boolean {
+    val ret = this.checkFix(str)
+    if (!ret) {
+        this.err_expected('"'+str+'"')
+    }
+    return ret
+}
 
-fun Alls.acceptX (str: String): Boolean {
-    val ret = this.checkX(str)
+fun Alls.acceptVar (enu: String): Boolean {
+    val ret = this.checkVar(enu)
     if (ret) {
         Lexer.lex()
     }
     return ret
 }
-
-fun Alls.accept_err (enu: String): Boolean {
-    this.check_err(enu)
-    this.accept(enu)
+fun Alls.acceptVar_err (enu: String): Boolean {
+    this.checkVar_err(enu)
+    this.acceptVar(enu)
     return true
 }
-
-fun Alls.acceptX_err (str: String): Boolean {
-    this.checkX_err(str)
-    this.acceptX(str)
-    return true
-}
-
-fun Alls.check (enu: String): Boolean {
+fun Alls.checkVar (enu: String): Boolean {
     //println(enu)
     return when (enu) {
         "id"  -> this.tk1 is Tk.id
@@ -130,23 +137,10 @@ fun Alls.check (enu: String): Boolean {
         else  -> error("bug found")
     }
 }
-
-fun Alls.checkX (str: String): Boolean {
-    return (alls.tk1.str == str)
-}
-
-fun Alls.check_err (enu: String): Boolean {
-    val ret = this.check(enu)
+fun Alls.checkVar_err (enu: String): Boolean {
+    val ret = this.checkVar(enu)
     if (!ret) {
         this.err_expected(enu.toErr())
-    }
-    return ret
-}
-
-fun Alls.checkX_err (str: String): Boolean {
-    val ret = this.checkX(str)
-    if (!ret) {
-        this.err_expected('"'+str+'"')
     }
     return ret
 }
@@ -180,10 +174,10 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 }
 
 fun Alls.checkExpr (): Boolean {
-    return this.checkX("(") || this.checkX("()") || this.check("id") || this.check("Nat")
-        || this.checkX("[") || this.checkX("<") || this.checkX("new")
-        || this.checkX("/") || this.checkX("func") || this.checkX("task")
-        || alls.tk1 is Tk.Id || this.checkX("Null")
+    return this.checkFix("(") || this.checkFix("()") || this.checkVar("id") || this.checkVar("Nat")
+        || this.checkFix("[") || this.checkFix("<") || this.checkFix("new")
+        || this.checkFix("/") || this.checkFix("func") || this.checkFix("task")
+        || alls.tk1 is Tk.Id || this.checkFix("Null")
 }
 
 fun exec (cmds: List<String>): Pair<Boolean,String> {
