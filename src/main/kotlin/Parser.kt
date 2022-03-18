@@ -423,12 +423,11 @@ object Parser
                alls.acceptFix("~")  ||
                alls.acceptFix(".")  ||
                alls.acceptFix("!")  ||
-               alls.acceptFix("?")  ||
-               alls.acceptFix("?!")
+               alls.acceptFix("?")
         ) {
             val tk0 = alls.tk0 as Tk.Fix
 
-            if (tk0.str in arrayOf(".","!","?","?!")) {
+            if (tk0.str in arrayOf(".","!","?")) {
                 alls.acceptVar("id") || alls.acceptVar("Id") || alls.acceptVar("Num") || alls.acceptFix("Null") || alls.err_tk1_unexpected()
 
                 if (tk0.str == ".") {
@@ -443,7 +442,7 @@ object Parser
                         "invalid discriminator : unexpected variable identifier"
                     }
                 }
-                // automatic unpack only for [.,!,?,?!]
+                // automatic unpack only for [.,!,?]
                 //  pt.x, list!1, list?0
                 e = if (CE1 && e !is Expr.Unpak) Expr.Unpak(tk0,true,e) else e
             }
@@ -462,14 +461,10 @@ object Parser
                     }
                     Expr.Dnref(tk0, e)
                 }
-                "~"  -> Expr.Unpak(tk0, false, e)
-                "?"  -> Expr.UPred(alls.tk0, e)
-                "!"  -> Expr.UDisc(alls.tk0, e)
-                "?!" -> {
-                    alls.checkFix("?!") || alls.checkFix_err("?")
-                    Expr.UPeDi(alls.tk0, e)
-                }
-                "."  -> {
+                "~" -> Expr.Unpak(tk0, false, e)
+                "?" -> Expr.UPred(alls.tk0, e)
+                "!" -> Expr.UDisc(alls.tk0, e)
+                "." -> {
                     if (alls.tk0 is Tk.id && alls.tk0.istask()) {
                         Expr.Field(alls.tk0 as Tk.id, e)
                     } else {

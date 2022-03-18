@@ -407,7 +407,7 @@ fun code_fe (e: Expr) {
             """.trimIndent()
             Code(it.type, it.struct, it.func, it.stmt+pre, "("+ee+"._"+num+")")
         }
-        is Expr.UPeDi -> CODE.removeFirst().let {
+        /*is Expr.UPeDi -> CODE.removeFirst().let {
             val ee = it.expr
             assert(e.tk.str != "Null")
             // TODO: only if e.uni.wtype!!.isrec()

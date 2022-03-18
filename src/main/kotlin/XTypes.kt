@@ -220,7 +220,6 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
         }
-        is Expr.UPeDi -> TODO()
         is Expr.UDisc -> {
             // not possible to infer big (union) from small (disc/pred)
             this.uni.xinfTypes(null)

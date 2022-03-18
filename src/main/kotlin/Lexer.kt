@@ -108,17 +108,8 @@ object Lexer {
 
         when {
             (c1 == -1) -> alls.tk1 = Tk.Eof("", lin(), col())
-            (x1 in listOf(')','{','}','[',']','<','>',';','=',',','\\','/','.','!','~','+')) -> {
+            (x1 in listOf(')','{','}','[',']','<','>',';','=',',','\\','/','.','!','~','+','?')) -> {
                 alls.tk1 = Tk.Fix(x1.toString(), lin(), col())
-            }
-            (x1 == '?') -> {
-                val (c2, x2) = all().read()
-                if (x2 == '!') {
-                    alls.tk1 = Tk.Fix("?!", lin(), col())
-                } else {
-                    alls.tk1 = Tk.Fix("?", lin(), col())
-                    all().unread(c2)
-                }
             }
             (x1 == ':') -> {
                 val (c2, x2) = all().read()

@@ -46,7 +46,6 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Field -> "Field ." + this.tk.str + "\n" + this.tsk.dump(spc+4)
         is Expr.UDisc -> "UDisc !" + this.tk.str + "\n" + this.uni.dump(spc+4)
         is Expr.UPred -> "UPred ?" + this.tk.str + "\n" + this.uni.dump(spc+4)
-        is Expr.UPeDi -> "UPeDi ?!" + this.tk.str + "\n" + this.uni.dump(spc+4)
         is Expr.New   -> "New\n" + this.arg.dump(spc+4)
         is Expr.Call  -> "Call\n" + this.f.dump(spc+4) + this.arg.dump(spc+4)
         is Expr.Func  -> "Func\n" + this.xtype?.dump(spc+4) + this.block.dump(spc+4)

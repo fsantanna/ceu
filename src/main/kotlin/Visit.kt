@@ -43,7 +43,6 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
         is Expr.Field -> this.tsk.visit(fs, fe, ft, fx)
         is Expr.UDisc -> this.uni.visit(fs, fe, ft, fx)
         is Expr.UPred -> this.uni.visit(fs, fe, ft, fx)
-        is Expr.UPeDi -> this.uni.visit(fs, fe, ft, fx)
         is Expr.Func  -> { this.xtype?.visit(ft, fx) ; this.block.visit(fs, fe, ft, fx) }
         is Expr.Call  -> {
             this.xscps.let {
