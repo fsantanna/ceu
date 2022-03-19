@@ -30,6 +30,15 @@ fun check_02_after_tps (s: Stmt) {
 
     fun fe (e: Expr) {
         when (e) {
+            is Expr.Cast -> {
+                e.type.let {
+                    val dst = e.type
+                    val src = e.e.wtype!!
+                    All_assert_tk(e.tk, dst.isSupOf(src) || src.isSupOf(dst)) {
+                        "invalid type cast : ${mismatch(dst,src)}"
+                    }
+                }
+            }
             is Expr.Pak -> {
                 e.xtype?.let {
                     val dst = it.noactnoalias()
@@ -57,7 +66,6 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
-
             is Expr.Call -> {
                 val func = e.f.wtype
                 val ret1 = e.wtype!!

@@ -979,6 +979,44 @@ class TXExec {
        """.trimIndent())
         assert(out == "1\n1\n0\n1\n10\n") { out }
     }
+    @Test
+    fun p15_type_hier_sub_ok () {
+        val out = test(true, """
+        type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
+        var h: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
+        output std h!Bbb!Ccc!Eee.1
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun p15_type_hier_sub_err () {
+        val out = test(true, """
+        type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
+        var h: Hier.Aaa = Hier.Bbb.Ccc.Eee [_10:_int]
+        output std h!Bbb!Ccc!Eee.1
+       """.trimIndent())
+        assert(out == "(ln 2, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
+    }
+    @Test
+    fun p16_type_hier_cast_ok () {
+        val out = test(true, """
+        type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
+        var h1: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
+        var h2: Hier.Bbb.Ccc = h1 :: Hier.Bbb.Ccc
+        output std h2!Bbb!Ccc!Eee.1
+       """.trimIndent())
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun p17_type_hier_sub_err () {
+        val out = test(true, """
+        type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
+        var h1: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
+        var h2: Hier.Bbb.Fff = h1 :: Hier.Bbb.Fff
+        output std h2!Bbb!Ccc!Eee.1
+       """.trimIndent())
+        assert(out.contains("main: Assertion `(global.h1)._2.tag == 2' failed.")) { out }
+    }
 
     @Test
     fun todo_pxx_type_hier () {

@@ -2,7 +2,7 @@ data class Code (val type: String, val struct: String, val func: String, val stm
 val CODE = ArrayDeque<Code>()
 
 var Event = "_CEU_Event"
-var Event_Size = 8  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
+var Event_Size = 32  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
 
 fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
@@ -377,7 +377,28 @@ fun code_fe (e: Expr) {
         is Expr.Cast  -> {
             val tp = CODE.removeFirst()
             val ex = CODE.removeFirst()
-            Code(ex.type+tp.type, ex.struct+tp.struct, ex.func+tp.func, ex.stmt+tp.stmt, "((${e.type.toce()})${ex.expr})")
+            val (pre,pos) = when (e.type) {
+                is Type.Nat   -> Pair("", "((${e.type.toce()})${ex.expr})")
+                is Type.Named -> {
+                    var xxx = e.type
+                    var yyy = ex.expr
+                    val pre = e.type.subs.map {
+                        val uni = xxx.unpack() as Type.Union
+                        val num = it.field2num(uni.yids)!!
+                        val pre = """
+                            assert(&$yyy != NULL);    // TODO: only if e.uni.wtype!!.isrec()
+                            ${if (num == 0) "" else "assert($yyy.tag == $num);"}
+            
+                        """.trimIndent()
+                        xxx = uni.vec[num-1]
+                        yyy = yyy + "._$num"
+                        pre
+                    }.joinToString("")
+                    Pair(pre,ex.expr)
+                }
+                else -> TODO()
+            }
+            Code(ex.type+tp.type, ex.struct+tp.struct, ex.func+tp.func, ex.stmt+tp.stmt+pre, pos)
         }
         is Expr.Pak   -> {
             val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
