@@ -23,9 +23,9 @@ fun Type.pos (): String {
 }
 
 fun Type.output_std (c: String, arg: String): String {
-    val pln_from_ptr_to_tup_or_uni: Type? = this.unpack().let {
+    val pln_from_ptr_to_tup_or_uni: Type? = this.unpak().let {
         if (it !is Type.Pointer) null else {
-            it.pln.unpack().let {
+            it.pln.unpak().let {
                 if (it is Type.Tuple || it is Type.Union) it else null
             }
         }
@@ -48,7 +48,7 @@ fun Type.output_std (c: String, arg: String): String {
                 
             """.trimIndent()
         }
-        else -> "output_std_${this.unpack().toce()}$c($arg);\n"
+        else -> "output_std_${this.unpak().toce()}$c($arg);\n"
     }
 }
 
@@ -129,7 +129,7 @@ fun code_ft (tp: Type) {
                     printf("[");
                     ${tp.vec
                         .mapIndexed { i,sub ->
-                            val s = when (sub.unpack()) {
+                            val s = when (sub.unpak()) {
                                 is Type.Union, is Type.Tuple -> "&v->_${i + 1}"
                                 else -> "v->_${i + 1}"
                             }
@@ -199,7 +199,7 @@ fun code_ft (tp: Type) {
                     switch (v->tag) {
                         ${tp.vec
                             .mapIndexed { i,sub ->
-                                val s = when (sub.unpack()) {
+                                val s = when (sub.unpak()) {
                                     is Type.Unit -> ""
                                     is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_std("_", "&v->_${i+1}")
                                     else -> "putchar(' ');\n" + sub.output_std("_", "v->_${i+1}")
@@ -383,7 +383,7 @@ fun code_fe (e: Expr) {
                     var xxx = e.type
                     var yyy = ex.expr
                     val pre = e.type.subs.map {
-                        val uni = xxx.unpack() as Type.Union
+                        val uni = xxx.unpak() as Type.Union
                         val num = it.field2num(uni.yids)!!
                         val pre = """
                             assert(&$yyy != NULL);    // TODO: only if e.uni.wtype!!.isrec()
@@ -420,7 +420,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+            val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
             val pre = """
                 assert(&$ee != NULL);    // TODO: only if e.uni.wtype!!.isrec()
                 ${if (num == 0) "" else "assert($ee.tag == $num);"}
@@ -433,15 +433,15 @@ fun code_fe (e: Expr) {
             val pos = when {
                 (e.tk.str == "Null")  -> "(&$ee == NULL)"
                 (e.wup is Expr.UPred) -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
                     "($ee.tag == $num) && $ee._$num"
                 }
                 (e.uni is Expr.UPred) -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
                     "($ee.tag == $num)"
                 }
                 else -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpack() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
                     "((&$ee != NULL) && ($ee.tag == $num))"
                 }
             }

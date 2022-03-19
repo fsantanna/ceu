@@ -112,7 +112,7 @@ fun Type.noact (): Type {
 }
 
 fun Type.noactnoalias (): Type {
-    return this.noact().unpack()
+    return this.noact().unpak()
 }
 
 fun Type.react_noalias (up: Expr): Type {
@@ -124,7 +124,7 @@ fun Type.react_noalias (up: Expr): Type {
     }
 }
 
-fun Type.unpack (): Type {
+fun Type.unpak (): Type {
     return if (this !is Type.Named) this else {
         val def = this.env(this.tk.str)!! as Stmt.Typedef
 
