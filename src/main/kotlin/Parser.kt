@@ -719,9 +719,6 @@ object Parser
                 } else if (alls.acceptFix("var")) {
                     Stmt.Var(tk_id, null)
                 } else {
-                    fun tpor(inf: String): String? {
-                        return if (tp == null) inf else null
-                    }
                     val tk0 = alls.tk0 as Tk.Fix
                     val dst = Expr.Var(tk_id)
                     val src = when {
@@ -808,9 +805,13 @@ object Parser
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
                 val scps = if (alls.checkFix("@[")) this.scopepars() else Pair(null, null)
-                alls.acceptFix_err("=")
+                (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
+                val isinc = (alls.tk0.str == "+=")
                 val tp = this.type()
-                Stmt.Typedef(id, scps, tp)
+                if (isinc) {
+                    All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
+                }
+                Stmt.Typedef(id, isinc, scps, tp)
             }
             alls.acceptFix("native") -> {
                 val istype = alls.acceptFix("type")

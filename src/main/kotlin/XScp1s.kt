@@ -159,7 +159,7 @@ fun Stmt.xinfScp1s () {
     fun fs (s: Stmt) {
         when (s) {
             is Stmt.Typedef -> {
-                val tps  = s.type.flattenLeft()
+                val tps  = s.xtype.flattenLeft()
                 val scps = tps.increasing(false)
                 val fst  = ((s.xscp1s.first?.map { Scope(it,null) } ?: emptyList()) + scps)
                     .distinctBy { it.scp1.str }

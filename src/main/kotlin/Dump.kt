@@ -87,7 +87,7 @@ fun Stmt.dump (spc: Int = 0): String {
         } + this.e.dump(spc+4)
         is Stmt.Throw -> "Throw\n"
         is Stmt.DLoop -> "DLoop\n" + this.i.dump(spc+4) + this.tsks.dump(spc+4) + this.block.dump(spc+4)
-        is Stmt.Typedef -> "Typedef " + this.tk.str + "\n" + this.type.dump(spc+4)
+        is Stmt.Typedef -> "Typedef " + this.tk.str + "\n" + this.xtype.dump(spc+4)
         else -> error("bug found")
     }
 }

@@ -13,7 +13,7 @@ fun Any.toType (): Type {
     return when (this) {
         is Type         -> this
         is Stmt.Var     -> this.xtype!!
-        is Stmt.Typedef -> this.type
+        is Stmt.Typedef -> this.xtype
         else -> error("bug found")
     }
 }
@@ -135,7 +135,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
             this.body.setEnvs(this) // also include blocks w/o labels b/c of inference
             env
         }
-        is Stmt.Typedef -> { this.type.visit(::ft,null) ; this }
+        is Stmt.Typedef -> { this.xtype.visit(::ft,null) ; this }
         else -> TODO(this.toString()) // do not remove this line b/c we may add new cases
     }
 }

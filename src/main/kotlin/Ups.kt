@@ -109,7 +109,7 @@ fun Stmt.setUps (up: Any?) {
         is Stmt.Loop  -> this.block.setUps(this)
         is Stmt.DLoop -> { this.i.setUps(this) ; this.tsks.setUps(this) ; this.block.setUps(this) }
         is Stmt.Block -> this.body.setUps(this)
-        is Stmt.Typedef -> this.type.setUps(this)
+        is Stmt.Typedef -> this.xtype.setUps(this)
         else -> TODO(this.toString()) // do not remove this line b/c we may add new cases
     }
 }

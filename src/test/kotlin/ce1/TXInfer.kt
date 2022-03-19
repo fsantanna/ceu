@@ -1481,4 +1481,49 @@ class TXInfer {
         """.trimIndent())
         assert(out == "(ln 2, col 17): invalid constructor : invalid position for \"y\"") { out }
     }
+
+    // TYPE / STRETCH
+
+    @Test
+    fun e01_stretch_err () {
+        val out = all("""
+            type Point = ()
+            type Point += <()>
+        """.trimIndent())
+        assert(out == "(ln 2, col 6): invalid declaration : \"Point\" must be of union type (ln 1)") { out }
+    }
+    @Test
+    fun e02_stretch_err () {
+        val out = all("""
+            type Point = <()>
+            type Point += ()
+        """.trimIndent())
+        assert(out == "(ln 2, col 15): expected union type") { out }
+    }
+    @Test
+    fun e03_stretch_ok () {
+        val out = all("""
+            type Point = <()>
+            type Point += <()>
+        """.trimIndent())
+        assert(out == """
+            type Point @[] = <(),()>
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun e04_stretch_err () {
+        val out = all("""
+            type Point = ()
+            type Point = ()
+        """.trimIndent())
+        assert(out == "(ln 2, col 6): invalid declaration : \"Point\" is already declared (ln 1)") { out }
+    }
+    @Test
+    fun e05_stretch_err () {
+        val out = all("""
+            type Point += <()>
+        """.trimIndent())
+        assert(out == "(ln 1, col 6): invalid declaration : \"Point\" is not yet declared") { out }
+    }
 }

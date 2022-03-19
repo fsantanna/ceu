@@ -635,12 +635,12 @@ fun code_fs (s: Stmt) {
                 }
             }
             val src = """
-                //#define output_std_${s.tk.str}_ output_std_${s.type.toce()}_
-                //#define output_std_${s.tk.str}  output_std_${s.type.toce()}
-                typedef ${s.type.pos()} CEU_${s.tk.str};
+                //#define output_std_${s.tk.str}_ output_std_${s.xtype.toce()}_
+                //#define output_std_${s.tk.str}  output_std_${s.xtype.toce()}
+                typedef ${s.xtype.pos()} CEU_${s.tk.str};
                 
             """.trimIndent()
-            Code(src+it.type+s.type.defs(s.tk.str), it.struct, it.func, "", "")
+            Code(src+it.type+s.xtype.defs(s.tk.str), it.struct, it.func, "", "")
         }
         is Stmt.Native -> if (s.istype) {
             Code("", s.tk_.payload().native(s,s.tk) + "\n", "", "", "")
