@@ -138,11 +138,12 @@ object Lexer {
                 }
             }
             (x1 == '+') -> {
-                val (_, x2) = all().read()
+                val (c2, x2) = all().read()
                 if (x2 == '=') {
                     alls.tk1 = Tk.Fix("+=", lin(), col())
                 } else {
-                    alls.tk1 = Tk.Err("+" + x1 + x2, lin(), col())
+                    alls.tk1 = Tk.Fix("+", lin(), col())
+                    all().unread(c2)
                 }
             }
             (x1 == '@') -> {
