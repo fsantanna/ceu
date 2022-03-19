@@ -263,9 +263,9 @@ The pointer caret can be expanded resulting in equivalent types:
 ## Function
 
 `TODO: closure, blocks scopes`
-<!--
+!--
     - closures cannot modify original up (it is a stack variable that gets lost)
--->
+->
 
 A function type holds a function value and is composed of the prefix `func`
 and input and output types separated by an arrow `->`:
