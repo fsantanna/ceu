@@ -887,6 +887,38 @@ class TXTask {
         assert(out == "1\n1\n2\n3\n") { out }
     }
 
+    @Test
+    fun g02_spawn_abort () {
+        val out = test(true, """
+            type Event = <(),_uint64_t>
+            type Event += <(),()>
+            var t: task @[] -> () -> () -> ()
+            set t = task @[] -> () -> () -> () {
+                var v: _int
+                set v = _1:_int
+                loop {
+                    output std v
+                    await evt~?3
+                    set v = _(${D}v+1):_int
+                }
+            }
+            
+            var l: active task  @[] -> () -> () -> ()
+            set l = spawn (task  @[] -> () -> () -> () {
+                loop {
+                    var x: active task  @[] -> () -> () -> ()
+                    set x = spawn t _1:_int
+                    await evt~?4
+                }
+            }) ()
+            
+            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
+            emit @GLOBAL Event <.4 ()>: <(),_uint64_t,(),()>
+            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
+            
+       """.trimIndent())
+        assert(out == "1\n2\n1\n2\n") { out }
+    }
     // AWAIT / RETURN / SPAWN
 
     @Test

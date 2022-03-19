@@ -166,7 +166,7 @@ fun code_ft (tp: Type) {
                 // Type.Union.struct
                 struct $ce {
                     union {
-                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
+                        ${if (tp.wup.let { it is Stmt.Typedef && !it.isinc && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -625,22 +625,29 @@ fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> CODE.removeFirst().let {
-            if (s.tk.str == "Event") {
-                Event = "CEU_Event"
-            }
-            fun Type.defs (pre: String): String {
-                return if (this !is Type.Union || this.yids==null) "" else {
-                    this.yids.mapIndexed { i,id -> "#define CEU_${(pre+'_'+id.str).toUpperCase()} ${i+1}\n" }.joinToString("") +
-                    this.vec.mapIndexed { i,sub -> sub.defs(pre+'_'+this.yids[i].str) }.joinToString("")
+            if (s.isinc) {
+                Code("", "", "", "", "")
+            } else {
+                if (s.tk.str == "Event") {
+                    Event = "CEU_Event"
                 }
-            }
-            val src = """
+                fun Type.defs(pre: String): String {
+                    return if (this !is Type.Union || this.yids == null) "" else {
+                        this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
+                            .joinToString("") +
+                                this.vec.mapIndexed { i, sub -> sub.defs(pre + '_' + this.yids[i].str) }
+                                    .joinToString("")
+                    }
+                }
+
+                val src = """
                 //#define output_std_${s.tk.str}_ output_std_${s.xtype.toce()}_
                 //#define output_std_${s.tk.str}  output_std_${s.xtype.toce()}
                 typedef ${s.xtype.pos()} CEU_${s.tk.str};
                 
             """.trimIndent()
-            Code(src+it.type+s.xtype.defs(s.tk.str), it.struct, it.func, "", "")
+                Code(src + it.type + s.xtype.defs(s.tk.str), it.struct, it.func, "", "")
+            }
         }
         is Stmt.Native -> if (s.istype) {
             Code("", s.tk_.payload().native(s,s.tk) + "\n", "", "", "")

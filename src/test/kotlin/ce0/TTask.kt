@@ -1145,6 +1145,7 @@ class TTask {
        """.trimIndent())
         assert(out == "1\n2\n1\n2\n") { out }
     }
+
     // TYPE TASK
 
     @Test
