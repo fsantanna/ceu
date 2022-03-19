@@ -1,4 +1,9 @@
-# Ce0 - Core
+# Ceu
+
+`TODO`
+
+<!--
+0 - Core
 
 `Ce` is a simple language with algebraic data types, pointers, first-class
 functions, and region-based memory management.
@@ -652,3 +657,5 @@ The operation returns a pointer with the same block of the allocation.
 ```
 
 `TODO: functions, calls, closures`
+
+-->
