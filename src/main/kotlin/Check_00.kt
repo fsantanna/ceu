@@ -44,7 +44,7 @@ fun check_00_after_envs (s: Stmt) {
             is Stmt.Var -> {
                 val dcl = s.env(s.tk.str)
                 All_assert_tk(s.tk, dcl == null) {
-                    "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl!!.toTk().lin})"
+                    "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl!!.getTk().lin})"
                 }
             }
             is Stmt.Return -> {
@@ -57,7 +57,7 @@ fun check_00_after_envs (s: Stmt) {
                 s.scp1?.let {
                     val dcl = s.env(it.str)
                     All_assert_tk(it, dcl == null) {
-                        "invalid scope : \"@${it.str}\" is already declared (ln ${dcl!!.toTk().lin})"
+                        "invalid scope : \"@${it.str}\" is already declared (ln ${dcl!!.getTk().lin})"
                     }
                 }
                 if (s.iscatch) {

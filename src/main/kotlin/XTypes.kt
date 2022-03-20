@@ -277,7 +277,7 @@ fun Expr.xinfTypes (inf: Type?) {
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!
             val ret = when {
-                (s !is Stmt.Var)  -> s.toType()
+                (s !is Stmt.Var)  -> s.getType()
                 (s.xtype == null) -> {
                     s.xtype = inf
                     inf

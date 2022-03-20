@@ -134,7 +134,7 @@ fun Type.unpak (): Type {
         //      typedef Pair @[LOCAL] = [/_int@LOCAL,/_int@LOCAL]
         //      var xy: Pair @[LOCAL] = [/x,/y]
 
-        def.toType().mapScps(false,
+        def.getType().mapScps(false,
             def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
         ).clone(this.tk,this)
     }

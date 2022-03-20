@@ -9,7 +9,7 @@ fun Any.getEnv (): Any? {
     }
 }
 
-fun Any.toTk (): Tk {
+fun Any.getTk (): Tk {
     return when (this) {
         is Type         -> this.tk
         is Stmt.Var     -> this.tk
@@ -19,11 +19,11 @@ fun Any.toTk (): Tk {
     }
 }
 
-fun Any.toType (): Type {
+fun Any.getType (): Type {
     return when (this) {
         is Type         -> this
         is Stmt.Var     -> this.xtype!!
-        is Stmt.Typedef -> this.xtype
+        is Stmt.Typedef -> this.xtype ?: this.type
         else -> error("bug found")
     }
 }
@@ -98,7 +98,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
         tp.wenv = if (this is Stmt.Typedef) this else env
         when (tp) {
             is Type.Named -> {
-                tp.xisrec = tp.env(tp.tk.str)?.toType()?.let {
+                tp.xisrec = tp.env(tp.tk.str)?.getType()?.let {
                     it.flattenLeft().any { it is Type.Named && it.tk.str==tp.tk.str }
                 } ?: false
             }
