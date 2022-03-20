@@ -270,6 +270,27 @@ class TXInfer {
             
         """.trimIndent()) { out }
     }
+    @Test
+    fun a17_task () {
+        val out = all("""
+            task f: ()->()->() {
+                output std _1:_int
+            }
+            var x = spawn f ()
+            output std _2:_int
+        """.trimIndent())
+        assert(out == """
+            var f: task @[] -> () -> () -> ()
+            set f = task @[] -> () -> () -> () {
+            output std (_1: _int)
+            }
+            
+            var x: active task @[] -> () -> () -> ()
+            set x = spawn (f @[] ())
+            output std (_2: _int)
+
+        """.trimIndent()) { out }
+    }
 
     // inference error
 

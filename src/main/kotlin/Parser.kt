@@ -933,7 +933,7 @@ object Parser
 
             // CE1
 
-            alls.acceptFix("func") -> {
+            alls.acceptFix("func") || alls.acceptFix("task") -> {
                 val tk = alls.tk0 as Tk.Fix
                 if (!CE1) alls.err_tk0_unexpected()
                 alls.acceptVar_err("id")

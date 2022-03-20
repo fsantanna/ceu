@@ -46,7 +46,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }
                     .joinToString(",")
             }
-            val scps = this.xscps.second.let { if (it==null) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "] -> " }
+            val scps = this.xscps.second.let { if (it==null) "" else "@[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "] -> " }
             this.tk.str + " " + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
         }
     }.let {
