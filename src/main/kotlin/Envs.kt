@@ -64,7 +64,7 @@ fun Any.env (id: String): Any? {
     val xid = if (id.istype()) id else id.toUpperCase()
     return this.env_first_map {
         when {
-            (it is Stmt.Typedef && it.tk.str==xid && !it.isinc)          -> it
+            (it is Stmt.Typedef && it.tk.str==xid)                       -> it
             (it is Stmt.Var     && it.tk.str.toUpperCase()==xid)         -> it
             (it is Stmt.Block   && (it.scp1?.str==xid || "B"+it.n==xid)) -> it
             (it is Expr.Func) -> {

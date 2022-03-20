@@ -166,7 +166,7 @@ fun code_ft (tp: Type) {
                 // Type.Union.struct
                 struct $ce {
                     union {
-                        ${if (tp.wup.let { it is Stmt.Typedef && !it.isinc && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
+                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -624,8 +624,10 @@ fun code_fe (e: Expr) {
 fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
-        is Stmt.Typedef -> CODE.removeFirst().let {
-            if (s.isinc) {
+        is Stmt.Typedef -> {
+            val xtype = s.xtype?.let { CODE.removeFirst() }
+            val type  = CODE.removeFirst()
+            if (xtype == null) {
                 Code("", "", "", "", "")
             } else {
                 if (s.tk.str == "Event") {
@@ -641,12 +643,12 @@ fun code_fs (s: Stmt) {
                 }
 
                 val src = """
-                //#define output_std_${s.tk.str}_ output_std_${s.xtype.toce()}_
-                //#define output_std_${s.tk.str}  output_std_${s.xtype.toce()}
-                typedef ${s.xtype.pos()} CEU_${s.tk.str};
-                
-            """.trimIndent()
-                Code(src + it.type + s.xtype.defs(s.tk.str), it.struct, it.func, "", "")
+            //#define output_std_${s.tk.str}_ output_std_${s.xtype!!.toce()}_
+            //#define output_std_${s.tk.str}  output_std_${s.xtype!!.toce()}
+            typedef ${s.xtype!!.pos()} CEU_${s.tk.str};
+            
+        """.trimIndent()
+                Code(src + type.type + xtype.type + s.xtype!!.defs(s.tk.str), type.struct + xtype.struct, xtype.func, "", "")
             }
         }
         is Stmt.Native -> if (s.istype) {

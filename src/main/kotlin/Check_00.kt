@@ -72,6 +72,7 @@ fun check_00_after_envs (s: Stmt) {
                     All_assert_tk(s.tk, !s.isinc) {
                         "invalid declaration : \"${s.tk.str}\" is not yet declared"
                     }
+                    s.xtype = s.type.clone(s.type.tk, s, s)
                 } else {
                     All_assert_tk(s.tk, s.isinc) {
                         "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl.tk.lin})"
@@ -81,7 +82,7 @@ fun check_00_after_envs (s: Stmt) {
                     }
                     if (s.isinc) {
                         val old = dcl.xtype as Type.Union
-                        val inc = s.xtype as Type.Union
+                        val inc = s.type.setUpEnv(dcl,dcl) as Type.Union
                         assert(inc.common == null) { "TODO" }
 
                         val yids = when {
@@ -90,7 +91,9 @@ fun check_00_after_envs (s: Stmt) {
                             else -> error("TODO")
                         }
 
-                        dcl.xtype = Type.Union(old.tk_, old.common, old.vec+inc.vec, yids)
+                        // TODO: check funcs should not mutate the AST
+                        dcl.xtype = null
+                        s.xtype = Type.Union(old.tk_, old.common, old.vec+inc.vec, yids).setUpEnv(dcl,dcl)
                     }
                 }
                 val isrec = s.type.flattenLeft().any { it is Type.Named && it.tk.str==s.tk.str }

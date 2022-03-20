@@ -159,17 +159,24 @@ fun Stmt.xinfScp1s () {
     fun fs (s: Stmt) {
         when (s) {
             is Stmt.Typedef -> {
-                val tps  = s.xtype.flattenLeft()
-                val scps = tps.increasing(false)
-                val fst  = ((s.xscp1s.first?.map { Scope(it,null) } ?: emptyList()) + scps)
-                    .distinctBy { it.scp1.str }
+                var FST: List<Scope>? = null    // TODO: use xtype is correct?
 
-                //println(tps)
-                tps.filter { it is Type.Named && it.xisrec }.let { it as List<Type.Named> }.forEach {
-                    it.xscps = it.xscps ?: fst
+                fun Type.f () {
+                    val tps = this.flattenLeft()
+                    val scps = tps.increasing(false)
+                    val fst = ((s.xscp1s.first?.map { Scope(it, null) } ?: emptyList()) + scps)
+                        .distinctBy { it.scp1.str }
+                    FST = fst
+
+                    //println(tps)
+                    tps.filter { it is Type.Named && it.xisrec }.let { it as List<Type.Named> }.forEach {
+                        it.xscps = it.xscps ?: fst
+                    }
                 }
+                s.type.f()
+                s.xtype?.f()
                 s.xscp1s = Pair (
-                    s.xscp1s.first  ?: fst.map { it.scp1 },
+                    s.xscp1s.first  ?: FST!!.map { it.scp1 },
                     s.xscp1s.second ?: emptyList()
                 )
             }
