@@ -1011,7 +1011,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("type Unit = ()"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Typedef && s.tk.str == "Unit" && s.xtype is Type.Unit)
+        assert(s is Stmt.Typedef && s.tk.str == "Unit" && s.type is Type.Unit)
     }
 
     @Test
@@ -1031,7 +1031,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //println(s.dump())
-        assert(s is Stmt.Typedef && s.xtype.let { it is Type.Union && it.vec.size==2 && (it.vec[0] as Type.Tuple).vec[0] is Type.Nat})
+        assert(s is Stmt.Typedef && s.type.let { it is Type.Union && it.vec.size==2 && (it.vec[0] as Type.Tuple).vec[0] is Type.Nat})
     }
 
     @Test
@@ -1067,7 +1067,7 @@ class TParser {
         Lexer.lex()
         val s = Parser.stmt()
         //println(s.dump())
-        assert(s is Stmt.Typedef && s.xtype.let {
+        assert(s is Stmt.Typedef && s.type.let {
             it is Type.Union && it.vec.size==2 && it.vec[1] is Type.Tuple && it.vec[0].let {
                 it is Type.Union && it.vec.size==1  && it.vec[0].let {
                     it is Type.Tuple && it.vec.size==4 && it.vec[2] is Type.Unit

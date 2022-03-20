@@ -71,7 +71,7 @@ fun Any.env (id: String): Any? {
                         emptyList(),
                         false,
                         emptyList()
-                    ).clone(it, it.tk.lin, it.tk.col).nonat_()
+                    ).clone(it.tk,it).nonat_()
                     else  -> null
                 }
             }

@@ -32,7 +32,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
         this.inp.aux(),
         this.pub?.aux(),
         this.out.aux()
-    ).clone(up,this.tk.lin,this.tk.col) as Type.Func
+    ).clone(this.tk, up) as Type.Func
 }
 
 fun Scope.isNestIn (sub: Scope, up: Any): Boolean {

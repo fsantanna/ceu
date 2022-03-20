@@ -89,8 +89,8 @@ fun check_02_after_tps (s: Stmt) {
                 val (inp2,out2) = if (func is Type.Func) {
                     val map = scp1s.first!!.map { it.scp1.str }.zip(e.xscps.first!!).toMap()
                     Pair (
-                        inp1.mapScps(false, map).clone(e,e.tk.lin,e.tk.col),
-                        out1.mapScps(true,  map).clone(e,e.tk.lin,e.tk.col)
+                        inp1.mapScps(false, map).clone(e.tk,e),
+                        out1.mapScps(true,  map).clone(e.tk,e)
                     )
                 } else {
                     Pair(inp1,out1)

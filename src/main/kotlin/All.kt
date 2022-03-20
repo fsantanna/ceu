@@ -4,7 +4,7 @@ import java.io.StringReader
 import java.lang.AssertionError
 
 var CE1 = true
-val THROW = false
+val THROW = true
 var LINES = false
 
 // search in tests output for

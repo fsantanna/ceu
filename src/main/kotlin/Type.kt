@@ -24,13 +24,14 @@ fun Type.flattenLeft (): List<Type> {
     }
 }
 
-fun Type.setUpEnv (up: Any): Type {
+fun Type.setUpEnv (up: Any, env: Any? = null): Type {
     this.wup  = up
-    this.wenv = up.getEnv()
+    this.wenv = env ?: up.getEnv()
     return this
 }
 
-fun Type.clone (up: Any, lin: Int, col: Int): Type {
+fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
+    val (lin,col) = Pair(tk.lin,tk.col)
     fun Tk.clone (): Tk {
         return when (this) {
             is Tk.Err -> this.copy(lin_ = lin, col_ = col)
@@ -85,12 +86,10 @@ fun Type.clone (up: Any, lin: Int, col: Int): Type {
             )
             is Type.Pointer -> Type.Pointer(
                 this.tk_.copy(lin_ = lin, col_ = col),
-                Scope(this.xscp!!.scp1.copy(lin_=lin,col_=col), this.xscp!!.scp2),
+                this.xscp?.let { Scope(it.scp1.copy(lin_=lin,col_=col), it.scp2) },
                 this.pln.aux(lin, col)
             )
-        }.let {
-            it.setUpEnv(up)
-        }
+        }.setUpEnv(up, env)
     }
     return this.aux(lin,col)
 }
@@ -116,7 +115,7 @@ fun Type.noactnoalias (): Type {
 }
 
 fun Type.react_noalias (up: Expr): Type {
-    val noalias = this.noactnoalias().clone(up,up.tk.lin,up.tk.col)
+    val noalias = this.noactnoalias().clone(up.tk,up)
     return when (this) {
         is Type.Active  -> Type.Active(this.tk_, noalias).setUpEnv(this.getUp()!!)
         is Type.Actives -> Type.Actives(this.tk_, this.len, noalias).setUpEnv(this.getUp()!!)
@@ -137,7 +136,7 @@ fun Type.unpak (): Type {
 
         def.toType().mapScps(false,
             def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
-        ).clone(this,this.tk.lin,this.tk.col)
+        ).clone(this.tk,this)
     }
 }
 

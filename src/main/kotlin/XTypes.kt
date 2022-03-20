@@ -16,7 +16,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
                 /*listOf(to),*/ this.xscps!!.map{Scope(to,null)})   // TODO: wrong
         }
     }
-    return this.aux().clone(up, this.tk.lin, this.tk.col)
+    return this.aux().clone(this.tk,up)
 }
 
 fun Expr.xinfTypes (inf: Type?) {
@@ -31,7 +31,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: inf!!.clone(this,this.tk.lin,this.tk.col)
+            this.xtype = this.xtype ?: inf!!.clone(this.tk, this)
             this.xtype!!
         }
         is Expr.Cast -> {
@@ -144,7 +144,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
                 val x = (inf as Type.Union).vec[num-1]
                 this.arg.xinfTypes(x)
-                this.xtype = inf.clone(this,this.tk.lin,this.tk.col) as Type.Union
+                this.xtype = inf.clone(this.tk,this) as Type.Union
                 this.xtype!!
             }
         }
@@ -152,7 +152,7 @@ fun Expr.xinfTypes (inf: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: (inf?.clone(this,this.tk.lin,this.tk.col) as Type.Pointer)
+            this.xtype = this.xtype ?: (inf?.clone(this.tk,this) as Type.Pointer)
             this.xtype!!
                 //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
         }
@@ -404,7 +404,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
             }
         }
-    }.clone(this, this.tk.lin, this.tk.col)
+    }.clone(this.tk, this)
 }
 
 fun Stmt.xinfTypes (inf: Type? = null) {
@@ -413,7 +413,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
     }
     when (this) {
         is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Throw, is Stmt.Typedef -> {}
-        is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this,this.tk.lin,this.tk.col) }
+        is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this.tk,this) }
         is Stmt.Set -> {
             try {
                 this.dst.xinfTypes(null)
@@ -458,7 +458,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             // inf is at least Unit
             this.arg.xinfTypes(null)
             this.dst?.xinfTypes(null)
-            this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this,this.tk.lin,this.tk.col) ?: unit()
+            this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this.tk,this) ?: unit()
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument
         is Stmt.If -> {

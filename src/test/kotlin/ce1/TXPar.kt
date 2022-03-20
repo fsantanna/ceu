@@ -199,7 +199,7 @@ class TXPar {
     @Test
     fun c01_clk () {
         val out = test(true, """
-            type Event = <(),_int,(),(),_int>
+            type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
             }
@@ -212,9 +212,9 @@ class TXPar {
                 output std _4:_int
             }
             output std _2:_int
-            emit @GLOBAL Event.5 _999
+            emit @GLOBAL Event.3 _999
             output std _3:_int
-            emit @GLOBAL Event.5 _1
+            emit @GLOBAL Event.3 _1
             output std _5:_int
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n") { out }
@@ -222,7 +222,7 @@ class TXPar {
     @Test
     fun c02_clk () {
         val out = test(true, """
-            type Event = <(),_int,(),(),_int>
+            type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
             }
@@ -234,9 +234,9 @@ class TXPar {
                     output std _1:_int
                 }
             }
-            emit @GLOBAL Event.5 _1000
-            emit @GLOBAL Event.5 _1000
-            emit @GLOBAL Event.5 _1000
+            emit @GLOBAL Event.3 _1000
+            emit @GLOBAL Event.3 _1000
+            emit @GLOBAL Event.3 _1000
         """.trimIndent())
         assert(out == "1\n1\n1\n") { out }
     }

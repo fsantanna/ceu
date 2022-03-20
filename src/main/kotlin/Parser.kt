@@ -93,7 +93,7 @@ object Parser
                         val uni = this.type() as Type.Union
 
                         fun Type?.add (inc: Type.Tuple): Type.Tuple {
-                            val inc_ = inc.clone(uni, inc.tk.lin, inc.tk.col) as Type.Tuple
+                            val inc_ = inc.clone(inc.tk,uni) as Type.Tuple
                             return when (this) {
                                 null, is Type.Unit -> inc_
                                 is Type.Tuple -> {

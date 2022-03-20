@@ -1083,8 +1083,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt~)?5)
-            set ms_8 = (sub @[] [ms_8,((evt~)!5)])
+            await ((evt~)?3)
+            set ms_8 = (sub @[] [ms_8,((evt~)!3)])
             if (lte @[] [ms_8,(_0: _int)])
             {
             break
@@ -1128,8 +1128,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt~)?5)
-            set ms_13 = (sub @[] [ms_13,((evt~)!5)])
+            await ((evt~)?3)
+            set ms_13 = (sub @[] [ms_13,((evt~)!3)])
             if (lte @[] [ms_13,(_0: _int)])
             {
             break
@@ -1507,7 +1507,8 @@ class TXInfer {
             type Point += <()>
         """.trimIndent())
         assert(out == """
-            type Point @[] = <(),()>
+            type Point @[] = <()>
+            type Point @[] += <()>
             
         """.trimIndent()) { out }
     }
@@ -1525,5 +1526,20 @@ class TXInfer {
             type Point += <()>
         """.trimIndent())
         assert(out == "(ln 1, col 6): invalid declaration : \"Point\" is not yet declared") { out }
+    }
+    @Test
+    fun e06_stretch_ok () {
+        val out = all("""
+            type Point = <()>
+            type Point += <()>
+            var pt = Point.2
+        """.trimIndent())
+        assert(out == """
+            type Point @[] = <()>
+            type Point @[] += <()>
+            var pt: Point
+            set pt = (Point.2 ())
+            
+        """.trimIndent()) { out }
     }
 }
