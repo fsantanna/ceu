@@ -103,6 +103,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
         val isinc: Boolean,
         var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
         val type: Type,
-        var xtype: Type?
+        var xtype: Type?,
+        var xisact: Boolean
     ) : Stmt(N++, tk_, null, null)
 }

@@ -627,7 +627,7 @@ fun code_fs (s: Stmt) {
         is Stmt.Typedef -> {
             val xtype = s.xtype?.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
-            if (xtype == null) {
+            if (!s.xisact) {
                 Code("", "", "", "", "")
             } else {
                 if (s.tk.str == "Event") {
@@ -648,7 +648,7 @@ fun code_fs (s: Stmt) {
             typedef ${s.xtype!!.pos()} CEU_${s.tk.str};
             
         """.trimIndent()
-                Code(src + type.type + xtype.type + s.xtype!!.defs(s.tk.str), type.struct + xtype.struct, xtype.func, "", "")
+                Code(src + type.type + xtype!!.type + s.xtype!!.defs(s.tk.str), type.struct + xtype.struct, xtype.func, "", "")
             }
         }
         is Stmt.Native -> if (s.istype) {

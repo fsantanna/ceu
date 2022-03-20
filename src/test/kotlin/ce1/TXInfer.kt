@@ -1542,4 +1542,36 @@ class TXInfer {
             
         """.trimIndent()) { out }
     }
+    @Test
+    fun e07_stretch_ok () {
+        val out = all("""
+            type Point = <Xxx = ()>
+            type Point += <Yyy = ()>
+            var pt = Point.Xxx
+        """.trimIndent())
+        assert(out == """
+            type Point @[] = <Xxx=()>
+            type Point @[] += <Yyy=()>
+            var pt: Point
+            set pt = (Point.Xxx ())
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun e08_stretch_ok () {
+        val out = all("""
+            type Point = <Xxx = ()>
+            type Point += <Yyy = ()>
+            var pt = Point.Xxx
+            type Point += <Zzz = ()>
+        """.trimIndent())
+        assert(out == """
+            type Point @[] = <Xxx=()>
+            type Point @[] += <Yyy=()>
+            var pt: Point
+            set pt = (Point.Xxx ())
+            type Point @[] += <Zzz=()>
+            
+        """.trimIndent()) { out }
+    }
 }
