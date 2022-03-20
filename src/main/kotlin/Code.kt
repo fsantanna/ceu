@@ -403,11 +403,14 @@ fun code_fe (e: Expr) {
         is Expr.Pak   -> {
             val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
             val ex = CODE.removeFirst()
-            Code(tp.type+ex.type, tp.struct+ex.struct, tp.func+ex.func, tp.stmt+ex.stmt, tp.expr+ex.expr)
+            val v = if (e.xtype==null || e.e.wtype !is Type.Union) ex.expr else {
+                // because of type stretching
+                "(*(${e.wtype!!.pos()}*)&${ex.expr})"
+            }
+            Code(tp.type+ex.type, tp.struct+ex.struct, tp.func+ex.func, tp.stmt+ex.stmt, tp.expr+v)
         }
-        is Expr.Unpak -> {
-            val x = CODE.removeFirst()
-            Code(x.type, x.struct, x.func, x.stmt, x.expr)
+        is Expr.Unpak -> CODE.removeFirst().let {
+            Code(it.type, it.struct, it.func, it.stmt, it.expr)
         }
         is Expr.Field -> CODE.removeFirst().let {
             val src = when (e.tk.str) {
@@ -625,10 +628,11 @@ fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> {
-            val xtype = s.xtype?.let { CODE.removeFirst() }
+            val xtype = s.xtype!!.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
             if (!s.xisact) {
-                Code("", "", "", "", "")
+                //Code("", "", "", "", "")
+                Code(type.type+xtype.type, type.struct+xtype.struct, type.func+xtype.func, "", "")
             } else {
                 if (s.tk.str == "Event") {
                     Event = "CEU_Event"
@@ -648,7 +652,7 @@ fun code_fs (s: Stmt) {
             typedef ${s.xtype!!.pos()} CEU_${s.tk.str};
             
         """.trimIndent()
-                Code(src + type.type + xtype!!.type + s.xtype!!.defs(s.tk.str), type.struct + xtype.struct, xtype.func, "", "")
+                Code(src+type.type+xtype!!.type+s.xtype!!.defs(s.tk.str), type.struct+xtype.struct, type.func+xtype.func, "", "")
             }
         }
         is Stmt.Native -> if (s.istype) {

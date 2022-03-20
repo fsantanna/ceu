@@ -1019,6 +1019,18 @@ class TXExec {
     }
 
     @Test
+    fun p18_stretch_ok () {
+        val out = test(true, """
+            type Point = [x:_int] + <Xxx = ()>
+            type Point += <Yyy = ()>
+            var pt = Point.Xxx [_10]
+            type Point += <Zzz = ()>
+            output std /pt
+        """.trimIndent())
+        assert(out == "<.1 [10]>\n") { out }
+    }
+
+    @Test
     fun todo_pxx_type_hier () {
         val out = test(true, """
         type Event = <
@@ -1079,5 +1091,4 @@ class TXExec {
        """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
-
 }
