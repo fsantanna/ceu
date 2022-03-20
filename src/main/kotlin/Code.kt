@@ -983,6 +983,7 @@ fun Stmt.code (): String {
                 char _ceu[${Event_Size}];  // max payload size
                 //void Kill;
                 uint64_t Task;  // cast from Task*
+                //int Timer;
             } payload;
             int tag;
         } _CEU_Event;

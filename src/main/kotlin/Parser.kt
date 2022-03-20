@@ -862,8 +862,8 @@ object Parser
                             {
                                 var ms_$N: _int = _${clk.str}
                                 loop {
-                                    await evt?5
-                                    set ms_$N = sub [ms_$N, evt!5]
+                                    await evt?3
+                                    set ms_$N = sub [ms_$N, evt!3]
                                     if lte [ms_$N,_0] {
                                         break
                                     }
