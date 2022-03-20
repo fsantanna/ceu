@@ -1023,8 +1023,10 @@ class TXExec {
         val out = test(true, """
             type Point = [x:_int] + <Xxx = ()>
             type Point += <Yyy = ()>
+            type Pp = Point
             var pt = Point.Xxx [_10]
             type Point += <Zzz = ()>
+            var p3: Point
             output std /pt
         """.trimIndent())
         assert(out == "<.1 [10]>\n") { out }

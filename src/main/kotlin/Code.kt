@@ -628,32 +628,33 @@ fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> {
+            val unddef = """
+                #undef CEU_${s.tk.str}
+                #define CEU_${s.tk.str} CEU_${s.tk.str}_${s.n}
+                
+            """.trimIndent()
+
             val xtype = s.xtype!!.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
-            if (!s.xisact) {
-                //Code("", "", "", "", "")
-                Code(type.type+xtype.type, type.struct+xtype.struct, type.func+xtype.func, "", "")
-            } else {
-                if (s.tk.str == "Event") {
-                    Event = "CEU_Event"
-                }
-                fun Type.defs(pre: String): String {
-                    return if (this !is Type.Union || this.yids == null) "" else {
-                        this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
-                            .joinToString("") +
-                                this.vec.mapIndexed { i, sub -> sub.defs(pre + '_' + this.yids[i].str) }
-                                    .joinToString("")
-                    }
-                }
-
-                val src = """
-            //#define output_std_${s.tk.str}_ output_std_${s.xtype!!.toce()}_
-            //#define output_std_${s.tk.str}  output_std_${s.xtype!!.toce()}
-            typedef ${s.xtype!!.pos()} CEU_${s.tk.str};
-            
-        """.trimIndent()
-                Code(src+type.type+xtype!!.type+s.xtype!!.defs(s.tk.str), type.struct+xtype.struct, type.func+xtype.func, "", "")
+            if (s.tk.str == "Event") {
+                Event = "CEU_Event"
             }
+            fun Type.defs(pre: String): String {
+                return if (this !is Type.Union || this.yids == null) "" else {
+                    this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
+                        .joinToString("") +
+                            this.vec.mapIndexed { i, sub -> sub.defs(pre + '_' + this.yids[i].str) }
+                                .joinToString("")
+                }
+            }
+
+            val src = """
+                //#define output_std_${s.tk.str}_ output_std_${s.xtype!!.toce()}_
+                //#define output_std_${s.tk.str}  output_std_${s.xtype!!.toce()}
+                typedef ${s.xtype!!.pos()} CEU_${s.tk.str}_${s.n};
+                
+            """.trimIndent()
+            Code(unddef+src+type.type+xtype!!.type+s.xtype!!.defs(s.tk.str), unddef+type.struct+xtype.struct, unddef+type.func+xtype.func, "", "")
         }
         is Stmt.Native -> if (s.istype) {
             Code("", s.tk_.payload().native(s,s.tk) + "\n", "", "", "")
