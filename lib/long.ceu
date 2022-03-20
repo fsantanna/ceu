@@ -1,0 +1,66 @@
+-- LOGICAL
+
+func lnot: _long -> _long {
+    return _(!$arg)
+}
+
+func land: [_long,_long] -> _long {
+    return _($arg._1 && $arg._2)
+}
+
+func lor: [_long,_long] -> _long {
+    return _($arg._1 || $arg._2)
+}
+
+-- RELATIONAL
+
+func leq: [_long,_long] -> _long {
+    return _($arg._1 == $arg._2)
+}
+
+func lneq: [_long,_long] -> _long {
+    return _($arg._1 != $arg._2)
+}
+
+func lgt: [_long,_long] -> _long {
+    return _($arg._1 > $arg._2)
+}
+
+func llt: [_long,_long] -> _long {
+    return _($arg._1 < $arg._2)
+}
+
+
+func lgte: [_long,_long] -> _long {
+    return _($arg._1 >= $arg._2)
+}
+
+func llte: [_long,_long] -> _long {
+    return _($arg._1 <= $arg._2)
+}
+
+-- ARITHMETIC
+
+func lumn: _long -> _long {
+    return _(-$arg)
+}
+
+func ladd: [_long,_long] -> _long {
+    return _($arg._1 + $arg._2)
+}
+
+func lsub: [_long,_long] -> _long {
+    return _($arg._1 - $arg._2)
+}
+
+func lmul: [_long,_long] -> _long {
+    return _($arg._1 * $arg._2)
+}
+
+func ldiv: [_long,_long] -> _long {
+    return _($arg._1 / $arg._2)
+}
+
+func lrem: [_long,_long] -> _long {
+    return _($arg._1 % $arg._2)
+}
