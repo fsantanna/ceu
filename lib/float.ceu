@@ -1,0 +1,23 @@
+var int2f = func _int -> _float {
+    return arg
+}
+
+var f2int = func _float -> _int {
+    return arg
+}
+
+var fadd = func [_float,_float] -> _float {
+    return _($arg._1 + $arg._2)
+}
+
+var fsub = func [_float,_float] -> _float {
+    return _($arg._1 - $arg._2)
+}
+
+var fmul = func [_float,_float] -> _float {
+    return _($arg._1 * $arg._2)
+}
+
+var fdiv = func [_float,_float] -> _float {
+    return _($arg._1 / $arg._2)
+}
