@@ -162,6 +162,20 @@ type Event = <
 var e = Event.Mouse.Button.Down [ [x,y], _10 ]
 ```
 
+```
+type List [a] @[s] = <[a, /(List [a] @[s]) @s]>
+var str: List [_char] = new <.1 ['a', Null]>
+var str: *[_char] = *['a']
+var str: String = *"a"
+
+type Either [a,b] = <Left=a, Right=b>
+var xy: Either [Int,Int] = Either.Left _10
+
+@[a1,a2: a2>a1] -> [/Num@[a1],/Num@a2]
+
+```
+
+
 # Tasks
 
 - either assignable or anonymous

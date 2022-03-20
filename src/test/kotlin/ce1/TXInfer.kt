@@ -252,6 +252,24 @@ class TXInfer {
         val out = all("var x: _int ; set x = _10")
         assert(out == "var x: _int\nset x = (_10: _int)\n") { out }
     }
+    @Test
+    fun a16_func () {
+        val out = all("""
+            func f: <()> -> () { return arg }
+            var v = f <.1>
+        """.trimIndent())
+        assert(out == """
+            var f: func @[] -> <()> -> ()
+            set f = func @[] -> <()> -> () {
+            set ret = arg
+            return
+            }
+            
+            var v: ()
+            set v = (f @[] <.1 ()>: <()>)
+            
+        """.trimIndent()) { out }
+    }
 
     // inference error
 

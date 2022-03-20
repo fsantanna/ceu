@@ -1,6 +1,6 @@
 object Parser
 {
-    fun type (preid: Tk.Id? = null): Type {
+    fun type (preid: Tk.Id?=null, prefunc: Tk.Fix?=null): Type {
         return when {
             (preid!=null || alls.acceptVar("Id")) -> {
                 val tk0 = preid ?: alls.tk0 as Tk.Id
@@ -22,8 +22,8 @@ object Parser
                 val scp = alls.acceptVar("Scp")
                 Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
             }
-            alls.acceptFix("func") || alls.acceptFix("task") -> {
-                val tk0 = alls.tk0 as Tk.Fix
+            (prefunc!=null || alls.acceptFix("func") || alls.acceptFix("task")) -> {
+                val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
                 val (scps, ctrs) = if (alls.checkFix("@[")) {
                     val (x, y) = this.scopepars()
@@ -925,6 +925,21 @@ object Parser
                 val lib = (alls.tk0 as Tk.id)
                 val arg = this.expr()
                 Stmt.Output(tk, lib, arg)
+            }
+
+            // CE1
+
+            alls.acceptFix("func") -> {
+                val tk = alls.tk0 as Tk.Fix
+                if (!CE1) alls.err_tk0_unexpected()
+                alls.acceptVar_err("id")
+                val id = alls.tk0 as Tk.id
+                alls.acceptFix_err(":")
+                val tp = this.type(prefunc=tk) as Type.Func
+                val blk = this.block()
+                All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}") {
+                    this.stmt()
+                } as Stmt
             }
             alls.acceptFix("defer") -> {
                 if (!CE1) alls.err_tk0_unexpected()
