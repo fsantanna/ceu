@@ -9,6 +9,16 @@ fun Any.getEnv (): Any? {
     }
 }
 
+fun Any.toTk (): Tk {
+    return when (this) {
+        is Type         -> this.tk
+        is Stmt.Var     -> this.tk
+        is Stmt.Block   -> this.tk
+        is Stmt.Typedef -> this.tk
+        else -> error("bug found")
+    }
+}
+
 fun Any.toType (): Type {
     return when (this) {
         is Type         -> this
@@ -135,7 +145,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
             this.body.setEnvs(this) // also include blocks w/o labels b/c of inference
             env
         }
-        is Stmt.Typedef -> { this.xtype.visit(::ft,null) ; this }
+        is Stmt.Typedef -> { this.type.visit(::ft,null) ; this.xtype?.visit(::ft,null) ; this }
         else -> TODO(this.toString()) // do not remove this line b/c we may add new cases
     }
 }

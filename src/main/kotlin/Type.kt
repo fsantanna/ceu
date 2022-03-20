@@ -49,7 +49,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
     fun Type.aux (lin: Int, col: Int): Type {
         return when (this) {
             is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Fix)
-            is Type.Named -> Type.Named(this.tk.clone() as Tk.Id, this.subs.map { it.clone() }, this.xisrec, this.xscps)
+            is Type.Named -> Type.Named(this.tk.clone() as Tk.Id, this.subs.map { it.clone() }, this.xisrec, this.xscps?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) })
             is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
             is Type.Tuple -> Type.Tuple(
                 this.tk.clone() as Tk.Fix,

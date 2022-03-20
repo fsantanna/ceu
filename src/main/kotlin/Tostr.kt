@@ -131,9 +131,10 @@ fun Stmt.tostr (lc: Boolean = false): String {
         }
         is Stmt.Throw -> "throw\n"
         is Stmt.DLoop -> "loop " + this.i.tostr(lc) + " in " + this.tsks.tostr(lc) + " " + this.block.tostr(lc)
-        is Stmt.Typedef -> if (this.isinc) "" else {
+        is Stmt.Typedef -> {
             val scps = this.xscp1s.first.let { if (it == null) "" else " @[" + this.xscp1s.first!!.map { it.str }.joinToString(",") + "]" }
-            "type " + this.tk.str + scps + " = " + this.xtype.tostr(lc) + "\n"
+            val op = if (this.isinc) " += " else " = "
+            "type " + this.tk.str + scps + op + this.type.tostr(lc) + "\n"
         }
         else -> error("bug found")
     }.let {

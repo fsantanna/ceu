@@ -811,7 +811,7 @@ object Parser
                 if (isinc) {
                     All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
                 }
-                Stmt.Typedef(id, isinc, scps, tp)
+                Stmt.Typedef(id, isinc, scps, tp, null)
             }
             alls.acceptFix("native") -> {
                 val istype = alls.acceptFix("type")

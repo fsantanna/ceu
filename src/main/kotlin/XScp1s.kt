@@ -163,7 +163,7 @@ fun Stmt.xinfScp1s () {
                 val scps = tps.increasing(false)
                 val fst  = ((s.xscp1s.first?.map { Scope(it,null) } ?: emptyList()) + scps)
                     .distinctBy { it.scp1.str }
-                    
+
                 //println(tps)
                 tps.filter { it is Type.Named && it.xisrec }.let { it as List<Type.Named> }.forEach {
                     it.xscps = it.xscps ?: fst

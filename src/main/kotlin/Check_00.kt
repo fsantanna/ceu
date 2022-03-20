@@ -40,16 +40,6 @@ fun check_00_after_envs (s: Stmt) {
         }
     }
     fun fs (s: Stmt) {
-        fun Any.toTk (): Tk {
-            return when (this) {
-                is Type         -> this.tk
-                is Stmt.Var     -> this.tk
-                is Stmt.Block   -> this.tk
-                is Stmt.Typedef -> this.tk
-                else -> error("bug found")
-            }
-        }
-
         when (s) {
             is Stmt.Var -> {
                 val dcl = s.env(s.tk.str)
@@ -86,7 +76,7 @@ fun check_00_after_envs (s: Stmt) {
                     All_assert_tk(s.tk, s.isinc) {
                         "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl.tk.lin})"
                     }
-                    All_assert_tk(s.tk, dcl.xtype is Type.Union) {
+                    All_assert_tk(s.tk, dcl.type is Type.Union) {
                         "invalid declaration : \"${s.tk.str}\" must be of union type (ln ${dcl.tk.lin})"
                     }
                     if (s.isinc) {
@@ -103,9 +93,9 @@ fun check_00_after_envs (s: Stmt) {
                         dcl.xtype = Type.Union(old.tk_, old.common, old.vec+inc.vec, yids)
                     }
                 }
-                val isrec = s.xtype.flattenLeft().any { it is Type.Named && it.tk.str==s.tk.str }
+                val isrec = s.type.flattenLeft().any { it is Type.Named && it.tk.str==s.tk.str }
                 if (isrec) {
-                    All_assert_tk(s.tk, s.xtype !is Type.Pointer) {
+                    All_assert_tk(s.tk, s.type !is Type.Pointer) {
                         "invalid recursive type : cannot be a pointer"
                     }
                 }
