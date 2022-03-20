@@ -689,8 +689,12 @@ object Parser
                         alls.acceptVar_err("id")
                         val lib = (alls.tk0 as Tk.id)
                         val arg = this.expr()
-                        alls.acceptFix_err(":")
-                        val tp = this.type()
+                        val tp = if (CE1) {
+                            if (!alls.acceptFix(":")) null else this.type()
+                        } else {
+                            alls.acceptFix_err(":")
+                            this.type()
+                        }
                         Stmt.Input(tk, tp, dst, lib, arg)
                     }
                     alls.checkFix("spawn") -> {

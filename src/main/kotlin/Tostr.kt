@@ -30,7 +30,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk.str
-        is Type.Pointer -> this.xscp!!.let { "/" + this.pln.tostr(lc) + " @" + it.scp1.str.anon2local() }
+        is Type.Pointer -> "/" + this.pln.tostr(lc) + this.xscp.let { if (it==null) "" else " @" + it.scp1.str.anon2local() }
         is Type.Named   -> this.tk.str + this.pak_subs() + this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
         }}
@@ -47,7 +47,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
                     .joinToString(",")
             }
             val scps = this.xscps.second.let { if (it==null) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "] -> " }
-            this.tk.str + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
+            this.tk.str + " " + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
         }
     }.let {
         if (!lc) it else {

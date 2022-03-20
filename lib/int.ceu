@@ -4,63 +4,63 @@ func not: _int -> _int {
     return _(!$arg)
 }
 
-var and = func [_int,_int] -> _int {
+func and: [_int,_int] -> _int {
     return _($arg._1 && $arg._2)
 }
 
-var or = func [_int,_int] -> _int {
+func or: [_int,_int] -> _int {
     return _($arg._1 || $arg._2)
 }
 
 -- RELATIONAL
 
-var eq = func [_int,_int] -> _int {
+func eq: [_int,_int] -> _int {
     return _($arg._1 == $arg._2)
 }
 
-var neq = func [_int,_int] -> _int {
+func neq: [_int,_int] -> _int {
     return _($arg._1 != $arg._2)
 }
 
-var gt = func [_int,_int] -> _int {
+func gt: [_int,_int] -> _int {
     return _($arg._1 > $arg._2)
 }
 
-var lt = func [_int,_int] -> _int {
+func lt: [_int,_int] -> _int {
     return _($arg._1 < $arg._2)
 }
 
 
-var gte = func [_int,_int] -> _int {
+func gte: [_int,_int] -> _int {
     return _($arg._1 >= $arg._2)
 }
 
-var lte = func [_int,_int] -> _int {
+func lte: [_int,_int] -> _int {
     return _($arg._1 <= $arg._2)
 }
 
 -- ARITHMETIC
 
-var umn = func _int -> _int {
+func umn: _int -> _int {
     return _(-$arg)
 }
 
-var add = func [_int,_int] -> _int {
+func add: [_int,_int] -> _int {
     return _($arg._1 + $arg._2)
 }
 
-var sub = func [_int,_int] -> _int {
+func sub: [_int,_int] -> _int {
     return _($arg._1 - $arg._2)
 }
 
-var mul = func [_int,_int] -> _int {
+func mul: [_int,_int] -> _int {
     return _($arg._1 * $arg._2)
 }
 
-var div = func [_int,_int] -> _int {
+func div: [_int,_int] -> _int {
     return _($arg._1 / $arg._2)
 }
 
-var rem = func [_int,_int] -> _int {
+func rem: [_int,_int] -> _int {
     return _($arg._1 % $arg._2)
 }
