@@ -1615,4 +1615,13 @@ class TXInfer {
             
         """.trimIndent()) { out }
     }
+    @Test
+    fun e09_hier () {
+        val out = all("""
+        type Point = [_int,_int]
+        type Event = [/()] + <[()]>
+        var e = Event <.1 [_,_]>
+       """.trimIndent())
+        assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
+    }
 }
