@@ -388,7 +388,8 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("f ()\n()\n()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.f is Expr.Var && e.arg is Expr.Call && (e.arg as Expr.Call).f is Expr.Unit)
+        //assert(e is Expr.Call && e.f is Expr.Var && e.arg is Expr.Call && (e.arg as Expr.Call).f is Expr.Unit)
+        assert(e is Expr.Call && e.f is Expr.Var && e.arg is Expr.Unit)
     }
 
     @Test
@@ -396,7 +397,9 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("f1 f2\nf3\n()"), 2)) // f1 (f2 (f3 ()))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Call && e.arg is Expr.Call && (e.arg as Expr.Call).arg is Expr.Call && ((e.arg as Expr.Call).arg as Expr.Call).arg is Expr.Unit)
+        println(e.dump())
+        //assert(e is Expr.Call && e.arg is Expr.Call && (e.arg as Expr.Call).arg is Expr.Call && ((e.arg as Expr.Call).arg as Expr.Call).arg is Expr.Unit)
+        assert(e is Expr.Call && e.arg is Expr.Var)
     }
 
     @Test

@@ -3,12 +3,13 @@ import java.io.PushbackReader
 import java.io.StringReader
 
 object Lexer {
-    fun blanks() {
+    fun blanks(): Boolean {
+        var hasline = false
         while (true) {
             val (c1, x1) = all().read()
             when (x1) {
-                '\n', ' ' -> {
-                }                // ignore line/space
+                '\n' -> hasline=true    // ignore line/space
+                ' '  -> {}              // ignore line/space
                 '-' -> {
                     val (c2, x2) = all().read()
                     if (x2 == '-') {            // ignore comments
@@ -25,12 +26,12 @@ object Lexer {
                     } else {
                         all().unread(c2)
                         all().unread(c1)
-                        return
+                        return hasline
                     }
                 }
                 else -> {
                     all().unread(c1)
-                    return
+                    return hasline
                 }
             }
         }
@@ -286,12 +287,13 @@ object Lexer {
 
     fun lex () {
         alls.tk0 = alls.tk1
-        blanks(); while (lincol()) { blanks() }
+        alls.hasln=blanks(); while (lincol()) { blanks(); alls.hasln=false }
         token()
         while (all().isinc && alls.tk1 is Tk.Eof) {
             alls.stack.removeFirst()
             blanks(); while (lincol()) { blanks() }
             token()
+            alls.hasln = true
         }
     }
 }

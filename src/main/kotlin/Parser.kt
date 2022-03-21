@@ -386,6 +386,10 @@ object Parser
     }
     fun expr (preid: Tk.id? = null): Expr {
         var e = this.expr_dots(preid)
+        if (alls.hasln) {
+            return e
+        }
+
         // call
         if (alls.checkExpr() || alls.checkFix("@[")) {
             val iscps = if (!alls.acceptFix("@[")) null else {

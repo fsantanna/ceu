@@ -255,10 +255,12 @@ class TXInfer {
     @Test
     fun a16_func () {
         val out = all("""
+            call _f ()
             func f: <()> -> () { return arg }
             var v = f <.1>
         """.trimIndent())
         assert(out == """
+            call ((_f: _) @[] ())
             var f: func @[] -> <()> -> ()
             set f = func @[] -> <()> -> () {
             set ret = arg

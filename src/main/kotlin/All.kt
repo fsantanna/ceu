@@ -20,6 +20,7 @@ val D = "\$"
 data class Alls (
     val stack: ArrayDeque<All> = ArrayDeque(),
     var tk0:   Tk = Tk.Err("",1,1),
+    var hasln: Boolean = false,     // has a line between tk0/tk1
     var tk1:   Tk = Tk.Err("",1,1)
 )
 
@@ -49,6 +50,7 @@ fun All_nest (src: String, f: ()->Any): Any {
     val (tk0,tk1) = Pair(alls.tk0,alls.tk1)
     alls.tk0 = Tk.Err("",1,1)
     alls.tk1 = Tk.Err("",1,1)
+    alls.hasln = false
     alls.stack.addFirst(All(old.file,PushbackReader(StringReader(src),2),false))
     all().lin = old.lin
     all().col = 1
