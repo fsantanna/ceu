@@ -1075,7 +1075,7 @@ class TTask {
     @Test
     fun g03_f_kill () {
         val out = test(false, """
-            var fff: func () -> () {}
+            var fff: func () -> ()
             set fff = func () -> () {}
             spawn (task @[]->()->()->() {
                 output std _111:_int
