@@ -145,4 +145,26 @@ class TXParser {
             assert(e.message == "(ln 1, col 15): expected \":\" : have \"=\"") { e.message!! }
         }
     }
+    @Test
+    fun d08_nocomma () {
+        val src = """
+            type Button = [_int] + <
+                [_int,()] + <
+                    [_int]
+                >
+                ()
+            >
+       """.trimIndent()
+        All_restart(null, PushbackReader(StringReader(src), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        //println(s.dump())
+        assert(s is Stmt.Typedef && s.type.let {
+            it is Type.Union && it.vec.size==2 && it.vec[1] is Type.Tuple && it.vec[0].let {
+                it is Type.Union && it.vec.size==1  && it.vec[0].let {
+                    it is Type.Tuple && it.vec.size==4 && it.vec[2] is Type.Unit
+                }
+            }
+        })
+    }
 }

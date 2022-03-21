@@ -922,13 +922,13 @@ class TXExec {
         val out = test(true, """
         type Point = [_int,_int]
         type Event = <
-            Xxx = _int,
-            Yyy = (),
-            Key = <_int,_int>,  -- Key.Up/Down
+            Xxx = _int
+            Yyy = ()
+            Key = <_int,_int>  -- Key.Up/Down
             Mouse = <
-                Motion = [Point],
+                Motion = [Point]
                 Button = < 
-                    Up = [Point,_int],
+                    Up = [Point,_int]
                     Down = [Point,_int]
                 >
             >

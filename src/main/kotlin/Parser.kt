@@ -155,7 +155,8 @@ object Parser
                 val ids = if (haseq) arrayListOf(id) else null
 
                 while (true) {
-                    if (!alls.acceptFix(",")) {
+                    val hasln = CE1 && alls.hasln && !alls.haslc
+                    if (!(alls.acceptFix(",") || hasln) || alls.checkFix(">")) {
                         break
                     }
                     if (haseq) {
