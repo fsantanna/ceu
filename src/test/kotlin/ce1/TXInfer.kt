@@ -1619,9 +1619,15 @@ class TXInfer {
     fun e09_hier () {
         val out = all("""
         type Point = [_int,_int]
-        type Event = [/()] + <[()]>
-        var e = Event <.1 [_,_]>
+        type Event = [/()] + <()>
+        var e = Event <.1 [_]>
        """.trimIndent())
-        assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
+        assert(out == """
+            type Point @[] = [_int,_int]
+            type Event @[i] = [/() @i] <[/() @i]>
+            var e: Event @[GLOBAL]
+            set e = (Event @[GLOBAL] <.1 [(_: /() @GLOBAL)]>: [/() @GLOBAL] <[/() @GLOBAL]>)
+
+        """.trimIndent()) { out }
     }
 }

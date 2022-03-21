@@ -89,7 +89,7 @@ object Parser
                 alls.acceptFix_err("]")
                 Type.Tuple(tk0, tps, ids as List<Tk.id>?).let {
                     if (!alls.acceptFix("+")) it else {
-                        if (!CE1) alls.err_tk0_unexpected()
+                        //if (!CE1) alls.err_tk0_unexpected()
                         alls.checkFix_err("<")
                         val uni = this.type() as Type.Union
 

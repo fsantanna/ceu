@@ -16,7 +16,7 @@ fun Type.flattenLeft (): List<Type> {
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Named -> listOf(this)
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else listOf(it) } + this.vec.map { it.flattenLeft() }.flatten()
+        is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else it.flattenLeft() } + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
         is Type.Active  -> listOf(this) + this.tsk.flattenLeft()
         is Type.Actives -> listOf(this) + this.tsk.flattenLeft()
