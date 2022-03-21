@@ -376,7 +376,7 @@ class TExec {
     fun d07_func_fg () {
         val out = all("""
             var f:(func@[]->  _int->_int)
-            set f = func@[]-> _int->_int { set ret=arg return }
+            set f = func@[]-> _int->_int { set ret=arg; return }
             var g:  (func@[i1]-> [(func@[]-> _int->_int), _int] -> _int)
             set g = func@[i1]-> [(func@[]-> _int->_int), _int]-> _int {
                var fx: (func@[]-> _int->_int)

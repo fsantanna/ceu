@@ -386,7 +386,7 @@ object Parser
     }
     fun expr (preid: Tk.id? = null): Expr {
         var e = this.expr_dots(preid)
-        if (alls.hasln) {
+        if (alls.hasln && !alls.haslc) {
             return e
         }
 
@@ -644,11 +644,16 @@ object Parser
         }
 
         var ret: Stmt = Stmt.Nop(alls.tk0)
+        var first = true
         while (true) {
-            alls.acceptFix(";")
+            val ok = alls.acceptFix(";") || alls.hasln || alls.haslc || first //|| (alls.tk1.lin==1 && alls.tk1.col==1)
+            val err = alls.tk1
+            first = false
+
             val isend = alls.checkFix("}") || alls.checkVar("Eof")
             if (!isend) {
                 val s = this.stmt()
+                All_assert_tk(err, ok) { "expected \";\"" }
                 ret = enseq(ret, s)
             } else {
                 break
@@ -673,18 +678,17 @@ object Parser
                     alls.acceptFix("await") -> {
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                        All_nest(
-                            """
-                        {
-                            var tsk_$N = spawn ${e.tostr(true)}
-                            var st_$N = tsk_$N.status
-                            if _(${D}st_$N == TASK_AWAITING) {
-                                await tsk_$N
+                        All_nest("""
+                            {
+                                var tsk_$N = spawn ${e.tostr(true)}
+                                var st_$N = tsk_$N.status
+                                if _(${D}st_$N == TASK_AWAITING) {
+                                    await tsk_$N
+                                }
+                                set ${dst.tostr(true)} = tsk_$N.ret
                             }
-                            set ${dst.tostr(true)} = tsk_$N.ret
-                        }
-                    """.trimIndent()
-                        ) {
+                            
+                        """.trimIndent()) {
                             this.stmts()
                         } as Stmt
                     }
@@ -747,8 +751,7 @@ object Parser
                         alls.acceptFix("await") -> {
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                            val ret = All_nest(
-                                """
+                            val ret = All_nest("""
                                 {
                                     var tsk_$N = spawn ${e.tostr(true)}
                                     var st_$N = tsk_$N.status
@@ -757,8 +760,8 @@ object Parser
                                     }
                                     set ${tk_id.str} = tsk_$N.ret
                                 }
-                            """.trimIndent()
-                            ) {
+                                
+                            """.trimIndent()) {
                                 this.stmts()
                             }
                             ret as Stmt
@@ -836,7 +839,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
                     val block = this.block()
-                    All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()") {
+                    All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()\n") {
                         this.stmt()
                     } as Stmt
                 } else {
@@ -877,6 +880,7 @@ object Parser
                                     }
                                 }
                             }
+                            
                         """.trimIndent()
                         ) {
                             this.stmt()
@@ -945,7 +949,7 @@ object Parser
                 alls.acceptFix_err(":")
                 val tp = this.type(prefunc=tk) as Type.Func
                 val blk = this.block()
-                All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}") {
+                All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
                     this.stmt()
                 } as Stmt
             }

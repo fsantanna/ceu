@@ -732,7 +732,7 @@ class TParser {
 
     @Test
     fun c08_parser_stmt_seq() {
-        All_restart(null, PushbackReader(StringReader("call f() ; call _printf:func@[]->()->() () call g()"), 2))
+        All_restart(null, PushbackReader(StringReader("call f() ; call _printf:func@[]->()->() (); call g()"), 2))
         Lexer.lex()
         val s = Parser.stmts()
         assert(
@@ -743,6 +743,18 @@ class TParser {
                         }
                     }
         )
+    }
+
+    @Test
+    fun c09_parser_stmt_seq_err() {
+        All_restart(null, PushbackReader(StringReader("call f() call g()"), 2))
+        Lexer.lex()
+        try {
+            Parser.stmts()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 10): expected \";\"") { e.message!! }
+        }
     }
 
     // STMT_BLOCK

@@ -1064,6 +1064,13 @@ class TTask {
         assert(out == "10\n") { out }
     }
 
+    @Test
+    fun g03_f_kill_err () {
+        val out = test(false, """
+            var fff: func () -> () {}  -- leading block has no effect 
+       """.trimIndent())
+        assert(out == "(ln 1, col 24): expected \";\"") { out }
+    }
 
     @Test
     fun g03_f_kill () {
