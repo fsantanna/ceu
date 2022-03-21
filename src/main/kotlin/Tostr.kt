@@ -2,6 +2,8 @@ fun Tk.lincol (src: String): String {
     if (true) {
         //return src
     }
+    return "^[${this.lin},${this.col}]$src^[]"
+    /*
     return """
         
         ^[${this.lin},${this.col}]
@@ -9,6 +11,7 @@ fun Tk.lincol (src: String): String {
         ^[]
         
     """.trimIndent()
+    */
 }
 
 fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
@@ -95,7 +98,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
             val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.str.anon2local() }
             "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
         }
-        is Expr.Func -> this.ftp()!!.tostr(lc) + " " + this.block.tostr(lc)
+        is Expr.Func -> "("+ this.ftp()!!.tostr(lc) + " " + this.block.tostr(lc) + ")"
     }.let {
         if (!lc) it else {
             this.tk.lincol(it)

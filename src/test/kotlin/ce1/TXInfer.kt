@@ -116,11 +116,11 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var f: func @[] -> <()> -> ()
-            set f = func @[] -> <()> -> () {
+            set f = (func @[] -> <()> -> () {
             set ret = arg
             return
             }
-            
+            )
             var v: ()
             set v = (f @[] <.1 ()>: <()>)
             
@@ -200,7 +200,7 @@ class TXInfer {
         """.trimIndent()) { out }
     }
     @Test
-    fun todo_a12_new () {
+    fun todo_a12_new_ce1_ce0 () {
         val out = all("""
             type List = <Cons=/List>
             var l = new List.Cons Null
@@ -212,7 +212,7 @@ class TXInfer {
             var l: /List @[GLOBAL] @GLOBAL
             set l = (new (List @[GLOBAL] <.1 Null: /List @[GLOBAL] @GLOBAL>: </List @[GLOBAL] @GLOBAL>): @GLOBAL)
             output std l
-
+            
         """.trimIndent()) { out }
     }
     @Test
@@ -232,10 +232,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var input_pico_Unit: func @[i] -> /() @i -> ()
-            set input_pico_Unit = func @[i] -> /() @i -> () {
+            set input_pico_Unit = (func @[i] -> /() @i -> () {
 
             }
-
+            )
             var e: ()
             set e = ()
             input pico (/e): ()
@@ -262,11 +262,11 @@ class TXInfer {
         assert(out == """
             call ((_f: _) @[] ())
             var f: func @[] -> <()> -> ()
-            set f = func @[] -> <()> -> () {
+            set f = (func @[] -> <()> -> () {
             set ret = arg
             return
             }
-            
+            )
             var v: ()
             set v = (f @[] <.1 ()>: <()>)
             
@@ -283,10 +283,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var f: task @[] -> () -> () -> ()
-            set f = task @[] -> () -> () -> () {
+            set f = (task @[] -> () -> () -> () {
             output std (_1: _int)
             }
-            
+            )
             var x: active task @[] -> () -> () -> ()
             set x = spawn (f @[] ())
             output std (_2: _int)
@@ -307,12 +307,12 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var output_pico: func @[] -> () -> ()
-            set output_pico = func @[] -> () -> () {
+            set output_pico = (func @[] -> () -> () {
             native _{
                     pico_output(*(Pico_IO*)&arg);
                 }
             }
-
+            )
     
         """.trimIndent()) { out }
     }
@@ -340,10 +340,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var f: func @[i] -> /_int @i -> ()
-            set f = func @[i] -> /_int @i -> () {
+            set f = (func @[i] -> /_int @i -> () {
             
             }
-            
+            )
             
         """.trimIndent()) { out }
     }
@@ -410,10 +410,10 @@ class TXInfer {
         assert(out == """
             type List @[x] = </List @[x] @x>
             var f: func @[i,j] -> /List @[j] @i -> ()
-            set f = func @[i,j] -> /List @[j] @i -> () {
+            set f = (func @[i,j] -> /List @[j] @i -> () {
             set (((arg\)~)!1) = Null: /List @[j] @j
             }
-
+            )
 
         """.trimIndent()) { out }
     }
@@ -428,10 +428,10 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
-            set f = func @[i,j] -> /List @[j] @i -> () {
+            set f = (func @[i,j] -> /List @[j] @i -> () {
             set (((arg\)~)!1) = Null: /List @[j] @j
             }
-
+            )
 
         """.trimIndent()) { out }
     }
@@ -446,10 +446,10 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var f: func @[i,j] -> /List @[j] @i -> ()
-            set f = func @[i,j] -> /List @[j] @i -> () {
+            set f = (func @[i,j] -> /List @[j] @i -> () {
             set (((arg\)~)!1) = (new (List @[j] <.1 Null: /List @[j] @j>: </List @[j] @j>): @j)
             }
-
+            )
 
         """.trimIndent()) { out }
     }
@@ -622,10 +622,10 @@ class TXInfer {
             var x: ()
             set x = ()
             var f: func @[] -> () -> ()
-            set f = func @[] -> () -> () {
+            set f = (func @[] -> () -> () {
             output std x
             }
-            
+            )
             call (f @[] ())
             }
 
@@ -648,10 +648,10 @@ class TXInfer {
             var pa: /List @[LOCAL] @LOCAL
             set pa = (new (List @[LOCAL] <.1 Null: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
-            set f = func @[] -> () -> () {
+            set f = (func @[] -> () -> () {
 
             }
-            
+            )
             call (f @[] ())
             }
             
@@ -687,10 +687,10 @@ class TXInfer {
             set x = ()
             {
             var f: func @[] -> () -> ()
-            set f = func @[] -> () -> () {
+            set f = (func @[] -> () -> () {
             output std x
             }
-            
+            )
             call (f @[] ())
             }
             }
@@ -716,7 +716,7 @@ class TXInfer {
         assert(out == """
             type List @[i] = </List @[i] @i>
             var clone: func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k
-            set clone = func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k {
+            set clone = (func @[i,j,k,l] -> /List @[j] @i -> /List @[l] @k {
             if (((arg\)~)?Null)
             {
             set ret = Null: /List @[l] @k
@@ -728,7 +728,7 @@ class TXInfer {
             return
             }
             }
-
+            )
 
         """.trimIndent()) { out }
     }
@@ -790,12 +790,12 @@ class TXInfer {
             var pa: /List @[LOCAL] @LOCAL
             set pa = (new (List @[LOCAL] <.1 Null: /List @[LOCAL] @LOCAL>: </List @[LOCAL] @LOCAL>): @LOCAL)
             var f: func @[] -> () -> ()
-            set f = func @[] -> () -> () {
+            set f = (func @[] -> () -> () {
             var pf: /List @[A] @A
             set pf = (new (List @[A] <.1 Null: /List @[A] @A>: </List @[A] @A>): @A)
             set (((pa\)~)!1) = pf
             }
-            
+            )
             call (f @[] ())
             output std pa
             }
@@ -821,11 +821,11 @@ class TXInfer {
             {
             var x: _int
             set x = (_10: _int)
-            set f = func @[] -> () -> _int {
+            set f = (func @[] -> () -> _int {
             set ret = x
             return
             }
-            
+            )
             }
             call (f @[] ())
             
@@ -848,19 +848,19 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             var x: ()
             set x = ()
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             output std x
             }
-             @[] ())
-            spawn (task @[] -> _ -> _ -> _ {
+            ) @[] ())
+            spawn ((task @[] -> _ -> _ -> _ {
             output std x
             }
-             @[] ())
+            ) @[] ())
             }
-             @[] ())
+            ) @[] ())
 
         """.trimIndent()) { out }
     }
@@ -880,22 +880,22 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             var x: ()
             set x = ()
-            spawn (task @[] -> _ -> _ -> _ {
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             output std x
             }
-             @[] ())
+            ) @[] ())
             }
-             @[] ())
-            spawn (task @[] -> _ -> _ -> _ {
+            ) @[] ())
+            spawn ((task @[] -> _ -> _ -> _ {
             output std x
             }
-             @[] ())
+            ) @[] ())
             }
-             @[] ())
+            ) @[] ())
 
         """.trimIndent()) { out }
     }
@@ -908,10 +908,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             var t: active task @[] -> _ -> _ -> _
-            set t = spawn (task @[] -> _ -> _ -> _ {
+            set t = spawn ((task @[] -> _ -> _ -> _ {
             output std ()
             }
-             @[] ())
+            ) @[] ())
             
         """.trimIndent()) { out }
     }
@@ -933,10 +933,10 @@ class TXInfer {
         assert(out == """
             type Xask @[] = task @[] -> () -> _int -> ()
             var t: Xask
-            set t = (Xask task @[] -> () -> _int -> () {
+            set t = (Xask (task @[] -> () -> _int -> () {
             output std (_2: _int)
             }
-            )
+            ))
             output std (_1: _int)
             var x: active Xask
             set x = spawn (active Xask ((t~) @[] (): @GLOBAL))
@@ -1117,7 +1117,7 @@ class TXInfer {
             type Event @[] = <(),(),(),(),_int>
             var sub: func @[] -> [_imt,_int] -> _int
             var lte: func @[] -> [_imt,_int] -> _int
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             {
             var ms_8: _int
             set ms_8 = (_1000: _int)
@@ -1139,7 +1139,7 @@ class TXInfer {
             }
             }
             }
-             @[] ())
+            ) @[] ())
 
         """.trimIndent()) { out }
     }
@@ -1159,7 +1159,7 @@ class TXInfer {
             type Event @[] = <(),(),(),(),_int>
             var sub: func @[] -> [_imt,_int] -> _int
             var lte: func @[] -> [_imt,_int] -> _int
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             {
             {
             loop {
@@ -1190,7 +1190,7 @@ class TXInfer {
             }
             }
             }
-             @[] ())
+            ) @[] ())
 
         """.trimIndent()) { out }
     }
@@ -1244,10 +1244,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type TPico @[] = <()>
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             output std (TPico.1 ())
             }
-             @[] ())
+            ) @[] ())
             
         """.trimIndent()) { out }
     }
@@ -1261,10 +1261,10 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type TPico @[] = <(),[_int,_int]>
-            spawn (task @[] -> _ -> _ -> _ {
+            spawn ((task @[] -> _ -> _ -> _ {
             output std (TPico.2 [(_1: _int),(_2: _int)])
             }
-             @[] ())
+            ) @[] ())
             
         """.trimIndent()) { out }
     }
@@ -1311,10 +1311,10 @@ class TXInfer {
         assert(out == """
             type Int2Int @[] = func @[] -> _int -> _int
             var f: Int2Int
-            set f = (Int2Int func @[] -> _int -> _int {
+            set f = (Int2Int (func @[] -> _int -> _int {
             set ret = arg
             }
-            )
+            ))
             var x: _int
             set x = ((f~) @[] (_10: _int))
             output std x
@@ -1337,12 +1337,12 @@ class TXInfer {
         assert(out == """
             type Event @[] = <(),_uint64_t,_int>
             var f: task @[] -> _int -> () -> _int
-            set f = task @[] -> _int -> () -> _int {
+            set f = (task @[] -> _int -> () -> _int {
             set ret = arg
             return
             }
-            
-            spawn (task @[] -> _ -> _ -> _ {
+            )
+            spawn ((task @[] -> _ -> _ -> _ {
             var x: _int
             {
             var tsk_25: active task @[] -> _int -> () -> _int
@@ -1361,7 +1361,7 @@ class TXInfer {
             }
             output std x
             }
-             @[] ())
+            ) @[] ())
             
         """.trimIndent()) { out }
     }
@@ -1376,10 +1376,10 @@ class TXInfer {
         assert(out == """
             type Xask @[] = task @[] -> () -> () -> ()
             var t: Xask
-            set t = (Xask task @[] -> () -> () -> () {
+            set t = (Xask (task @[] -> () -> () -> () {
             
             }
-            )
+            ))
             output std ()
             
         """.trimIndent()) { out }

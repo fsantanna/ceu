@@ -155,7 +155,7 @@ object Parser
                 val ids = if (haseq) arrayListOf(id) else null
 
                 while (true) {
-                    val hasln = CE1 && alls.hasln && !alls.haslc
+                    val hasln = CE1 && alls.hasln
                     if (!(alls.acceptFix(",") || hasln) || alls.checkFix(">")) {
                         break
                     }
@@ -387,7 +387,7 @@ object Parser
     }
     fun expr (preid: Tk.id? = null): Expr {
         var e = this.expr_dots(preid)
-        if (alls.hasln && !alls.haslc) {
+        if (alls.hasln) {
             return e
         }
 
@@ -647,7 +647,7 @@ object Parser
         var ret: Stmt = Stmt.Nop(alls.tk0)
         var first = true
         while (true) {
-            val ok = alls.acceptFix(";") || alls.hasln || alls.haslc || first //|| (alls.tk1.lin==1 && alls.tk1.col==1)
+            val ok = alls.acceptFix(";") || alls.hasln || first //|| (alls.tk1.lin==1 && alls.tk1.col==1)
             val err = alls.tk1
             first = false
 
@@ -1092,13 +1092,12 @@ object Parser
                 //All_assert_tk(tk0, stmt !is Stmt.Var) { "unexpected `until`" }
 
                 val cnd = this.expr()
-                val if1 = All_nest(
-                    """
+                val if1 = All_nest("""
                     if ${cnd.tostr(true)} {
                         break
                     }
                     
-                """.trimIndent()
+                    """.trimIndent()
                 ) {
                     this.stmt()
                 } as Stmt

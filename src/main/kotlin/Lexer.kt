@@ -287,13 +287,13 @@ object Lexer {
 
     fun lex () {
         alls.tk0 = alls.tk1
-        alls.hasln=blanks(); while (lincol()) { blanks(); alls.haslc=true }
+        alls.hasln=blanks(); while (lincol()) { blanks().let { alls.hasln=alls.hasln||it } }
         token()
         while (all().isinc && alls.tk1 is Tk.Eof) {
             alls.stack.removeFirst()
             blanks(); while (lincol()) { blanks() }
             token()
-            alls.haslc = true
+            alls.hasln = true
         }
     }
 }

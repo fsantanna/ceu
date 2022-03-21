@@ -1,5 +1,5 @@
 type Event = <
-    Kill  = (),
-    Task  = _uint64_t,
+    Kill  = ()
+    Task  = _uint64_t
     Timer = _int
 >
