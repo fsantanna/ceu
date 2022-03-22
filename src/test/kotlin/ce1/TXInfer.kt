@@ -1323,7 +1323,7 @@ class TXInfer {
     }
 
     @Test
-    fun f10_await_ret () {
+    fun f10_await_ret_err () {
         val out = all("""
             type Event = <(),_uint64_t,_int>
             var f = task @[]->_int->()->_int {
@@ -1331,6 +1331,21 @@ class TXInfer {
             }
             spawn {
                 var x = await f _1
+                output std x
+            }
+        """.trimIndent())
+        assert(out == "(ln 6, col 19): expected \"spawn\" : have \"f\"") { out }
+    }
+
+    @Test
+    fun f10_await_ret () {
+        val out = all("""
+            type Event = <(),_uint64_t,_int>
+            var f = task @[]->_int->()->_int {
+                return arg
+            }
+            spawn {
+                var x = await spawn f _1
                 output std x
             }
         """.trimIndent())

@@ -664,7 +664,7 @@ object Parser
         }
         return ret
     }
-    fun await_task (e: Expr, dst: Expr?): Stmt {
+    fun await_spawn (e: Expr, dst: Expr?): Stmt {
         return All_nest("""
         {
             var tsk_$N = spawn ${e.tostr(true)}
@@ -695,9 +695,10 @@ object Parser
                 when {
                     alls.acceptFix("await") -> {
                         if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                        alls.acceptFix_err("spawn")
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                        await_task(e, dst)
+                        await_spawn(e, dst)
                     }
                     alls.acceptFix("input") -> {
                         val tk = alls.tk0 as Tk.Fix
@@ -757,9 +758,10 @@ object Parser
                         }
                         alls.acceptFix("await") -> {
                             if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                            alls.acceptFix_err("spawn")
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                            await_task(e, null)
+                            await_spawn(e, dst)
                         }
                         else -> {
                             val src = this.expr()
@@ -889,7 +891,7 @@ object Parser
                         if (e is Expr.Pak && e.e is Expr.Call) {
                             assert(e.xtype == null)
                             if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                            await_task(e, null)
+                            await_spawn(e, null)
                         } else {
                             Stmt.Await(tk0, e)
                         }

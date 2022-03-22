@@ -929,7 +929,7 @@ class TXTask {
                 return arg
             }
             spawn {
-                var x = await f _10
+                var x = await spawn f _10
                 output std x
             }
         """.trimIndent())
@@ -947,8 +947,8 @@ class TXTask {
             var x1: _int
             var x2: _int
             spawn {
-                set x1 = await f _10
-                set x2 = await f _20
+                set x1 = await spawn f _10
+                set x2 = await spawn f _20
             }
             emit @GLOBAL Event.3 _1
             emit @GLOBAL Event.3 _1
@@ -967,11 +967,11 @@ class TXTask {
                 return v
             }
             spawn {
-                var v = await f _10
+                var v = await spawn f _10
                 output std v
             }
             spawn {
-                var v = await f _20
+                var v = await spawn f _20
                 output std v
             }
             emit @GLOBAL Event.3 _1

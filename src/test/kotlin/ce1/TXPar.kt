@@ -323,10 +323,10 @@ class TXPar {
             }            
             task aaa: () -> () -> _int {
                 output std _222:_int
-                set ret = await bbb ()
+                set ret = await spawn bbb ()
             }            
             spawn {
-                var opt = await aaa ()
+                var opt = await spawn aaa ()
                 output std opt
             }
         """.trimIndent())
