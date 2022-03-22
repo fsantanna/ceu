@@ -4,7 +4,6 @@ import java.io.StringReader
 
 fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
     //TYPEX.clear()
-    EXPR_WTYPE = true
     //N = 1
     All_restart(file, PushbackReader(StringReader(ce), 2))
     Lexer.lex()

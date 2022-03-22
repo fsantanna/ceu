@@ -3,6 +3,7 @@ val CODE = ArrayDeque<Code>()
 
 var Event = "_CEU_Event"
 var Event_Size = 32  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
+var Error = "_CEU_Error"
 
 fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
@@ -87,6 +88,7 @@ fun code_ft (tp: Type) {
                     struct {
                         ${tp.inp.pos()} arg;
                         $Event evt;
+                        $Error err;
                         ${tp.pub.let { if (it == null) "" else it.pos() + " pub;" }}
                         ${tp.out.pos()} ret;
                     };
@@ -94,6 +96,7 @@ fun code_ft (tp: Type) {
                 
                 typedef union {
                     _CEU_Event* evt;
+                    void** err;         // double pointer to return if caught or not
                     struct {
                         Block* blks[${tp.xscps.second!!.size}];
                         ${tp.inp.pos()} arg;
@@ -637,8 +640,9 @@ fun code_fs (s: Stmt) {
 
             val xtype = s.xtype!!.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
-            if (s.tk.str == "Event") {
-                Event = "CEU_Event"
+            when (s.tk.str) {
+                "Event" -> { Event = "CEU_Event" }
+                "Error" -> { Error = "CEU_Error" }
             }
             fun Type.defs(pre: String): String {
                 return if (this !is Type.Union || this.yids == null) "" else {
@@ -826,7 +830,7 @@ fun code_fs (s: Stmt) {
             val src = """
                 {
                     Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    block_throw(&stk, &stk, (_CEU_Throw*) &${it.expr});
+                    block_throw(&stk, &stk, &${it.expr});
                     assert(stk.block == NULL);
                     if (stk.block == NULL) {
                         return;
@@ -884,12 +888,13 @@ fun code_fs (s: Stmt) {
                     case ${s.n}: {      // ?? catch
                         int status = task0->status;    
                         task0->status = TASK_RUNNING;
-                        task1->err = * (CEU_Error*) xxx.err;
+                        task1->err = * (CEU_Error*) *xxx.err;
                         ${catch.stmt}
                         if (!${catch.expr}) {
                             task0->status = status;
                             return;     // NO catch
                         }
+                        *xxx.err = NULL;
                         // OK catch
                     }
                 """.trimIndent()}
@@ -1011,8 +1016,11 @@ fun Stmt.code (): String {
             int tag;
         } _CEU_Event;
         
+        typedef struct _CEU_Error {
+        } _CEU_Error;
+        
         // stack, task, evt
-        typedef void (*Task_F) (Stack*, struct Task*, _CEU_Event*);
+        typedef void (*Task_F) (Stack*, struct Task*, void*);
         
         typedef struct Task {
             TASK_STATUS status;
@@ -1022,7 +1030,7 @@ fun Stmt.code (): String {
                 struct Block* blk_down;     // nested block inside me
             } links;
             int size;
-            Task_F f; // (Stack* stack, Task* task, _CEU_Event* evt);
+            Task_F f; // (Stack* stack, Task* task, void* evt);
             int pc;
         } Task;
         
@@ -1136,16 +1144,21 @@ fun Stmt.code (): String {
         
         ///
 
-        void block_throw (Stack* top, Stack* cur) {
+        void block_throw (Stack* top, Stack* cur, void* err) {
             if (cur == NULL) {
                 assert(0 && "throw without catch");
             } if (cur->block->catch == 0) {
-                block_throw(top, cur->stk_up);
+                block_throw(top, cur->stk_up, err);
             } else {
+//puts("try");
                 assert(cur->task!=NULL && "catch outside task");
                 Stack stk = { top, cur->task, cur->block };
                 cur->task->pc = cur->block->catch;
-                cur->task->f(&stk, cur->task, NULL);
+                cur->task->f(&stk, cur->task, &err);
+                if (err != NULL) { // err not caught
+//puts("again");
+                    block_throw(top, cur->stk_up, err);
+                }
             }            
         }
         

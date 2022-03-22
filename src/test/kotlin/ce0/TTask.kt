@@ -579,8 +579,8 @@ class TTask {
             set h = task @[]->()->()->() {
                output std _2:_int
                 catch err~?1 {
-                   output std _3:_int
-                    throw Error.1
+                    output std _3:_int
+                    { throw Error.1 }
                     output std _999:_int
                 }
                 output std _4:_int
@@ -592,11 +592,53 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n") { out }
     }
-
-
-
     @Test
-    fun c08_throw () {
+    fun c09_no_catch () {
+        val out = test(false, """
+            type Error = <(),()>
+            var h : task @[]->()->()->()
+            set h = task @[]->()->()->() {
+               output std _2:_int
+                catch err~?2 {
+                    output std _3:_int
+                    throw Error.1
+                    output std _999:_int
+                }
+                output std _4:_int
+           }
+           var z : active task @[]->()->()->()
+           output std _1:_int
+           set z = spawn h ()
+           output std _5:_int
+        """.trimIndent())
+        assert(out.contains("block_throw: Assertion `0 && \"throw without catch\"' failed.")) { out }
+    }
+    @Test
+    fun c10_up_catch () {
+        val out = test(false, """
+            type Error = <(),()>
+            var h : task @[]->()->()->()
+            set h = task @[]->()->()->() {
+                output std _2:_int
+                catch err~?1 {
+                    catch err~?2 {
+                       output std _3:_int
+                        throw Error.1
+                        output std _999:_int
+                    }
+                    output std _999:_int
+                }
+                output std _4:_int
+           }
+           var z : active task @[]->()->()->()
+           output std _1:_int
+           set z = spawn h ()
+           output std _5:_int
+        """.trimIndent())
+        assert(out == "1\n2\n3\n4\n5\n") { out }
+    }
+    @Test
+    fun c11_throw () {
         val out = test(false, """
             type Error = <()>
             type Event = <(),_uint64_t,_int>
@@ -621,12 +663,13 @@ class TTask {
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
-    fun c01_throw () {
+    fun c12_throw () {
         val out = test(false, """
+            type Error = <()>
             type Event = <(),_uint64_t,_int>
             var h : task @[]->()->()->()
             set h = task @[]->()->()->() {
-                catch {
+                catch _1 {
                     var f : task @[]->()->()->()
                     set f = task @[]->()->()->() {
                         await evt~?3
@@ -642,7 +685,7 @@ class TTask {
                     var y : active task @[]->()->()->()
                     set y = spawn g ()
                     output std _0:_int
-                    throw
+                    throw Error.1
                     output std _999:_int
                 }
                 output std _2:_int
@@ -654,8 +697,9 @@ class TTask {
         assert(out == "0\n1\n2\n3\n") { out }
     }
     @Test
-    fun c02_throw_par2 () {
+    fun c13_throw_par2 () {
         val out = test(false, """
+            type Error = <()>
             type Event = <(),_uint64_t,_int>
             var main : task @[]->()->()->()
             set main = task @[]->()->()->() {
@@ -676,7 +720,7 @@ class TTask {
                     set xf = spawn f ()
                     var xg : active task @[]->()->()->()
                     set xg = spawn g ()
-                    throw
+                    throw Error.1
                 }
                 var h : task @[]->()->()->()
                 set h = task @[]->()->()->() {
@@ -685,7 +729,7 @@ class TTask {
                 }
                 var xfg : active task @[]->()->()->()
                 var xh : active task @[]->()->()->()
-                catch {
+                catch _1 {
                     set xfg = spawn fg ()
                     set xh = spawn h ()
                     emit @GLOBAL Event <.3 _1:_int>:<(),_uint64_t,_int>
@@ -699,16 +743,17 @@ class TTask {
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
-    fun c03_throw_func () {
+    fun c14_throw_func () {
         val out = test(false, """
+            type Error = <()>
             type Event = <(),_uint64_t,_int>
-            var err : func @[]->()->()
-            set err = func @[]->()->() {
-                throw
+            var xxx : func @[]->()->()
+            set xxx = func @[]->()->() {
+                throw Error.1
             }
             var h : task @[]->()->()->()
             set h = task @[]->()->()->() {
-               catch {
+               catch _1 {
                     var f: task @[]->()->()->()
                     set f = task @[]->()->()->() {
                         await _1:_int
@@ -716,7 +761,7 @@ class TTask {
                     }
                     var xf: active task @[]->()->()->()
                     set xf = spawn f ()
-                    call err ()
+                    call xxx ()
                     output std _999:_int
                }
                output std _2:_int
