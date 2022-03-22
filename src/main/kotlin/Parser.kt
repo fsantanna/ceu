@@ -492,6 +492,7 @@ object Parser
     }
     fun where (s: Stmt): Stmt {
         alls.acceptFix_err("where")
+        if (!CE1) alls.err_tk0_unexpected()
         val tk0 = alls.tk0
         val blk = this.block()
         assert(!blk.iscatch && blk.scp1?.str.isanon()) { "TODO" }
@@ -678,6 +679,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 when {
                     alls.acceptFix("await") -> {
+                        if (!CE1) alls.err_tk0_unexpected()
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                         All_nest("""
@@ -751,6 +753,7 @@ object Parser
                             Stmt.SSpawn(ss.tk_, dst, ss.call)
                         }
                         alls.acceptFix("await") -> {
+                            if (!CE1) alls.err_tk0_unexpected()
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                             val ret = All_nest("""
@@ -799,6 +802,7 @@ object Parser
                 if (!alls.checkExpr()) {
                     Stmt.Return(alls.tk0 as Tk.Fix)
                 } else {
+                    if (!CE1) alls.err_tk0_unexpected()
                     val tk0 = alls.tk0
                     val e = this.expr()
                     All_nest(
@@ -840,6 +844,7 @@ object Parser
             alls.acceptFix("spawn") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
+                    if (!CE1) alls.err_tk0_unexpected()
                     val block = this.block()
                     All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()\n") {
                         this.stmt()
@@ -869,6 +874,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 when {
                     alls.acceptVar("Clk") -> {
+                        if (!CE1) alls.err_tk0_unexpected()
                         val clk = alls.tk0 as Tk.Clk
                         All_nest(
                             """

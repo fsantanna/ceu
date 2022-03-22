@@ -332,5 +332,23 @@ class TXPar {
         """.trimIndent())
         assert(out == "222\n111\n3\n") { out }
     }
+    @Test
+    fun f02_multi () {
+        val out = test(true, """
+            type Event = <(),_uint64_t,()>
+            task menu_button: () -> () -> () {
+                output std _222:_int
+                await _0
+            }
+            spawn {
+                output std _111:_int
+                await menu_button ()
+            }
+            emit @GLOBAL Event.3
+            emit @GLOBAL Event.3
+            emit @GLOBAL Event.3
+        """.trimIndent())
+        assert(out == "222\n111\n3\n") { out }
+    }
 
 }
