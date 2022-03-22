@@ -175,6 +175,13 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid `throw` : type mismatch : expected Error : have ${s.e.wtype!!.tostr()}"
                 }
             }
+            is Stmt.Block -> {
+                if (s.catch != null) {
+                    All_assert_tk(s.catch.tk, s.catch.wtype.let { it is Type.Nat && it.tk.str == "_int" }) {
+                        "invalid `catch` : type mismatch : expected _int : have ${s.catch.wtype!!.tostr()}"
+                    }
+                }
+            }
             is Stmt.If -> {
                 All_assert_tk(s.tk, s.tst.wtype is Type.Nat) {
                     "invalid condition : type mismatch : expected _int : have ${s.tst.wtype!!.tostr()}"

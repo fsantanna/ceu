@@ -248,7 +248,7 @@ fun String.loc_mem (up: Any): String {
     val isglb = up.ups_first(true){ it is Expr.Func } == null
     return when {
         isglb -> "(global.$this)"
-        (this in listOf("arg","pub","evt","ret","status")) -> "(task1->$this)"
+        (this in listOf("arg","pub","evt","err","ret","status")) -> "(task1->$this)"
         else -> "(task2->$this)"
     }
 }
@@ -262,7 +262,7 @@ fun String.out_mem (up: Any): String {
         return "(global.$str)"
     }
 
-    val ispar = this in listOf("arg","pub","evt","ret","status")
+    val ispar = this in listOf("arg","pub","evt","err","ret","status")
     val jmps = up.ups_tolist().filter { it is Expr.Func }.takeWhile { it != upf }.size
     if (jmps == 0) {
         val tsk = if (ispar) "task1" else "task2"
@@ -822,11 +822,11 @@ fun code_fs (s: Stmt) {
 
             }
         }
-        is Stmt.Throw -> {
+        is Stmt.Throw -> CODE.removeFirst().let {
             val src = """
                 {
                     Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    block_throw(&stk, &stk);
+                    block_throw(&stk, &stk, (_CEU_Throw*) &${it.expr});
                     assert(stk.block == NULL);
                     if (stk.block == NULL) {
                         return;
@@ -834,7 +834,7 @@ fun code_fs (s: Stmt) {
                 }
                 
             """.trimIndent()
-            Code("", "", "", src, "")
+            Code(it.type, it.struct, it.func, it.stmt+src, "")
         }
         is Stmt.Input -> {
             val arg = CODE.removeFirst()
@@ -857,7 +857,9 @@ fun code_fs (s: Stmt) {
             }
             Code(it.type, it.struct, it.func, it.stmt+call, "")
         }
-        is Stmt.Block -> CODE.removeFirst().let {
+        is Stmt.Block -> {
+            val body = CODE.removeFirst()
+            val catch = if (s.catch==null) Code("","","","","") else CODE.removeFirst()
             val up = s.ups_first { it is Expr.Func || it is Stmt.Block }
             val blk = "B${s.n}".loc_mem(s)
 
@@ -874,11 +876,23 @@ fun code_fs (s: Stmt) {
                     ""
                 }}
                 
-                ${it.stmt}
+                ${body.stmt}
                 
                 // CLEANUP
                 
-                ${if (s.catch==null) "" else "case ${s.n}: // catch"}
+                ${if (s.catch==null) "" else """
+                    case ${s.n}: {      // ?? catch
+                        int status = task0->status;    
+                        task0->status = TASK_RUNNING;
+                        task1->err = * (CEU_Error*) xxx.err;
+                        ${catch.stmt}
+                        if (!${catch.expr}) {
+                            task0->status = status;
+                            return;     // NO catch
+                        }
+                        // OK catch
+                    }
+                """.trimIndent()}
                 
             _BLOCK_${s.n}_:
             
@@ -922,7 +936,7 @@ fun code_fs (s: Stmt) {
             
             """.trimIndent()
 
-            Code(it.type, it.struct, it.func, src, "")
+            Code(body.type+catch.type, body.struct+catch.struct, body.func+catch.func, src, "")
         }
     }.let {
         val line = if (!LINES) "" else "\n#line ${s.tk.lin} \"CEU\"\n"

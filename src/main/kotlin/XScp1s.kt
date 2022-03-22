@@ -131,7 +131,7 @@ fun Stmt.xinfScp1s () {
                 fun fx (x: Expr) {
                     when (x) {
                         is Expr.Var -> {
-                            if (x.tk.str in arrayOf("arg","pub","ret","evt")) {
+                            if (x.tk.str in arrayOf("arg","pub","ret","evt","err")) {
                                 return
                             }
                             val env = x.env(x.tk.str)!!

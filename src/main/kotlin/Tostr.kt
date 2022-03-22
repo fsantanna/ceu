@@ -122,7 +122,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Output -> "output " + this.lib.str + " " + this.arg.tostr(lc) + "\n"
         is Stmt.If -> "if " + this.tst.tostr(lc) + "\n" + this.true_.tostr(lc) + "else\n" + this.false_.tostr(lc)
         is Stmt.Loop -> "loop " + this.block.tostr(lc)
-        is Stmt.Block -> (if (this.catch==null) "" else "catch ") + "{" + (if (this.scp1?.str.isanon()) "" else " @" + this.scp1!!.str) + "\n" + this.body.tostr(lc) + "}\n"
+        is Stmt.Block -> (if (this.catch==null) "" else ("catch "+this.catch.tostr(lc)+" ")) + "{" + (if (this.scp1?.str.isanon()) "" else " @" + this.scp1!!.str) + "\n" + this.body.tostr(lc) + "}\n"
         is Stmt.SSpawn -> (if (this.dst == null) "" else "set " + this.dst.tostr(lc) + " = ") + "spawn " + this.call.tostr(lc) + "\n"
         is Stmt.DSpawn -> "spawn " + this.call.tostr(lc) + " in " + this.dst.tostr(lc) + "\n"
         is Stmt.Await -> "await " + this.e.tostr(lc) + "\n"

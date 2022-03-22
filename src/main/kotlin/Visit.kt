@@ -83,7 +83,7 @@ fun Stmt.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
         is Stmt.If      -> { this.tst.visit(fs, fe, ft, fx) ; this.true_.visit(fs, fe, ft, fx) ; this.false_.visit(fs, fe, ft, fx) }
         is Stmt.Loop    -> { this.block.visit(fs, fe, ft, fx) }
         is Stmt.DLoop   -> { this.i.visit(fs, fe, ft, fx) ; this.tsks.visit(fs, fe, ft, fx) ; this.block.visit(fs, fe, ft, fx) }
-        is Stmt.Block   -> this.body.visit(fs, fe, ft, fx)
+        is Stmt.Block   -> { this.catch?.visit(fs,fe,ft,fx) ; this.body.visit(fs, fe, ft, fx) }
         is Stmt.Typedef -> { this.type.visit(ft, fx); this.xtype?.visit(ft, fx) }
         else -> TODO(this.toString()) // do not remove this line b/c we may add new cases
     }

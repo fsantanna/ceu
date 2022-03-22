@@ -258,9 +258,13 @@ object Parser
                         this.expr()
                     }
                     // Func {}
-                   else -> {
+                    alls.checkFix("{") -> {
                         val block = this.block(null)
                         Expr.Func(id, null, block)
+                    }
+                    else -> {
+                        alls.err_expected("union constructor")
+                        error("unreachable code")
                     }
                 }
                 Expr.Pak(id, e, isact, tp)

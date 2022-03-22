@@ -72,12 +72,18 @@ fun Any.env (id: String): Any? {
                     return if (this is Type.Nat && this.tk.str=="_") null else this
                 }
                 when {
-                    (it.ftp() == null) -> if (id in listOf("arg","pub","ret","evt")) true else null
+                    (it.ftp() == null) -> if (id in listOf("arg","pub","ret","evt","err")) true else null
                     (id == "arg") -> it.ftp()!!.inp.nonat_()
                     (id == "pub") -> it.ftp()!!.pub!!.nonat_()
                     (id == "ret") -> it.ftp()!!.out.nonat_()
                     (id == "evt") -> Type.Named (
                         Tk.Id("Event", it.tk.lin, it.tk.col),
+                        emptyList(),
+                        false,
+                        emptyList()
+                    ).clone(it.tk,it).nonat_()
+                    (id == "err") -> Type.Named (
+                        Tk.Id("Error", it.tk.lin, it.tk.col),
                         emptyList(),
                         false,
                         emptyList()
@@ -143,6 +149,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
         is Stmt.Loop  -> { this.block.setEnvs(env) ; env }
         is Stmt.DLoop -> { this.i.visit(null,::fe,::ft,null) ; this.tsks.visit(null,::fe,::ft,null) ; this.block.setEnvs(env) ; env }
         is Stmt.Block -> {
+            this.catch?.visit(null,::fe,::ft,null)
             this.body.setEnvs(this) // also include blocks w/o labels b/c of inference
             env
         }

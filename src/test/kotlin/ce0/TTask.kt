@@ -530,7 +530,18 @@ class TTask {
         assert(out == "(ln 1, col 10): invalid `catch` : requires enclosing task") { out }
     }
     @Test
-    fun c03_err () {
+    fun c03_catch_err () {
+        val out = test(false, """
+            var f : task @[]->()->()->()
+            set f = task @[]->()->()->() {
+                catch () {
+                }
+            }
+        """.trimIndent())
+        assert(out == "(ln 3, col 11): invalid `catch` : type mismatch : expected _int : have ()") { out }
+    }
+    @Test
+    fun c04_err () {
         val out = test(false, """
             var f : task @[]->()->()->()
             var x : task @[]->()->()->()
@@ -539,21 +550,21 @@ class TTask {
         assert(out.startsWith("(ln 3, col 5): invalid `spawn` : type mismatch : expected active task")) { out }
     }
     @Test
-    fun c04_throw_err () {
+    fun c05_throw_err () {
         val out = test(false, """
             throw
         """.trimIndent())
         assert(out == "(ln 1, col 6): expected expression : have end of file") { out }
     }
     @Test
-    fun c05_throw_err () {
+    fun c06_throw_err () {
         val out = test(false, """
             throw _1
         """.trimIndent())
         assert(out == "(ln 1, col 1): invalid `throw` : undeclared type \"Error\"") { out }
     }
     @Test
-    fun c06_throw_err () {
+    fun c07_throw_err () {
         val out = test(false, """
             type Error = ()
             throw ()
@@ -561,8 +572,33 @@ class TTask {
         assert(out == "(ln 2, col 7): invalid `throw` : type mismatch : expected Error : have ()") { out }
     }
     @Test
-    fun c05_throw () {
+    fun c08_catch () {
         val out = test(false, """
+            type Error = <()>
+            var h : task @[]->()->()->()
+            set h = task @[]->()->()->() {
+               output std _2:_int
+                catch err~?1 {
+                   output std _3:_int
+                    throw Error.1
+                    output std _999:_int
+                }
+                output std _4:_int
+           }
+           var z : active task @[]->()->()->()
+           output std _1:_int
+           set z = spawn h ()
+           output std _5:_int
+        """.trimIndent())
+        assert(out == "1\n2\n3\n4\n5\n") { out }
+    }
+
+
+
+    @Test
+    fun c08_throw () {
+        val out = test(false, """
+            type Error = <()>
             type Event = <(),_uint64_t,_int>
             var h : task @[]->()->()->()
             set h = task @[]->()->()->() {
@@ -574,7 +610,7 @@ class TTask {
                     }
                     var x : active task @[]->()->()->()
                     set x = spawn f ()
-                    throw _1
+                    throw Error.1
                }
                output std _2:_int
            }
@@ -691,32 +727,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
-
-    // THROW / CATCH
-
-    @Test
-    fun cxx_catch () {
-        val out = test(false, """
-            type Error = <()>
-            var h : task @[]->()->()->()
-            set h = task @[]->()->()->() {
-               output std _2:_int
-                catch Error.1 {
-                   output std _3:_int
-                    throw Error.1
-                    output std _999:_int
-                }
-                output std _4:_int
-           }
-           var z : active task @[]->()->()->()
-           output std _1:_int
-           set z = spawn h ()
-           output std _5:_int
-        """.trimIndent())
-        assert(out == "1\n2\n3\n4\n5\n") { out }
-    }
-
-
 
     // FIELDS
 

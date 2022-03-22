@@ -473,7 +473,10 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.i.xinfTypes(null)
             this.block.xinfTypes(null)
         }
-        is Stmt.Block -> this.body.xinfTypes(null)
+        is Stmt.Block -> {
+            this.catch?.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
+            this.body.xinfTypes(null)
+        }
         is Stmt.Seq -> {
             this.s1.xinfTypes(null)
             this.s2.xinfTypes(null)

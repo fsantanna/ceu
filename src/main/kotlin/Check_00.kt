@@ -17,6 +17,11 @@ fun check_00_after_envs (s: Stmt) {
                         "undeclared type \"Event\""
                     }
                 }
+                if (e.tk.str == "err") {
+                    All_assert_tk(e.tk, e.env("Error") != null) {
+                        "undeclared type \"Error\""
+                    }
+                }
                 All_assert_tk(e.tk, e.env(e.tk.str) != null) {
                     "undeclared variable \"${e.tk.str}\""
                 }
