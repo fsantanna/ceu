@@ -355,18 +355,10 @@ class TXPar {
         val out = test(true, """
             type Event = <(),_uint64_t,()>
             task fff: () -> () -> () {
-                output std _222:_int
-                await _0
             }
-            spawn {
-                output std _111:_int
-                await fff ()
-            }
-            emit @GLOBAL Event.3
-            emit @GLOBAL Event.3
-            emit @GLOBAL Event.3
+            await fff ()
         """.trimIndent())
-        assert(out == "111\n222\n") { out }
+        assert(out == "(ln 4, col 7): invalid call : unexpected task") { out }
     }
     @Test
     fun f04_multi_err () {
