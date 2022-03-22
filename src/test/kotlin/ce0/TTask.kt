@@ -710,7 +710,8 @@ class TTask {
             var fs : active {} task @[]->()->()->()
             spawn f () in fs
         """.trimIndent())
-        assert(out.startsWith("(ln 3, col 7): invalid `spawn` : type mismatch : expected task")) { out }
+        //assert(out.startsWith("(ln 3, col 7): invalid `spawn` : type mismatch : expected task")) { out }
+        assert(out.startsWith("(ln 3, col 7): invalid spawn : expected task")) { out }
     }
     @Test
     fun e01_spawn_err3 () {

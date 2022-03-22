@@ -519,7 +519,8 @@ class TXTask {
             var fs : active {} task ()->()->()
             spawn f () in fs
         """.trimIndent())
-        assert(out == "(ln 3, col 7): invalid `spawn` : type mismatch : expected task : have func @[] -> () -> ()") { out }
+        //assert(out == "(ln 3, col 7): invalid `spawn` : type mismatch : expected task : have func @[] -> () -> ()") { out }
+        assert(out == "(ln 3, col 7): invalid spawn : expected task") { out }
     }
     @Test
     fun e01_spawn_err3 () {

@@ -71,6 +71,13 @@ fun check_02_after_tps (s: Stmt) {
                 val ret1 = e.wtype!!
                 val arg1 = e.arg.wtype!!
 
+                val istask = (func is Type.Func && func.tk.str=="task")
+                if (e.upspawn() == null) {
+                    All_assert_tk(e.tk, !istask) { "invalid call : unexpected task" }
+                } else {
+                    All_assert_tk(e.tk, istask) { "invalid spawn : expected task" }
+                }
+
                 val (scp1s,inp1,out1) = when (func) {
                     is Type.Func -> Triple(Pair(func.xscps.second!!,func.xscps.third!!),func.inp,func.out)
                     is Type.Nat  -> Triple(Pair(emptyList(),emptyList()),func,func)
