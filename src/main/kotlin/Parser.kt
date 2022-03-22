@@ -664,6 +664,21 @@ object Parser
         }
         return ret
     }
+    fun await_task (e: Expr, dst: Expr?): Stmt {
+        return All_nest("""
+        {
+            var tsk_$N = spawn ${e.tostr(true)}
+            var st_$N = tsk_$N.status
+            if _(${D}st_$N == TASK_AWAITING) {
+                await tsk_$N
+            }
+            ${if (dst == null) "" else "set ${dst.tostr(true)} = tsk_$N.ret"}
+        }
+        
+        """.trimIndent()) {
+            this.stmts()
+        } as Stmt
+    }
     fun event (): String {
         return if (alls.acceptVar("Clk")) {
             "" + alls.tk0.str + "ms"
@@ -682,19 +697,7 @@ object Parser
                         if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                        All_nest("""
-                            {
-                                var tsk_$N = spawn ${e.tostr(true)}
-                                var st_$N = tsk_$N.status
-                                if _(${D}st_$N == TASK_AWAITING) {
-                                    await tsk_$N
-                                }
-                                set ${dst.tostr(true)} = tsk_$N.ret
-                            }
-                            
-                        """.trimIndent()) {
-                            this.stmts()
-                        } as Stmt
+                        await_task(e, dst)
                     }
                     alls.acceptFix("input") -> {
                         val tk = alls.tk0 as Tk.Fix
@@ -756,20 +759,7 @@ object Parser
                             if (!CE1) alls.err_tk_unexpected(alls.tk0)
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                            val ret = All_nest("""
-                                {
-                                    var tsk_$N = spawn ${e.tostr(true)}
-                                    var st_$N = tsk_$N.status
-                                    if _(${D}st_$N == TASK_AWAITING) {
-                                        await tsk_$N
-                                    }
-                                    set ${tk_id.str} = tsk_$N.ret
-                                }
-                                
-                            """.trimIndent()) {
-                                this.stmts()
-                            }
-                            ret as Stmt
+                            await_task(e, null)
                         }
                         else -> {
                             val src = this.expr()
@@ -899,19 +889,7 @@ object Parser
                         if (e is Expr.Pak && e.e is Expr.Call) {
                             assert(e.xtype == null)
                             if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                            All_nest("""
-                            {
-                                var tsk_$N = spawn ${e.tostr(true)}
-                                var st_$N = tsk_$N.status
-                                if _(${D}st_$N == TASK_AWAITING) {
-                                    await tsk_$N
-                                }
-                            }
-                            
-                            """.trimIndent()
-                            ) {
-                                this.stmts()
-                            } as Stmt
+                            await_task(e, null)
                         } else {
                             Stmt.Await(tk0, e)
                         }
