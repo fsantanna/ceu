@@ -375,15 +375,16 @@ class TXTask {
     @Test
     fun c00_throw () {
         val out = test(true, """
+            type Error = <()>
             type Event = <(),_int>
             var h = task ()->()->() {
-               catch {
+               catch _1 {
                     var f = task ()->()->() {
                         await _1
                         output std _1:_int
                     }
                     var x = spawn f ()
-                    throw
+                    throw Error.1
                }
                output std _2:_int
            }
@@ -395,9 +396,10 @@ class TXTask {
     @Test
     fun c01_throw () {
         val out = test(true, """
+            type Error = <()>
             type Event = <(),_int,_int>
             var h = task ()->()->() {
-                catch {
+                catch _1 {
                     var f = task ()->()->() {
                         await evt?3
                         output std _999:_int
@@ -409,7 +411,7 @@ class TXTask {
                     var x = spawn f ()
                     var y = spawn g ()
                     output std _0:_int
-                    throw
+                    throw Error.1
                     output std _999:_int
                 }
                 output std _2:_int
@@ -422,6 +424,7 @@ class TXTask {
     @Test
     fun c02_throw_par2 () {
         val out = test(true, """
+            type Error = <()>
             type Event = <(),_int,_int>
             var main = task ()->()->() {
                 var fg = task ()->()->() {
@@ -436,7 +439,7 @@ class TXTask {
                     await evt?3
                     var xf = spawn f ()
                     var xg = spawn g ()
-                    throw
+                    throw Error.1
                 }
                 var h = task ()->()->() {
                     await evt?1
@@ -444,7 +447,7 @@ class TXTask {
                 }
                 var xfg : active task @[]->()->()->()
                 var xh : active task @[]->()->()->()
-                catch {
+                catch _1 {
                     set xfg = spawn fg ()
                     set xh = spawn h ()
                     emit @GLOBAL <.3 _5>
@@ -459,19 +462,20 @@ class TXTask {
     @Test
     fun c03_throw_func () {
         val out = test(true, """
+            type Error = <()>
             type Event = <(),_int>
-            var err = func ()->() {
-                throw
+            var xxx = func ()->() {
+                throw Error.1
             }
             var h = task ()->()->() {
-               catch {
+               catch _1 {
                     var f = task ()->()->() {
                         await _1
                         output std _1:_int
                     }
                     var xf: active task ()->()->()
                     set xf = spawn f ()
-                    call err ()
+                    call xxx ()
                     output std _999:_int
                }
                output std _2:_int
