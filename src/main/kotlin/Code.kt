@@ -590,10 +590,11 @@ fun code_fe (e: Expr) {
                     Task* task0 = &task2->task1.task0;
                     ${e.xtype!!.toce()}* task1 = &task2->task1;
                     ${e.xtype!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
-                    assert(task0->status==TASK_UNBORN || task0->status==TASK_AWAITING);
+                    assert(task0->status==TASK_UNBORN || task0->status==TASK_AWAITING || stack->block->catch!=0);
                     switch (task0->pc) {
                         case 0: {                    
                             assert(task0->status == TASK_UNBORN);
+                            task0->status = TASK_RUNNING;
                             task2->task1.arg = xxx.pars.arg;
                             ${block.stmt}
                             break;
@@ -779,12 +780,13 @@ fun code_fs (s: Stmt) {
                     return;                 // await (1 = awake ok)
                 case ${s.n}:                // awake here
                     assert(task0->status == TASK_AWAITING);
+                    task0->status = TASK_RUNNING;
                     task1->evt = * (CEU_Event*) xxx.evt;
                     ${it.stmt}
                     if (!($cnd)) {
+                        task0->status = TASK_AWAITING;
                         return;             // (0 = awake no)
                     }
-                    task0->status = TASK_RUNNING;
                 }
                 
             """.trimIndent()
@@ -979,7 +981,7 @@ fun Stmt.code (): String {
         
         typedef enum {
             TASK_POOL=1, TASK_UNBORN, TASK_RUNNING, TASK_AWAITING, TASK_PAUSED, /*TASK_DYING,*/ TASK_DEAD
-        } TASK_STATE;
+        } TASK_STATUS;
         
         typedef enum {
             EVENT_KILL=1, EVENT_TASK //, ...
@@ -999,7 +1001,7 @@ fun Stmt.code (): String {
         typedef void (*Task_F) (Stack*, struct Task*, _CEU_Event*);
         
         typedef struct Task {
-            TASK_STATE status;
+            TASK_STATUS status;
             struct {
                 struct Task*  tsk_up;       // first outer task alive (for upvalues)
                 struct Task*  tsk_next;     // next Task in the same block (for broadcast)
@@ -1021,7 +1023,7 @@ fun Stmt.code (): String {
         } Block;
         
         typedef struct Tasks {              // task + block
-            TASK_STATE status;
+            TASK_STATUS status;
             struct {
                 Task*  tsk_up;              // for upvalues
                 Task*  tsk_next;            // for broadcast

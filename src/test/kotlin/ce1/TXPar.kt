@@ -310,4 +310,27 @@ class TXPar {
         """.trimIndent())
         assert(out == "(ln 4, col 31): undeclared type \"Event\"") { out }
     }
+
+    //
+
+    @Test
+    fun f01_multi () {
+        val out = test(true, """
+            type Event = <(),_uint64_t>
+            task bbb: () -> () -> _int {
+                output std _111:_int
+                return _3
+            }            
+            task aaa: () -> () -> _int {
+                output std _222:_int
+                set ret = await bbb ()
+            }            
+            spawn {
+                var opt = await aaa ()
+                output std opt
+            }
+        """.trimIndent())
+        assert(out == "222\n111\n3\n") { out }
+    }
+
 }
