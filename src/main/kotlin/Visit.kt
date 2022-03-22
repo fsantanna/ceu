@@ -60,7 +60,7 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
 
 fun Stmt.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Unit)?, fx: ((Any,Scope) -> Unit)?) {
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Break, is Stmt.Return, is Stmt.Throw -> {}
+        is Stmt.Nop, is Stmt.Native, is Stmt.Break, is Stmt.Return -> {}
         is Stmt.Var     -> this.xtype?.visit(ft, fx)
         is Stmt.Set     -> { this.dst.visit(fs, fe, ft, fx) ; this.src.visit(fs, fe, ft, fx) }
         is Stmt.SCall   -> this.e.visit(fs, fe, ft, fx)
@@ -68,6 +68,7 @@ fun Stmt.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
         is Stmt.DSpawn  -> { this.dst.visit(fs, fe, ft, fx) ; this.call.visit(fs, fe, ft, fx) }
         is Stmt.Await   -> this.e.visit(fs, fe, ft, fx)
         is Stmt.Pause   -> this.tsk.visit(fs, fe, ft, fx)
+        is Stmt.Throw   -> this.e.visit(fs, fe, ft, fx)
         is Stmt.Emit    -> {
             if (this.tgt is Expr) {
                 this.tgt.visit(fs, fe, ft, fx)

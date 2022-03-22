@@ -111,7 +111,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
         }
     }
     return when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Return, is Stmt.Break, is Stmt.Throw -> env
+        is Stmt.Nop, is Stmt.Native, is Stmt.Return, is Stmt.Break -> env
         is Stmt.Var    -> { this.xtype?.visit(::ft,null) ; this }
         is Stmt.Set    -> { this.dst.visit(null,::fe,::ft,null) ; this.src.visit(null,::fe,::ft,null) ; env }
         is Stmt.SCall  -> { this.e.visit(null,::fe,::ft,null) ; env }
@@ -119,6 +119,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
         is Stmt.DSpawn -> { this.dst.visit(null,::fe,::ft,null) ; this.call.visit(null,::fe,::ft,null) ; env }
         is Stmt.Await  -> { this.e.visit(null,::fe,::ft,null) ; env }
         is Stmt.Pause  -> { this.tsk.visit(null,::fe,::ft,null) ; env }
+        is Stmt.Throw  -> { this.e.visit(null,::fe,::ft,null) ; env }
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.visit(null,::fe,::ft,null)

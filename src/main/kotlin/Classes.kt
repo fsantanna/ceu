@@ -88,7 +88,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Pause  (val tk_: Tk.Fix, val tsk: Expr, val pause: Boolean): Stmt(N++, tk_, null, null)
     data class Await  (val tk_: Tk.Fix, val e: Expr): Stmt(N++, tk_, null, null)
     data class Emit   (val tk_: Tk.Fix, val tgt: Any, val e: Expr): Stmt(N++, tk_, null, null)
-    data class Throw  (val tk_: Tk.Fix): Stmt(N++, tk_, null, null)
+    data class Throw  (val tk_: Tk.Fix, val e: Expr): Stmt(N++, tk_, null, null)
     data class Input  (val tk_: Tk.Fix, var xtype: Type?, val dst: Expr?, val lib: Tk.id, val arg: Expr): Stmt(N++, tk_, null, null)
     data class Output (val tk_: Tk.Fix, val lib: Tk.id, val arg: Expr): Stmt(N++, tk_, null, null)
     data class Seq    (val tk_: Tk, val s1: Stmt, val s2: Stmt) : Stmt(N++, tk_, null, null)
@@ -97,7 +97,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Loop   (val tk_: Tk.Fix, val block: Block) : Stmt(N++, tk_, null, null)
     data class DLoop  (val tk_: Tk.Fix, val i: Expr.Var, val tsks: Expr, val block: Block) : Stmt(N++, tk_, null, null)
     data class Break  (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
-    data class Block  (val tk_: Tk.Fix, val iscatch: Boolean, var scp1: Tk.Scp?, val body: Stmt) : Stmt(N++, tk_, null, null)
+    data class Block  (val tk_: Tk.Fix, val catch: Expr?, var scp1: Tk.Scp?, val body: Stmt) : Stmt(N++, tk_, null, null)
     data class Typedef (
         val tk_: Tk.Id,
         val isinc: Boolean,

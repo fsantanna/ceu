@@ -122,7 +122,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Output -> "output " + this.lib.str + " " + this.arg.tostr(lc) + "\n"
         is Stmt.If -> "if " + this.tst.tostr(lc) + "\n" + this.true_.tostr(lc) + "else\n" + this.false_.tostr(lc)
         is Stmt.Loop -> "loop " + this.block.tostr(lc)
-        is Stmt.Block -> (if (this.iscatch) "catch " else "") + "{" + (if (this.scp1?.str.isanon()) "" else " @" + this.scp1!!.str) + "\n" + this.body.tostr(lc) + "}\n"
+        is Stmt.Block -> (if (this.catch==null) "" else "catch ") + "{" + (if (this.scp1?.str.isanon()) "" else " @" + this.scp1!!.str) + "\n" + this.body.tostr(lc) + "}\n"
         is Stmt.SSpawn -> (if (this.dst == null) "" else "set " + this.dst.tostr(lc) + " = ") + "spawn " + this.call.tostr(lc) + "\n"
         is Stmt.DSpawn -> "spawn " + this.call.tostr(lc) + " in " + this.dst.tostr(lc) + "\n"
         is Stmt.Await -> "await " + this.e.tostr(lc) + "\n"
@@ -132,7 +132,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
             is Expr  -> "emit " + this.tgt.tostr(lc) + " " + this.e.tostr(lc) + "\n"
             else -> error("bug found")
         }
-        is Stmt.Throw -> "throw\n"
+        is Stmt.Throw -> "throw " + this.e.tostr(lc) + "\n"
         is Stmt.DLoop -> "loop " + this.i.tostr(lc) + " in " + this.tsks.tostr(lc) + " " + this.block.tostr(lc)
         is Stmt.Typedef -> {
             val scps = this.xscp1s.first.let { if (it == null) "" else " @[" + this.xscp1s.first!!.map { it.str }.joinToString(",") + "]" }

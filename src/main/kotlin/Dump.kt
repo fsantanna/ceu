@@ -70,7 +70,7 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.If -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
         is Stmt.Loop -> "Loop\n" + this.block.dump(spc+4)
         is Stmt.Block -> "Block" +
-                (if (this.iscatch) " (catch)" else "") +
+                (if (this.catch==null) "" else " (catch)") +
                 (if (this.scp1?.str.isanon()) "" else " @" + (this.scp1?.str ?: "anon")) +
                 "\n" +
                 this.body.dump(spc+4)
@@ -82,10 +82,10 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.Pause -> "Pause\n" + this.tsk.dump(spc+4)
         is Stmt.Emit -> "Emit" + when (this.tgt) {
             is Scope -> " @" + this.tgt.scp1.str.anon2local() + "\n"
-            is Expr -> this.tgt.dump(spc+4)
+            is Expr -> "\n" + this.tgt.dump(spc+4)
             else -> error("bug found")
         } + this.e.dump(spc+4)
-        is Stmt.Throw -> "Throw\n"
+        is Stmt.Throw -> "Throw\n" + this.e.dump(spc+4)
         is Stmt.DLoop -> "DLoop\n" + this.i.dump(spc+4) + this.tsks.dump(spc+4) + this.block.dump(spc+4)
         is Stmt.Typedef -> "Typedef " + this.tk.str + "\n" + this.type.dump(spc+4)
         else -> error("bug found")

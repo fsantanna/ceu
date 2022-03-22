@@ -60,7 +60,7 @@ fun check_00_after_envs (s: Stmt) {
                         "invalid scope : \"@${it.str}\" is already declared (ln ${dcl!!.getTk().lin})"
                     }
                 }
-                if (s.iscatch) {
+                if (s.catch != null) {
                     All_assert_tk(s.tk, s.ups_first { it is Expr.Func } != null) {
                         "invalid `catch` : requires enclosing task"
                     }
@@ -106,6 +106,11 @@ fun check_00_after_envs (s: Stmt) {
             is Stmt.Emit -> {
                 All_assert_tk(s.tk, s.env("Event")!=null) {
                     "invalid `emit` : undeclared type \"Event\""
+                }
+            }
+            is Stmt.Throw -> {
+                All_assert_tk(s.tk, s.env("Error")!=null) {
+                    "invalid `throw` : undeclared type \"Error\""
                 }
             }
         }

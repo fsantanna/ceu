@@ -412,7 +412,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         return Type.Unit(Tk.Fix("()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
-        is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Throw, is Stmt.Typedef -> {}
+        is Stmt.Nop, is Stmt.Break, is Stmt.Return, is Stmt.Native, is Stmt.Typedef -> {}
         is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this.tk,this) }
         is Stmt.Set -> {
             try {
@@ -444,11 +444,12 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.call.xinfTypes(null)
         }
         is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
+        is Stmt.Throw -> this.e.xinfTypes(Type.Named(Tk.Id("Error", this.tk.lin, this.tk.col), emptyList(), false, emptyList()).setUpEnv(this))
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Id("Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList() /*null*/).setUpEnv(this))
+            this.e.xinfTypes(Type.Named(Tk.Id("Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList()).setUpEnv(this))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

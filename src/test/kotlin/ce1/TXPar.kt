@@ -383,4 +383,24 @@ class TXPar {
         """.trimIndent())
         assert(out == "(ln 5, col 7): invalid spawn : expected task") { out }
     }
+    @Test
+    fun f06_multi () {
+        val out = test(true, """
+            type Event = <(),_uint64_t>
+            task aaa: () -> () -> _int {
+                par {
+                    await _0
+                    return _1
+                } with {
+                    output std ()
+                    return _2
+                }
+            }
+            spawn {
+                var opt = await spawn aaa ()
+                output std opt
+            }
+        """.trimIndent())
+        assert(out == "2\n") { out }
+    }
 }

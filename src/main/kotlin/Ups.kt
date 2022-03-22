@@ -78,7 +78,7 @@ fun Expr.setUps (up: Any) {
 fun Stmt.setUps (up: Any?) {
     this.wup = up
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Break, is Stmt.Return, is Stmt.Throw -> {}
+        is Stmt.Nop, is Stmt.Native, is Stmt.Break, is Stmt.Return -> {}
         is Stmt.Var -> this.xtype?.setUps(this)
         is Stmt.Set -> {
             this.dst.setUps(this)
@@ -89,6 +89,7 @@ fun Stmt.setUps (up: Any?) {
         is Stmt.DSpawn -> { this.dst.setUps(this) ; this.call.setUps(this) }
         is Stmt.Await -> this.e.setUps(this)
         is Stmt.Pause -> this.tsk.setUps(this)
+        is Stmt.Throw -> this.e.setUps(this)
         is Stmt.Emit -> {
             if (this.tgt is Expr) {
                 this.tgt.setUps(this)

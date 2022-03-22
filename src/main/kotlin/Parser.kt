@@ -259,7 +259,7 @@ object Parser
                     }
                     // Func {}
                    else -> {
-                        val block = this.block()
+                        val block = this.block(null)
                         Expr.Func(id, null, block)
                     }
                 }
@@ -377,7 +377,7 @@ object Parser
             alls.checkFix("task") || alls.checkFix("func") -> {
                 val tk = alls.tk1 as Tk.Fix
                 val tp = this.type() as Type.Func
-                val block = this.block()
+                val block = this.block(null)
                 Expr.Func(tk, tp, block)
             }
             else -> {
@@ -494,8 +494,8 @@ object Parser
         alls.acceptFix_err("where")
         if (!CE1) alls.err_tk_unexpected(alls.tk0)
         val tk0 = alls.tk0
-        val blk = this.block()
-        assert(!blk.iscatch && blk.scp1?.str.isanon()) { "TODO" }
+        val blk = this.block(null)
+        assert(blk.catch==null && blk.scp1?.str.isanon()) { "TODO" }
         return when {
             (s !is Stmt.Seq) -> {
                 All_nest("""
@@ -521,7 +521,7 @@ object Parser
                 Stmt.Seq(
                     tk0, s.s1,
                     Stmt.Block(
-                        blk.tk_, blk.iscatch, blk.scp1,
+                        blk.tk_, blk.catch, blk.scp1,
                         Stmt.Seq(tk0, blk.body, s.s2)
                     )
                 )
@@ -621,8 +621,7 @@ object Parser
         return e
     }
 
-    fun block (): Stmt.Block {
-        val iscatch = (alls.tk0.str == "catch")
+    fun block (catch: Expr?): Stmt.Block {
         alls.acceptFix_err("{")
         val tk0 = alls.tk0 as Tk.Fix
         val scp1 = if (!alls.acceptVar("Scp")) null else {
@@ -632,10 +631,9 @@ object Parser
             }
             tk
         }
-
         val ss = this.stmts()
         alls.acceptFix_err("}")
-        return Stmt.Block(tk0, iscatch, scp1, ss)
+        return Stmt.Block(tk0, catch, scp1, ss)
     }
     fun stmts (): Stmt {
         fun enseq(s1: Stmt, s2: Stmt): Stmt {
@@ -782,11 +780,11 @@ object Parser
             alls.acceptFix("if") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val tst = this.expr()
-                val true_ = this.block()
+                val true_ = this.block(null)
                 val false_ = if (alls.acceptFix("else")) {
-                    this.block()
+                    this.block(null)
                 } else {
-                    Stmt.Block(Tk.Fix("{", alls.tk1.lin, alls.tk1.col), false, null, Stmt.Nop(alls.tk0))
+                    Stmt.Block(Tk.Fix("{", alls.tk1.lin, alls.tk1.col), null, null, Stmt.Nop(alls.tk0))
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }
@@ -837,7 +835,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
                     if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                    val block = this.block()
+                    val block = this.block(null)
                     All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()\n") {
                         this.stmt()
                     } as Stmt
@@ -908,15 +906,17 @@ object Parser
                 Stmt.Emit(tk0, tgt, e)
             }
             alls.acceptFix("throw") -> {
-                Stmt.Throw(alls.tk0 as Tk.Fix)
+                val tk0 = alls.tk0 as Tk.Fix
+                val e = this.expr()
+                Stmt.Throw(tk0, e)
             }
             alls.acceptFix("loop") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
-                    val block = this.block()
+                    val block = this.block(null)
                     // add additional block to break out w/ goto and cleanup
                     Stmt.Block(
-                        block.tk_, false, null,
+                        block.tk_, null, null,
                         Stmt.Loop(tk0, block)
                     )
                 } else {
@@ -926,16 +926,20 @@ object Parser
                     }
                     alls.acceptFix_err("in")
                     val tsks = this.expr()
-                    val block = this.block()
+                    val block = this.block(null)
                     // add additional block to break out w/ goto and cleanup
                     Stmt.Block(
-                        block.tk_, false, null,
+                        block.tk_, null, null,
                         Stmt.DLoop(tk0, i as Expr.Var, tsks, block)
                     )
                 }
             }
             alls.acceptFix("break") -> Stmt.Break(alls.tk0 as Tk.Fix)
-            alls.acceptFix("catch") || alls.checkFix("{") -> this.block()
+            alls.checkFix("{") -> this.block(null)
+            alls.acceptFix("catch") -> {
+                val catch = this.expr()
+                this.block(catch)
+            }
             alls.acceptFix("output") -> {
                 val tk = alls.tk0 as Tk.Fix
                 alls.acceptVar_err("id")
@@ -953,14 +957,14 @@ object Parser
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")
                 val tp = this.type(prefunc=tk) as Type.Func
-                val blk = this.block()
+                val blk = this.block(null)
                 All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
                     this.stmt()
                 } as Stmt
             }
             alls.acceptFix("defer") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                val blk = this.block()
+                val blk = this.block(null)
                 All_nest(
                     """
                     spawn {
@@ -976,7 +980,7 @@ object Parser
             alls.acceptFix("every") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val evt = this.event()
-                val blk = this.block()
+                val blk = this.block(null)
                 All_nest(
                     """
                     loop {
@@ -992,9 +996,9 @@ object Parser
             alls.acceptFix("par") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val pars = mutableListOf<Stmt.Block>()
-                pars.add(this.block())
+                pars.add(this.block(null))
                 while (alls.acceptFix("with")) {
-                    pars.add(this.block())
+                    pars.add(this.block(null))
                 }
                 val srcs = pars.map { "spawn ${it.tostr(true)}" }.joinToString("\n")
                 All_nest(srcs + "await _0\n") {
@@ -1005,9 +1009,9 @@ object Parser
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val op = if (alls.tk0.str == "parand") "&&" else "||"
                 val pars = mutableListOf<Stmt.Block>()
-                pars.add(this.block())
+                pars.add(this.block(null))
                 while (alls.acceptFix("with")) {
-                    pars.add(this.block())
+                    pars.add(this.block(null))
                 }
                 val spws =
                     pars.mapIndexed { i, x -> "var tk_${N}_$i = spawn { ${x.body.tostr(true)} }" }.joinToString("\n")
@@ -1042,7 +1046,7 @@ object Parser
             alls.acceptFix("pauseif") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val pred = this.expr() as Expr.UPred
-                val blk = this.block()
+                val blk = this.block(null)
                 All_nest(
                     """
                     {
@@ -1068,7 +1072,7 @@ object Parser
             alls.acceptFix("watching") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val evt = this.event()
-                val blk = this.block()
+                val blk = this.block(null)
                 All_nest(
                     """
                     paror {

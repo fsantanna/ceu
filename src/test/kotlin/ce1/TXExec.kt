@@ -1095,4 +1095,30 @@ class TXExec {
        """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
+
+    // RETURN
+
+    @Test
+    fun q01_return () {
+        val out = test(true, """
+            func f: _int->_int {
+                var ret = _0:_int
+                do { @Y
+                    var x = do {
+                        if arg {
+                            return _10
+                        } else {
+                            return @Y
+                        }
+                    }
+                    ret = x
+                }
+                return ret
+            }
+            output std f _0
+            output std f _1
+        """.trimIndent())
+        assert(out == "0\n10\n") { out }
+    }
+
 }

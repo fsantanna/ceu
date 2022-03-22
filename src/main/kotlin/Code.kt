@@ -863,7 +863,7 @@ fun code_fs (s: Stmt) {
 
             val src = """
             {
-                $blk = (Block) { NULL, ${if (s.iscatch) s.n else 0}, {NULL,NULL,NULL} };
+                $blk = (Block) { NULL, ${if (s.catch!=null) s.n else 0}, {NULL,NULL,NULL} };
                 
                 // link
                 ${if (up is Stmt.Block) {
@@ -878,7 +878,7 @@ fun code_fs (s: Stmt) {
                 
                 // CLEANUP
                 
-                ${if (!s.iscatch) "" else "case ${s.n}: // catch"}
+                ${if (s.catch==null) "" else "case ${s.n}: // catch"}
                 
             _BLOCK_${s.n}_:
             

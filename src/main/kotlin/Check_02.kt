@@ -166,8 +166,13 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Stmt.Emit -> {
-                All_assert_tk(s.tk, s.e.wtype.let { it is Type.Named && it.tk.str=="Event" }) {
+                All_assert_tk(s.e.tk, s.e.wtype.let { it is Type.Named && it.tk.str=="Event" }) {
                     "invalid `emit` : type mismatch : expected Event : have ${s.e.wtype!!.tostr()}"
+                }
+            }
+            is Stmt.Throw -> {
+                All_assert_tk(s.e.tk, s.e.wtype.let { it is Type.Named && it.tk.str=="Error" }) {
+                    "invalid `throw` : type mismatch : expected Error : have ${s.e.wtype!!.tostr()}"
                 }
             }
             is Stmt.If -> {
