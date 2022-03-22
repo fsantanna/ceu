@@ -259,7 +259,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 1): expected expression : have \"Point\"") { e.message!! }
-            assert(e.message == "(ln 1, col 6): expected \"{\" : have end of file") { e.message!! }
+            assert(e.message == "(ln 1, col 6): expected union constructor : have end of file") { e.message!! }
             //assert(e.message == "(ln 1, col 1): unexpected end of file") { e.message!! }
         }
     }
