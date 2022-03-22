@@ -63,7 +63,7 @@ object Parser
                 val hasid = alls.acceptVar("id")
                 val id = alls.tk0
                 val haseq = hasid && alls.acceptFix(":")
-                if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
+                if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
 
                 val tp = when {
                     !hasid -> this.type(null)
@@ -144,7 +144,7 @@ object Parser
                 val hasid = alls.acceptVar("Id")
                 val id = alls.tk0
                 val haseq = hasid && alls.acceptFix("=")
-                if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
+                if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
 
                 val tp = when {
                     !hasid -> this.type(null)
@@ -291,7 +291,7 @@ object Parser
                 All_assert_tk(alls.tk0, alls.tk0 is Tk.Num || alls.tk0 is Tk.Id) {
                     "invalid discriminator : expected index or type identifier"
                 }
-                if (!(CE1 || dsc is Tk.Num)) alls.err_tk0_unexpected()
+                if (!(CE1 || dsc is Tk.Num)) alls.err_tk_unexpected(alls.tk0)
 
                 val cons = if (alls.checkExpr()) {
                     this.expr()
@@ -350,7 +350,7 @@ object Parser
                 val hasid = alls.acceptVar("id")
                 val id = alls.tk0
                 val haseq = alls.acceptFix("=")
-                if (!(CE1 || !haseq)) alls.err_tk0_unexpected()
+                if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
 
                 val e = this.expr(if (hasid && !haseq) (id as Tk.id) else null)
                 val es = arrayListOf(e)
@@ -434,7 +434,7 @@ object Parser
             val tk0 = alls.tk0 as Tk.Fix
 
             if (tk0.str in arrayOf(".","!","?")) {
-                alls.acceptVar("id") || alls.acceptVar("Id") || alls.acceptVar("Num") || alls.acceptFix("Null") || alls.err_tk1_unexpected()
+                alls.acceptVar("id") || alls.acceptVar("Id") || alls.acceptVar("Num") || alls.acceptFix("Null") || alls.err_tk_unexpected(alls.tk1)
 
                 if (tk0.str == ".") {
                     All_assert_tk(alls.tk0, alls.tk0 !is Tk.Id) {
@@ -492,7 +492,7 @@ object Parser
     }
     fun where (s: Stmt): Stmt {
         alls.acceptFix_err("where")
-        if (!CE1) alls.err_tk0_unexpected()
+        if (!CE1) alls.err_tk_unexpected(alls.tk0)
         val tk0 = alls.tk0
         val blk = this.block()
         assert(!blk.iscatch && blk.scp1?.str.isanon()) { "TODO" }
@@ -679,7 +679,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 when {
                     alls.acceptFix("await") -> {
-                        if (!CE1) alls.err_tk0_unexpected()
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         val e = this.expr()
                         All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                         All_nest("""
@@ -753,7 +753,7 @@ object Parser
                             Stmt.SSpawn(ss.tk_, dst, ss.call)
                         }
                         alls.acceptFix("await") -> {
-                            if (!CE1) alls.err_tk0_unexpected()
+                            if (!CE1) alls.err_tk_unexpected(alls.tk0)
                             val e = this.expr()
                             All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
                             val ret = All_nest("""
@@ -802,7 +802,7 @@ object Parser
                 if (!alls.checkExpr()) {
                     Stmt.Return(alls.tk0 as Tk.Fix)
                 } else {
-                    if (!CE1) alls.err_tk0_unexpected()
+                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
                     val tk0 = alls.tk0
                     val e = this.expr()
                     All_nest(
@@ -844,7 +844,7 @@ object Parser
             alls.acceptFix("spawn") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
-                    if (!CE1) alls.err_tk0_unexpected()
+                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
                     val block = this.block()
                     All_nest("spawn (task _ -> _ -> _ ${block.tostr(true)}) ()\n") {
                         this.stmt()
@@ -874,7 +874,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 when {
                     alls.acceptVar("Clk") -> {
-                        if (!CE1) alls.err_tk0_unexpected()
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         val clk = alls.tk0 as Tk.Clk
                         All_nest(
                             """
@@ -898,7 +898,7 @@ object Parser
                         val e = this.expr()
                         if (e is Expr.Pak && e.e is Expr.Call) {
                             assert(e.xtype == null)
-                            if (!CE1) alls.err_tk0_unexpected()
+                            if (!CE1) alls.err_tk_unexpected(alls.tk0)
                             All_nest("""
                             {
                                 var tsk_$N = spawn ${e.tostr(true)}
@@ -969,7 +969,7 @@ object Parser
 
             alls.acceptFix("func") || alls.acceptFix("task") -> {
                 val tk = alls.tk0 as Tk.Fix
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 alls.acceptVar_err("id")
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")
@@ -980,7 +980,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("defer") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val blk = this.block()
                 All_nest(
                     """
@@ -995,7 +995,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("every") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val evt = this.event()
                 val blk = this.block()
                 All_nest(
@@ -1011,7 +1011,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("par") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
                 while (alls.acceptFix("with")) {
@@ -1023,7 +1023,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("parand") || alls.acceptFix("paror") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val op = if (alls.tk0.str == "parand") "&&" else "||"
                 val pars = mutableListOf<Stmt.Block>()
                 pars.add(this.block())
@@ -1061,7 +1061,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("pauseif") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val pred = this.expr() as Expr.UPred
                 val blk = this.block()
                 All_nest(
@@ -1087,7 +1087,7 @@ object Parser
                 } as Stmt
             }
             alls.acceptFix("watching") -> {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val evt = this.event()
                 val blk = this.block()
                 All_nest(
@@ -1108,11 +1108,11 @@ object Parser
             }
         }.let { it1 ->
             val it2 = if (!alls.checkFix("where")) it1 else {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 this.where(it1)
             }
             val it3 = if (!alls.acceptFix("until")) it2 else {
-                if (!CE1) alls.err_tk0_unexpected()
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 //val tk0 = alls.tk0
                 //All_assert_tk(tk0, stmt !is Stmt.Var) { "unexpected `until`" }
 

@@ -151,14 +151,9 @@ fun Alls.err_expected (str: String): Boolean {
     error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): expected $str : have ${this.tk1.toPay()}")
 }
 
-fun Alls.err_tk0_unexpected (): Boolean {
+fun Alls.err_tk_unexpected (tk: Tk): Boolean {
     val file = all().file.let { if (it==null) "" else it+" : " }
-    error(file + "(ln ${this.tk0.lin}, col ${this.tk0.col}): unexpected ${this.tk0.toPay()}")
-}
-
-fun Alls.err_tk1_unexpected (): Boolean {
-    val file = all().file.let { if (it==null) "" else it+" : " }
-    error(file + "(ln ${this.tk1.lin}, col ${this.tk1.col}): unexpected ${this.tk1.toPay()}")
+    error(file + "(ln ${tk.lin}, col ${tk.col}): unexpected ${tk.toPay()}")
 }
 
 fun All_err_tk (tk: Tk, str: String): String {
