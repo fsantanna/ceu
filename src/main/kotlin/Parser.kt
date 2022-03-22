@@ -896,7 +896,25 @@ object Parser
                     }
                     else -> {
                         val e = this.expr()
-                        Stmt.Await(tk0, e)
+                        if (e is Expr.Pak && e.e is Expr.Call) {
+                            assert(e.xtype == null)
+                            if (!CE1) alls.err_tk0_unexpected()
+                            All_nest("""
+                            {
+                                var tsk_$N = spawn ${e.tostr(true)}
+                                var st_$N = tsk_$N.status
+                                if _(${D}st_$N == TASK_AWAITING) {
+                                    await tsk_$N
+                                }
+                            }
+                            
+                            """.trimIndent()
+                            ) {
+                                this.stmts()
+                            } as Stmt
+                        } else {
+                            Stmt.Await(tk0, e)
+                        }
                     }
                 }
             }

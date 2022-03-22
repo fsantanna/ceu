@@ -336,19 +336,19 @@ class TXPar {
     fun f02_multi () {
         val out = test(true, """
             type Event = <(),_uint64_t,()>
-            task menu_button: () -> () -> () {
+            task fff: () -> () -> () {
                 output std _222:_int
                 await _0
             }
             spawn {
                 output std _111:_int
-                await menu_button ()
+                await fff ()
             }
             emit @GLOBAL Event.3
             emit @GLOBAL Event.3
             emit @GLOBAL Event.3
         """.trimIndent())
-        assert(out == "222\n111\n3\n") { out }
+        assert(out == "111\n222\n") { out }
     }
 
 }

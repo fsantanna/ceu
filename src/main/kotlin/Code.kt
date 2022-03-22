@@ -775,7 +775,7 @@ fun code_fs (s: Stmt) {
 
             val src = """
                 {
-                    task0->pc = ${s.n};      // next awake
+                    task0->pc = ${s.n};     // next awake
                     task0->status = TASK_AWAITING;
                     return;                 // await (1 = awake ok)
                 case ${s.n}:                // awake here
