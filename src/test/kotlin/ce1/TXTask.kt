@@ -958,6 +958,28 @@ class TXTask {
         assert(out == "10\n20\n") { out }
     }
     @Test
+    fun h02_ret_one () {
+        val out = test(true, """
+            type Event = <(),_uint64_t,_int>
+            var f = task @[]->_int->()->_int {
+                --var v = arg
+                await evt?3
+                return arg
+            }
+            --var x1: _int
+            var x2: _int
+            spawn {
+                await spawn f _10
+                set x2 = await spawn f _20
+            }
+            emit @GLOBAL Event.3 _1
+            emit @GLOBAL Event.3 _1
+            --output std x1
+            output std x2
+        """.trimIndent())
+        assert(out == "20\n") { out }
+    }
+    @Test
     fun h03_ret () {
         val out = test(true, """
             type Event = <(),_uint64_t,_int>

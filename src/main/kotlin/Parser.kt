@@ -886,15 +886,14 @@ object Parser
                             this.stmt()
                         } as Stmt
                     }
+                    alls.acceptFix("spawn") -> {
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                        val e = this.expr()
+                        await_spawn(e, null)
+                    }
                     else -> {
                         val e = this.expr()
-                        if (e is Expr.Pak && e.e is Expr.Call) {
-                            assert(e.xtype == null)
-                            if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                            await_spawn(e, null)
-                        } else {
-                            Stmt.Await(tk0, e)
-                        }
+                        Stmt.Await(tk0, e)
                     }
                 }
             }
