@@ -1175,9 +1175,9 @@ fun Stmt.code (): String {
                     block_throw(top, err, cur_tsk->links.up.tsk, cur_tsk->links.up.blk);
                 }
             } else {
-                assert(cur_tsk!=NULL && "catch outside task");
                 //printf("    > %d\n", cur_blk->catch);
                 if (cur_blk->catch != 0) {
+                    assert(cur_tsk!=NULL && "catch outside task");
                     Stack stk = { top, cur_tsk, cur_blk };
                     cur_tsk->pc = cur_blk->catch;
                     cur_tsk->f(&stk, cur_tsk, &err);

@@ -1805,7 +1805,8 @@ class TExec {
         val out = all("""
         type Button = [_int] + () -- ERR: ... + <...>
        """.trimIndent())
-        assert(out == "(ln 1, col 22): unexpected \"+\"") { out }
+        //assert(out == "(ln 1, col 22): unexpected \"+\"") { out }
+        assert(out == "(ln 1, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun p03_type_hier_sub_ok () {

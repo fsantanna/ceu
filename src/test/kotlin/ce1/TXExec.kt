@@ -778,7 +778,7 @@ class TXExec {
         assert(out == "()\n") { out }
     }
     @Test
-    fun f03_err () {
+    fun todo_03_err () {
         val out = test(true, """
             output std () until ()
         """.trimIndent())
@@ -1099,7 +1099,7 @@ class TXExec {
     // RETURN
 
     @Test
-    fun q01_return () {
+    fun DO_q01_return () {
         val out = test(true, """
             func f: _int->_int {
                 var ret = _0:_int
