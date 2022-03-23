@@ -112,8 +112,6 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Native -> "native " + (if (this.istype) "type " else "") + this.tk.str + "\n"
         is Stmt.Var -> "var " + this.tk.str + this.xtype.let { if (it==null) " = var" else (": "+it.tostr()) } + "\n"
         is Stmt.Set -> "set " + this.dst.tostr(lc) + " = " + this.src.tostr(lc) + "\n"
-        is Stmt.Break -> "break\n"
-        is Stmt.Return -> "return\n"
         is Stmt.Seq -> this.s1.tostr(lc) + this.s2.tostr(lc)
         is Stmt.SCall -> "call " + this.e.tostr(lc) + "\n"
         is Stmt.Input -> (if (this.dst == null) "" else "set " + this.dst.tostr(lc) + " = ") +

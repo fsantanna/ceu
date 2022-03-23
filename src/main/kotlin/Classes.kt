@@ -93,10 +93,8 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Output (val tk_: Tk.Fix, val lib: Tk.id, val arg: Expr): Stmt(N++, tk_, null, null)
     data class Seq    (val tk_: Tk, val s1: Stmt, val s2: Stmt) : Stmt(N++, tk_, null, null)
     data class If     (val tk_: Tk.Fix, val tst: Expr, val true_: Block, val false_: Block) : Stmt(N++, tk_, null, null)
-    data class Return (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
     data class Loop   (val tk_: Tk.Fix, val block: Block) : Stmt(N++, tk_, null, null)
     data class DLoop  (val tk_: Tk.Fix, val i: Expr.Var, val tsks: Expr, val block: Block) : Stmt(N++, tk_, null, null)
-    data class Break  (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
     data class Block  (val tk_: Tk.Fix, val catch: Expr?, var scp1: Tk.Scp?, val body: Stmt) : Stmt(N++, tk_, null, null)
     data class Typedef (
         val tk_: Tk.Id,

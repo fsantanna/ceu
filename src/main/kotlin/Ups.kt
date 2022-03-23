@@ -78,7 +78,7 @@ fun Expr.setUps (up: Any) {
 fun Stmt.setUps (up: Any?) {
     this.wup = up
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Break, is Stmt.Return -> {}
+        is Stmt.Nop, is Stmt.Native -> {}
         is Stmt.Var -> this.xtype?.setUps(this)
         is Stmt.Set -> {
             this.dst.setUps(this)

@@ -1,5 +1,5 @@
 var f = func _int -> _int {
-    return arg
+    set ret = arg
 }
 
 var g = func () -> () {

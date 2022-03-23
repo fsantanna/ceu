@@ -829,11 +829,12 @@ class TParser {
         assert(
             (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") &&
                     s.src.let {
-                        (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.Return
+                        (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.Throw //Stmt.Return
                     }
         )
     }
 
+    /*
     @Test
     fun c14_parser_ret() {
         All_restart(null, PushbackReader(StringReader("return"), 2))
@@ -841,6 +842,7 @@ class TParser {
         val s = Parser.stmt()
         assert(s is Stmt.Return)
     }
+     */
 
     @Test
     fun c15_parser_func() {
@@ -897,7 +899,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("loop { break }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        assert(s is Stmt.Block && s.body is Stmt.Loop && (s.body as Stmt.Loop).block.body is Stmt.Break)
+        assert(s is Stmt.Block && s.body is Stmt.Loop && (s.body as Stmt.Loop).block.body is Stmt.Throw) //Stmt.Break)
     }
 
     // STMT_SET / STMT_VAR

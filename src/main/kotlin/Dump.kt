@@ -58,8 +58,6 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.Native -> "Native " + this.tk.str + "\n"
         is Stmt.Var -> "Var " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: "")
         is Stmt.Set -> "Set\n" + this.dst.dump(spc+4) + this.src.dump(spc+4)
-        is Stmt.Break -> "Break\n"
-        is Stmt.Return -> "Return\n"
         is Stmt.Seq -> "Seq\n" + this.s1.dump(spc+4) + this.s2.dump(spc+4)
         is Stmt.SCall -> "SCall\n" + this.e.dump(spc+4)
         is Stmt.Input -> "Input " + this.lib.str + "\n" +

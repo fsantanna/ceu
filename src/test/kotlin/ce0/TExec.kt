@@ -218,14 +218,52 @@ class TExec {
 
     // FUNC / CALL
 
+    val _prelude_ = """
+        type Error = <_int>
+        var isErrRet : func @[] -> [Error,_int] -> _int
+        set isErrRet = func @[] -> [Error,_int] -> _int {
+            if arg.1~?1 {
+                var v1: _int
+                set v1 = arg.1~!1
+                var v2: _int
+                set v2 = arg.2
+                set ret = _(${D}v1 == ${D}v2)
+            } else {
+                set ret = _0:_int
+            }
+        }
+
+    """.trimIndent()
+
+    fun _catch_ (v: Int): String {
+        return "catch isErrRet [err,_$v:_int]"
+    }
+    fun _throw_ (v: Int): String {
+        return "throw Error.1 _$v:_int"
+    }
+
     @Test
     fun d01_f_int () {
         val out = all("""
             type Error = <_int>
+            var isErrRet : func @[] -> [Error,_int] -> _int
+            set isErrRet = func @[] -> [Error,_int] -> _int {
+                if arg.1~?1 {
+                    var v1: _int
+                    set v1 = arg.1~!1
+                    var v2: _int
+                    set v2 = arg.2
+                    set ret = _(${D}v1 == ${D}v2)
+                } else {
+                    set ret = _0:_int
+                }
+            }
             var f: (func @[]-> _int -> _int)
             set f = func@[]-> _int -> _int {
-                set ret = arg
-                return
+                catch isErrRet [err,_1:_int] {
+                    set ret = arg
+                    throw Error.1 _1:_int
+                }
             }
             var x: _int
             set x = f _10: _int
@@ -236,8 +274,9 @@ class TExec {
     @Test
     fun d02_f_unit () {
         val out = all("""
+            $_prelude_
             var f: (func @[]-> () -> ())
-            set f = func@[]-> ()->() { return }
+            set f = func@[]-> ()->() { ${_catch_(1)} { ${_throw_(1)} } }
             var x: ()
             set x = f ()
             output std x
@@ -270,7 +309,7 @@ class TExec {
             var f: (func@[]-> () -> ())
             set f = func@[]-> ()->() { var x: _int; set x = _10: _int ; output std x }
             var g: (func@[]-> () -> ())
-            set g = func@[]-> ()->() { call f () ; return }
+            set g = func@[]-> ()->() { call f () }
             call g ()
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -282,7 +321,6 @@ class TExec {
         set f = func@[]-> _int->_int {
            set arg = _(${D}arg+1): _int
            set ret = arg
-           return
         }
         output std f _1: _int
         """.trimIndent())
@@ -311,7 +349,6 @@ class TExec {
         set f = func@[]-> ()->_int {
            set arg = _(${D}x+1): _int
            set ret = arg
-           return
         }
         output std f ()
         """.trimIndent())
@@ -348,7 +385,7 @@ class TExec {
     fun d05_func_var () {
         val out = all("""
         var f: (func@[]-> _int->_int)
-        set f = func@[]-> _int->_int { set ret=arg ; return }
+        set f = func@[]-> _int->_int { set ret=arg }
         var p: (func@[]-> _int->_int)
         set p = f
         output std p _10: _int
@@ -359,7 +396,7 @@ class TExec {
     fun d06_func_fg () {
         val out = all("""
             var f: (func@[]-> _int->_int)
-            set f = func@[]-> _int->_int { set ret=arg ; return }
+            set f = func@[]-> _int->_int { set ret=arg }
             var g: (func@[]-> [func@[]-> _int->_int, _int] -> _int)
             set g = func@[]-> [func@[]-> _int->_int, _int] -> _int {
                var f: (func@[]-> _int->_int)
@@ -367,7 +404,6 @@ class TExec {
                var v: _int
                set v = f arg.2
                set ret = v
-               return
             }
             output std g [f,_10: _int]
         """.trimIndent())
@@ -377,7 +413,7 @@ class TExec {
     fun d07_func_fg () {
         val out = all("""
             var f:(func@[]->  _int->_int)
-            set f = func@[]-> _int->_int { set ret=arg; return }
+            set f = func@[]-> _int->_int { set ret=arg }
             var g:  (func@[i1]-> [(func@[]-> _int->_int), _int] -> _int)
             set g = func@[i1]-> [(func@[]-> _int->_int), _int]-> _int {
                var fx: (func@[]-> _int->_int)
@@ -385,7 +421,6 @@ class TExec {
                var v: _int
                set v = fx arg.2
                set ret = v
-               return
             }
             --var n: _int = _10: _int
             output std g @[LOCAL] [f,_10:_int]
@@ -396,7 +431,7 @@ class TExec {
     fun d08_func_unit () {
         val out = all("""
             var f: (func@[]->  ()->() )
-            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg ; return }
+            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg }
             var x:() ; set x = f ()
             output std x
         """.trimIndent())
@@ -406,7 +441,7 @@ class TExec {
     fun d09_func_unit () {
         val out = all("""
             var f: (func@[]-> ()->())
-            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg ; return }
+            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg }
             output std f ()
         """.trimIndent())
         assert(out == "()\n") { out }
@@ -623,7 +658,7 @@ class TExec {
         }
         output std ()
         """.trimIndent())
-        assert(out == "()\n")
+        assert(out == "()\n") { out }
     }
 
     // PTR
@@ -645,7 +680,6 @@ class TExec {
         var f : func@[i1]-> /_int@i1 -> ()
         set f = func@[i1]-> /_int@i1 -> () {
            set arg\ = _(*${D}arg+1): _int
-           return
         }
         var x: _int
         set x = _1: _int
@@ -897,7 +931,6 @@ class TExec {
             var f : func@[i1]-> /_int@i1 -> /_int@i1
             set f = func@[i1]-> /_int@i1 -> /_int@i1 {            
                 set ret = /v
-                return
             }
             --{
                 var p: /_int @LOCAL
@@ -1566,7 +1599,6 @@ class TExec {
                 var g : func @[] -> () -> _int
                 set g = func @[] -> () -> _int {
                     set ret = x
-                    return
                 }
                 output std g ()
             }
@@ -1588,7 +1620,6 @@ class TExec {
                     var h : func @[] -> () -> _int
                     set h = func @[] -> () -> _int {
                         set ret = x
-                        return
                     }
                     output std h ()
                 }
