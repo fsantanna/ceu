@@ -830,7 +830,7 @@ fun code_fs (s: Stmt) {
             val src = """
                 {
                     Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    block_throw(&stk, &stk, &${it.expr});
+                    block_throw(&stk, &${it.expr}, task0, ${s.localBlockMem()});
                     assert(stk.block == NULL);
                     if (stk.block == NULL) {
                         return;
@@ -1028,6 +1028,10 @@ fun Stmt.code (): String {
                 struct Task*  tsk_up;       // first outer task alive (for upvalues)
                 struct Task*  tsk_next;     // next Task in the same block (for broadcast)
                 struct Block* blk_down;     // nested block inside me
+                struct {                    // tsk/blk which called me (for throw/catch)
+                    struct Task*  tsk;
+                    struct Block* blk;
+                } up;
             } links;
             int size;
             Task_F f; // (Stack* stack, Task* task, void* evt);
@@ -1041,6 +1045,7 @@ fun Stmt.code (): String {
                 struct Task*  tsk_first;    // first Task inside me
                 struct Task*  tsk_last;     // current last Task inside me
                 struct Block* blk_down;     // nested Block inside me 
+                struct Block* blk_up;       // block in which I am nested (for throw/catch)
             } links;
         } Block;
         
@@ -1050,6 +1055,7 @@ fun Stmt.code (): String {
                 Task*  tsk_up;              // for upvalues
                 Task*  tsk_next;            // for broadcast
                 Block* blk_down;
+                Block* blk_up;              // for throw/catch
             } links;
             Block block;
         } Tasks;
@@ -1144,20 +1150,23 @@ fun Stmt.code (): String {
         
         ///
 
-        void block_throw (Stack* top, Stack* cur, void* err) {
-            if (cur == NULL) {
-                assert(0 && "throw without catch");
-            } if (cur->block->catch == 0) {
-                block_throw(top, cur->stk_up, err);
+        void block_throw (Stack* top, void* err, Task* cur_tsk, Block* cur_blk) {
+            if (cur_blk == NULL) {
+                if (cur_tsk == NULL) {
+                    assert(0 && "throw without catch");
+                } else {
+                    block_throw(top, err, cur_tsk->links.up.tsk, cur_tsk->links.up.blk);
+                }
             } else {
-//puts("try");
-                assert(cur->task!=NULL && "catch outside task");
-                Stack stk = { top, cur->task, cur->block };
-                cur->task->pc = cur->block->catch;
-                cur->task->f(&stk, cur->task, &err);
-                if (err != NULL) { // err not caught
-//puts("again");
-                    block_throw(top, cur->stk_up, err);
+                assert(cur_tsk!=NULL && "catch outside task");
+                if (cur_blk->catch != 0) {
+                    Stack stk = { top, cur_tsk, cur_blk };
+                    cur_tsk->pc = cur_blk->catch;
+                    cur_tsk->f(&stk, cur_tsk, &err);
+                    if (err == NULL) {  // err caught
+                        return;
+                    }
+                    block_throw(top, err, cur_tsk, cur_blk->links.blk_up);
                 }
             }            
         }
