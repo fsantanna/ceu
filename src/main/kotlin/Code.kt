@@ -518,6 +518,7 @@ fun code_fe (e: Expr) {
                         else           -> Pair("${tpf.out.pos()} ret_${e.n};", "ret_${e.n} = (((${tpf.toce()}*)frame)->ret);")
                     }
 
+                    val task0 = if (e.ups_first { it is Expr.Func } == null) "NULL" else "task0"
                     val pre = """
                         $ret1
                         {
@@ -533,8 +534,8 @@ fun code_fe (e: Expr) {
                             memcpy(frame, ${f.expr}, ${f.expr}->task0.size);
                             //${if (upspawn is Stmt.DSpawn) "frame->task0.isauto = 1;" else ""}
                             block_push($block, frame);
-                            frame->task0.links.tsk_up = ${if (e.ups_first { it is Expr.Func }==null) "NULL" else "task0"};
-                            task_link($block, &frame->task0);
+                            frame->task0.links.tsk_up = $task0;
+                            task_link(&frame->task0, $task0, $block);
                             frame->task0.status = TASK_UNBORN;
                             ((F_${tpf.toce()})(frame->task0.f)) (
                                 &stk_${e.n},
@@ -674,10 +675,13 @@ fun code_fs (s: Stmt) {
         is Stmt.Var -> CODE.removeFirst().let {
             val src = if (s.xtype is Type.Actives) {
                 s.tk.str.loc_mem(s).let {
+                    val blk_cur = s.localBlockMem()
+                    val task0 = if (s.ups_first { it is Expr.Func } == null) "NULL" else "task0"
                     """
-                        $it = (Tasks) { TASK_POOL, { NULL, NULL }, { NULL, 0, { NULL, NULL, NULL } } };
-                        task_link(${s.localBlockMem()}, (Task*) &$it);
+                        $it = (Tasks) { TASK_POOL, { NULL, NULL }, { NULL, 0, { NULL, NULL, NULL, NULL } } };
+                        task_link((Task*) &$it, $task0, $blk_cur);
                         $it.links.blk_down = &$it.block;
+                        $it.block.links.blk_up = $blk_cur;
                         
                     """.trimIndent()
                 }
@@ -869,14 +873,21 @@ fun code_fs (s: Stmt) {
 
             val src = """
             {
-                $blk = (Block) { NULL, ${if (s.catch!=null) s.n else 0}, {NULL,NULL,NULL} };
+                $blk = (Block) { NULL, ${if (s.catch!=null) s.n else 0}, {NULL,NULL,NULL,NULL} };
                 
                 // link
                 ${if (up is Stmt.Block) {
-                    "${s.localBlockMem()}->links.blk_down = &$blk;"
+                    val cur = s.localBlockMem()
+                    """
+                        $cur->links.blk_down = &$blk;
+                        $blk.links.blk_up = $cur;
+                        //printf("BLK: %p -> %p\n", &$blk, $cur);
+                    """.trimIndent()
                 } else if (up is Expr.Func) {
+                    // blk_up = NULL
                     "task0->links.blk_down = &$blk;"
-                } else {
+                } else { // global
+                    // blk_up = NULL
                     ""
                 }}
                 
@@ -923,15 +934,15 @@ fun code_fs (s: Stmt) {
                 // uplink still points to me, but I will not propagate down
                 ${if (up is Stmt.Block) {
                     """
-                    $blk.links.tsk_first = NULL;
-                    //$blk.links.tsk_last  = NULL;
-                    $blk.links.blk_down  = NULL;
+                    $blk.links.tsk_first  = NULL;
+                    //$blk.links.tsk_last = NULL;
+                    $blk.links.blk_down   = NULL;
                     """.trimIndent()
                 } else if (up is Expr.Func) {
                     """
                     //task0->links.tsk_up   = NULL;
                     //task0->links.tsk_next = NULL;
-                    task0->links.blk_down = NULL;
+                    task0->links.blk_down   = NULL;
                     task0->status = TASK_DEAD;                        
                     """.trimIndent()
                 } else {
@@ -1055,7 +1066,10 @@ fun Stmt.code (): String {
                 Task*  tsk_up;              // for upvalues
                 Task*  tsk_next;            // for broadcast
                 Block* blk_down;
-                Block* blk_up;              // for throw/catch
+                struct {                    // for throw/catch
+                    struct Task*  tsk;
+                    struct Block* blk;
+                } up;
             } links;
             Block block;
         } Tasks;
@@ -1082,17 +1096,19 @@ fun Stmt.code (): String {
         
         ///
         
-        void task_link (Block* block, Task* task) {
-            Task* last = block->links.tsk_last;
+        void task_link (Task* task, Task* up_tsk, Block* up_blk) {
+            Task* last = up_blk->links.tsk_last;
             if (last == NULL) {
-                assert(block->links.tsk_first == NULL);
-                block->links.tsk_first = task;
+                assert(up_blk->links.tsk_first == NULL);
+                up_blk->links.tsk_first = task;
             } else {
                 last->links.tsk_next = task;
             }
-            block->links.tsk_last = task;
+            up_blk->links.tsk_last = task;
             task->links.tsk_next  = NULL;
             task->links.blk_down = NULL;
+            task->links.up.tsk = up_tsk;
+            task->links.up.blk = up_blk;
         }
         
         /// ONLY FOR DYNAMIC POOLS
@@ -1151,6 +1167,7 @@ fun Stmt.code (): String {
         ///
 
         void block_throw (Stack* top, void* err, Task* cur_tsk, Block* cur_blk) {
+            //printf(">>> %p/%p\n", cur_tsk, cur_blk);
             if (cur_blk == NULL) {
                 if (cur_tsk == NULL) {
                     assert(0 && "throw without catch");
@@ -1159,6 +1176,7 @@ fun Stmt.code (): String {
                 }
             } else {
                 assert(cur_tsk!=NULL && "catch outside task");
+                //printf("    > %d\n", cur_blk->catch);
                 if (cur_blk->catch != 0) {
                     Stack stk = { top, cur_tsk, cur_blk };
                     cur_tsk->pc = cur_blk->catch;
@@ -1166,8 +1184,8 @@ fun Stmt.code (): String {
                     if (err == NULL) {  // err caught
                         return;
                     }
-                    block_throw(top, err, cur_tsk, cur_blk->links.blk_up);
                 }
+                block_throw(top, err, cur_tsk, cur_blk->links.blk_up);
             }            
         }
         
