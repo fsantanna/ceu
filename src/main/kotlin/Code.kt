@@ -1,9 +1,7 @@
 data class Code (val type: String, val struct: String, val func: String, val stmt: String, val expr: String)
 val CODE = ArrayDeque<Code>()
 
-var Event = "_CEU_Event"
-var Event_Size = 32  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
-var Error = "_CEU_Error"
+var EVENT_SIZE = 32  // 8 bytes (Task: uint64_t) // TODO: change if Event uses more
 
 fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
@@ -87,8 +85,8 @@ fun code_ft (tp: Type) {
                     };
                     struct {
                         ${tp.inp.pos()} arg;
-                        $Event evt;
-                        $Error err;
+                        CEU_Event evt;
+                        CEU_Error err;
                         ${tp.pub.let { if (it == null) "" else it.pos() + " pub;" }}
                         ${tp.out.pos()} ret;
                     };
@@ -169,7 +167,7 @@ fun code_ft (tp: Type) {
                 // Type.Union.struct
                 struct $ce {
                     union {
-                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${Event_Size}];" else "" }
+                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${EVENT_SIZE}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -641,10 +639,6 @@ fun code_fs (s: Stmt) {
 
             val xtype = s.xtype!!.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
-            when (s.tk.str) {
-                "Event" -> { Event = "CEU_Event" }
-                "Error" -> { Error = "CEU_Error" }
-            }
             fun Type.defs(pre: String): String {
                 return if (this !is Type.Union || this.yids == null) "" else {
                     this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
@@ -736,6 +730,7 @@ fun code_fs (s: Stmt) {
         is Stmt.Return -> {
             val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.n
             Code("", "", "", "goto _BLOCK_${n}_;\n", "")
+            //Code("", "", "", src, "")
         }
         is Stmt.SCall -> CODE.removeFirst().let {
             Code(it.type, it.struct, it.func, it.stmt+it.expr+";\n", "")
@@ -778,7 +773,7 @@ fun code_fs (s: Stmt) {
             val cnd = if (s.e.wtype is Type.Nat) {
                 it.expr
             } else {
-                "(task1->evt.tag == 2) && (((_CEU_Event*)(&task1->evt))->payload.Task == ((uint64_t)(${it.expr})))"
+                "(task1->evt.tag == _CEU_EVENT_TASK) && (((_CEU_Event*)(&task1->evt))->payload.Task == ((uint64_t)(${it.expr})))"
             }
 
             val src = """
@@ -916,7 +911,7 @@ fun code_fs (s: Stmt) {
                 ${if (up !is Expr.Func || up.tk.str=="func") "" else """
                 {
                     //task0->status = TASK_DYING;
-                    _CEU_Event evt = { .tag=EVENT_TASK, .payload={.Task=(uint64_t)task0} };
+                    _CEU_Event evt = { .tag=_CEU_EVENT_TASK, .payload={.Task=(uint64_t)task0} };
                     Stack stk = { stack, task0, &$blk };
                     bcast_event_block(&stk, GLOBAL, (_CEU_Event*) &evt);
                     if (stk.block == NULL) {
@@ -962,7 +957,6 @@ fun code_fs (s: Stmt) {
 }
 
 fun Stmt.code (): String {
-    Event = "_CEU_Event"
     TYPEX.clear()
     EXPR_WTYPE = false
     this.visit(::code_fs, ::code_fe, ::code_ft, null)
@@ -1014,21 +1008,33 @@ fun Stmt.code (): String {
         } TASK_STATUS;
         
         typedef enum {
-            EVENT_KILL=1, EVENT_TASK //, ...
-        } EVENT;
+            _CEU_EVENT_KILL=1, _CEU_EVENT_TASK //, ...
+        } _CEU_EVENT;
         
         typedef struct _CEU_Event {
             union {
-                char _ceu[${Event_Size}];  // max payload size
+                char _ceu[${EVENT_SIZE}];  // max payload size
                 //void Kill;
                 uint64_t Task;  // cast from Task*
                 //int Timer;
             } payload;
-            int tag;
+            _CEU_EVENT tag;
         } _CEU_Event;
         
+        #define CEU_Event _CEU_Event
+        
+        typedef enum {
+            _CEU_ERROR_RETURN=1 //, ...
+        } _CEU_ERROR;
+        
         typedef struct _CEU_Error {
+            union {
+                int Return;
+            };
+            _CEU_ERROR tag;
         } _CEU_Error;
+        
+        #define CEU_Error _CEU_Error
         
         // stack, task, evt
         typedef void (*Task_F) (Stack*, struct Task*, void*);
@@ -1217,7 +1223,7 @@ fun Stmt.code (): String {
                     block_bcast_kill(stack, task->links.blk_down);      // 1.1
                 }
                 if (task->status == TASK_AWAITING) {
-                    _CEU_Event evt = { .tag=EVENT_KILL };            
+                    _CEU_Event evt = { .tag=_CEU_EVENT_KILL };            
                     task->f(stack, task, &evt);                     // 1.2
                 }
             }

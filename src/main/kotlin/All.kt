@@ -41,8 +41,6 @@ data class All (
 
 fun All_restart (file: String?, inp: PushbackReader) {
     EXPR_WTYPE = true
-    Event = "_CEU_Event"
-    Error = "_CEU_Error"
     alls = Alls()
     alls.stack.addFirst(All(file, inp, false))
 }

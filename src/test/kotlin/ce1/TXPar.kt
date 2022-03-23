@@ -384,7 +384,7 @@ class TXPar {
         assert(out == "(ln 5, col 7): invalid spawn : expected task") { out }
     }
     @Test
-    fun f06_multi () {
+    fun DO_f06_multi () {
         val out = test(true, """
             type Event = <(),_uint64_t>
             task aaa: () -> () -> _int {

@@ -1099,7 +1099,50 @@ class TXExec {
     // RETURN
 
     @Test
-    fun DO_q01_return () {
+    fun q01_return () {
+        val out = test(true, """
+            type Error = <Return=_int>
+            func f: ()->() {
+                output std _1:_int
+                return
+                output std _3:_int
+            }
+            call f ()
+        """.trimIndent())
+        assert(out == "1\n") { out }
+    }
+    @Test
+    fun qxx_return () {
+        val out = test(true, """
+            func f: ()->() {
+                output std _1:_int
+                do {
+                    output std _2:_int
+                    return
+                }
+                output std _3:_int
+            }
+            output std f ()
+        """.trimIndent())
+        assert(out == "1\n2\n3\n") { out }
+    }
+    @Test
+    fun q02_return () {
+        val out = test(true, """
+            func f: ()->() { @X
+                output std _1:_int
+                do {
+                    output std _2:_int
+                    return @X
+                }
+                output std _3:_int
+            }
+            output std f ()
+        """.trimIndent())
+        assert(out == "1\n2\n3\n") { out }
+    }
+    @Test
+    fun q03_return () {
         val out = test(true, """
             func f: _int->_int {
                 var ret = _0:_int

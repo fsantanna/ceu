@@ -221,6 +221,7 @@ class TExec {
     @Test
     fun d01_f_int () {
         val out = all("""
+            type Error = <_int>
             var f: (func @[]-> _int -> _int)
             set f = func@[]-> _int -> _int {
                 set ret = arg
