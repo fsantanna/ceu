@@ -625,7 +625,7 @@ fun code_fe (e: Expr) {
             val false_ = CODE.removeFirst()
             val true_  = CODE.removeFirst()
             val tst    = CODE.removeFirst()
-            val src = tst.stmt + "(${tst.expr} ? ${true_.expr} : ${false_.expr})"
+            val src    = "(${tst.expr} ? ${true_.expr} : ${false_.expr})"
             Code (
                 tst.type+true_.type+false_.type,
                 tst.struct+true_.struct+false_.struct,
@@ -840,17 +840,7 @@ fun code_fs (s: Stmt) {
             }
         }
         is Stmt.Throw -> CODE.removeFirst().let {
-            val src = """
-                {
-                    Stack stk = { stack, ${s.self_or_null()}, ${s.localBlockMem()} };
-                    block_throw(&stk, &${it.expr}, task0, ${s.localBlockMem()});
-                    assert(stk.block == NULL);
-                    if (stk.block == NULL) {
-                        return;
-                    }
-                }
-                
-            """.trimIndent()
+            val src = s.throwExpr('&' + it.expr)
             Code(it.type, it.struct, it.func, it.stmt+src, "")
         }
         is Stmt.Input -> {

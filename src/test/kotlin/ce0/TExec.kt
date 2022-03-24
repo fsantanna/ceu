@@ -7,17 +7,21 @@ import java.io.File
 val prelude0 = """
         type Event = <(),_uint64_t,_int>
         type Error = <_int>
+        var eq : func @[] -> [_int,_int] -> _int
+        set eq = func @[] -> [_int,_int] -> _int {
+            var v1: _int
+            set v1 = arg.1
+            var v2: _int
+            set v2 = arg.2
+            set ret = _(${D}v1 == ${D}v2)
+        }
         var isEscRet : func @[] -> [Error,_int] -> _int
         set isEscRet = func @[] -> [Error,_int] -> _int {
-            if arg.1~?1 {
-                var v1: _int
-                set v1 = arg.1~!1
-                var v2: _int
-                set v2 = arg.2
-                set ret = _(${D}v1 == ${D}v2)
-            } else {
-                set ret = _0:_int
-            }
+            var v1 : Error
+            set v1 = arg.1
+            var v2: _int
+            set v2 = arg.2
+            set ret = if v1~?1 { if eq [v1~!1,v2] {_1:_int} else {_0:_int} } else { _0:_int }
         }
 
     """.trimIndent()
