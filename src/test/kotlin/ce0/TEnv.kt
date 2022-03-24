@@ -59,7 +59,8 @@ class TEnv {
     @Test
     fun a05_return_err () {
         val out = inp2env("return")
-        assert(out == "(ln 1, col 1): invalid return : no enclosing function") { out }
+        //assert(out == "(ln 1, col 1): invalid return : no enclosing function") { out }
+        assert(out == "(ln 1, col 1): unexpected \"return\"") { out }
         //assert(out == "(ln 1, col 1): undeclared variable \"_ret_\"") { out }
     }
     @Test

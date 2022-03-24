@@ -530,6 +530,7 @@ object Parser
                     )
                 )
             }
+            /*
             (s.s2 is Stmt.Return) -> {
                 All_nest("""
                     {
@@ -542,6 +543,7 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
+             */
             else -> error("bug found")
         }
     }
@@ -955,8 +957,8 @@ object Parser
             // CE1
 
             alls.acceptFix("func") || alls.acceptFix("task") -> {
-                val tk = alls.tk0 as Tk.Fix
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                val tk = alls.tk0 as Tk.Fix
                 alls.acceptVar_err("id")
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")

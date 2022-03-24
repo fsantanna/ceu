@@ -1645,4 +1645,13 @@ class TXInfer {
 
         """.trimIndent()) { out }
     }
+
+    // THROW / CATCH
+
+    @Test
+    fun f01_return () {
+        val out = all("return")
+        assert(out == "(ln 1, col 1): invalid return : no enclosing function") { out }
+    }
+
 }

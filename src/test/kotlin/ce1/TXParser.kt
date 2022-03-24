@@ -223,4 +223,38 @@ class TXParser {
             }
         })
     }
+
+    // BREAK / RETURN
+
+    @Test
+    fun c13_parser_func() {
+        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { return }"), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        assert(
+            (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") &&
+                    s.src.let {
+                        (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.Throw //Stmt.Return
+                    }
+        )
+    }
+
+    @Test
+    fun c15_parser_func() {
+        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { return }"), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        assert(
+            (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") //&& s.src.let { (it is Expr.Func) && (it.ups.size==2) }
+        )
+    }
+
+    @Test
+    fun c15_parser_loop() {
+        All_restart(null, PushbackReader(StringReader("loop { break }"), 2))
+        Lexer.lex()
+        val s = Parser.stmt()
+        assert(s is Stmt.Block && s.body is Stmt.Loop && (s.body as Stmt.Loop).block.body is Stmt.Throw) //Stmt.Break)
+    }
+
 }

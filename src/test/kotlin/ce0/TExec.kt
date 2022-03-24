@@ -5,6 +5,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
 val prelude0 = """
+        type Event = <(),_uint64_t,_int>
         type Error = <_int>
         var isEscRet : func @[] -> [Error,_int] -> _int
         set isEscRet = func @[] -> [Error,_int] -> _int {

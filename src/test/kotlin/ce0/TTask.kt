@@ -1071,7 +1071,7 @@ class TTask {
     @Test
     fun g01_state () {
         val out = test(false, """
-            type Event = <(),_uint64_t,_int>
+            $prelude0
             var f: task @[]->()->()->()
             set f = task @[]->()->()->() {
                 await _1:_int
@@ -1079,13 +1079,15 @@ class TTask {
             var x : active task @[]->()->()->()
             set x = spawn f ()
             spawn (task @[]->()->()->() {
-                loop {
-                    await evt~?2
-                    var t: _uint64_t
-                    set t = evt~!2
-                    if _(${D}t == ((uint64_t)${D}x)):_int {
-                        break
-                    } else {}
+                ${catch0(1)} {
+                    loop {
+                        await evt~?2
+                        var t: _uint64_t
+                        set t = evt~!2
+                        if _(${D}t == ((uint64_t)${D}x)):_int {
+                            ${throw0(1)}
+                        } else {}
+                    }
                 }
                 output std _2:_int
             }) ()
@@ -1099,26 +1101,25 @@ class TTask {
     @Test
     fun g02_kill () {
         val out = test(false, """
-            type Event = <(),_uint64_t,_int>
+            $prelude0
             spawn (task @[]->()->()->() {
                 loop {
---native _{puts("loop");}
                     var f: task @[]->()->()->()
                     set f = task @[]->()->()->() {
---native _{printf(">>> task %p\n", task0);}
                         await evt~?3
                         output std _2:_int
---native _{printf("<<< task %p\n", task0);}
                     }
                     var x : active task @[]->()->()->()
                     set x = spawn f ()
-                    loop {
-                        await evt~?2
-                        var t: _uint64_t
-                        set t = evt~!2
-                        if _(${D}t == ((uint64_t)${D}x)):_int {
-                            break
-                        } else {}
+                    ${catch0(1)} {
+                        loop {
+                            await evt~?2
+                            var t: _uint64_t
+                            set t = evt~!2
+                            if _(${D}t == ((uint64_t)${D}x)):_int {
+                                ${throw0(1)}
+                            } else {}
+                        }
                     }
                     output std _3:_int
                 }
