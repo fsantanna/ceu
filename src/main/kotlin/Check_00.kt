@@ -52,12 +52,6 @@ fun check_00_after_envs (s: Stmt) {
                     "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl!!.getTk().lin})"
                 }
             }
-            is Stmt.Return -> {
-                val ok = s.ups_first { it is Expr.Func } != null
-                All_assert_tk(s.tk, ok) {
-                    "invalid return : no enclosing function"
-                }
-            }
             is Stmt.Block -> {
                 s.scp1?.let {
                     val dcl = s.env(it.str)
@@ -116,6 +110,18 @@ fun check_00_after_envs (s: Stmt) {
             is Stmt.Throw -> {
                 All_assert_tk(s.tk, s.env("Error")!=null) {
                     "invalid `throw` : undeclared type \"Error\""
+                }
+            }
+            is Stmt.XReturn -> {
+                val ok = s.ups_first { it is Expr.Func } != null
+                All_assert_tk(s.tk, ok) {
+                    "invalid \"return\" : no enclosing function"
+                }
+            }
+            is Stmt.XBreak -> {
+                val ok = s.ups_first { it is Stmt.Loop } != null
+                All_assert_tk(s.tk, ok) {
+                    "invalid \"break\" : no enclosing loop"
                 }
             }
         }

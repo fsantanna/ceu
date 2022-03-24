@@ -325,7 +325,7 @@ fun Stmt.mem_vars (): String {
     return when (this) {
         is Stmt.Nop, is Stmt.Set, is Stmt.Native, is Stmt.SCall, is Stmt.SSpawn,
         is Stmt.DSpawn, is Stmt.Await, is Stmt.Emit, is Stmt.Throw,
-        is Stmt.Input, is Stmt.Output, is Stmt.Pause,
+        is Stmt.Input, is Stmt.Output, is Stmt.Pause, is Stmt.XReturn, is Stmt.XBreak,
         is Stmt.Typedef -> ""
 
         is Stmt.Var -> "${this.xtype!!.pos()} ${this.tk.str};\n"
@@ -722,6 +722,16 @@ fun code_fs (s: Stmt) {
                 
             """.trimIndent()
             Code(tsks.type+i.type+block.type, tsks.struct+i.struct+block.struct, tsks.func+i.func+block.func, tsks.stmt+i.stmt+src, "")
+        }
+        is Stmt.XBreak -> {
+            val n = ((s.ups_first { it is Stmt.Loop } as Stmt.Loop).wup as Stmt.Block).n
+            Code("", "", "", "goto _BLOCK_${n}_;\n", "")
+            TODO()
+        }
+        is Stmt.XReturn -> {
+            val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.n
+            Code("", "", "", "goto _BLOCK_${n}_;\n", "")
+            TODO()
         }
         is Stmt.SCall -> CODE.removeFirst().let {
             Code(it.type, it.struct, it.func, it.stmt+it.expr+";\n", "")

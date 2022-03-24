@@ -117,7 +117,7 @@ fun Stmt.setEnvs (env: Any?): Any? {
         }
     }
     return when (this) {
-        is Stmt.Nop, is Stmt.Native -> env
+        is Stmt.Nop, is Stmt.Native, is Stmt.XReturn, is Stmt.XBreak -> env
         is Stmt.Var    -> { this.xtype?.visit(::ft,null) ; this }
         is Stmt.Set    -> { this.dst.visit(null,::fe,::ft,null) ; this.src.visit(null,::fe,::ft,null) ; env }
         is Stmt.SCall  -> { this.e.visit(null,::fe,::ft,null) ; env }

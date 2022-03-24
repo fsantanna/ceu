@@ -60,7 +60,7 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
 
 fun Stmt.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Unit)?, fx: ((Any,Scope) -> Unit)?) {
     when (this) {
-        is Stmt.Nop, is Stmt.Native -> {}
+        is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn -> {}
         is Stmt.Var     -> this.xtype?.visit(ft, fx)
         is Stmt.Set     -> { this.dst.visit(fs, fe, ft, fx) ; this.src.visit(fs, fe, ft, fx) }
         is Stmt.SCall   -> this.e.visit(fs, fe, ft, fx)

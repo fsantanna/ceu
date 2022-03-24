@@ -104,4 +104,6 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
         var xtype: Type?,
         var xisact: Boolean
     ) : Stmt(N++, tk_, null, null)
+    data class XBreak  (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
+    data class XReturn (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
 }

@@ -1651,7 +1651,12 @@ class TXInfer {
     @Test
     fun f01_return () {
         val out = all("return")
-        assert(out == "(ln 1, col 1): invalid return : no enclosing function") { out }
+        assert(out == "(ln 1, col 1): invalid \"return\" : no enclosing function") { out }
+    }
+    @Test
+    fun f02_break () {
+        val out = all("break")
+        assert(out == "(ln 1, col 1): invalid \"break\" : no enclosing loop") { out }
     }
 
 }

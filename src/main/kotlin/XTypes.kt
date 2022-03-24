@@ -412,7 +412,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         return Type.Unit(Tk.Fix("()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Typedef -> {}
+        is Stmt.Nop, is Stmt.Native, is Stmt.Typedef, is Stmt.XBreak, is Stmt.XReturn -> {}
         is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this.tk,this) }
         is Stmt.Set -> {
             try {

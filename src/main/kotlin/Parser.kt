@@ -794,26 +794,6 @@ object Parser
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }
-            alls.acceptFix("return") -> {
-                if (!alls.checkExpr()) {
-                    Stmt.Return(alls.tk0 as Tk.Fix)
-                } else {
-                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                    val tk0 = alls.tk0
-                    val e = this.expr()
-                    All_nest(
-                        tk0.lincol(
-                            """
-                        set ret = ${e.tostr(true)}
-                        return
-                        
-                    """.trimIndent()
-                        )
-                    ) {
-                        this.stmts()
-                    } as Stmt
-                }
-            }
             alls.acceptFix("type") -> {
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
@@ -940,7 +920,6 @@ object Parser
                     )
                 }
             }
-            alls.acceptFix("break") -> Stmt.Break(alls.tk0 as Tk.Fix)
             alls.checkFix("{") -> this.block(null)
             alls.acceptFix("catch") -> {
                 val catch = this.expr()
@@ -956,6 +935,31 @@ object Parser
 
             // CE1
 
+            alls.acceptFix("return") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                if (!alls.checkExpr()) {
+                    Stmt.XReturn(alls.tk0 as Tk.Fix)
+                } else {
+                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                    val tk0 = alls.tk0
+                    val e = this.expr()
+                    All_nest(
+                        tk0.lincol(
+                            """
+                        set ret = ${e.tostr(true)}
+                        return
+                        
+                    """.trimIndent()
+                        )
+                    ) {
+                        this.stmts()
+                    } as Stmt
+                }
+            }
+            alls.acceptFix("break") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                Stmt.XBreak(alls.tk0 as Tk.Fix)
+            }
             alls.acceptFix("func") || alls.acceptFix("task") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val tk = alls.tk0 as Tk.Fix
