@@ -217,7 +217,6 @@ class TEnv {
             set f =
                 func @[] -> () -> () {
                     set ret = [()]
-                    return
                 }
         """.trimIndent())
         assert(out.startsWith("(ln 4, col 17): invalid return : type mismatch")) { out }
@@ -882,7 +881,6 @@ class TEnv {
             var f: (func@[i1]->/()@i1->/()@i1)
             set f = func@[i1]->/()@i1->/()@i1 {
                 set ret = arg
-                return
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -893,7 +891,6 @@ class TEnv {
             var f: (func@[x,y: y>x]->/()@x->/()@y)
             set f = func@[x,y: y>x]->/()@x->/()@y {
                 set ret = arg
-                return
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -904,7 +901,6 @@ class TEnv {
             var f : /(func@[a1,a2]->/()@a2->/()@a1)@LOCAL
             set f =   func@[a1,a2]->/()@a2->/()@a1 {
                 set ret = arg
-                return
             }
         """.trimIndent())
         assert(out.startsWith("(ln 3, col 13): invalid return : type mismatch")) { out }
@@ -918,7 +914,6 @@ class TEnv {
                     var x: /() @LOCAL
                     set x = arg
                     set ret = x     -- err
-                    return
                 }
             }
         """.trimIndent())
@@ -933,7 +928,6 @@ class TEnv {
                     var x: /() @LOCAL
                     set x = arg
                     set ret = arg
-                    return    -- ok
                 }
             }
         """.trimIndent())
@@ -1035,7 +1029,6 @@ class TEnv {
             var f : ((func@[i1]->/_int@i1 -> /_int@i1))
             set f = func@[i1]->/_int@i1 -> /_int@i1 {
                 set ret = arg
-                return
             }
             var v: _int
             set v = _10: _int
@@ -2498,7 +2491,6 @@ class TEnv {
                     var h : func @[] -> () -> _int
                     set h = func @[] -> () -> _int {
                         set ret = x
-                        return
                     }
                     output std h ()
                 }

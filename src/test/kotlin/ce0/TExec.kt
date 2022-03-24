@@ -4,6 +4,31 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
+val prelude0 = """
+        type Error = <_int>
+        var isEscRet : func @[] -> [Error,_int] -> _int
+        set isEscRet = func @[] -> [Error,_int] -> _int {
+            if arg.1~?1 {
+                var v1: _int
+                set v1 = arg.1~!1
+                var v2: _int
+                set v2 = arg.2
+                set ret = _(${D}v1 == ${D}v2)
+            } else {
+                set ret = _0:_int
+            }
+        }
+
+    """.trimIndent()
+
+val func0 = "call func @[] -> () -> ()"
+fun catch0 (v: Int): String {
+    return "catch isEscRet [err,_$v:_int]"
+}
+fun throw0 (v: Int): String {
+    return "throw Error.1 _$v:_int"
+}
+
 @TestMethodOrder(Alphanumeric::class)
 class TExec {
 
@@ -218,36 +243,12 @@ class TExec {
 
     // FUNC / CALL
 
-    val _prelude_ = """
-        type Error = <_int>
-        var isErrRet : func @[] -> [Error,_int] -> _int
-        set isErrRet = func @[] -> [Error,_int] -> _int {
-            if arg.1~?1 {
-                var v1: _int
-                set v1 = arg.1~!1
-                var v2: _int
-                set v2 = arg.2
-                set ret = _(${D}v1 == ${D}v2)
-            } else {
-                set ret = _0:_int
-            }
-        }
-
-    """.trimIndent()
-
-    fun _catch_ (v: Int): String {
-        return "catch isErrRet [err,_$v:_int]"
-    }
-    fun _throw_ (v: Int): String {
-        return "throw Error.1 _$v:_int"
-    }
-
     @Test
     fun d01_f_int () {
         val out = all("""
             type Error = <_int>
-            var isErrRet : func @[] -> [Error,_int] -> _int
-            set isErrRet = func @[] -> [Error,_int] -> _int {
+            var isEscRet : func @[] -> [Error,_int] -> _int
+            set isEscRet = func @[] -> [Error,_int] -> _int {
                 if arg.1~?1 {
                     var v1: _int
                     set v1 = arg.1~!1
@@ -260,7 +261,7 @@ class TExec {
             }
             var f: (func @[]-> _int -> _int)
             set f = func@[]-> _int -> _int {
-                catch isErrRet [err,_1:_int] {
+                catch isEscRet [err,_1:_int] {
                     set ret = arg
                     throw Error.1 _1:_int
                 }
@@ -274,9 +275,9 @@ class TExec {
     @Test
     fun d02_f_unit () {
         val out = all("""
-            $_prelude_
+            $prelude0
             var f: (func @[]-> () -> ())
-            set f = func@[]-> ()->() { ${_catch_(1)} { ${_throw_(1)} } }
+            set f = func@[]-> ()->() { ${catch0(1)} { ${throw0(1)} } }
             var x: ()
             set x = f ()
             output std x
@@ -653,10 +654,15 @@ class TExec {
     @Test
     fun h01_loop () {
         val out = all("""
-        loop {
-           break
-        }
-        output std ()
+        $prelude0
+        call func @[]->()->() {
+            ${catch0(1)} {
+                loop {
+                   ${throw0(1)}
+                }
+            }
+            output std ()
+        } ()
         """.trimIndent())
         assert(out == "()\n") { out }
     }
@@ -2041,15 +2047,20 @@ class TExec {
     @Test
     fun z02 () {
         val out = all("""
+        $prelude0
         var i: _int; set i = _1: _int
         var n: _int; set n = _0: _int
-        loop {
-            set n = _(global.n + global.i): _int
-            set i = _(global.i + 1): _int
-            if _(global.i > 5): _int {
-                break
-            } else {}
-        }
+        $func0 {
+            ${catch0(1)} {
+                loop {
+                    set n = _(global.n + global.i): _int
+                    set i = _(global.i + 1): _int
+                    if _(global.i > 5): _int {
+                        ${throw0(1)}
+                    } else {}
+                }
+            }
+        } ()
         output std n
         """.trimIndent())
         assert(out == "15\n") { out }
@@ -2298,5 +2309,25 @@ class TExec {
             call g ()
         """.trimIndent())
         assert(out == "()\n") { out }
+    }
+    @Test
+    fun z18_throw () {
+        val out = all(
+            """
+            $prelude0
+            var g : func @[]-> () -> ()
+            set g = func @[]-> () -> () {
+            }
+            var f: func @[a1,b1] -> [()] -> ()
+            set f = func @[a1,b1] -> [()] -> () {
+                ${catch0(1)} {
+                    call g ()
+                    ${throw0(1)}
+                }
+            }
+            call f @[LOCAL,LOCAL] [()]
+        """.trimIndent()
+        )
+        assert(out == "<.2>\n<.3>\n<.1>\n<.4>\n") { out }
     }
 }

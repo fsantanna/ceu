@@ -1101,7 +1101,7 @@ class TXExec {
     @Test
     fun q01_return () {
         val out = test(true, """
-            type Error = <Return=_int>
+            type Error = <Escape=_int>
             func f: ()->() {
                 output std _1:_int
                 return

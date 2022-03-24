@@ -1018,7 +1018,7 @@ fun Stmt.code (): String {
         
         typedef struct _CEU_Error {
             union {
-                int Return;
+                int Escape;
             };
             _CEU_ERROR tag;
         } _CEU_Error;

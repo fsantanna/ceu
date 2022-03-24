@@ -679,6 +679,7 @@ class TBook {
         val Tri = "<(),(),(),()>"
         val out = all(
             """
+            $prelude0
             $nums
             $clone
             $add
@@ -693,24 +694,26 @@ class TBook {
             -- 123
             var analyse: func @[a1,b1,c1] -> [$NumA1,$NumB1,$NumC1] -> $Tri
             set analyse = func @[a1,b1,c1] -> [$NumA1,$NumB1,$NumC1] -> $Tri {
-                var xy: $NumTL
-                set xy = add @[LOCAL,a1,b1] [arg.1,arg.2]
-                if lte @[LOCAL,c1] [xy,arg.3] {
-                    set ret = <.1()>:$Tri
-                    return
-                } else {}
-                if eq @[a1,c1] [arg.1,arg.3] {
-                    set ret = <.2()>:$Tri
-                    return
-                } else {}
-                if bton (or [
-                    ntob (eq @[a1,b1] [arg.1,arg.2]),
-                    ntob (eq @[b1,c1] [arg.2,arg.3])
-                ]) {
-                    set ret = <.3()>:$Tri
-                    return
-                } else {}
-                set ret = <.4()>:$Tri
+                ${catch0(1)} {
+                    var xy: $NumTL
+                    set xy = add @[LOCAL,a1,b1] [arg.1,arg.2]
+                    if lte @[LOCAL,c1] [xy,arg.3] {
+                        set ret = <.1()>:$Tri
+                        ${throw0(1)}
+                    } else {}
+                    if eq @[a1,c1] [arg.1,arg.3] {
+                        set ret = <.2()>:$Tri
+                        ${throw0(1)}
+                    } else {}
+                    if bton (or [
+                        ntob (eq @[a1,b1] [arg.1,arg.2]),
+                        ntob (eq @[b1,c1] [arg.2,arg.3])
+                    ]) {
+                        set ret = <.3()>:$Tri
+                        ${throw0(1)}
+                    } else {}
+                    set ret = <.4()>:$Tri
+                }
             }
             var n10: $NumTL
             set n10 = mul @[LOCAL,LOCAL,LOCAL] [five,two]
