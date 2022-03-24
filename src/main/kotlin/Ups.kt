@@ -60,9 +60,10 @@ fun Expr.setUps (up: Any) {
         is Expr.Dnref -> this.ptr.setUps(this)
         is Expr.Upref -> this.pln.setUps(this)
         is Expr.TDisc -> this.tup.setUps(this)
-        is Expr.Field   -> this.tsk.setUps(this)
+        is Expr.Field -> this.tsk.setUps(this)
         is Expr.UDisc -> this.uni.setUps(this)
         is Expr.UPred -> this.uni.setUps(this)
+        is Expr.If    -> { this.tst.setUps(this) ; this.true_.setUps(this) ; this.false_.setUps(true) }
         is Expr.Call  -> {
             this.f.setUps(this)
             this.arg.setUps(this)

@@ -274,6 +274,12 @@ fun Expr.xinfTypes (inf: Type?) {
                 else -> xtp.vec[num!! - 1]
             }
         }
+        is Expr.If -> {
+            this.tst.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
+            this.true_.xinfTypes(inf)
+            this.false_.xinfTypes(inf)
+            this.true_.wtype!!
+        }
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!
             val ret = when {

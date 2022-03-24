@@ -1,7 +1,23 @@
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
+
+//val x = "v = if evt?Escape then evt!Escape else 0"
+
+val prelude1 = """
+        --type Event = <(),_uint64_t,_int>
+        type Error = <Escape=_int>
+        func isEscRet: func @[] -> [Error,_int] -> _int {
+            if arg.1?Escape ?! arg.1!Escape {
+                var v1 = arg.1!Escape
+                var v2 = arg.2
+                set ret = _(${D}v1 == ${D}v2)
+            } else {
+                set ret = _0:_int
+            }
+        }
+
+    """.trimIndent()
 
 @TestMethodOrder(Alphanumeric::class)
 class TXExec {
@@ -52,6 +68,7 @@ class TXExec {
     @Test
     fun a06_call () {
         val out = test(true, """
+            type Error = <Escape=_int>
             var f = func _int -> _int {
                 return arg
             }

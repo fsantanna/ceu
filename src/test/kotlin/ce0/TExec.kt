@@ -2024,6 +2024,29 @@ class TExec {
         assert(out == "1\n") { out }
     }
 
+    // IF / EXPR
+
+    @Test
+    fun r01_if_ok () {
+        val out = test(true, """
+        output std if _0 {_999:_int} else {_1:_int}
+       """.trimIndent())
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n") { out }
+    }
+
+    @Test
+    fun r01_if_err () {
+        val out = test(true, """
+        var x: ()
+        set x = if _0 {()} else {[()]}
+        output std x
+       """.trimIndent())
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
+    }
+
+
     // ALL
 
     @Test

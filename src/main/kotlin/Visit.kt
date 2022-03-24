@@ -44,6 +44,7 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
         is Expr.UDisc -> this.uni.visit(fs, fe, ft, fx)
         is Expr.UPred -> this.uni.visit(fs, fe, ft, fx)
         is Expr.Func  -> { this.xtype?.visit(ft, fx) ; this.block.visit(fs, fe, ft, fx) }
+        is Expr.If    -> { this.tst.visit(fs,fe,ft,fx) ; this.true_.visit(fs,fe,ft,fx) ; this.false_.visit(fs,fe,ft,fx) }
         is Expr.Call  -> {
             this.xscps.let {
                 it.first?.forEach { if (fx!=null) fx(this,it) }

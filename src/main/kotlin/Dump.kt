@@ -49,6 +49,7 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.New   -> "New\n" + this.arg.dump(spc+4)
         is Expr.Call  -> "Call\n" + this.f.dump(spc+4) + this.arg.dump(spc+4)
         is Expr.Func  -> "Func\n" + this.xtype?.dump(spc+4) + this.block.dump(spc+4)
+        is Expr.If    -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
     }
 }
 

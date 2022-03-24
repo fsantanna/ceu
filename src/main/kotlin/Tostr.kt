@@ -99,6 +99,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
             "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
         }
         is Expr.Func -> "("+ this.ftp()!!.tostr(lc) + " " + this.block.tostr(lc) + ")"
+        is Expr.If   -> "(if "+ this.tst.tostr(lc) + " " + this.true_.tostr(lc) + " else " + this.false_.tostr(lc) + ")"
     }.let {
         if (!lc) it else {
             this.tk.lincol(it)

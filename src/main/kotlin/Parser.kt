@@ -330,6 +330,18 @@ object Parser
                 }
                 Expr.New(tk0 as Tk.Fix, if (scp==null) null else Scope(scp,null), e)
             }
+            alls.acceptFix("if") -> {
+                val tk0 = alls.tk0
+                val e = this.expr()
+                alls.acceptFix_err("{")
+                val t = this.expr()
+                alls.acceptFix_err("}")
+                alls.acceptFix_err("else")
+                alls.acceptFix_err("{")
+                val f = this.expr()
+                alls.acceptFix_err("}")
+                Expr.If(tk0 as Tk.Fix, e, t, f)
+            }
             alls.acceptFix("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
             (preid!=null || alls.acceptVar("id")) -> Expr.Var(alls.tk0 as Tk.id)
             alls.acceptFix("/") -> {

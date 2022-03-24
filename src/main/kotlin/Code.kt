@@ -621,6 +621,19 @@ fun code_fe (e: Expr) {
 
             Code(tp.type+type+block.type, tp.struct+block.struct+struct, tp.func+block.func+func, src, "((${e.xtype!!.pos()}) frame_${e.n})")
         }
+        is Expr.If -> {
+            val false_ = CODE.removeFirst()
+            val true_  = CODE.removeFirst()
+            val tst    = CODE.removeFirst()
+            val src = tst.stmt + "(${tst.expr} ? ${true_.expr} : ${false_.expr})"
+            Code (
+                tst.type+true_.type+false_.type,
+                tst.struct+true_.struct+false_.struct,
+                tst.func+true_.func+false_.func,
+                tst.stmt+true_.stmt+false_.stmt,
+                src
+            )
+        }
     }.let {
         val line = if (!LINES) "" else "\n#line ${e.tk.lin} \"CEU\"\n"
         Code(line+it.type, line+it.struct, line+it.func, line+it.stmt, line+it.expr)

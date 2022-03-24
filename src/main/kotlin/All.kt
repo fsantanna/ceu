@@ -171,7 +171,8 @@ inline fun All_assert_tk (tk: Tk, value: Boolean, lazyMessage: () -> String = {"
 }
 
 fun Alls.checkExpr (): Boolean {
-    return this.checkFix("(") || this.checkFix("()") || this.checkVar("id") || this.checkVar("Nat")
+    return this.checkFix("(") || this.checkFix("()") || this.checkVar("id")
+        || this.checkVar("Nat") || this.checkFix("if")
         || this.checkFix("[") || this.checkFix("<") || this.checkFix("new")
         || this.checkFix("/") || this.checkFix("func") || this.checkFix("task")
         || alls.tk1 is Tk.Id || this.checkFix("Null")

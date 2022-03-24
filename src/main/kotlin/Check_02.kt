@@ -30,7 +30,7 @@ fun check_02_after_tps (s: Stmt) {
 
     fun fe (e: Expr) {
         when (e) {
-            is Expr.Cast -> {
+            is Expr.Cast  -> {
                 e.type.let {
                     val dst = e.type
                     val src = e.e.wtype!!
@@ -39,7 +39,7 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
-            is Expr.Pak -> {
+            is Expr.Pak   -> {
                 e.xtype?.let {
                     val dst = it.noactnoalias()
                     val src = e.e.wtype!!.noact()
@@ -61,12 +61,12 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid constructor : ${mismatch(sup,sub)}"
                 }
             }
-            is Expr.New -> {
+            is Expr.New   -> {
                 All_assert_tk(e.tk, ((e.arg as Expr.Pak).xtype!! as Type.Named).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
-            is Expr.Call -> {
+            is Expr.Call  -> {
                 val func = e.f.wtype
                 val ret1 = e.wtype!!
                 val arg1 = e.arg.wtype!!
@@ -125,6 +125,17 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
+            is Expr.If    -> {
+                All_assert_tk(e.tk, e.tst.wtype is Type.Nat) {
+                    "invalid condition : type mismatch : expected _int : have ${e.tst.wtype!!.tostr()}"
+                }
+                val t = e.true_.wtype!!
+                val f = e.false_.wtype!!
+                All_assert_tk(s.tk, t.isSupOf(f) && f.isSupOf(t)) {
+                    "invalid \"if\" : ${mismatch(t,f)}"
+                }
+            }
+
         }
     }
     fun fs (s: Stmt) {
