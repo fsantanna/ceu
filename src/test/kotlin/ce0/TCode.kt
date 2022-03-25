@@ -104,7 +104,9 @@ class TCode {
     fun c01_stmt_pass () {
         val s = Stmt.Nop(Tk.Err("", 1, 1))
         s.visit(::code_fs, null, null, null)
-        assert(CODE.removeFirst().stmt == "")
+        CODE.removeFirst().let {
+            assert(it.stmt == "\n// Stmt\$Nop\n")
+        }
         assert(CODE.size == 0)
     }
 

@@ -675,7 +675,7 @@ class TBook {
     }
 
     @Test
-    fun ch_02_01_triangles_pg33 () {
+    fun todo_ch_02_01_triangles_pg33 () {   // TODO: @[a1,b1]
         val Tri = "<(),(),(),()>"
         val out = all(
             """

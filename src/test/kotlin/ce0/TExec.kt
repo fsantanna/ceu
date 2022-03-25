@@ -28,7 +28,7 @@ val prelude0 = """
 
 val func0 = "call func @[] -> () -> ()"
 fun catch0 (v: Int): String {
-    return "catch isEscRet [err,_$v:_int]"
+    return "catch _(task1->err.tag==1 && task1->err._1==$v)"
 }
 fun throw0 (v: Int): String {
     return "throw Error.1 _$v:_int"

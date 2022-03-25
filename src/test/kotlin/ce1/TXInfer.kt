@@ -336,7 +336,7 @@ class TXInfer {
     @Test
     fun c02 () {
         val out = all("""
-        var f = func /_int -> () {}
+            var f = func /_int -> () {}
         """.trimIndent())
         assert(out == """
             var f: func @[i] -> /_int @i -> ()
