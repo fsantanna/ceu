@@ -986,9 +986,10 @@ object Parser
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")
                 val tp = this.type(prefunc=tk) as Type.Func
-                //val catch = All_nest("(if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0})") { this.expr() } as Expr
                 alls.checkFix_err("{")  // no catch
-                val catch = All_nest("_0") { this.expr() } as Expr
+                val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10)") {
+                    this.expr()
+                } as Expr
                 val blk = this.block(catch)
                 All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
                     this.stmt()

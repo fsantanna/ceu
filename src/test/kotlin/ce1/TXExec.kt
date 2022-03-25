@@ -58,31 +58,29 @@ class TXExec {
     }
     @Test
     fun a06_call () {
-        val out = test(
-            true, """
-                var f = func _int -> _int {
-                    return arg
-                }
-                var x = f _10
-                output std x
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            var f = func _int -> _int {
+                return arg
+            }
+            var x = f _10
+            output std x
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun a07_call_fg () {
-        val out = test(
-            true, """
-                var f = func ()->() {
-                    var x = _10:_int
-                    output std x
-                }
-                var g = func ()->() {
-                    return f ()
-                }
-                call g ()
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            var f = func ()->() {
+                var x = _10:_int
+                output std x
+            }
+            var g = func ()->() {
+                return f ()
+            }
+            call g ()
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
@@ -99,8 +97,8 @@ class TXExec {
     }
     @Test
     fun a09_func_if () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
             var inv = func <(),()> -> <(),()> {
                 if arg?1 {
                     return <.2>
@@ -111,26 +109,26 @@ class TXExec {
             var a: <(),()> = <.2>
             var b = inv a
             output std /b
-            """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "<.1>\n") { out }
     }
     @Test
     fun a10_loop () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
             var i: _int = _1
             var n = _0: _int
-            loop {
-                set n = _(${D}n + ${D}i)
-                set i = _(${D}i + 1)
-                if _(${D}i > 5) {
-                    break
+            spawn {
+                loop {
+                    set n = _(${D}n + ${D}i)
+                    set i = _(${D}i + 1)
+                    if _(${D}i > 5) {
+                        break
+                    }
                 }
             }
             output std n
-            """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "15\n") { out }
     }
     @Test
@@ -209,14 +207,15 @@ class TXExec {
     }
     @Test
     fun a18_loop () {
-        val out = test(
-            true, """
-            loop {
-               break
+        val out = test(true, """
+            type Error = <Escape=_int>
+            spawn {
+                loop {
+                   break
+                }
+                output std ()
             }
-            output std ()
-            """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
@@ -376,8 +375,8 @@ class TXExec {
 
     @Test
     fun c01 () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
             var f = func /_int@k1 -> () {
                set arg\ = _(*${D}arg+1)
                return
@@ -385,14 +384,13 @@ class TXExec {
             var x: _int = _1
             call f /x
             output std x
-            """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "2\n") { out }
     }
     @Test
     fun c02_fact () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
             var fact : func [/_int,_int] -> ()
             set fact = func [/_int,_int] -> () {
                 var x = _1: _int
@@ -405,62 +403,58 @@ class TXExec {
             var x = _0: _int
             call fact [/x,_6]
             output std x
-        """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "720\n") { out }
     }
     @Test
     fun c03 () {
-        val out = test(
-            true, """
-                type List = </List>
-                var f = func /List->() {
-                    var pf = arg
-                    output std pf
-                }
-                {
-                    var x: /List
-                    set x = new <.1 Null>
-                    call f x
-                }
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type List = </List>
+            var f = func /List->() {
+                var pf = arg
+                output std pf
+            }
+            {
+                var x: /List
+                set x = new <.1 Null>
+                call f x
+            }
+        """.trimIndent())
         assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun c04_ptr_arg () {
-        val out = test(
-            true, """
-                type List = </List>
-                var f = func /List->() {
-                    set arg\!1 = new <.1 Null>
-                }
-                {
-                    var x: /List
-                    set x = new <.1 Null>
-                    call f x
-                    output std x
-                }
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type List = </List>
+            var f = func /List->() {
+                set arg\!1 = new <.1 Null>
+            }
+            {
+                var x: /List
+                set x = new <.1 Null>
+                call f x
+                output std x
+            }
+        """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun c05_ptr_arg_two () {
-        val out = test(
-            true, """
-                type List = </List>
-                var f = func [/List,/List]->() {
-                    set arg.1\!1 = new <.1 Null>
-                    set arg.2\!1 = new <.1 Null>
-                }
-                {
-                    var x: /List = new <.1 Null>
-                    call f [x,x]
-                    output std x
-                }
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type List = </List>
+            var f = func [/List,/List]->() {
+                set arg.1\!1 = new <.1 Null>
+                set arg.2\!1 = new <.1 Null>
+            }
+            {
+                var x: /List = new <.1 Null>
+                call f [x,x]
+                output std x
+            }
+        """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
@@ -477,39 +471,37 @@ class TXExec {
     }
     @Test
     fun c07_ptr_arg_ret () {
-        val out = test(
-            true, """
-                var f = func /_int@a1 -> /_int@a1 {
-                    return arg
-                }
-                var x: _int = _10
-                var y: /_int = f /x
-                output std y\
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            var f = func /_int@a1 -> /_int@a1 {
+                return arg
+            }
+            var x: _int = _10
+            var y: /_int = f /x
+            output std y\
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun c08_call_call () {
-        val out = test(
-            true, """
-                var f = func /_int@k1 -> /()@k1 {
-                    return arg
-                }
-                var g = func /_int@k1 -> /()@k1 {
-                    return f arg
-                }
-                var x: _int
-                var px = f /x
-                output std _(${D}px == &${D}x):_int
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            var f = func /_int@k1 -> /()@k1 {
+                return arg
+            }
+            var g = func /_int@k1 -> /()@k1 {
+                return f arg
+            }
+            var x: _int
+            var px = f /x
+            output std _(${D}px == &${D}x):_int
+        """.trimIndent())
         assert(out == "1\n") { out }
     }
     @Test
     fun c09_func_arg () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
             var f = func () -> () {
                 return arg
             }
@@ -517,8 +509,7 @@ class TXExec {
                 return arg.1 arg.2
             }
             output std g [f,()]
-        """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
 
@@ -526,46 +517,44 @@ class TXExec {
 
     @Test
     fun d01 () {
-        val out = test(
-            true, """
-                type List = </List>
-                { @A
-                    var pa: /List @[LOCAL] @LOCAL
-                    set pa = new List.1@[A] Null: /(List @[A]) @A: @A
-                    var f: func ()->()
-                    set f = func @[]-> ()->() {
-                        var pf: /List @[A] @A
-                        set pf = new List.1 @[A] Null: /List @[A] @A: @A
-                        set pa\!1 = pf
-                        --output std pa
-                    }
-                    call f ()
-                    output std pa
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type List = </List>
+            { @A
+                var pa: /List @[LOCAL] @LOCAL
+                set pa = new List.1@[A] Null: /(List @[A]) @A: @A
+                var f: func ()->()
+                set f = func @[]-> ()->() {
+                    var pf: /List @[A] @A
+                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
+                    set pa\!1 = pf
+                    --output std pa
                 }
-            """.trimIndent()
-        )
+                call f ()
+                output std pa
+            }
+        """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun d02 () {
-        val out = test(
-            true, """
-                type List = </List>
-                { @A
-                    var pa: /List @[LOCAL] @LOCAL
-                    set pa = new <.1 Null>
-                    var f: func ()->()
-                    set f = func @[]-> ()->() {
-                        var pf: /List @[A] @A
-                        set pf = new List.1 @[A] Null: /List @[A] @A: @A
-                        set pa\!1 = pf
-                        --output std pa
-                    }
-                    call f ()
-                    output std pa
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type List = </List>
+            { @A
+                var pa: /List @[LOCAL] @LOCAL
+                set pa = new <.1 Null>
+                var f: func ()->()
+                set f = func @[]-> ()->() {
+                    var pf: /List @[A] @A
+                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
+                    set pa\!1 = pf
+                    --output std pa
                 }
-            """.trimIndent()
-        )
+                call f ()
+                output std pa
+            }
+        """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
@@ -683,23 +672,21 @@ class TXExec {
     }
     @Test
     fun todo_e10_rect() {
-        val out = test(
-            true, """
-                type Unit  = ()
-                type Int   = _int
-                type Point = [Int,Int]
-                type Rect  = [Point,Point]
-                type URect = [Unit,Rect]
-                var v:    Int   = _1
-                var pt:   Point = [_1,v]
-                var rect: Rect  = [pt,[_3,_4]]
-                var r2: Rect  = [[_1,_2],[_3,_4]]
-                var ur1:  URect = [(),rect]
-                var unit: Unit  = ()
-                var ur2:  URect = [unit,rect]
-                output std /ur2
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Unit  = ()
+            type Int   = _int
+            type Point = [Int,Int]
+            type Rect  = [Point,Point]
+            type URect = [Unit,Rect]
+            var v:    Int   = _1
+            var pt:   Point = [_1,v]
+            var rect: Rect  = [pt,[_3,_4]]
+            var r2: Rect  = [[_1,_2],[_3,_4]]
+            var ur1:  URect = [(),rect]
+            var unit: Unit  = ()
+            var ur2:  URect = [unit,rect]
+            output std /ur2
+        """.trimIndent())
         assert(out == "[(),[[1,1],[3,4]]]\n") { out }
     }
     @Test
@@ -732,17 +719,16 @@ class TXExec {
     }
     @Test
     fun e12_ucons_type () {
-        val out = test(
-            true, """
-                type TPico = <(),[_int,_int]>
-                spawn {
-                    var t1 = TPico.1
-                    output std /t1
-                    var t2 = TPico.2 [_1,_2]
-                    output std /t2
-                }
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type TPico = <(),[_int,_int]>
+            spawn {
+                var t1 = TPico.1
+                output std /t1
+                var t2 = TPico.2 [_1,_2]
+                output std /t2
+            }
+        """.trimIndent())
         assert(out == "<.1>\n<.2 [1,2]>\n") { out }
     }
     @Test
@@ -759,14 +745,13 @@ class TXExec {
     }
     @Test
     fun eyy_func_alias () {
-        val out = test(
-            true, """
-                type Int2Int = func @[] -> () -> ()
-                var f: func @[] -> () -> ()
-                set f = func @[] -> () -> () {}
-                output std ()
-           """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            type Int2Int = func @[] -> () -> ()
+            var f: func @[] -> () -> ()
+            set f = func @[] -> () -> () {}
+            output std ()
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
@@ -858,15 +843,13 @@ class TXExec {
     }
     @Test
     fun todo_e19_yids () {
-        val out = test(
-            true, """
-                type Bool = <False=(), True=()>
-                var x: Bool = False
-                var y: Bool = True ()
-                output std x
-                output std y
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Bool = <False=(), True=()>
+            var x: Bool = False
+            var y: Bool = True ()
+            output std x
+            output std y
+        """.trimIndent())
         assert(out == "False = 1\nTrue = 2\nx = 0\n") { out }
     }
 
@@ -884,34 +867,37 @@ class TXExec {
     }
     @Test
     fun f02_until () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
+            spawn {
                 output std () until _1
-            """.trimIndent()
-        )
+            }
+        """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
         assert(out == "()\n") { out }
     }
     @Test
     fun todo_03_err () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
+            spawn {
                 output std () until ()
-            """.trimIndent()
-        )
+            }
+        """.trimIndent())
         assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()") { out }
     }
     @Test
     fun f05_err () {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=_int>
+            spawn {
                 output std v where {
                     var v = ()
                 } until z where {
                     var z = _1:_int
                 }
-            """.trimIndent()
-        )
+            }
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
 
@@ -919,24 +905,22 @@ class TXExec {
 
     @Test
     fun g01_include () {
-        val out = test(
-            true, """
-                ^"test-func.ceu"
-                output std f _10
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            ^"test-func.ceu"
+            output std f _10
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun g02_include () {
-        val out = test(
-            true, """
-                var f = func _int -> _int {
-                    return arg
-                }
-                output std f _10
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            var f = func _int -> _int {
+                return arg
+            }
+            output std f _10
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
@@ -1263,76 +1247,70 @@ class TXExec {
 
     @Test
     fun q01_return () {
-        val out = test(
-            true, """
-                type Error = <Escape=_int>
-                func f: ()->() {
-                    output std _1:_int
-                    return
-                    output std _3:_int
-                }
-                call f ()
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Error = <Escape=_int>
+            func f: ()->() {
+                output std _1:_int
+                return
+                output std _3:_int
+            }
+            call f ()
+        """.trimIndent())
         assert(out == "1\n") { out }
     }
     @Test
     fun qxx_return () {
-        val out = test(
-            true, """
-                func f: ()->() {
-                    output std _1:_int
-                    do {
-                        output std _2:_int
-                        return
-                    }
-                    output std _3:_int
+        val out = test(true, """
+            type Error = <Escape=_int>
+            func f: ()->() {
+                output std _1:_int
+                do {
+                    output std _2:_int
+                    return
                 }
-                output std f ()
-            """.trimIndent()
-        )
+                output std _3:_int
+            }
+            output std f ()
+        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
     fun q02_return () {
-        val out = test(
-            true, """
-                func f: ()->() { @X
-                    output std _1:_int
-                    do {
-                        output std _2:_int
-                        return @X
-                    }
-                    output std _3:_int
+        val out = test(true, """
+            type Error = <Escape=_int>
+            func f: ()->() { @X
+                output std _1:_int
+                do {
+                    output std _2:_int
+                    return @X
                 }
-                output std f ()
-            """.trimIndent()
-        )
+                output std _3:_int
+            }
+            output std f ()
+        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
     fun q03_return () {
-        val out = test(
-            true, """
-                func f: _int->_int {
-                    var ret = _0:_int
-                    do { @Y
-                        var x = do {
-                            if arg {
-                                return _10
-                            } else {
-                                return @Y
-                            }
+        val out = test(true, """
+            type Error = <Escape=_int>
+            func f: _int->_int {
+                var ret = _0:_int
+                do { @Y
+                    var x = do {
+                        if arg {
+                            return _10
+                        } else {
+                            return @Y
                         }
-                        ret = x
                     }
-                    return ret
+                    ret = x
                 }
-                output std f _0
-                output std f _1
-            """.trimIndent()
-        )
+                return ret
+            }
+            output std f _0
+            output std f _1
+        """.trimIndent())
         assert(out == "0\n10\n") { out }
     }
-
 }

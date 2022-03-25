@@ -155,25 +155,23 @@ class TXBook {
     }
     @Test
     fun pre_02_add() {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=()>
             $nums
             $clone
             $add
             output std add [two,one]
-        """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Test
     fun pre_03_clone() {
-        val out = test(
-            true, """
+        val out = test(true, """
+            type Error = <Escape=()>
             $nums
             $clone
             output std clone two
-        """.trimIndent()
-        )
+        """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test

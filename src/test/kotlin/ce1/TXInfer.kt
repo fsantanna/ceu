@@ -1010,11 +1010,15 @@ class TXInfer {
     @Test
     fun h03_until () {
         val out = all("""
-            output std () until _0
+            spawn {
+                output std () until _0
+            }
         """.trimIndent())
         assert(out == """
+            spawn ((task @[] -> _ -> _ -> _ {
             {
-            loop {
+            {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             output std ()
             if (_0: _int)
             {
@@ -1026,17 +1030,24 @@ class TXInfer {
             }
             }
             }
+            }
+            }
+            ) @[] ())
             
         """.trimIndent()) { out }
     }
     @Test
     fun h04_until_where () {
         val out = all("""
-            output std () until x where { var x = () }
+            spawn {
+                output std () until x where { var x = () }
+            }
         """.trimIndent())
         assert(out == """
+            spawn ((task @[] -> _ -> _ -> _ {
             {
-            loop {
+            {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             output std ()
             {
             var x: ()
@@ -1052,6 +1063,9 @@ class TXInfer {
             }
             }
             }
+            }
+            }
+            ) @[] ())
     
         """.trimIndent()) { out }
     }
@@ -1066,11 +1080,15 @@ class TXInfer {
     @Test
     fun h06_where_until_where () {
         val out = all("""
-            output std y where { var y = () } until x where { var x:_int = _1 }
+            spawn {
+                output std y where { var y = () } until x where { var x:_int = _1 }
+            }
         """.trimIndent())
         assert(out == """
+            spawn ((task @[] -> _ -> _ -> _ {
             {
-            loop {
+            {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             {
             var y: ()
             set y = ()
@@ -1090,6 +1108,9 @@ class TXInfer {
             }
             }
             }
+            }
+            }
+            ) @[] ())
 
         """.trimIndent()) { out }
     }
@@ -1123,7 +1144,7 @@ class TXInfer {
             set ms_8 = (_1000: _int)
             {
             {
-            loop {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             await ((evt~)?3)
             set ms_8 = (sub @[] [ms_8,((evt~)!3)])
             if (lte @[] [ms_8,(_0: _int)])
@@ -1162,16 +1183,16 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             {
             {
-            loop {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             {
-            var ms_13: _int
-            set ms_13 = (_3902020: _int)
+            var ms_14: _int
+            set ms_14 = (_3902020: _int)
             {
             {
-            loop {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
             await ((evt~)?3)
-            set ms_13 = (sub @[] [ms_13,((evt~)!3)])
-            if (lte @[] [ms_13,(_0: _int)])
+            set ms_14 = (sub @[] [ms_14,((evt~)!3)])
+            if (lte @[] [ms_14,(_0: _int)])
             {
             break
             }

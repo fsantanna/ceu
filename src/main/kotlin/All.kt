@@ -193,18 +193,8 @@ fun exec (cmd: String): Pair<Boolean,String> {
     return exec(cmd.split(' '))
 }
 
-val prelude1 = """
-    type Event = <(),_uint64_t>
-    type Error = <Escape=_int>
-
-""".trimIndent()
-
 fun test (infer: Boolean, inp: String): String {
     CE1 = infer
-    println("prelude: " + (1+prelude1.count { it=='\n' }))
-    //val inp2 = if (prelude) prelude1+"call (func ()->() {\n"+inp+"\n}) ()\n" else inp
-    //val inp2 = if (prelude) prelude1+inp else inp
-    //println(inp2)
     val (ok1,out1) = ce2c(null, inp)
     if (!ok1) {
         return out1

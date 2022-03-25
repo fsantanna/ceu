@@ -2346,8 +2346,9 @@ class TExec {
     @Test
     fun z17_include () {
         val out = test(true, """
-                ^"test-func.ceu"
-                call g ()
+            type Error = <Escape=_int>
+            ^"test-func.ceu"
+            call g ()
             """.trimIndent()
         )
         assert(out == "()\n") { out }
