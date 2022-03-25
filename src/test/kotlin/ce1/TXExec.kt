@@ -2,33 +2,16 @@ import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
-//val x = "v = if evt?Escape then evt!Escape else 0"
-
-val prelude1 = """
-        --type Event = <(),_uint64_t,_int>
-        type Error = <Escape=_int>
-        func isEscRet: func @[] -> [Error,_int] -> _int {
-            if arg.1?Escape ?! arg.1!Escape {
-                var v1 = arg.1!Escape
-                var v2 = arg.2
-                set ret = _(${D}v1 == ${D}v2)
-            } else {
-                set ret = _0:_int
-            }
-        }
-
-    """.trimIndent()
-
 @TestMethodOrder(Alphanumeric::class)
 class TXExec {
     @Test
     fun a01_output () {
-        val out = test(true, "output std ()")
+        val out = test(true,true, "output std ()")
         assert(out == "()\n") { out }
     }
     @Test
     fun a02_int_abs () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x: _int
             set x = _abs _(-1)
             output std x
@@ -37,7 +20,7 @@ class TXExec {
     }
     @Test
     fun a03_tuple () {
-        val out = test(true, """
+        val out = test(true,true, """
             var v = [(),()]
             output std /v
         """.trimIndent())
@@ -45,7 +28,7 @@ class TXExec {
     }
     @Test
     fun a04_tuples () {
-        val out = test(true, """
+        val out = test(true,true, """
             var v = [(),()]
             var x = [(),v]
             var y = x.2
@@ -57,7 +40,7 @@ class TXExec {
     }
     @Test
     fun a05_nat () {
-        val out = test(true, """
+        val out = test(true,true, """
             var y: _(char*) = _{"hello"}
             var n: _{int} = _10
             var x = [n,y]
@@ -67,8 +50,7 @@ class TXExec {
     }
     @Test
     fun a06_call () {
-        val out = test(true, """
-            type Error = <Escape=_int>
+        val out = test(true,true, """
             var f = func _int -> _int {
                 return arg
             }
@@ -79,7 +61,7 @@ class TXExec {
     }
     @Test
     fun a07_call_fg () {
-        val out = test(true, """
+        val out = test(true,true, """
             var f = func ()->() {
                 var x = _10:_int
                 output std x
@@ -93,7 +75,7 @@ class TXExec {
     }
     @Test
     fun a08_union () {
-        val out = test(true, """
+        val out = test(true,true, """
             var a = <.1>:<(),()>
             var b : <(),()> = <.2>
             output std /a
@@ -103,7 +85,7 @@ class TXExec {
     }
     @Test
     fun a09_func_if () {
-        val out = test(true, """
+        val out = test(true,true, """
         var inv = func <(),()> -> <(),()> {
             if arg?1 {
                 return <.2>
@@ -119,7 +101,7 @@ class TXExec {
     }
     @Test
     fun a10_loop () {
-        val out = test(true, """
+        val out = test(true,true, """
         var i: _int = _1
         var n = _0: _int
         loop {
@@ -135,7 +117,7 @@ class TXExec {
     }
     @Test
     fun a11_unions () {
-        val out = test(true, """
+        val out = test(true,true, """
             var z = <.1()>:<()>
             var y : <<()>> = <.1 z>
             var x = <.1 y>:<<<()>>>
@@ -147,7 +129,7 @@ class TXExec {
     }
     @Test
     fun a12_tuple_nat () {
-        val out = test(true, """
+        val out = test(true,true, """
             var s: [_int,_int,_int,_int] = [_1,_2,_3,_4]
             output std /s
         """.trimIndent())
@@ -155,7 +137,7 @@ class TXExec {
     }
     @Test
     fun a13_union_nat () {
-        val out = test(true, """
+        val out = test(true,true, """
             var s: <[_int,_int,_int,_int],_int,_int> = <.1 [_1,_2,_3,_4]>
             output std /s
         """.trimIndent())
@@ -163,7 +145,7 @@ class TXExec {
     }
     @Test
     fun a14_pred () {
-        val out = test(true, """
+        val out = test(true,true, """
             var z = <.1>: <()>
             output std z?1
         """.trimIndent())
@@ -171,7 +153,7 @@ class TXExec {
     }
     @Test
     fun a15_disc () {
-        val out = test(true, """
+        val out = test(true,true, """
             var z: <(),()> = <.2>
             output std z!2
         """.trimIndent())
@@ -179,7 +161,7 @@ class TXExec {
     }
     @Test
     fun a16_dots () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x: <<<()>>> = <.1 <.1 <.1>>>
             output std x!1!1!1
         """.trimIndent())
@@ -187,7 +169,7 @@ class TXExec {
     }
     @Test
     fun a17_if () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x: <(),()> = <.2>
             if x?2 { output std () } else { }
         """.trimIndent())
@@ -195,7 +177,7 @@ class TXExec {
     }
     @Test
     fun a18_loop () {
-        val out = test(true, """
+        val out = test(true,true, """
         loop {
            break
         }
@@ -205,7 +187,7 @@ class TXExec {
     }
     @Test
     fun a19_ptr () {
-        val out = test(true, """
+        val out = test(true,true, """
             var y: _int = _10
             var x = /y
             output std x\
@@ -214,7 +196,7 @@ class TXExec {
     }
     @Test
     fun i05_ptr_block_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             var p1: /_int
             var p2: /_int
             {
@@ -230,7 +212,7 @@ class TXExec {
 
     @Test
     fun b09_union () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var x: /List = Null
             var y: <//List> = <.1 /x>
@@ -242,7 +224,7 @@ class TXExec {
     }
     @Test
     fun b12_new_self () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <[(),/List]>
             var x: /List = new <.1 [(),Null]>
             var y: [(),/List] = [(), new <.1 [(),Null]>]
@@ -253,7 +235,7 @@ class TXExec {
     }
     @Test
     fun todo_b13_new_self () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <[//List,/List]>
             var x: /List = new <.1 [_(&printf),Null]>
             set x\!1.1 = /x
@@ -264,7 +246,7 @@ class TXExec {
     }
     @Test
     fun b16_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <(),/List>
             var l: /List = new <.2 new <.1>>
             var t1 = [l]
@@ -275,7 +257,7 @@ class TXExec {
     }
     @Test
     fun b17_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <(),/List>
             var l: /List = new <.2 new <.1>>
             var t1 = [(), l]
@@ -286,7 +268,7 @@ class TXExec {
     }
     @Test
     fun b21_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <(),/List>
             var x: /List = new <.2 new <.1>>
             var y = x
@@ -297,7 +279,7 @@ class TXExec {
     }
     @Test
     fun b22_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = <(),[(),/List]>
             var x: /List = new <.2 [(),new <.1>]>
             var y = [(), x\!2.2]
@@ -308,7 +290,7 @@ class TXExec {
     }
     @Test
     fun b23_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var z: /List = Null
             var one: /List = new <.1 z>
@@ -323,7 +305,7 @@ class TXExec {
     }
     @Test
     fun b25_new () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var l1: /List = new <.1 Null>
             var l2 = new List.1 l1
@@ -338,7 +320,7 @@ class TXExec {
 
     @Test
     fun c01 () {
-        val out = test(true, """
+        val out = test(true,true, """
         var f = func /_int@k1 -> () {
            set arg\ = _(*${D}arg+1)
            return
@@ -351,7 +333,7 @@ class TXExec {
     }
     @Test
     fun c02_fact () {
-        val out = test(true, 
+        val out = test(true,true, 
             """
             var fact : func [/_int,_int] -> ()
             set fact = func [/_int,_int] -> () {
@@ -371,7 +353,7 @@ class TXExec {
     }
     @Test
     fun c03 () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var f = func /List->() {
                 var pf = arg
@@ -387,7 +369,7 @@ class TXExec {
     }
     @Test
     fun c04_ptr_arg () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var f = func /List->() {
                 set arg\!1 = new <.1 Null>
@@ -403,7 +385,7 @@ class TXExec {
     }
     @Test
     fun c05_ptr_arg_two () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var f = func [/List,/List]->() {
                 set arg.1\!1 = new <.1 Null>
@@ -419,7 +401,7 @@ class TXExec {
     }
     @Test
     fun c06_ptr_call_err () {
-        val out = test(true, """
+        val out = test(true,false, """
             var f = func /() -> /() {
                 return arg
             }
@@ -430,7 +412,7 @@ class TXExec {
     }
     @Test
     fun c07_ptr_arg_ret () {
-        val out = test(true, """
+        val out = test(true,true, """
             var f = func /_int@a1 -> /_int@a1 {
                 return arg
             }
@@ -443,7 +425,7 @@ class TXExec {
     }
     @Test
     fun c08_call_call () {
-        val out = test(true, """
+        val out = test(true,true, """
             var f = func /_int@k1 -> /()@k1 {
                 return arg
             }
@@ -459,7 +441,7 @@ class TXExec {
     }
     @Test
     fun c09_func_arg () {
-        val out = test(true, 
+        val out = test(true,true, 
             """
             var f = func () -> () {
                 return arg
@@ -477,7 +459,7 @@ class TXExec {
 
     @Test
     fun d01 () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
@@ -497,7 +479,7 @@ class TXExec {
     }
     @Test
     fun d02 () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             { @A
                 var pa: /List @[LOCAL] @LOCAL
@@ -517,7 +499,7 @@ class TXExec {
     }
     @Test
     fun d03_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             var f: func () -> _int          -- 1. `f` is a reference to a function
             {
                 var x: _int = _10
@@ -536,7 +518,7 @@ class TXExec {
 
     @Test
     fun e01_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List @LOCAL>
             var l: /List = Null
             output std l
@@ -545,7 +527,7 @@ class TXExec {
     }
     @Test
     fun e02_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List @LOCAL>
             var l: /List = new <.1 Null>
             output std l
@@ -555,7 +537,7 @@ class TXExec {
     }
     @Test
     fun e03_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List @LOCAL>
             var l: /List
             var z: /List = Null
@@ -567,7 +549,7 @@ class TXExec {
     }
     @Test
     fun e04_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             type List = </List>
             var l: /List = new <.1 Null>
             output std l
@@ -577,7 +559,7 @@ class TXExec {
     }
     @Test
     fun e07_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             native _{
                 void output_pico (CEU_Pico arg) {}
             }
@@ -594,7 +576,7 @@ class TXExec {
     }
     @Test
     fun e08_ptr_num() {
-        val out = test(true, """
+        val out = test(true,true, """
             type Num = /<Num>    
             var zero:  Num = Null
             var one:   Num = new <.1 zero>
@@ -606,7 +588,7 @@ class TXExec {
     }
     @Test
     fun e09_bool() {
-        val out = test(true, """
+        val out = test(true,true, """
             type Bool = <(),()>
             var v: Bool = <.1>
             output std /v
@@ -615,7 +597,7 @@ class TXExec {
     }
     @Test
     fun todo_e10_rect() {
-        val out = test(true, """
+        val out = test(true,true, """
             type Unit  = ()
             type Int   = _int
             type Point = [Int,Int]
@@ -634,7 +616,7 @@ class TXExec {
     }
     @Test
     fun e11_rect_dot() {
-        val out = test(true, """
+        val out = test(true,true, """
             type Int   = _int
             type Point = [Int,Int]
             type Rect  = [Point,Point]
@@ -645,7 +627,7 @@ class TXExec {
     }
     @Test
     fun e11_rect_dot_output() {
-        val out = test(true, """
+        val out = test(true,true, """
             type Int   = _int
             type Point = [Int,Int]
             type Rect  = [Point,Point]
@@ -658,7 +640,7 @@ class TXExec {
     }
     @Test
     fun e12_ucons_type () {
-        val out = test(true, """
+        val out = test(true,true, """
             type TPico = <(),[_int,_int]>
             spawn {
                 var t1 = TPico.1
@@ -671,7 +653,7 @@ class TXExec {
     }
     @Test
     fun exx_func_alias () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Int2Int = func @[] -> () -> ()
             var f: Int2Int
             set f = Int2Int {} 
@@ -681,7 +663,7 @@ class TXExec {
     }
     @Test
     fun eyy_func_alias () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Int2Int = func @[] -> () -> ()
             var f: func @[] -> () -> ()
             set f = func @[] -> () -> () {}
@@ -691,7 +673,7 @@ class TXExec {
     }
     @Test
     fun e13_func_alias () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Int2Int = func @[] -> _int -> _int
             
             var f: Int2Int
@@ -708,7 +690,7 @@ class TXExec {
     }
     @Test
     fun e14_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Bool = <False=(), True=()>
             var x = Bool.False
             native _{
@@ -721,7 +703,7 @@ class TXExec {
     }
     @Test
     fun e15_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Point = [x:_int,y:_int]
             var pt = Point [_10,_20]
             output std pt.x
@@ -731,7 +713,7 @@ class TXExec {
     }
     @Test
     fun e16_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Bool = <False=(), True=()>
             var x = Bool.True
             output std x?False
@@ -741,7 +723,7 @@ class TXExec {
     }
     @Test
     fun e17_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Rect  = [()]
             var r: Rect
             var x = r.pos
@@ -750,7 +732,7 @@ class TXExec {
     }
     @Test
     fun e18_types_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type False = ()
             type Bool = <False=(), True=()>
             type Xxx = <True=(), False=()>
@@ -766,7 +748,7 @@ class TXExec {
     }
     @Test
     fun todo_e19_yids () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Bool = <False=(), True=()>
             var x: Bool = False
             var y: Bool = True ()
@@ -780,7 +762,7 @@ class TXExec {
 
     @Test
     fun f01_where () {
-        val out = test(true, """
+        val out = test(true,true, """
             output std x where { var x = ()  }
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
@@ -788,7 +770,7 @@ class TXExec {
     }
     @Test
     fun f02_until () {
-        val out = test(true, """
+        val out = test(true,true, """
             output std () until _1
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
@@ -796,14 +778,14 @@ class TXExec {
     }
     @Test
     fun todo_03_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             output std () until ()
         """.trimIndent())
         assert(out == "(ln 1, col 21): invalid condition : type mismatch : expected _int : have ()") { out }
     }
     @Test
     fun f05_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             output std v where {
                 var v = ()
             } until z where {
@@ -817,7 +799,7 @@ class TXExec {
 
     @Test
     fun g01_include () {
-        val out = test(true, """
+        val out = test(true,true, """
             ^"test-func.ceu"
             output std f _10
         """.trimIndent())
@@ -825,7 +807,7 @@ class TXExec {
     }
     @Test
     fun g02_include () {
-        val out = test(true, """
+        val out = test(true,true, """
             var f = func _int -> _int {
                 return arg
             }
@@ -835,7 +817,7 @@ class TXExec {
     }
     @Test
     fun g03_include_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             ^"test-func.ceu"
             output () f _10
         """.trimIndent())
@@ -843,7 +825,7 @@ class TXExec {
     }
     @Test
     fun g04_include_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             ^"test-lincol.ceu"
             output () f _10
         """.trimIndent())
@@ -854,7 +836,7 @@ class TXExec {
 
     @Test
     fun h01_cast_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x: [_int,_int]
             var ptr: _(char*)
             set x = [ptr,ptr]
@@ -863,7 +845,7 @@ class TXExec {
     }
     @Test
     fun h02_cast_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x: [_long,_long]
             var ptr: _(char*)
             set x = [ptr::_long,ptr::_long]
@@ -876,7 +858,7 @@ class TXExec {
 
     @Test
     fun p01_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Point = [_int,_int]
         type Event = <
             _int,
@@ -897,7 +879,7 @@ class TXExec {
     }
     @Test
     fun p02_hier_name_err () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [_int] + <(),()>
         var e = Button <.2 _10:_int>:<_int,_int>
         output std e!Common
@@ -906,7 +888,7 @@ class TXExec {
     }
     @Test
     fun p03_hier_name () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [b:_int] + <(),()>
         var e = Button <.2 _10:_int>:<_int,_int>
         output std e!Common
@@ -915,7 +897,7 @@ class TXExec {
     }
     @Test
     fun p04_hier_name () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [b:_int] + <Up=(),Down=()>
         var e = Button <.2 _10:_int>:<[_int],[_int]>
         output std /e
@@ -925,7 +907,7 @@ class TXExec {
     }
     @Test
     fun p05_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [b:_int] + <Up=(),Down=()>
         var e: Button
         set e = Button <.Down [_10:_int]>
@@ -936,7 +918,7 @@ class TXExec {
     }
     @Test
     fun p06_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Point = [_int,_int]
         type Event = <
             Xxx = _int
@@ -957,7 +939,7 @@ class TXExec {
     }
     @Test
     fun p07_type_hier_sub () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = <(),()> -- Up/Down
         var dn: Button.2 = Button.2 ()
         output std /dn
@@ -966,7 +948,7 @@ class TXExec {
     }
     @Test
     fun p07_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = <(),()> -- Up/Down
         var dn: Button.1 = Button.1 ()
         output std /dn
@@ -975,7 +957,7 @@ class TXExec {
     }
     @Test
     fun p08_type_hier_evt () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Point = ()
         type Event = [Point] + <()>
         output std ()
@@ -984,7 +966,7 @@ class TXExec {
     }
     @Test
     fun p14_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
         var h: Hier
         set h = Hier.Bbb.Ccc.Eee [_10:_int]
@@ -998,7 +980,7 @@ class TXExec {
     }
     @Test
     fun p15_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
         var h: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
         output std h!Bbb!Ccc!Eee.1
@@ -1007,7 +989,7 @@ class TXExec {
     }
     @Test
     fun p15_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
         var h: Hier.Aaa = Hier.Bbb.Ccc.Eee [_10:_int]
         output std h!Bbb!Ccc!Eee.1
@@ -1016,7 +998,7 @@ class TXExec {
     }
     @Test
     fun p16_type_hier_cast_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
         var h1: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
         var h2: Hier.Bbb.Ccc = h1 :: Hier.Bbb.Ccc
@@ -1026,7 +1008,7 @@ class TXExec {
     }
     @Test
     fun p17_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [x:_int] + <Aaa=(),Bbb=<Ccc=<Ddd=(),Eee=()>,Fff=()>>
         var h1: Hier.Bbb = Hier.Bbb.Ccc.Eee [_10:_int]
         var h2: Hier.Bbb.Fff = h1 :: Hier.Bbb.Fff
@@ -1039,7 +1021,7 @@ class TXExec {
 
     @Test
     fun p18_stretch_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Point = [x:_int] + <Xxx = ()>
             type Point += <Yyy = ()>
             type Pp = Point
@@ -1053,7 +1035,7 @@ class TXExec {
 
     @Test
     fun todo_pxx_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Event = <
             Frame = _int,
             Draw  = (),
@@ -1117,7 +1099,7 @@ class TXExec {
 
     @Test
     fun q01_return () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Error = <Escape=_int>
             func f: ()->() {
                 output std _1:_int
@@ -1130,7 +1112,7 @@ class TXExec {
     }
     @Test
     fun qxx_return () {
-        val out = test(true, """
+        val out = test(true,true, """
             func f: ()->() {
                 output std _1:_int
                 do {
@@ -1145,7 +1127,7 @@ class TXExec {
     }
     @Test
     fun q02_return () {
-        val out = test(true, """
+        val out = test(true,true, """
             func f: ()->() { @X
                 output std _1:_int
                 do {
@@ -1160,7 +1142,7 @@ class TXExec {
     }
     @Test
     fun q03_return () {
-        val out = test(true, """
+        val out = test(true,true, """
             func f: _int->_int {
                 var ret = _0:_int
                 do { @Y

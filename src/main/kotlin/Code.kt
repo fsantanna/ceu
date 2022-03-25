@@ -640,6 +640,20 @@ fun code_fe (e: Expr) {
     })
 }
 
+fun Stmt.throwExpr (e: String): String {
+    return """
+    {
+        Stack stk = { stack, ${this.self_or_null()}, ${this.localBlockMem()} };
+        block_throw(&stk, $e, task0, ${this.localBlockMem()});
+        assert(stk.block == NULL);
+        if (stk.block == NULL) {
+            return;
+        }
+    }
+    
+    """.trimIndent()
+}
+
 fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
@@ -715,7 +729,7 @@ fun code_fs (s: Stmt) {
             Code(tst.type+true_.type+false_.type, tst.struct+true_.struct+false_.struct, tst.func+true_.func+false_.func, src, "")
         }
         is Stmt.Loop -> CODE.removeFirst().let {
-            Code(it.type, it.struct, it.func, "while (1) { ${it.stmt} }", "")
+            Code(it.type, it.struct, it.func, "while (1) ${it.stmt}", "")
         }
         is Stmt.DLoop -> {
             val block = CODE.removeFirst()
@@ -735,16 +749,6 @@ fun code_fs (s: Stmt) {
                 
             """.trimIndent()
             Code(tsks.type+i.type+block.type, tsks.struct+i.struct+block.struct, tsks.func+i.func+block.func, tsks.stmt+i.stmt+src, "")
-        }
-        is Stmt.XBreak -> {
-            val n = ((s.ups_first { it is Stmt.Loop } as Stmt.Loop).wup as Stmt.Block).n
-            Code("", "", "", "goto _BLOCK_${n}_;\n", "")
-            TODO()
-        }
-        is Stmt.XReturn -> {
-            val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.n
-            Code("", "", "", "goto _BLOCK_${n}_;\n", "")
-            TODO()
         }
         is Stmt.SCall -> CODE.removeFirst().let {
             Code(it.type, it.struct, it.func, it.stmt+it.expr+";\n", "")
@@ -843,6 +847,22 @@ fun code_fs (s: Stmt) {
             val src = s.throwExpr('&' + it.expr)
             Code(it.type, it.struct, it.func, it.stmt+src, "")
         }
+        is Stmt.XBreak -> {
+            //val n = ((s.ups_first { it is Stmt.Loop } as Stmt.Loop).wup as Stmt.Block).n
+            val src = """
+                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=10 };
+                ${s.throwExpr("&_tmp_${s.n}")}    
+            """.trimIndent()
+            Code("", "", "", src, "")
+        }
+        is Stmt.XReturn -> {
+            //val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.n
+            val src = """
+                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=10 };
+                ${s.throwExpr("&_tmp_${s.n}")}    
+            """.trimIndent()
+            Code("", "", "", src, "")
+        }
         is Stmt.Input -> {
             val arg = CODE.removeFirst()
             if (s.dst == null) {
@@ -895,17 +915,20 @@ fun code_fs (s: Stmt) {
                 // CLEANUP
                 
                 ${if (s.catch==null) "" else """
-                    case ${s.n}: {      // ?? catch
-                        int status = task0->status;    
-                        task0->status = TASK_RUNNING;
-                        task1->err = * (CEU_Error*) *xxx.err;
-                        ${catch.stmt}
-                        if (!${catch.expr}) {
-                            task0->status = status;
-                            return;     // NO catch
+                    if (0) {
+                        case ${s.n}: {      // ?? catch
+                            int status = task0->status;    
+                            task0->status = TASK_RUNNING;
+                            task1->err = * (CEU_Error*) *xxx.err;
+                            ${catch.stmt}
+                            if (!${catch.expr}) {
+                                task0->status = status;
+                                return;     // NO catch
+                            }
+                            *xxx.err = NULL;
+                            // OK catch
+                            ${if (s.wup is Stmt.Loop) "break;" else ""} 
                         }
-                        *xxx.err = NULL;
-                        // OK catch
                     }
                 """.trimIndent()}
                 
@@ -952,9 +975,10 @@ fun code_fs (s: Stmt) {
             Code(body.type+catch.type, body.struct+catch.struct, body.func+catch.func, src, "")
         }
     }.let {
+        val name = "\n// "+ s.javaClass.name + "\n"
         val line = if (!LINES) "" else "\n#line ${s.tk.lin} \"CEU\"\n"
         assert(it.expr == "")
-        Code(line+it.type, line+it.struct, line+it.func, line+it.stmt, "")
+        Code(name+line+it.type, name+line+it.struct, name+line+it.func, name+line+it.stmt, "")
     })
 }
 
@@ -976,7 +1000,7 @@ fun Stmt.code (): String {
         #include <string.h>
         
         #define input_std_int(x)     ({ int _x ; scanf("%d",&_x) ; _x ; })
-        #define output_std_Unit_(x)  printf("()")
+        #define output_std_Unit_(x)  (x, printf("()"))
         #define output_std_Unit(x)   (output_std_Unit_(x), puts(""))
         #define output_std_int_(x)   printf("%d",x)
         #define output_std_int(x)    (output_std_int_(x), puts(""))

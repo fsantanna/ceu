@@ -393,7 +393,12 @@ object Parser
             alls.checkFix("task") || alls.checkFix("func") -> {
                 val tk = alls.tk1 as Tk.Fix
                 val tp = this.type() as Type.Func
-                val block = this.block(null)
+                val catch = if (!CE1) null else {
+                    All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
+                        this.expr()
+                    } as Expr
+                }
+                val block = this.block(if (alls.checkFix("catch")) null else catch)
                 Expr.Func(tk, tp, block)
             }
             else -> {
@@ -542,8 +547,7 @@ object Parser
                     )
                 )
             }
-            /*
-            (s.s2 is Stmt.Return) -> {
+            (s.s2 is Stmt.XReturn) -> {
                 All_nest("""
                     {
                         ${blk.body.tostr(true)}
@@ -555,7 +559,6 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-             */
             else -> error("bug found")
         }
     }
@@ -640,6 +643,7 @@ object Parser
     }
 
     fun block (catch: Expr?): Stmt.Block {
+        val c = catch ?: if (alls.acceptFix("catch")) this.expr() else null
         alls.acceptFix_err("{")
         val tk0 = alls.tk0 as Tk.Fix
         val scp1 = if (!alls.acceptVar("Scp")) null else {
@@ -651,7 +655,7 @@ object Parser
         }
         val ss = this.stmts()
         alls.acceptFix_err("}")
-        return Stmt.Block(tk0, catch, scp1, ss)
+        return Stmt.Block(tk0, c, scp1, ss)
     }
     fun stmts (): Stmt {
         fun enseq(s1: Stmt, s2: Stmt): Stmt {
@@ -910,8 +914,13 @@ object Parser
             }
             alls.acceptFix("loop") -> {
                 val tk0 = alls.tk0 as Tk.Fix
-                if (alls.checkFix("{")) {
-                    val block = this.block(null)
+                val catch = if (!CE1) null else {
+                    All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
+                        this.expr()
+                    } as Expr
+                }
+                if (alls.checkFix("catch") || alls.checkFix("{")) {
+                    val block = this.block(if (alls.checkFix("catch")) null else catch)
                     // add additional block to break out w/ goto and cleanup
                     Stmt.Block(
                         block.tk_, null, null,
@@ -924,7 +933,7 @@ object Parser
                     }
                     alls.acceptFix_err("in")
                     val tsks = this.expr()
-                    val block = this.block(null)
+                    val block = this.block(if (alls.checkFix("catch")) null else catch)
                     // add additional block to break out w/ goto and cleanup
                     Stmt.Block(
                         block.tk_, null, null,
@@ -932,11 +941,7 @@ object Parser
                     )
                 }
             }
-            alls.checkFix("{") -> this.block(null)
-            alls.acceptFix("catch") -> {
-                val catch = this.expr()
-                this.block(catch)
-            }
+            alls.checkFix("catch") || alls.checkFix("{") -> this.block(null)
             alls.acceptFix("output") -> {
                 val tk = alls.tk0 as Tk.Fix
                 alls.acceptVar_err("id")
@@ -979,7 +984,10 @@ object Parser
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")
                 val tp = this.type(prefunc=tk) as Type.Func
-                val blk = this.block(null)
+                //val catch = All_nest("(if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0})") { this.expr() } as Expr
+                alls.checkFix_err("{")  // no catch
+                val catch = All_nest("_0") { this.expr() } as Expr
+                val blk = this.block(catch)
                 All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
                     this.stmt()
                 } as Stmt

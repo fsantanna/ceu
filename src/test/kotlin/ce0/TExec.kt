@@ -174,14 +174,22 @@ class TExec {
             set x = [(),()]
             var y: ()
             set y = x.1
-            native _{ output_std_Unit(y); }
+            native _{ output_std_Unit(${D}y); }
         """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
-    fun b02_tuple_idx () {
+    fun todo_b02_tuple_idx () {
         val out = all("""
-            output std ([(),()].1)
+            output std ([(),()].1)  -- TODO: generate (struct T_Unit_Unit_T)
+        """.trimIndent())
+        //assert(out == "(ln 1, col 21): invalid discriminator : unexpected constructor") { out }
+        assert(out == "()\n") { out }
+    }
+    @Test
+    fun b03_union_idx () {
+        val out = all("""
+            output std (<.1>:<(),()>)!1
         """.trimIndent())
         //assert(out == "(ln 1, col 21): invalid discriminator : unexpected constructor") { out }
         assert(out == "()\n") { out }
@@ -604,6 +612,7 @@ class TExec {
         val out = all("""
             var v: <[<()>,()]>
             set v = <.1 [<.1()>:<()>,()]>: <[<()>,()]>
+            err ?! Escape 
             output std v!1.1?1
         """.trimIndent())
         assert(out == "1\n") { out }
@@ -652,6 +661,15 @@ class TExec {
             if x?2 { output std () } else { }
         """.trimIndent())
         assert(out == "()\n") { out }
+    }
+    @Test
+    fun g03_if_expr () {
+        val out = all("""
+            var x: <_int,()>
+            set x = <.2 ()>: <_int,()>
+            output std (if x?1 { x!1 } else { _999:_int })
+        """.trimIndent())
+        assert(out == "999\n") { out }
     }
 
     // LOOP
@@ -1853,7 +1871,7 @@ class TExec {
     }
     @Test
     fun p03_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = <[_int],<<[_int],[_int]>,[_int]>>
         var h: Hier
         set h = Hier.2.1.2 [_10:_int]
@@ -1867,7 +1885,7 @@ class TExec {
     }
     @Test
     fun p04_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = <<[_int,_int,(),_int]>, [_int]> -- Up/Down
         var e: Button
         set e = Button
@@ -1883,7 +1901,7 @@ class TExec {
 
     @Test
     fun q01_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = <_int,_int> -- Up/Down
         var e: Button
         set e = Button <.2 _10:_int>:<_int,_int>
@@ -1893,21 +1911,21 @@ class TExec {
     }
     @Test
     fun q02_type_hier_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         type Button = _int + <(),()> -- ERR: [_int] + ...
        """.trimIndent())
         assert(out == "(ln 1, col 20): expected statement : have \"+\"") { out }
     }
     @Test
     fun q03_type_hier_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         type Button = [_int] + () -- ERR: ... + <...>
        """.trimIndent())
         assert(out == "(ln 1, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun q04_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [_int] + <(),()> -- Up/Down
         var e: Button
         set e = Button <.2 [_10:_int]>:<[_int],[_int]>
@@ -1917,7 +1935,7 @@ class TExec {
     }
     @Test
     fun q05_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [_int]+ <[_int,()]+ <[_int]>, ()> -- Up/Down
         var e: Button
         set e = Button
@@ -1932,7 +1950,7 @@ class TExec {
     }
     @Test
     fun q06_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = [_int] + <(),()> -- Up/Down
         var e: Button
         set e = Button <.2 [_10:_int]>:<[_int],[_int]>
@@ -1943,7 +1961,7 @@ class TExec {
     }
     @Test
     fun q07_type_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         type Button = <(),()> -- Up/Down
         var e: Button
         set e = Button <.2 ()>:<(),()>
@@ -1954,7 +1972,7 @@ class TExec {
     }
     @Test
     fun q08_type_hier () {
-        val out = test(true, """
+        val out = test(true,true, """
         var e: [_int]+<(),()>
         set e = <.2 [_10:_int]>:[_int]+<(),()>
         output std /e
@@ -1964,7 +1982,7 @@ class TExec {
     }
     @Test
     fun q09_type_hier_sub () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Button = <(),()> -- Up/Down
         var dn: Button.2
         set dn = Button.2 ()
@@ -1974,7 +1992,7 @@ class TExec {
     }
     @Test
     fun q10_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         type Button = <(),()> -- Up/Down
         var dn: Button.2
         set dn = Button <.2 ()>:<(),()>
@@ -1984,7 +2002,7 @@ class TExec {
     }
     @Test
     fun q11_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         type Button = <(),()> -- Up/Down
         var dn: Button.2
         set dn = Button.1 ()
@@ -1994,7 +2012,7 @@ class TExec {
     }
     @Test
     fun q12_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [_int] + <(),<(),()>>
         var h: Hier
         set h = Hier.2.2 [_10:_int]
@@ -2004,7 +2022,7 @@ class TExec {
     }
     @Test
     fun q13_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [_int] + <(),<<(),()>,()>>
         var h: Hier
         set h = Hier.2.1.2 [_10:_int]
@@ -2018,7 +2036,7 @@ class TExec {
     }
     @Test
     fun q14_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(true,true, """
         type Hier = [_int] + <(),<<(),()>,()>>
         var h: Hier
         set h = Hier.2.1.2 [_10:_int]
@@ -2032,7 +2050,7 @@ class TExec {
 
     @Test
     fun r01_if_ok () {
-        val out = test(true, """
+        val out = test(true,true, """
         output std if _0 {_999:_int} else {_1:_int}
        """.trimIndent())
         //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
@@ -2041,7 +2059,7 @@ class TExec {
 
     @Test
     fun r01_if_err () {
-        val out = test(true, """
+        val out = test(true,false, """
         var x: ()
         set x = if _0 {()} else {[()]}
         output std x
@@ -2332,7 +2350,7 @@ class TExec {
     }
     @Test
     fun z17_include () {
-        val out = test(true, """
+        val out = test(true,true, """
             ^"test-func.ceu"
             call g ()
         """.trimIndent())

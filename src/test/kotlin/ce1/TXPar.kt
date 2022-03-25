@@ -9,7 +9,7 @@ class TXPar {
 
     @Test
     fun a01_spawn () {
-        val out = test(true, """
+        val out = test(true,true, """
             spawn {
                 output std ()
             }
@@ -22,7 +22,7 @@ class TXPar {
     }
     @Test
     fun a02_spawn_var () {
-        val out = test(true, """
+        val out = test(true,true, """
             var x = ()
             spawn {
                 output std x
@@ -36,7 +36,7 @@ class TXPar {
     }
     @Test
     fun a03_spawn_spawn_var () {
-        val out = test(true, """
+        val out = test(true,true, """
             spawn {
                 var x = ()
                 spawn {
@@ -52,7 +52,7 @@ class TXPar {
     }
     @Test
     fun a04_spawn_spawn_spawn_var () {
-        val out = test(true, """
+        val out = test(true,true, """
             spawn {
                 var x = ()
                 spawn {
@@ -70,7 +70,7 @@ class TXPar {
     }
     @Test
     fun a05_spawn_task () {
-        val out = test(true, """
+        val out = test(true,true, """
             var t = spawn {
                 output std ()
             }
@@ -80,7 +80,7 @@ class TXPar {
     }
     @Test
     fun a6_dollar () {
-        val out = test(true, """
+        val out = test(true,true, """
             spawn {
                 var x: _int
                 set x = _10:_int
@@ -93,7 +93,7 @@ class TXPar {
     }
     @Test
     fun a7_anon () {
-        val out = test(true, """
+        val out = test(true,true, """
             var t = task () -> _int -> () {
                 spawn {
                     set pub = _10
@@ -109,7 +109,7 @@ class TXPar {
 
     @Test
     fun b01_par () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_int>
             spawn {
                 par {
@@ -125,7 +125,7 @@ class TXPar {
     }
     @Test
     fun b02_parand () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 parand {
@@ -145,7 +145,7 @@ class TXPar {
     }
     @Test
     fun b03_paror () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 paror {
@@ -166,7 +166,7 @@ class TXPar {
     }
     @Test
     fun b04_watching () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             spawn {
                 watching evt?3 {
@@ -181,7 +181,7 @@ class TXPar {
     }
     @Test
     fun b05_spawn_every () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 every evt?3 {
@@ -198,7 +198,7 @@ class TXPar {
 
     @Test
     fun c01_clk () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
@@ -221,7 +221,7 @@ class TXPar {
     }
     @Test
     fun c02_clk () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
@@ -245,7 +245,7 @@ class TXPar {
 
     @Test
     fun d01_pause () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,_int,()>
             spawn {
                 pauseif evt?3 {
@@ -269,7 +269,7 @@ class TXPar {
 
     @Test
     fun e01_defer () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 defer {
@@ -285,7 +285,7 @@ class TXPar {
     }
     @Test
     fun e02_defer_block () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,_int>
             spawn {
                 {
@@ -303,7 +303,7 @@ class TXPar {
     }
     @Test
     fun e03_defer_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             defer {
                 output std _2:_int
             }
@@ -315,7 +315,7 @@ class TXPar {
 
     @Test
     fun f01_multi () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t>
             task bbb: () -> () -> _int {
                 output std _111:_int
@@ -334,7 +334,7 @@ class TXPar {
     }
     @Test
     fun f02_multi () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             task fff: () -> () -> () {
                 output std _222:_int
@@ -352,7 +352,7 @@ class TXPar {
     }
     @Test
     fun f03_multi_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             task fff: () -> () -> () {
             }
@@ -362,7 +362,7 @@ class TXPar {
     }
     @Test
     fun f04_multi_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             task fff: () -> () -> () {
                 output std _222:_int
@@ -374,7 +374,7 @@ class TXPar {
     }
     @Test
     fun f05_multi_err () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t,()>
             func fff: () -> () {
                 output std _222:_int
@@ -385,7 +385,7 @@ class TXPar {
     }
     @Test
     fun DO_f06_multi () {
-        val out = test(true, """
+        val out = test(true,true, """
             type Event = <(),_uint64_t>
             task aaa: () -> () -> _int {
                 par {
