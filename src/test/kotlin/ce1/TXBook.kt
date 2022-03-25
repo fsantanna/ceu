@@ -2,7 +2,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 private val nums = """
     type Num = </Num>    
@@ -143,8 +142,8 @@ class TXBook {
 
     @Test
     fun pre_01_nums() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             type Num = </Num>
             var zero: /Num = Null
             var one:   Num = <.1 zero>
@@ -156,8 +155,8 @@ class TXBook {
     }
     @Test
     fun pre_02_add() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -168,8 +167,8 @@ class TXBook {
     }
     @Test
     fun pre_03_clone() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             output std clone two
@@ -179,8 +178,8 @@ class TXBook {
     }
     @Test
     fun pre_04_mul() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -194,8 +193,8 @@ class TXBook {
     }
     @Test
     fun pre_05_lt() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $lt
             output std lt [two, one]
@@ -206,8 +205,8 @@ class TXBook {
     }
     @Test
     fun pre_06_sub() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -219,8 +218,8 @@ class TXBook {
     }
     @Test
     fun pre_07_eq() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $eq
             output std eq [three, two]
@@ -234,8 +233,8 @@ class TXBook {
 
     @Test
     fun ch_01_01_square_pg02() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -251,8 +250,8 @@ class TXBook {
 
     @Test
     fun ch_01_01_smaller_pg02() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $lt
             -- 20
@@ -280,8 +279,8 @@ class TXBook {
 
     @Test
     fun ch_01_02_three_pg05() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             var f_three = func /Num -> /Num {
                 return three
@@ -294,8 +293,8 @@ class TXBook {
     @Disabled // TODO: infinite loop
     @Test
     fun ch_01_02_infinity_pg05() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             var infinity : func () -> /Num
             set infinity = func () -> /Num {
                 output std _10:_int
@@ -311,8 +310,8 @@ class TXBook {
 
     @Test
     fun ch_01_03_multiply_pg09() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -334,8 +333,8 @@ class TXBook {
 
     @Test
     fun ch_01_04_twice_pg11() {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -356,8 +355,8 @@ class TXBook {
 
     @Test
     fun ch_01_05_fact_pg23 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -444,8 +443,8 @@ class TXBook {
 
     @Test
     fun ch_02_01_not_pg30 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             var not = func <(),()> -> <(),()> {
                 if arg?1 {
                     return <.2>
@@ -462,8 +461,8 @@ class TXBook {
 
     @Test
     fun ch_02_01_and_pg30 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             var and = func [$B,$B] -> $B {
                 if arg.1?1 {
                     return <.1>
@@ -481,8 +480,8 @@ class TXBook {
     }
     @Test
     fun ch_02_01_or_pg30 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             var or = func [$B,$B] -> $B {
                 if arg.1?2 {
                     return <.2>
@@ -502,8 +501,8 @@ class TXBook {
     }
     @Test
     fun ch_02_01_eq_neq_pg31 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $not
             $and
             $or
@@ -526,8 +525,8 @@ class TXBook {
 
     @Test
     fun ch_02_01_mod_pg33 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -553,8 +552,8 @@ class TXBook {
     @Disabled   // TODO: too slow
     @Test
     fun ch_02_01_leap_pg33 () {
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add
@@ -594,8 +593,8 @@ class TXBook {
     @Test
     fun ch_02_01_triangles_pg33 () {
         val Tri = "<(),(),(),()>"
-        val out = test(true,true, 
-            """
+        val out = test(
+            true, """
             $nums
             $clone
             $add

@@ -4,28 +4,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
-val prelude0 = """
-        type Event = <(),_uint64_t,_int>
-        type Error = <_int>
-        var eq : func @[] -> [_int,_int] -> _int
-        set eq = func @[] -> [_int,_int] -> _int {
-            var v1: _int
-            set v1 = arg.1
-            var v2: _int
-            set v2 = arg.2
-            set ret = _(${D}v1 == ${D}v2)
-        }
-        var isEscRet : func @[] -> [Error,_int] -> _int
-        set isEscRet = func @[] -> [Error,_int] -> _int {
-            var v1 : Error
-            set v1 = arg.1
-            var v2: _int
-            set v2 = arg.2
-            set ret = if v1~?1 { if eq [v1~!1,v2] {_1:_int} else {_0:_int} } else { _0:_int }
-        }
-
-    """.trimIndent()
-
 val func0 = "call func @[] -> () -> ()"
 fun catch0 (v: Int): String {
     return "catch _(task1->err.tag==1 && task1->err._1==$v)"
@@ -288,7 +266,7 @@ class TExec {
     @Test
     fun d02_f_unit () {
         val out = all("""
-            $prelude0
+            type Error = <_int>
             var f: (func @[]-> () -> ())
             set f = func@[]-> ()->() { ${catch0(1)} { ${throw0(1)} } }
             var x: ()
@@ -676,7 +654,7 @@ class TExec {
     @Test
     fun h01_loop () {
         val out = all("""
-        $prelude0
+        type Error = <_int>
         call func @[]->()->() {
             ${catch0(1)} {
                 loop {
@@ -1870,177 +1848,193 @@ class TExec {
     }
     @Test
     fun p03_type_hier_sub_ok () {
-        val out = test(true,true, """
-        type Hier = <[_int],<<[_int],[_int]>,[_int]>>
-        var h: Hier
-        set h = Hier.2.1.2 [_10:_int]
-        output std h~?2
-        output std h~?2?1
-        output std h~?2?1?1
-        output std h~?2?1?2
-        output std h~!2!1!2.1
-       """.trimIndent())
+        val out = test(true, """
+            type Hier = <[_int],<<[_int],[_int]>,[_int]>>
+            var h: Hier
+            set h = Hier.2.1.2 [_10:_int]
+            output std h~?2
+            output std h~?2?1
+            output std h~?2?1?1
+            output std h~?2?1?2
+            output std h~!2!1!2.1
+           """.trimIndent()
+        )
         assert(out == "1\n1\n0\n1\n10\n") { out }
     }
     @Test
     fun p04_type_hier () {
-        val out = test(true,true, """
-        type Button = <<[_int,_int,(),_int]>, [_int]> -- Up/Down
-        var e: Button
-        set e = Button
-            <.1
+        val out = test(true, """
+            type Button = <<[_int,_int,(),_int]>, [_int]> -- Up/Down
+            var e: Button
+            set e = Button
                 <.1
-                    [_1:_int,_2:_int,(),_4:_int]
-                >: <[_int,_int,(),_int]>
-            >: <<[_int,_int,(),_int]>,[_int]>
-        output std /e
-       """.trimIndent())
+                    <.1
+                        [_1:_int,_2:_int,(),_4:_int]
+                    >: <[_int,_int,(),_int]>
+                >: <<[_int,_int,(),_int]>,[_int]>
+            output std /e
+           """.trimIndent()
+        )
         assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
     }
 
     @Test
     fun q01_type_hier () {
-        val out = test(true,true, """
-        type Button = <_int,_int> -- Up/Down
-        var e: Button
-        set e = Button <.2 _10:_int>:<_int,_int>
-        output std /e
-       """.trimIndent())
+        val out = test(true, """
+            type Button = <_int,_int> -- Up/Down
+            var e: Button
+            set e = Button <.2 _10:_int>:<_int,_int>
+            output std /e
+           """.trimIndent()
+        )
         assert(out == "<.2 10>\n") { out }
     }
     @Test
     fun q02_type_hier_err () {
-        val out = test(true,false, """
-        type Button = _int + <(),()> -- ERR: [_int] + ...
-       """.trimIndent())
+        val out = test(true, """
+            type Button = _int + <(),()> -- ERR: [_int] + ...
+           """.trimIndent()
+        )
         assert(out == "(ln 1, col 20): expected statement : have \"+\"") { out }
     }
     @Test
     fun q03_type_hier_err () {
-        val out = test(true,false, """
-        type Button = [_int] + () -- ERR: ... + <...>
-       """.trimIndent())
+        val out = test(true, """
+            type Button = [_int] + () -- ERR: ... + <...>
+           """.trimIndent()
+        )
         assert(out == "(ln 1, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun q04_type_hier () {
-        val out = test(true,true, """
-        type Button = [_int] + <(),()> -- Up/Down
-        var e: Button
-        set e = Button <.2 [_10:_int]>:<[_int],[_int]>
-        output std /e
-       """.trimIndent())
+        val out = test(true, """
+            type Button = [_int] + <(),()> -- Up/Down
+            var e: Button
+            set e = Button <.2 [_10:_int]>:<[_int],[_int]>
+            output std /e
+           """.trimIndent()
+        )
         assert(out == "<.2 [10]>\n") { out }
     }
     @Test
     fun q05_type_hier () {
-        val out = test(true,true, """
-        type Button = [_int]+ <[_int,()]+ <[_int]>, ()> -- Up/Down
-        var e: Button
-        set e = Button
-            <.1
+        val out = test(true, """
+            type Button = [_int]+ <[_int,()]+ <[_int]>, ()> -- Up/Down
+            var e: Button
+            set e = Button
                 <.1
-                    [_1:_int,_2:_int,(),_4:_int]
-                >: <[_int,_int,(),_int]>
-            >: <<[_int,_int,(),_int]>,[_int]>
-        output std /e
-       """.trimIndent())
+                    <.1
+                        [_1:_int,_2:_int,(),_4:_int]
+                    >: <[_int,_int,(),_int]>
+                >: <<[_int,_int,(),_int]>,[_int]>
+            output std /e
+           """.trimIndent()
+        )
         assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
     }
     @Test
     fun q06_type_hier () {
-        val out = test(true,true, """
-        type Button = [_int] + <(),()> -- Up/Down
-        var e: Button
-        set e = Button <.2 [_10:_int]>:<[_int],[_int]>
-        output std /e
-        output std e~!0.1
-       """.trimIndent())
+        val out = test(true, """
+            type Button = [_int] + <(),()> -- Up/Down
+            var e: Button
+            set e = Button <.2 [_10:_int]>:<[_int],[_int]>
+            output std /e
+            output std e~!0.1
+           """.trimIndent()
+        )
         assert(out == "<.2 [10]>\n10\n") { out }
     }
     @Test
     fun q07_type_err () {
-        val out = test(true,false, """
-        type Button = <(),()> -- Up/Down
-        var e: Button
-        set e = Button <.2 ()>:<(),()>
-        output std /e
-        output std e~!0
-       """.trimIndent())
+        val out = test(true, """
+            type Button = <(),()> -- Up/Down
+            var e: Button
+            set e = Button <.2 ()>:<(),()>
+            output std /e
+            output std e~!0
+           """.trimIndent()
+        )
         assert(out == "(ln 5, col 15): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun q08_type_hier () {
-        val out = test(true,true, """
-        var e: [_int]+<(),()>
-        set e = <.2 [_10:_int]>:[_int]+<(),()>
-        output std /e
-        output std e!0.1
-       """.trimIndent())
+        val out = test(true, """
+            var e: [_int]+<(),()>
+            set e = <.2 [_10:_int]>:[_int]+<(),()>
+            output std /e
+            output std e!0.1
+           """.trimIndent()
+        )
         assert(out == "<.2 [10]>\n10\n") { out }
     }
     @Test
     fun q09_type_hier_sub () {
-        val out = test(true,true, """
-        type Button = <(),()> -- Up/Down
-        var dn: Button.2
-        set dn = Button.2 ()
-        output std /dn
-       """.trimIndent())
+        val out = test(true, """
+            type Button = <(),()> -- Up/Down
+            var dn: Button.2
+            set dn = Button.2 ()
+            output std /dn
+           """.trimIndent()
+        )
         assert(out == "<.2>\n") { out }
     }
     @Test
     fun q10_type_hier_sub_err () {
-        val out = test(true,false, """
-        type Button = <(),()> -- Up/Down
-        var dn: Button.2
-        set dn = Button <.2 ()>:<(),()>
-        output std /dn
-       """.trimIndent())
+        val out = test(true, """
+            type Button = <(),()> -- Up/Down
+            var dn: Button.2
+            set dn = Button <.2 ()>:<(),()>
+            output std /dn
+           """.trimIndent()
+        )
         assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button") { out }
     }
     @Test
     fun q11_type_hier_sub_err () {
-        val out = test(true,false, """
-        type Button = <(),()> -- Up/Down
-        var dn: Button.2
-        set dn = Button.1 ()
-        output std /dn
-       """.trimIndent())
+        val out = test(true, """
+            type Button = <(),()> -- Up/Down
+            var dn: Button.2
+            set dn = Button.1 ()
+            output std /dn
+           """.trimIndent()
+        )
         assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button.1") { out }
     }
     @Test
     fun q12_type_hier_sub_ok () {
-        val out = test(true,true, """
-        type Hier = [_int] + <(),<(),()>>
-        var h: Hier
-        set h = Hier.2.2 [_10:_int]
-        output std h~!0.1
-       """.trimIndent())
+        val out = test(true, """
+            type Hier = [_int] + <(),<(),()>>
+            var h: Hier
+            set h = Hier.2.2 [_10:_int]
+            output std h~!0.1
+           """.trimIndent()
+        )
         assert(out == "10\n") { out }
     }
     @Test
     fun q13_type_hier_sub_ok () {
-        val out = test(true,true, """
-        type Hier = [_int] + <(),<<(),()>,()>>
-        var h: Hier
-        set h = Hier.2.1.2 [_10:_int]
-        output std h~?2
-        output std h~?2?1
-        output std h~?2?1?1
-        output std h~?2?1?2
-        output std h~!2!1!2.1
-       """.trimIndent())
+        val out = test(true, """
+            type Hier = [_int] + <(),<<(),()>,()>>
+            var h: Hier
+            set h = Hier.2.1.2 [_10:_int]
+            output std h~?2
+            output std h~?2?1
+            output std h~?2?1?1
+            output std h~?2?1?2
+            output std h~!2!1!2.1
+           """.trimIndent()
+        )
         assert(out == "1\n1\n0\n1\n10\n") { out }
     }
     @Test
     fun q14_type_hier_sub_err () {
-        val out = test(true,true, """
-        type Hier = [_int] + <(),<<(),()>,()>>
-        var h: Hier
-        set h = Hier.2.1.2 [_10:_int]
-        output std h~?2
-       """.trimIndent())
+        val out = test(true, """
+            type Hier = [_int] + <(),<<(),()>,()>>
+            var h: Hier
+            set h = Hier.2.1.2 [_10:_int]
+            output std h~?2
+           """.trimIndent()
+        )
         //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
         assert(out == "1\n") { out }
     }
@@ -2049,20 +2043,22 @@ class TExec {
 
     @Test
     fun r01_if_ok () {
-        val out = test(true,true, """
-        output std if _0 {_999:_int} else {_1:_int}
-       """.trimIndent())
+        val out = test(true, """
+            output std if _0 {_999:_int} else {_1:_int}
+           """.trimIndent()
+        )
         //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
         assert(out == "1\n") { out }
     }
 
     @Test
     fun r01_if_err () {
-        val out = test(true,false, """
-        var x: ()
-        set x = if _0 {()} else {[()]}
-        output std x
-       """.trimIndent())
+        val out = test(true, """
+            var x: ()
+            set x = if _0 {()} else {[()]}
+            output std x
+           """.trimIndent()
+        )
         //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
         assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
     }
@@ -2092,7 +2088,7 @@ class TExec {
     @Test
     fun z02 () {
         val out = all("""
-        $prelude0
+        type Error = <_int>
         var i: _int; set i = _1: _int
         var n: _int; set n = _0: _int
         $func0 {
@@ -2349,17 +2345,18 @@ class TExec {
     }
     @Test
     fun z17_include () {
-        val out = test(true,true, """
-            ^"test-func.ceu"
-            call g ()
-        """.trimIndent())
+        val out = test(true, """
+                ^"test-func.ceu"
+                call g ()
+            """.trimIndent()
+        )
         assert(out == "()\n") { out }
     }
     @Test
     fun todo_z18_throw () {
         val out = all(
             """
-            $prelude0
+            type Error = <_int>
             var g : func @[]-> () -> ()
             set g = func @[]-> () -> () {
             }

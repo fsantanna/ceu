@@ -196,26 +196,16 @@ fun exec (cmd: String): Pair<Boolean,String> {
 val prelude1 = """
     type Event = <(),_uint64_t>
     type Error = <Escape=_int>
-    func eq: [_int,_int] -> _int {
-        var v1 = arg.1
-        var v2 = arg.2
-        set ret = _(${D}v1 == ${D}v2)
-    }
-    func isEscRet: [Error,_int] -> _int {
-        var v1 = arg.1
-        var v2 = arg.2
-        set ret = if v1?Escape { if eq [v1!Escape,v2] {_1} else {_0} } else { _0 }
-    }
 
 """.trimIndent()
 
-fun test (infer: Boolean, prelude: Boolean, inp: String): String {
+fun test (infer: Boolean, inp: String): String {
     CE1 = infer
     println("prelude: " + (1+prelude1.count { it=='\n' }))
     //val inp2 = if (prelude) prelude1+"call (func ()->() {\n"+inp+"\n}) ()\n" else inp
-    val inp2 = if (prelude) prelude1+inp else inp
+    //val inp2 = if (prelude) prelude1+inp else inp
     //println(inp2)
-    val (ok1,out1) = ce2c(null, inp2)
+    val (ok1,out1) = ce2c(null, inp)
     if (!ok1) {
         return out1
     }

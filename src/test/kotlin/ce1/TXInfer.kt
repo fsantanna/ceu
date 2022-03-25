@@ -1360,19 +1360,19 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             var x: _int
             {
-            var tsk_25: active task @[] -> _int -> () -> _int
-            set tsk_25 = spawn (f @[] (_1: _int))
-            var st_25: _int
-            set st_25 = (tsk_25.status)
-            if (_(${D}st_25 == TASK_AWAITING): _int)
+            var tsk_26: active task @[] -> _int -> () -> _int
+            set tsk_26 = spawn (f @[] (_1: _int))
+            var st_26: _int
+            set st_26 = (tsk_26.status)
+            if (_(${D}st_26 == TASK_AWAITING): _int)
             {
-            await tsk_25
+            await tsk_26
             }
             else
             {
             
             }
-            set x = (tsk_25.ret)
+            set x = (tsk_26.ret)
             }
             output std x
             }

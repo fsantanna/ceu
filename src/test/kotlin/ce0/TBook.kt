@@ -679,7 +679,7 @@ class TBook {
         val Tri = "<(),(),(),()>"
         val out = all(
             """
-            $prelude0
+            type Error = <_int>
             $nums
             $clone
             $add
