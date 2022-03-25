@@ -91,14 +91,16 @@ fun code_ft (tp: Type) {
                         ${tp.out.pos()} ret;
                     };
                 } ${tp.toce()};
-                
+
+                typedef struct {
+                    Block* blks[${tp.xscps.second!!.size}];
+                    ${tp.inp.pos()} arg;
+                } X_PARS_${tp.toce()};
+
                 typedef union {
                     _CEU_Event* evt;
                     void** err;         // double pointer to return if caught or not
-                    struct {
-                        Block* blks[${tp.xscps.second!!.size}];
-                        ${tp.inp.pos()} arg;
-                    } pars;
+                    X_PARS_${tp.toce()}* pars;
                 } X_${tp.toce()};
 
                 typedef void (*F_${tp.toce()}) (Stack*, ${tp.toce()}*, X_${tp.toce()});
@@ -535,10 +537,11 @@ fun code_fe (e: Expr) {
                             frame->task0.links.tsk_up = $task0;
                             task_link(&frame->task0, $task0, $block);
                             frame->task0.status = TASK_UNBORN;
+                            X_PARS_${tpf.toce()} _tmp_${e.n} = { {$blks}, ${arg.expr} };
                             ((F_${tpf.toce()})(frame->task0.f)) (
                                 &stk_${e.n},
                                 frame,
-                                (X_${tpf.toce()}) {.pars={{$blks}, ${arg.expr}}}
+                                (X_${tpf.toce()}) {.pars=&_tmp_${e.n}}
                             );
                             if (stk_${e.n}.block == NULL) {
                                 return;
@@ -591,13 +594,13 @@ fun code_fe (e: Expr) {
                 void func_${e.n} (Stack* stack, struct Func_${e.n}* task2, X_${e.xtype!!.toce()} xxx) {
                     Task* task0 = &task2->task1.task0;
                     ${e.xtype!!.toce()}* task1 = &task2->task1;
-                    ${e.xtype!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars.blks[$i];\n" }.joinToString("")}
+                    ${e.xtype!!.xscps.second!!.mapIndexed { i, _ -> "task1->blks[$i] = xxx.pars->blks[$i];\n" }.joinToString("")}
                     assert(task0->status==TASK_UNBORN || task0->status==TASK_AWAITING || stack->block->catch!=0);
                     switch (task0->pc) {
                         case 0: {                    
                             assert(task0->status == TASK_UNBORN);
                             task0->status = TASK_RUNNING;
-                            task2->task1.arg = xxx.pars.arg;
+                            task2->task1.arg = xxx.pars->arg;
                             ${block.stmt}
                             break;
                         }
