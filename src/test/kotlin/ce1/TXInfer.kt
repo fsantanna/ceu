@@ -1018,7 +1018,7 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==13): _int) {
             output std ()
             if (_0: _int)
             {
@@ -1047,7 +1047,7 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==35): _int) {
             output std ()
             {
             var x: ()
@@ -1088,7 +1088,7 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==52): _int) {
             {
             var y: ()
             set y = ()
@@ -1144,7 +1144,7 @@ class TXInfer {
             set ms_8 = (_1000: _int)
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==14): _int) {
             await ((evt~)?3)
             set ms_8 = (sub @[] [ms_8,((evt~)!3)])
             if (lte @[] [ms_8,(_0: _int)])
@@ -1183,13 +1183,13 @@ class TXInfer {
             spawn ((task @[] -> _ -> _ -> _ {
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==12): _int) {
             {
             var ms_14: _int
             set ms_14 = (_3902020: _int)
             {
             {
-            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10): _int) {
+            loop catch (_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==20): _int) {
             await ((evt~)?3)
             set ms_14 = (sub @[] [ms_14,((evt~)!3)])
             if (lte @[] [ms_14,(_0: _int)])

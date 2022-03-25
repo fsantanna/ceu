@@ -395,7 +395,7 @@ object Parser
                 val tp = this.type() as Type.Func
                 val catch = if (!CE1) null else {
                     //All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
-                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10)") {
+                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
                         this.expr()
                     } as Expr
                 }
@@ -917,7 +917,7 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 val catch = if (!CE1) null else {
                     //All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
-                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10)") {
+                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
                         this.expr()
                     } as Expr
                 }
@@ -987,7 +987,7 @@ object Parser
                 alls.acceptFix_err(":")
                 val tp = this.type(prefunc=tk) as Type.Func
                 alls.checkFix_err("{")  // no catch
-                val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==10)") {
+                val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
                     this.expr()
                 } as Expr
                 val blk = this.block(catch)

@@ -3,6 +3,9 @@
   - can infer from func signature
 - Main.kt: EXPR_WTYPE
 - bugs
+  - Expr.pre stmt
+    - Call, Func, UCons, New, UDisc, New
+    - they all may have stmt called before actual expr
   - Type.Alias.supOf (check scopes)
   - :: check isSupOf
   - atcive currently w/o check scopes (they should be trated as pointers)
@@ -11,6 +14,9 @@
 - List @[...].1 doesnt work
 - command to kill task
 - check pause/resume types
+- abstract types -> cannot be in UCons
+  - Event, Error
+  - otherwise, problem with ?
 - ce1:
   - func f <-- var f = func
     - () -> [() ->] ()

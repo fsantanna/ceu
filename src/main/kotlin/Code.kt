@@ -861,17 +861,17 @@ fun code_fs (s: Stmt) {
             Code(it.type, it.struct, it.func, it.stmt+src, "")
         }
         is Stmt.XBreak -> {
-            //val n = ((s.ups_first { it is Stmt.Loop } as Stmt.Loop).wup as Stmt.Block).n
+            val n = (s.ups_first { it is Stmt.Loop } as Stmt.Loop).block.catch!!.n
             val src = """
-                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=10 };
+                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=$n };
                 ${s.throwExpr("&_tmp_${s.n}")}    
             """.trimIndent()
             Code("", "", "", src, "")
         }
         is Stmt.XReturn -> {
-            //val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.n
+            val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.catch!!.n
             val src = """
-                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=10 };
+                CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=$n };
                 ${s.throwExpr("&_tmp_${s.n}")}    
             """.trimIndent()
             Code("", "", "", src, "")
