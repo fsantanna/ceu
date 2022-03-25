@@ -612,7 +612,6 @@ class TExec {
         val out = all("""
             var v: <[<()>,()]>
             set v = <.1 [<.1()>:<()>,()]>: <[<()>,()]>
-            err ?! Escape 
             output std v!1.1?1
         """.trimIndent())
         assert(out == "1\n") { out }
@@ -2357,7 +2356,7 @@ class TExec {
         assert(out == "()\n") { out }
     }
     @Test
-    fun z18_throw () {
+    fun todo_z18_throw () {
         val out = all(
             """
             $prelude0
@@ -2365,7 +2364,7 @@ class TExec {
             set g = func @[]-> () -> () {
             }
             var f: func @[a1,b1] -> [()] -> ()
-            set f = func @[a1,b1] -> [()] -> () {
+            set f = func @[a1,b1] -> [()] -> () {   // extra [a1,b1] to xxx confuses task->f(.,.,XXX)
                 ${catch0(1)} {
                     call g ()
                     ${throw0(1)}

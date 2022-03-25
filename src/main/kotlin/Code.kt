@@ -625,13 +625,23 @@ fun code_fe (e: Expr) {
             val false_ = CODE.removeFirst()
             val true_  = CODE.removeFirst()
             val tst    = CODE.removeFirst()
-            val src    = "(${tst.expr} ? ${true_.expr} : ${false_.expr})"
+            val stmt   = """
+                ${e.wtype!!.pos()} _tmp_${e.n};
+                if (${tst.expr}) {
+                    ${true_.stmt}
+                    _tmp_${e.n} = ${true_.expr};
+                } else {
+                    ${false_.stmt}
+                    _tmp_${e.n} = ${false_.expr};
+                }
+                
+            """.trimIndent()
             Code (
                 tst.type+true_.type+false_.type,
                 tst.struct+true_.struct+false_.struct,
                 tst.func+true_.func+false_.func,
-                tst.stmt+true_.stmt+false_.stmt,
-                src
+                tst.stmt+stmt,
+                "_tmp_${e.n}"
             )
         }
     }.let {
