@@ -934,7 +934,7 @@ fun code_fs (s: Stmt) {
                             task0->status = TASK_RUNNING;
                             task1->err = * (CEU_Error*) *xxx.err;
                             ${catch.stmt}
-                            if (!${catch.expr}) {
+                            if (!(${catch.expr})) {
                                 task0->status = status;
                                 return;     // NO catch
                             }
