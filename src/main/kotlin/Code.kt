@@ -869,7 +869,9 @@ fun code_fs (s: Stmt) {
             Code("", "", "", src, "")
         }
         is Stmt.XReturn -> {
-            val n = (s.ups_first { it is Expr.Func } as Expr.Func).block.catch!!.n
+            val n = (s.ups_first {
+                it is Expr.Func && !(it.wtype as Type.Func).let { it.inp.nonat_()==null && it.out.nonat_()==null }
+            } as Expr.Func).block.catch!!.n
             val src = """
                 CEU_Error _tmp_${s.n} = { .tag=CEU_ERROR_ESCAPE, .Escape=$n };
                 ${s.throwExpr("&_tmp_${s.n}")}    

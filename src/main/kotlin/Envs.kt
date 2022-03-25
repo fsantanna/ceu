@@ -59,6 +59,9 @@ fun <T> Any.env_first_map (f: (Any)->T): T? {
     return aux (this.getEnv())
 }
 
+fun Type.nonat_ (): Type? {
+    return if (this is Type.Nat && this.tk.str=="_") null else this
+}
 fun Any.env (id: String): Any? {
     // keep types apart from var/block
     val xid = if (id.istype()) id else id.toUpperCase()
@@ -68,9 +71,6 @@ fun Any.env (id: String): Any? {
             (it is Stmt.Var     && it.tk.str.toUpperCase()==xid)         -> it
             (it is Stmt.Block   && (it.scp1?.str==xid || "B"+it.n==xid)) -> it
             (it is Expr.Func) -> {
-                fun Type.nonat_ (): Type? {
-                    return if (this is Type.Nat && this.tk.str=="_") null else this
-                }
                 when {
                     (it.ftp() == null) -> if (id in listOf("arg","pub","ret","evt","err")) true else null
                     (id == "arg") -> it.ftp()!!.inp.nonat_()
