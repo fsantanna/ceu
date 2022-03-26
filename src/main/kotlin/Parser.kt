@@ -402,6 +402,52 @@ object Parser
                 val block = this.block(if (alls.checkFix("catch")) null else catch)
                 Expr.Func(tk, tp, block)
             }
+
+            // CE1
+
+            alls.acceptFix("ifs") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                val tk0 = alls.tk0 as Tk.Fix
+                alls.acceptFix_err("{")
+                val tst1 = this.expr()
+                alls.acceptFix_err("{")
+                val blk1 = this.expr()
+                alls.acceptFix_err("}")
+                val tsts: MutableList<Pair<Expr?,Expr>> = mutableListOf(Pair(tst1,blk1))
+                while (! (alls.checkFix("}") || alls.acceptFix("else")) ) {
+                    val tsti = this.expr()
+                    alls.acceptFix_err("{")
+                    val blki = this.expr()
+                    alls.acceptFix_err("}")
+                    tsts.add(Pair(tsti,blki))
+                }
+                if (alls.tk0.str == "else") {
+                    alls.acceptFix_err("{")
+                    val blk = this.expr()
+                    alls.acceptFix_err("}")
+                    tsts.add(Pair(null,blk))
+                } else {
+                    val blk = All_nest("{ _((assert(0 && \"runtime error : missing \\\"ifs\\\" case\"),0);):_int }") {
+                        alls.acceptFix_err("{")
+                        val blk = this.expr()
+                        alls.acceptFix_err("}")
+                        blk
+                    } as Expr
+                    tsts.add(Pair(null,blk))
+                }
+                alls.acceptFix_err("}")
+
+                fun f (tsts: List<Pair<Expr?,Expr>>): Expr {
+                    val (tst,blk) = tsts.first()
+                    return if (tst == null) {
+                        blk
+                    } else {
+                        Expr.If(tk0, tst, blk, f(tsts.drop(1)))
+                    }
+                }
+                f(tsts) as Expr.If
+            }
+
             else -> {
                 alls.err_expected("expression")
                 error("unreachable")
@@ -954,6 +1000,40 @@ object Parser
 
             // CE1
 
+            alls.acceptFix("ifs") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                val tk0 = alls.tk0 as Tk.Fix
+                alls.acceptFix_err("{")
+                val tst1 = this.expr()
+                val blk1 = this.block(null)
+                val tsts: MutableList<Pair<Expr?,Stmt.Block>> = mutableListOf(Pair(tst1,blk1))
+                while (! (alls.checkFix("}") || alls.acceptFix("else")) ) {
+                    val tsti = this.expr()
+                    val blki = this.block(null)
+                    tsts.add(Pair(tsti,blki))
+                }
+                if (alls.tk0.str == "else") {
+                    val blk = this.block(null)
+                    tsts.add(Pair(null,blk))
+                } else {
+                    val blk = All_nest("{ native _(assert(0 && \"runtime error : missing \\\"ifs\\\" case\");) }") {
+                        this.block(null)
+                    } as Stmt.Block
+                    tsts.add(Pair(null,blk))
+                }
+                alls.acceptFix_err("}")
+
+                fun f (tsts: List<Pair<Expr?,Stmt.Block>>): Stmt {
+                    val (tst,blk) = tsts.first()
+                    return if (tst == null) {
+                        blk
+                    } else {
+                        Stmt.If(tk0, tst, blk, Stmt.Block(tk0, null, null, f(tsts.drop(1))))
+                    }
+                }
+                f(tsts) as Stmt.If
+            }
+
             alls.acceptFix("return") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 if (!alls.checkExpr()) {
@@ -1014,15 +1094,13 @@ object Parser
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val evt = this.event()
                 val blk = this.block(null)
-                All_nest(
-                    """
+                All_nest("""
                     loop {
                         await $evt
                         ${blk.tostr(true)}
                     }
                     
-                """.trimIndent()
-                ) {
+                """.trimIndent()) {
                     this.stmt()
                 } as Stmt
             }

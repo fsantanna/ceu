@@ -1680,4 +1680,83 @@ class TXInfer {
         assert(out == "(ln 1, col 1): invalid \"break\" : no enclosing loop") { out }
     }
 
+    // IFS
+
+    @Test
+    fun g01_ifs_stmt () {
+        val out = all("""
+            ifs {
+                _0 { output std _999:_int }
+                _1 { output std _1:_int   }
+            }
+           """.trimIndent()
+        )
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == """
+            if (_0: _int)
+            {
+            output std (_999: _int)
+            }
+            else
+            {
+            if (_1: _int)
+            {
+            output std (_1: _int)
+            }
+            else
+            {
+            {
+            native _(assert(0 && "runtime error : missing \"ifs\" case");)
+            }
+            }
+            }
+
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun g02_ifs_stmt () {
+        val out = all("""
+            ifs {
+            }
+       """.trimIndent())
+        assert(out == "(ln 2, col 1): expected expression : have \"}\"") { out }
+    }
+    @Test
+    fun g03_ifs_stmt () {
+        val out = all("""
+            ifs {
+                else {}
+            }
+       """.trimIndent())
+        assert(out == "(ln 2, col 5): expected expression : have \"else\"") { out }
+    }
+    @Test
+    fun g04_ifs_expr () {
+        val out = all("""
+            output std ifs {
+                _0:_int { _999:_int }
+                _1:_int { _1:_int   }
+            }
+           """.trimIndent()
+        )
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "output std (if (_0: _int) { (_999: _int)}  else { (if (_1: _int) { (_1: _int)}  else { (_((assert(0 && \"runtime error : missing \\\"ifs\\\" case\"),0);): _int) }) })\n") { out }
+    }
+    @Test
+    fun g05_ifs_expr () {
+        val out = all("""
+            output std ifs {
+            }
+       """.trimIndent())
+        assert(out == "(ln 2, col 1): expected expression : have \"}\"") { out }
+    }
+    @Test
+    fun g06_ifs_expr () {
+        val out = all("""
+            output std ifs {
+                else {}
+            }
+       """.trimIndent())
+        assert(out == "(ln 2, col 5): expected expression : have \"else\"") { out }
+    }
 }

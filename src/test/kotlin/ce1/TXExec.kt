@@ -1313,4 +1313,95 @@ class TXExec {
         """.trimIndent())
         assert(out == "0\n10\n") { out }
     }
+
+    // IFS
+
+    @Test
+    fun r01_if_ok () {
+        val out = test(true, """
+            output std if _0 {_999:_int} else {_1:_int}
+           """.trimIndent()
+        )
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n") { out }
+    }
+
+    @Test
+    fun r02_if_err () {
+        val out = test(true, """
+            var x: ()
+            set x = if _0 {()} else {[()]}
+            output std x
+           """.trimIndent()
+        )
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
+    }
+
+    @Test
+    fun r03_ifs_stmt () {
+        val out = test(true, """
+            ifs {
+                _0 { output std _999:_int }
+                _1 { output std _1:_int   }
+            }
+       """.trimIndent())
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n")
+    }
+    @Test
+    fun r04_ifs_stmt_err () {
+        val out = test(true, """
+            ifs {
+                _0 { output std _999:_int }
+            }
+           """.trimIndent()
+        )
+        assert(out.endsWith("main: Assertion `0 && \"runtime error : missing \\\"ifs\\\" case\"' failed.\n")) { out }
+    }
+    @Test
+    fun r05_ifs_stmt () {
+        val out = test(true, """
+            ifs {
+                _0 { output std _999:_int }
+                else  { output std _1:_int }
+            }
+           """.trimIndent()
+        )
+        assert(out=="1\n") { out }
+    }
+
+    @Test
+    fun r06_ifs_expr () {
+        val out = test(true, """
+            output std ifs {
+                _0 { _999:_int }
+                _1 { _1:_int   }
+            }
+       """.trimIndent())
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n") { out }
+    }
+    @Test
+    fun r07_ifs_expr_err () {
+        val out = test(true, """
+            output std ifs {
+                _0 { _999:_int }
+            }
+           """.trimIndent()
+        )
+        assert(out.endsWith("main: Assertion `0 && \"runtime error : missing \\\"ifs\\\" case\"' failed.\n")) { out }
+    }
+    @Test
+    fun r08_ifs_expr () {
+        val out = test(true, """
+            output std ifs {
+                _0 { _999:_int }
+                else  { _1:_int }
+            }
+           """.trimIndent()
+        )
+        assert(out=="1\n") { out }
+    }
+
 }

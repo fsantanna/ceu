@@ -2063,7 +2063,6 @@ class TExec {
         assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
     }
 
-
     // ALL
 
     @Test
