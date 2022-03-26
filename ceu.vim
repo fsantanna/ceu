@@ -14,8 +14,9 @@ let s:ft = matchstr(&ft, '^\([^.]\)\+')
 
 syn keyword PreProc     await awake break call emit in input
 syn keyword PreProc     new output pause resume return set throw until var
-syn keyword Statement   active catch defer do else every func if loop native par parand
-syn keyword Statement   paror pauseif spawn type task type watching with where
+syn keyword Statement   active catch defer do else every func if ifs loop
+syn keyword Statement   native par parand paror pauseif spawn type task type
+syn keyword Statement   watching with where
 syn keyword Identifier  arg pub ret evt status Event Int Null Common
 syn keyword Function    std pico
 syn keyword Function    not and or

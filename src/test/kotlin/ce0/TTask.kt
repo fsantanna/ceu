@@ -1562,4 +1562,21 @@ class TTask {
         )
         assert(out == "1\n2\n3\n4\n5\n") { out }
     }
+
+    // XXX
+
+    @Test
+    fun xxx_01 () {
+        val out = test(false, """
+            type Error @[] = <_int>
+            spawn ((task @[] -> _ -> _ -> _ {
+                var opt: _int
+                var str: ()
+                set str = (if (_0: _int) { ()}  else { (if opt { ()}  else { () }) })
+                output std ()
+            }) @[] ())
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
+
 }

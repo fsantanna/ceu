@@ -1099,4 +1099,19 @@ class TXTask {
         """.trimIndent())
         assert(out == "()\n()\n") { out }
     }
+
+    // XXX
+
+    @Test
+    fun xxx_01 () {
+        val out = test(true, """
+            type Error = <Escape=_int>
+            spawn {
+                var opt: _int
+                var str = if _1 {()} else { if opt {()} else {()} }
+                output std str
+            }
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 }

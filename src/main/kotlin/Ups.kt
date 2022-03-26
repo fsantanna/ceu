@@ -63,7 +63,7 @@ fun Expr.setUps (up: Any) {
         is Expr.Field -> this.tsk.setUps(this)
         is Expr.UDisc -> this.uni.setUps(this)
         is Expr.UPred -> this.uni.setUps(this)
-        is Expr.If    -> { this.tst.setUps(this) ; this.true_.setUps(this) ; this.false_.setUps(true) }
+        is Expr.If    -> { this.tst.setUps(this) ; this.true_.setUps(this) ; this.false_.setUps(this) }
         is Expr.Call  -> {
             this.f.setUps(this)
             this.arg.setUps(this)

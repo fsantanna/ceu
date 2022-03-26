@@ -1759,4 +1759,15 @@ class TXInfer {
        """.trimIndent())
         assert(out == "(ln 2, col 5): expected expression : have \"else\"") { out }
     }
+    @Test
+    fun h05_ret () {
+        val out = all("""
+            type Error = <Escape=_int>
+            spawn {
+                var opt: _int
+                var str = if _0 {()} else { if opt {()} else {()} }
+            }
+        """.trimIndent())
+        assert(out == "()\n()\n") { out }
+    }
 }
