@@ -1065,7 +1065,7 @@ object Parser
                 alls.acceptVar_err("id")
                 val id = alls.tk0 as Tk.id
                 alls.acceptFix_err(":")
-                val tp = this.type(prefunc=tk) as Type.Func
+                val tp = this.type(prefunc=tk) //as Type.Func
                 alls.checkFix_err("{")  // no catch
                 val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
                     this.expr()

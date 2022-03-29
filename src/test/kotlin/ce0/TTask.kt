@@ -1578,5 +1578,26 @@ class TTask {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
-
+    @Test
+    fun xxx_02 () {
+        val out = test(false, """
+            type Error @[] = <_int>
+            spawn ((task @[] -> _ -> _ -> _ {
+                var x:_int
+                set x = _1:_int
+                spawn ((task @[] -> _ -> _ -> _ {
+                    spawn ((task @[] -> _ -> _ -> _ {
+                        loop {
+                            await _1
+                            set x = _10:_int
+                            output std x
+                        }
+                    }) @[] ())
+                    output std x
+                }) @[] ())
+                output std x
+            }) @[] ())
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 }

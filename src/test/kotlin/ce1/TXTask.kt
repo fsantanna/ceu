@@ -1114,4 +1114,32 @@ class TXTask {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
+    @Test
+    fun xxx_02 () {
+        val out = test(true, """
+            type Pingu = task () -> () -> ()
+            task pingu: Pingu { output std () }
+            spawn pingu ()
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
+    @Test
+    fun xxx_03 () {
+        val out = test(true, """
+            type Error = <Escape=_int>
+            task pingu: ()->()->() {
+                var spd: _int = _0
+                task faller: () -> () -> () {
+                    set spd = _10
+                }
+                --spawn faller ()
+                spawn {
+                    await spawn faller ()
+                }
+                output std spd
+            }
+            spawn pingu ()
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 }

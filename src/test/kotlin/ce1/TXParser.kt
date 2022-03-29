@@ -231,7 +231,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { return }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
-        println(s.dump())
+        //println(s.dump())
         assert(
             (s is Stmt.Set) && ((s.dst as Expr.Var).tk.str == "f") && s.src.let {
                         (it is Expr.Func) && (it.xtype!!.inp is Type.Unit) && it.block.body is Stmt.XReturn
