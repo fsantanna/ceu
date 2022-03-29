@@ -1142,5 +1142,24 @@ class TXTask {
         """.trimIndent())
         assert(out == "10\n") { out }
     }
+    @Test
+    fun xxx_04 () {
+        val out = test(true, """
+            type Error = <Escape=_int>
+            task pingu: ()->()->() {
+                var spd: _int = _0
+                task faller: () -> () -> () {
+                    set spd = _10
+                }
+                --spawn faller ()
+                spawn {
+                    await spawn faller ()
+                }
+                output std spd
+            }
+            spawn pingu ()
+        """.trimIndent())
+        assert(out == "10\n") { out }
+    }
 }
 

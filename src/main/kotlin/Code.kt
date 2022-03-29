@@ -15,8 +15,8 @@ fun Type.pos (): String {
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
-        is Type.Func    -> "struct " + this.toce() + "*"
-        is Type.Active   -> this.tsk.pos()
+        is Type.Func    -> "struct " + this.toce()
+        is Type.Active   -> this.tsk.pos() + "*"
         is Type.Actives  -> "Tasks"
     }
 }
@@ -529,9 +529,9 @@ fun code_fe (e: Expr) {
                                 "if ($len==0 || pool_size((Task*)&$mem)<$len) {"
                             }}
                             Stack stk_${e.n} = { stack, ${e.self_or_null()}, ${e.localBlockMem()} };
-                            ${tpf.toce()}* frame = (${tpf.toce()}*) malloc(${f.expr}->task0.size);
+                            ${tpf.toce()}* frame = (${tpf.toce()}*) malloc(${f.expr}.task0.size);
                             assert(frame!=NULL && "not enough memory");
-                            memcpy(frame, ${f.expr}, ${f.expr}->task0.size);
+                            *frame = *(${tpf.toce()}*) &${f.expr};
                             //${if (upspawn is Stmt.DSpawn) "frame->task0.isauto = 1;" else ""}
                             block_push($block, frame);
                             //frame->task0.links.tsk_up = $task0;
@@ -615,15 +615,14 @@ fun code_fe (e: Expr) {
 
             val task0 = if (e.ups_first { it is Expr.Func } == null) "NULL" else "task0"
             val src = """
-                static Func_${e.n} _frame_${e.n};
-                _frame_${e.n}.task1.task0 = (Task) {
+                Func_${e.n} _tmp_${e.n} = {
                     TASK_UNBORN, {$task0,NULL,NULL,{}}, sizeof(Func_${e.n}), (Task_F)func_${e.n}, 0
                 };
-                static Func_${e.n}* frame_${e.n} = &_frame_${e.n};
+                //static Func_${e.n}* frame_${e.n} = &_frame_${e.n};
     
             """.trimIndent()
 
-            Code(tp.type+type+block.type, tp.struct+block.struct+struct, tp.func+block.func+func, src, "((${e.xtype!!.pos()}) frame_${e.n})")
+            Code(tp.type+type+block.type, tp.struct+block.struct+struct, tp.func+block.func+func, src, "(*(${e.xtype!!.toce()}*)&_tmp_${e.n})")
         }
         is Expr.If -> {
             val false_ = CODE.removeFirst()
