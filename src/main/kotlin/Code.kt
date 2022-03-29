@@ -534,7 +534,7 @@ fun code_fe (e: Expr) {
                             memcpy(frame, ${f.expr}, ${f.expr}->task0.size);
                             //${if (upspawn is Stmt.DSpawn) "frame->task0.isauto = 1;" else ""}
                             block_push($block, frame);
-                            frame->task0.links.tsk_up = $task0;
+                            //frame->task0.links.tsk_up = $task0;
                             task_link(&frame->task0, $task0, $block);
                             frame->task0.status = TASK_UNBORN;
                             X_PARS_${tpf.toce()} _tmp_${e.n} = { {$blks}, ${arg.expr} };
@@ -613,10 +613,11 @@ fun code_fe (e: Expr) {
                 
             """.trimIndent()
 
+            val task0 = if (e.ups_first { it is Expr.Func } == null) "NULL" else "task0"
             val src = """
                 static Func_${e.n} _frame_${e.n};
                 _frame_${e.n}.task1.task0 = (Task) {
-                    TASK_UNBORN, {}, sizeof(Func_${e.n}), (Task_F)func_${e.n}, 0
+                    TASK_UNBORN, {$task0,NULL,NULL,{}}, sizeof(Func_${e.n}), (Task_F)func_${e.n}, 0
                 };
                 static Func_${e.n}* frame_${e.n} = &_frame_${e.n};
     

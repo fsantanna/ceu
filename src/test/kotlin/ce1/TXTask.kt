@@ -1140,6 +1140,7 @@ class TXTask {
             }
             spawn pingu ()
         """.trimIndent())
-        assert(out == "()\n") { out }
+        assert(out == "10\n") { out }
     }
 }
+
