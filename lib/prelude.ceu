@@ -1,3 +1,7 @@
+type Error = <
+    Escape = _int
+>
+
 type Event = <
     Kill  = ()
     Task  = _uint64_t

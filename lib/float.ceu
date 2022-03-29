@@ -6,6 +6,35 @@ func f2int: _float -> _int {
     return arg
 }
 
+-- RELATIONAL
+
+func feq: [_float,_float] -> _int {
+    return _($arg._1 == $arg._2)
+}
+
+func fneq: [_float,_float] -> _int {
+    return _($arg._1 != $arg._2)
+}
+
+func fgt: [_float,_float] -> _int {
+    return _($arg._1 > $arg._2)
+}
+
+func flt: [_float,_float] -> _int {
+    return _($arg._1 < $arg._2)
+}
+
+
+func fgte: [_float,_float] -> _int {
+    return _($arg._1 >= $arg._2)
+}
+
+func flte: [_float,_float] -> _int {
+    return _($arg._1 <= $arg._2)
+}
+
+-- ARITHMETIC
+
 func fadd: [_float,_float] -> _float {
     return _($arg._1 + $arg._2)
 }
