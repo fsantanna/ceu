@@ -16,8 +16,9 @@ fun Type.pos (): String {
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()
-        is Type.Active   -> this.tsk.pos() + "*"
-        is Type.Actives  -> "Tasks"
+        is Type.Active  -> this.tsk.pos() + "*"
+        is Type.Actives -> "Tasks"
+        is Type.Par     -> error("bug found")
     }
 }
 
@@ -55,6 +56,7 @@ val TYPEX = mutableSetOf<String>()
 
 fun code_ft (tp: Type) {
     CODE.addFirst(when (tp) {
+        is Type.Par -> error("bug found")
         is Type.Nat, is Type.Unit, is Type.Named -> Code("","","","","")
         is Type.Pointer -> CODE.removeFirst()
         is Type.Active  -> CODE.removeFirst()

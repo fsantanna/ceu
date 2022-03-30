@@ -33,8 +33,9 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk.str
+        is Type.Par     -> this.tk.str
         is Type.Pointer -> "/" + this.pln.tostr(lc) + this.xscp.let { if (it==null) "" else " @" + it.scp1.str.anon2local() }
-        is Type.Named   -> this.tk.str + this.pak_subs() + this.xscps.let { if (it==null) "" else it.let {
+        is Type.Named   -> this.tk.str + this.pak_subs() + /*" {"+this.args.map { it.tostr(lc) }.joinToString(",") +"}" +*/ this.xscps.let { if (it==null) "" else it.let {
             if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
         }}
         is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"

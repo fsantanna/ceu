@@ -33,7 +33,8 @@ fun Any.ups_first_block (me: Boolean=false): Stmt.Block? {
 fun Type.setUps (up: Any) {
     this.wup = up
     when (this) {
-        is Type.Unit, is Type.Nat, is Type.Named -> {}
+        is Type.Unit, is Type.Nat, is Type.Par -> {}
+        is Type.Named   -> this.args.forEach { it.setUps(this) }
         is Type.Tuple   -> this.vec.forEach { it.setUps(this) }
         is Type.Union   -> { this.common?.setUps(this) ; this.vec.forEach { it.setUps(this) } }
         is Type.Func    -> { this.inp.setUps(this) ; this.pub?.setUps(this) ; this.out.setUps(this) }

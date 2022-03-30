@@ -9,8 +9,9 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
     val MAP: Map<String, String> = scps.zip((1..scps.size).map { 'a'+it-1+"" }).toMap()
     fun Type.aux (): Type {
         return when (this) {
-            is Type.Active, is Type.Actives -> TODO()
-            is Type.Unit, is Type.Nat, is Type.Named -> this
+            is Type.Active, is Type.Actives, is Type.Par -> TODO()
+            is Type.Unit, is Type.Nat -> this
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.aux() }, this.xscps)
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this

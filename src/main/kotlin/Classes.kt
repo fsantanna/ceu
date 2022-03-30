@@ -31,6 +31,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Pointer (val tk_: Tk.Fix, var xscp: Scope?, val pln: Type): Type(tk_, null, null)
     data class Active  (val tk_: Tk.Fix, val tsk: Type): Type(tk_, null, null)
     data class Actives (val tk_: Tk.Fix, val len: Tk.Num?, val tsk: Type): Type(tk_, null, null)
+    data class Par     (val tk_: Tk.id): Type(tk_, null, null)
     data class Func (
         val tk_: Tk.Fix,
         var xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
@@ -40,6 +41,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         val tk_: Tk.Id,
         val subs: List<Tk>,
         var xisrec: Boolean,
+        val args: List<Type>,  // {_int}
         var xscps: List<Scope>?,
     ): Type(tk_, null, null)
 }
@@ -98,10 +100,11 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class DLoop  (val tk_: Tk.Fix, val i: Expr.Var, val tsks: Expr, val block: Block) : Stmt(N++, tk_, null, null)
     data class Block  (val tk_: Tk.Fix, val catch: Expr?, var scp1: Tk.Scp?, val body: Stmt) : Stmt(N++, tk_, null, null)
     data class Typedef (
-        val tk_: Tk.Id,
+        val tk_: Tk.Id,         // List
         val isinc: Boolean,
+        val pars: List<Tk.id>,  // {a}
         var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
-        val type: Type,
+        val type: Type,         // = <...>
         var xtype: Type?,
         var xisact: Boolean
     ) : Stmt(N++, tk_, null, null)

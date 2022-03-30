@@ -7,12 +7,12 @@
 fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     fun Type.aux (): Type {
         return when (this) {
-            is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives -> this
+            is Type.Unit, is Type.Nat, is Type.Active, is Type.Actives, is Type.Par -> this
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
-            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec,
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.aux() },
                 /*listOf(to),*/ this.xscps!!.map{Scope(to,null)})   // TODO: wrong
         }
     }
@@ -450,12 +450,12 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.call.xinfTypes(null)
         }
         is Stmt.Await -> this.e.xinfTypes(Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col)).setUpEnv(this))
-        is Stmt.Throw -> this.e.xinfTypes(Type.Named(Tk.Id("Error", this.tk.lin, this.tk.col), emptyList(), false, emptyList()).setUpEnv(this))
+        is Stmt.Throw -> this.e.xinfTypes(Type.Named(Tk.Id("Error", this.tk.lin, this.tk.col), emptyList(), false, emptyList(), emptyList()).setUpEnv(this))
         is Stmt.Emit  -> {
             if (this.tgt is Expr) {
                 this.tgt.xinfTypes(null)
             }
-            this.e.xinfTypes(Type.Named(Tk.Id("Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList()).setUpEnv(this))
+            this.e.xinfTypes(Type.Named(Tk.Id("Event", this.tk.lin, this.tk.col), emptyList(), false, emptyList(), emptyList()).setUpEnv(this))
         }
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {

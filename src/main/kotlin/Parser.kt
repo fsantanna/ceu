@@ -14,7 +14,24 @@ object Parser
                     alls.acceptFix_err("]")
                     ret
                 }
-                Type.Named(tk0, subs, false, scps?.map { Scope(it,null) })
+                val args = if (alls.hasln || !alls.checkFix("{")) emptyList() else {
+                    val args = mutableListOf<Type>()
+                    alls.acceptFix_err("{")
+                    while (true) {
+                        val tp = Parser.type()
+                        args.add(tp)
+                        if (!alls.acceptFix(",")) {
+                            break
+                        }
+                    }
+                    alls.acceptFix_err("}")
+                    args
+                }
+                Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) })
+            }
+            (alls.acceptVar("id")) -> {
+                val tk0 = alls.tk0 as Tk.id
+                Type.Par(tk0)
             }
             alls.acceptFix("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -859,6 +876,20 @@ object Parser
             alls.acceptFix("type") -> {
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
+
+                val pars = if (!alls.checkFix("{")) emptyList() else {
+                    alls.acceptFix_err("{")
+                    val pars = mutableListOf<Tk.id>()
+                    while (alls.acceptVar("id")) {
+                        pars.add(alls.tk0 as Tk.id)
+                        if (!alls.acceptFix(",")) {
+                            break
+                        }
+                    }
+                    alls.acceptFix_err("}")
+                    pars
+                }
+
                 val scps = if (alls.checkFix("@[")) this.scopepars() else Pair(null, null)
                 (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
                 val isinc = (alls.tk0.str == "+=")
@@ -866,7 +897,7 @@ object Parser
                 if (isinc) {
                     All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
                 }
-                Stmt.Typedef(id, isinc, scps, tp, null, true)
+                Stmt.Typedef(id, isinc, pars, scps, tp, null, true)
             }
             alls.acceptFix("native") -> {
                 val istype = alls.acceptFix("type")

@@ -24,8 +24,9 @@ fun Type.dump (spc: Int = 0): String {
         is Type.Union -> "Union\n" + (if (this.common==null) "" else this.common.dump(spc+4)) + this.vec.map { it.dump(spc+4) }.joinToString("")
         is Type.Active -> "Active\n" + this.tsk.dump(spc+4)
         is Type.Actives -> "Actives\n" + this.tsk.dump(spc+4)
-        is Type.Named -> "Named '" + this.tk.str + this.subs.map { '.'+it.str }.joinToString("") + "'\n"
+        is Type.Named -> "Named '" + this.tk.str + this.subs.map { '.'+it.str }.joinToString("") + "'\n" + this.args.map { it.dump(spc+4) }.joinToString("")
         is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (if (this.pub==null) "" else this.pub?.dump(spc+4)) + this.out.dump(spc+4)
+        is Type.Par -> error("bug found")
     }
 }
 
