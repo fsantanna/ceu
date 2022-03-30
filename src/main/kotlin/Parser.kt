@@ -14,7 +14,7 @@ object Parser
                     alls.acceptFix_err("]")
                     ret
                 }
-                val args = if (alls.hasln || !alls.checkFix("{")) emptyList() else {
+                val args = if (true || alls.hasln || !alls.checkFix("{")) emptyList() else {
                     val args = mutableListOf<Type>()
                     alls.acceptFix_err("{")
                     while (true) {
@@ -877,7 +877,7 @@ object Parser
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
 
-                val pars = if (!alls.checkFix("{")) emptyList() else {
+                val pars = if (true || !alls.checkFix("{")) emptyList() else {
                     alls.acceptFix_err("{")
                     val pars = mutableListOf<Tk.id>()
                     while (alls.acceptVar("id")) {
