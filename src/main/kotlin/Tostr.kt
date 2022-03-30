@@ -18,26 +18,23 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
     fun List<Tk>?.idx (i: Int, c: Char): String {
         return if (this == null) "" else this[i].str+c
     }
-    /*
-    fun Type.Named.pak_subs (): String {
-        return if (this.ups_first { it is Expr.UCons } != null) "" else {
-            this.subs.map { '.' + it.str }.joinToString("")
-        }
-    }
-     */
-    fun Type.Named.pak_subs (): String {
-        return if (!ispak) "" else {
-            this.subs.map { '.' + it.str }.joinToString("")
-        }
-    }
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk.str
         is Type.Par     -> this.tk.str
         is Type.Pointer -> "/" + this.pln.tostr(lc) + this.xscp.let { if (it==null) "" else " @" + it.scp1.str.anon2local() }
-        is Type.Named   -> this.tk.str + this.pak_subs() + /*" {"+this.args.map { it.tostr(lc) }.joinToString(",") +"}" +*/ this.xscps.let { if (it==null) "" else it.let {
-            if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
-        }}
+        is Type.Named   -> {
+            val pak_subs = if (!ispak) "" else {
+                this.subs.map { '.' + it.str }.joinToString("")
+            }
+            val args = if (this.args.size == 0) "" else {
+                " $D{" + this.args.map { it.tostr(lc) }.joinToString(",") + "}"
+            }
+            val scps = this.xscps.let { if (it==null) "" else it.let {
+                if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
+            }}
+            this.tk.str + pak_subs + args + scps
+        }
         is Type.Tuple   -> "[" + this.vec.mapIndexed { i,v -> this.yids.idx(i,':') + v.tostr(lc) }.joinToString(",") + "]"
         is Type.Union   -> {
             val common = if (this.common == null) "" else (this.common.tostr(lc) + " ")

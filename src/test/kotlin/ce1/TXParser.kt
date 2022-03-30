@@ -111,8 +111,8 @@ class TXParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 2): invalid type identifier") { e.message!! }
-            //assert(e.message == "(ln 1, col 2): expected type : have \"xxx\"") { e.message!! }
-            assert(e.message == "(ln 1, col 5): expected \">\" : have \"=\"") { e.message!! }
+            assert(e.message == "(ln 1, col 2): expected type : have \"xxx\"") { e.message!! }
+            //assert(e.message == "(ln 1, col 5): expected \">\" : have \"=\"") { e.message!! }
         }
     }
     @Test

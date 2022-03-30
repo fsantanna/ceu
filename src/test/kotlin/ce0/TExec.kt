@@ -2081,25 +2081,58 @@ class TExec {
         val out = test(true, """
             type Maybe $D{a} @[] = <(), ${D}a>
             var x: Maybe $D{_int}
-            set x = Maybe <.2 _10:_int>: <(),_int>
+            set x = Maybe $D{_int} <.2 _10:_int>: <(),_int>
             output std x~!2
            """.trimIndent()
         )
         assert(out == "10\n") { out }
     }
     @Test
-    fun s02_maybe () {
+    fun s02_maybe_err () {
         val out = test(true, """
             type Maybe $D{a} @[] = <(), ${D}a>
-            var x: Maybe $D{[()]}
-            var y: Maybe $D{()}
-            set x = y -- error
+            var x: Maybe $D{_int}
+            set x = Maybe <.2 _10:_int>: <(),_int>  -- ERR: missing instance
+            output std x~!2
+           """.trimIndent()
+        )
+        assert(out == "ERR\n") { out }
+    }
+    @Test
+    fun s03_maybe_err () {
+        val out = test(true, """
+            type Maybe $D{a} @[] = <(), ${D}a>
+            var x: Maybe $D{_int}
+            set x = Maybe $D{()} <.2 ()>: <(),()>  -- ERR: incompatible instance
+            output std x~!2
+           """.trimIndent()
+        )
+        assert(out == "ERR\n") { out }
+    }
+    @Test
+    fun s04_maybe_err () {
+        val out = test(true, """
+            type Maybe $D{a} @[] = <(), ${D}a>
+            var x: Maybe $D{()}
+            set x = Maybe $D{()} <.2 [()]>: <(),[()]>   -- ERR: incompatible cons
+            output std x~!2
            """.trimIndent()
         )
         assert(out == "ERR") { out }
     }
     @Test
-    fun s03_maybe () {
+    fun s05_maybe_err () {
+        val out = test(true, """
+            type Maybe $D{a} @[] = <(), ${D}a>
+            var x: Maybe $D{[()]}
+            var y: Maybe $D{()}
+            set x = y   -- ERR: incompatible instances
+           """.trimIndent()
+        )
+        assert(out == "(ln 4, col 7): invalid assignment : type mismatch :\n    Maybe $D{[()]}\n    Maybe $D{()}") { out }
+    }
+    @Test
+    fun s06_maybe_concrete () {
         val out = test(true, """
             type Maybe1 @[] = <(), _int>
             type Maybe2 @[] = <(), _int>

@@ -70,7 +70,8 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
             //println(sub.dump())
             (this.tk.str == sub.tk.str) &&
             (this.subs.size <= sub.subs.size) &&
-            this.subs.zip(sub.subs).all { it.first.str==it.second.str }
+            this.subs.zip(sub.subs).all { it.first.str==it.second.str } &&
+            this.args.zip(sub.args).all { it.first.isSupOf(it.second) }
         }
         (this::class != sub::class) -> false
         (this is Type.Unit && sub is Type.Unit) -> true
