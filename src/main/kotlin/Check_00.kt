@@ -6,6 +6,10 @@ fun check_00_after_envs (s: Stmt) {
                 All_assert_tk(tp.tk, def is Stmt.Typedef) {
                     "undeclared type \"${tp.tk.str}\""
                 }
+                def as Stmt.Typedef
+                All_assert_tk(tp.tk, def.pars.size == tp.args.size) {
+                    "invalid type instantiation : parameters mismatch"
+                }
             }
         }
     }

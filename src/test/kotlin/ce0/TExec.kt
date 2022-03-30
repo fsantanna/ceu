@@ -2096,18 +2096,18 @@ class TExec {
             output std x~!2
            """.trimIndent()
         )
-        assert(out == "ERR\n") { out }
+        assert(out == "(ln 3, col 9): invalid type instantiation : parameters mismatch") { out }
     }
     @Test
     fun s03_maybe_err () {
         val out = test(true, """
             type Maybe $D{a} @[] = <(), ${D}a>
-            var x: Maybe $D{_int}
-            set x = Maybe $D{()} <.2 ()>: <(),()>  -- ERR: incompatible instance
+            var x: Maybe $D{()}
+            set x = Maybe $D{[()]} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
             output std x~!2
            """.trimIndent()
         )
-        assert(out == "ERR\n") { out }
+        assert(out == "(ln 3, col 7): invalid assignment : type mismatch :\n    Maybe $D{()}\n    Maybe $D{[()]}") { out }
     }
     @Test
     fun s04_maybe_err () {
@@ -2118,7 +2118,7 @@ class TExec {
             output std x~!2
            """.trimIndent()
         )
-        assert(out == "ERR") { out }
+        assert(out == "(ln 3, col 9): invalid type pack : type mismatch :\n    <(),()>\n    <(),[()]>") { out }
     }
     @Test
     fun s05_maybe_err () {
