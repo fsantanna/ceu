@@ -219,13 +219,15 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
 }
 
 fun Type.Named.def (): Stmt.Typedef? {
-    if (this.xdef == null) {
-        val def = this.env(this.tk.str) as Stmt.Typedef?
-        this.xdef = if (def==null || this.args.size==0) def else {
-            def.instantiate(this.args)
+    val def = this.env(this.tk.str) as Stmt.Typedef?
+    return when {
+        (this.xdef != null) -> this.xdef!!
+        (def==null || this.args.size==0) -> def
+        else -> {
+            this.xdef = def.instantiate(this.args)
+            this.xdef!!
         }
     }
-    return this.xdef!!
 }
 
 fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {

@@ -1179,6 +1179,18 @@ class TXExec {
         assert(out == "<.1 [10]>\n") { out }
     }
     @Test
+    fun p19_nostretch_ok () {
+        val out = test(
+            true, """
+                type Point = <Xxx = [x:_int], Yyy = [x:_int]>
+                type Pp = Point
+                var pt = Point.Xxx [_10]
+                output std /pt
+            """.trimIndent()
+        )
+        assert(out == "<.1 [10]>\n") { out }
+    }
+    @Test
     fun todo_pxx_type_hier () {
         val out = test(
             true, """
@@ -1276,7 +1288,7 @@ class TXExec {
         assert(out == "1\n") { out }
     }
     @Test
-    fun qxx_return () {
+    fun todo_qxx_return () {
         val out = test(true, """
             type Error = <Escape=_int>
             func f: ()->() {
@@ -1292,7 +1304,7 @@ class TXExec {
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
-    fun q02_return () {
+    fun todo_q02_return () {
         val out = test(true, """
             type Error = <Escape=_int>
             func f: ()->() { @X
@@ -1308,7 +1320,7 @@ class TXExec {
         assert(out == "1\n2\n3\n") { out }
     }
     @Test
-    fun q03_return () {
+    fun todo_q03_return () {
         val out = test(true, """
             type Error = <Escape=_int>
             func f: _int->_int {
