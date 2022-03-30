@@ -3,6 +3,7 @@ object Parser
     fun type (preid: Tk.Id?=null, prefunc: Tk.Fix?=null): Type {
         return when {
             (preid!=null || alls.acceptVar("Id")) -> {
+                // preid!=null: <List, ...>, needed b/c of <Cons=List, ...>
                 val tk0 = preid ?: alls.tk0 as Tk.Id
                 val subs = mutableListOf<Tk>()
                 while (alls.acceptFix(".")) {
@@ -14,9 +15,9 @@ object Parser
                     alls.acceptFix_err("]")
                     ret
                 }
-                val args = if (true || alls.hasln || !alls.checkFix("{")) emptyList() else {
+                val args = if (true || alls.hasln || !alls.checkFix("\${")) emptyList() else {
                     val args = mutableListOf<Type>()
-                    alls.acceptFix_err("{")
+                    alls.acceptFix_err("\${")
                     while (true) {
                         val tp = Parser.type()
                         args.add(tp)
@@ -86,7 +87,7 @@ object Parser
                     !hasid -> this.type(null)
                     haseq  -> this.type(null)
                     (id is Tk.id) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
-                    else -> this.type(id as Tk.Id)
+                    else -> TODO() //this.type(id as Tk.Id)
                 }
                 val tps = mutableListOf(tp)
                 val ids = if (haseq) mutableListOf(id) else null
@@ -877,8 +878,8 @@ object Parser
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
 
-                val pars = if (true || !alls.checkFix("{")) emptyList() else {
-                    alls.acceptFix_err("{")
+                val pars = if (true || !alls.checkFix("\${")) emptyList() else {
+                    alls.acceptFix_err("\${")
                     val pars = mutableListOf<Tk.id>()
                     while (alls.acceptVar("id")) {
                         pars.add(alls.tk0 as Tk.id)

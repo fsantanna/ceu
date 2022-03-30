@@ -132,6 +132,7 @@ fun Alls.checkVar (enu: String): Boolean {
         "Id"  -> this.tk1 is Tk.Id
         "ID"  -> this.tk1 is Tk.ID
         "Scp" -> this.tk1 is Tk.Scp
+        "Par" -> this.tk1 is Tk.Par
         "Nat" -> this.tk1 is Tk.Nat
         "Num" -> this.tk1 is Tk.Num
         "Clk" -> this.tk1 is Tk.Clk

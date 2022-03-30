@@ -42,6 +42,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
             is Tk.Id  -> this.copy(lin_ = lin, col_ = col)
             is Tk.ID  -> this.copy(lin_ = lin, col_ = col)
             is Tk.Scp -> this.copy(lin_ = lin, col_ = col)
+            is Tk.Par -> this.copy(lin_ = lin, col_ = col)
             is Tk.Nat -> this.copy(lin_ = lin, col_ = col)
             is Tk.Num -> this.copy(lin_ = lin, col_ = col)
             is Tk.Clk -> this.copy(lin_ = lin, col_ = col)

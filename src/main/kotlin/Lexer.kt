@@ -167,6 +167,26 @@ object Lexer {
                     }
                 }
             }
+            (x1 == '$') -> {
+                all().read().let { c1 = it.first; x1 = it.second }
+                when {
+                    (x1 == '{') -> {
+                        alls.tk1 = Tk.Fix("@{", lin(), col())
+                    }
+                    x1.isLetter() -> {
+                        var pay = ""
+                        do {
+                            pay += x1
+                            all().read().let { c1 = it.first; x1 = it.second }
+                        } while (x1.isLetterOrDigit() || x1 == '_')
+                        all().unread(c1)
+                        alls.tk1 = Tk.Par(pay, lin(), col())
+                    }
+                    else -> {
+                        alls.tk1 = Tk.Err("}", lin(), col())
+                    }
+                }
+            }
             (x1 == '_') -> {
                 var (c2, x2) = all().read()
                 var pay = "_"+x2

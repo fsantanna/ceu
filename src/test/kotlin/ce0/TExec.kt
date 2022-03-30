@@ -2068,9 +2068,15 @@ class TExec {
     @Test
     fun s01_maybe () {
         val out = test(true, """
-            type Maybe {a} @[] = <(), a>
-            var x: Maybe {_int}
+            type Maybe $D{a} @[] = <(), a>
+            var x: Maybe $D{_int}
             set x = <.2 _10:_int>: <(),_int> --: Maybe
+
+            var f: Int2Int
+            set f = Int2Int {
+                set ret = arg
+            } 
+
             output std x~!2
            """.trimIndent()
         )
