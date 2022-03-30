@@ -69,18 +69,6 @@ fun code_ft (tp: Type) {
                 val def1 = tp.env(tp.tk.str) as Stmt.Typedef
                 assert(def1.pars.size > 0)
 
-                fun Type.instantiate (pars: List<Tk.id>, args: List<Type>): Type {
-                    val p2a = pars.zip(args).map {
-                        Pair(it.first.str, it.second)
-                    }.toMap()
-                    return when (this) {
-                        is Type.Unit, is Type.Nat -> this
-                        is Type.Par -> p2a[this.tk.str]!!
-                        is Type.Union -> Type.Union(this.tk_, this.common, this.vec.map { it.instantiate(pars,args) }, this.yids)
-                        else -> TODO(this.toString())
-                    }.clone(this.tk, this)
-                }
-
                 val def2 = Stmt.Typedef(
                     def1.tk_,
                     false,
