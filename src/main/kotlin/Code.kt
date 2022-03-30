@@ -60,7 +60,52 @@ fun code_ft (tp: Type) {
         is Type.Pointer -> CODE.removeFirst()
         is Type.Active  -> CODE.removeFirst()
         is Type.Actives -> CODE.removeFirst()
-        is Type.Func    -> {
+        is Type.Named   -> if (tp.args.size == 0) Code("","","","","") else {
+            val args = tp.args.map { CODE.removeFirst() }.reversed()
+            val types = args.map { it.type }.joinToString("")
+            val structs  = args.map { it.struct  }.joinToString("")
+            val def = Unit.let {
+                //println(tp)
+                val def1 = tp.env(tp.tk.str) as Stmt.Typedef
+                assert(def1.pars.size > 0)
+
+                fun Type.instantiate (pars: List<Tk.id>, args: List<Type>): Type {
+                    val p2a = pars.zip(args).map {
+                        Pair(it.first.str, it.second)
+                    }.toMap()
+                    return when (this) {
+                        is Type.Unit, is Type.Nat -> this
+                        is Type.Par -> p2a[this.tk.str]!!
+                        is Type.Union -> Type.Union(this.tk_, this.common, this.vec.map { it.instantiate(pars,args) }, this.yids)
+                        else -> TODO(this.toString())
+                    }.clone(this.tk, this)
+                }
+
+                val def2 = Stmt.Typedef(
+                    def1.tk_,
+                    false,
+                    emptyList(),
+                    def1.xscp1s,
+                    def1.type,      // ignore, will use xtype
+                    def1.xtype!!.instantiate(def1.pars, tp.args),
+                    false
+                )
+                /*
+                if (TYPEX.contains(def2ce)) {
+                    Code("","", "", "","")
+                } else {
+                    TYPEX.add(ce)
+                    it
+                }
+                 */
+                def2.visit(::code_fs, ::code_fe, ::code_ft, null)
+                //def1.xtype!!.instantiate(def1.pars, tp.args).visit(::code_ft,null)
+                CODE.removeFirst()
+            }
+            Code(types+def.type,structs+def.struct, def.func, "", "")
+            //Code("","","","","")
+        }
+        is Type.Func  -> {
             val out = CODE.removeFirst()
             val pub = if (tp.pub == null) Code("","","","","") else CODE.removeFirst()
             val inp = CODE.removeFirst()
@@ -161,8 +206,7 @@ fun code_ft (tp: Type) {
                 void output_std_${ce} (${tp.pos()}* v);
 
             """.trimIndent()
-
-            val struct = """
+            val struct  = """
                 // Type.Union.struct
                 struct $ce {
                     union {

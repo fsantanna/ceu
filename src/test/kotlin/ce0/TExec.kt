@@ -196,6 +196,17 @@ class TExec {
         """.trimIndent())
         assert(out == "[[1,1],[1,1]]\n") { out }
     }
+    @Test
+    fun b05_tuple_pp () {
+        val out = all("""
+            var n: _int ; set n = _1: _int
+            var x: [[_int,_int],[_int,_int]] ; set x = [[n,n],[n,n]]
+            var y: [_int,[_int,_int]] ; set y = [n,[n,n]]
+            output std /x
+            output std /y
+        """.trimIndent())
+        assert(out == "[[1,1],[1,1]]\n[1,[1,1]]\n") { out }
+    }
 
     // NATIVE
 
