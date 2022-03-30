@@ -71,11 +71,11 @@ object Parser
                     (id is Tk.id) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
                     else -> this.type(id as Tk.Id)
                 }
-                val tps = arrayListOf(tp)
-                val ids = if (haseq) arrayListOf(id) else null
+                val tps = mutableListOf(tp)
+                val ids = if (haseq) mutableListOf(id) else null
 
                 while (true) {
-                    if (!alls.acceptFix(",")) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix(">")) {
                         break
                     }
                     if (haseq) {
@@ -152,12 +152,11 @@ object Parser
                     (id is Tk.id) -> { All_err_tk(id, "unexpected variable identifier"); error("") }
                     else -> this.type(id as Tk.Id)
                 }
-                val tps = arrayListOf(tp)
-                val ids = if (haseq) arrayListOf(id) else null
+                val tps = mutableListOf(tp)
+                val ids = if (haseq) mutableListOf(id) else null
 
                 while (true) {
-                    val hasln = CE1 && alls.hasln
-                    if (!(alls.acceptFix(",") || hasln) || alls.checkFix(">")) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix(">")) {
                         break
                     }
                     if (haseq) {
@@ -369,11 +368,11 @@ object Parser
                 if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
 
                 val e = this.expr(if (hasid && !haseq) (id as Tk.id) else null)
-                val es = arrayListOf(e)
-                val ids = if (haseq) arrayListOf(id as Tk.id) else null
+                val es = mutableListOf(e)
+                val ids = if (haseq) mutableListOf(id as Tk.id) else null
 
                 while (true) {
-                    if (!alls.acceptFix(",")) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix(">")) {
                         break
                     }
                     if (haseq) {

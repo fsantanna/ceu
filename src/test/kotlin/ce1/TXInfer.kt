@@ -1760,7 +1760,7 @@ class TXInfer {
         assert(out == "(ln 2, col 5): expected expression : have \"else\"") { out }
     }
     @Test
-    fun h05_ret () {
+    fun todo_h05_ret () {   // TODO: needs tostring(CE0/CE1)
         val out = all("""
             type Error = <Escape=_int>
             spawn {

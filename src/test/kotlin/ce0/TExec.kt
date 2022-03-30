@@ -2063,6 +2063,20 @@ class TExec {
         assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
     }
 
+    // PARAMETRIC TYPES / GENERICS
+
+    @Test
+    fun s01_maybe () {
+        val out = test(true, """
+            type Maybe {a} @[] = <(), a>
+            var x: Maybe {_int}
+            set x = <.2 _10:_int>: Maybe
+            output std x~!2
+           """.trimIndent()
+        )
+        assert(out == "(ln 1, col 5): invalid \"if\" : type mismatch :\n    ()\n    [()]") { out }
+    }
+
     // ALL
 
     @Test

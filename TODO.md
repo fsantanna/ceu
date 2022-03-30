@@ -177,6 +177,12 @@ var str: String = *"a"
 type Either [a,b] = <Left=a, Right=b>
 var xy: Either [Int,Int] = Either.Left _10
 
+type Maybe a = <None, Some=a>
+var x = Some a
+x?? -> x?Some
+x!! -> x!Some
+var x: _int?
+
 @[a1,a2: a2>a1] -> [/Num@[a1],/Num@a2]
 
 ```
