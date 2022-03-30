@@ -28,7 +28,7 @@ object Parser
                     alls.acceptFix_err("}")
                     args
                 }
-                Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) })
+                Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) }, null)
             }
             (alls.acceptVar("Par")) -> {
                 val tk0 = alls.tk0 as Tk.Par

@@ -58,7 +58,8 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
                 this.subs.map { it.clone() },
                 this.xisrec,
                 this.args.map { it.aux(lin, col) },
-                this.xscps?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) }
+                this.xscps?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) },
+                this.xdef
             )
             is Type.Tuple -> Type.Tuple(
                 this.tk.clone() as Tk.Fix,
@@ -134,7 +135,7 @@ fun Type.react_noalias (up: Expr): Type {
 
 fun Type.unpak (): Type {
     return if (this !is Type.Named) this else {
-        val def = this.env(this.tk.str)!! as Stmt.Typedef
+        val def = this.def()!!
 
         // Original constructor:
         //      typedef Pair @[a] = [/_int@a,/_int@a]
@@ -200,7 +201,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
         is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Union   -> Type.Union(this.tk_, this.common?.mapScps(dofunc,map) as Type.Tuple?, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.mapScps(dofunc, map) },
-                                        this.xscps!!.map { it.idx() })
+                                        this.xscps!!.map { it.idx() }, null)
         is Type.Func -> if (!dofunc) this else {
             Type.Func(
                 this.tk_,
@@ -217,14 +218,35 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
     }
 }
 
-fun Type.instantiate (pars: List<Tk.id>, args: List<Type>): Type {
-    val p2a = pars.zip(args).map {
+fun Type.Named.def (): Stmt.Typedef? {
+    if (this.xdef == null) {
+        val def = this.env(this.tk.str) as Stmt.Typedef?
+        this.xdef = if (def==null || this.args.size==0) def else {
+            def.instantiate(this.args)
+        }
+    }
+    return this.xdef!!
+}
+
+fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
+    val p2a = this.pars.zip(args).map {
         Pair(it.first.str, it.second)
     }.toMap()
-    return when (this) {
-        is Type.Unit, is Type.Nat -> this
-        is Type.Par -> p2a[this.tk.str]!!
-        is Type.Union -> Type.Union(this.tk_, this.common, this.vec.map { it.instantiate(pars,args) }, this.yids)
-        else -> TODO(this.toString())
-    }.clone(this.tk, this)
+    fun Type.aux (): Type {
+        return when (this) {
+            is Type.Unit, is Type.Nat -> this
+            is Type.Par -> p2a[this.tk.str]!!
+            is Type.Union -> Type.Union(this.tk_, this.common, this.vec.map { it.aux() }, this.yids)
+            else -> TODO(this.toString())
+        }.clone(this.tk, this)
+    }
+    return Stmt.Typedef (
+        this.tk_,
+        false,
+        emptyList(),
+        this.xscp1s,
+        this.type,      // ignore, will use xtype
+        this.xtype!!.aux(),
+        false
+    )
 }

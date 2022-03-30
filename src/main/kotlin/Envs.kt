@@ -81,14 +81,16 @@ fun Any.env (id: String): Any? {
                         emptyList(),
                         false,
                         emptyList(),
-                        emptyList()
+                        emptyList(),
+                        null
                     ).clone(it.tk,it).nonat_()
                     (id == "err") -> Type.Named (
                         Tk.Id("Error", it.tk.lin, it.tk.col),
                         emptyList(),
                         false,
                         emptyList(),
-                        emptyList()
+                        emptyList(),
+                        null
                     ).clone(it.tk,it).nonat_()
                     else  -> null
                 }

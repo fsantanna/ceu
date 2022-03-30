@@ -44,6 +44,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         var xisrec: Boolean,
         val args: List<Type>,  // {_int}
         var xscps: List<Scope>?,
+        var xdef: Stmt.Typedef?     // typedef after args instantiation
     ): Type(tk_, null, null)
 }
 

@@ -15,7 +15,7 @@ fun check_02_after_tps (s: Stmt) {
     fun ft (tp: Type) {
         when (tp) {
             is Type.Named -> {
-                val def = tp.env(tp.tk.str) as Stmt.Typedef
+                val def = tp.def()!!
                 val s1 = def.xscp1s.first!!.size
                 val s2 = tp.xscps!!.size
                 All_assert_tk(tp.tk, s1 == s2) {    // xsc1ps may not be available in Check_01

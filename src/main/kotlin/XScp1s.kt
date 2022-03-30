@@ -26,7 +26,7 @@ fun List<Type>.increasing (toinc: Boolean): List<Scope> {
                         isself -> emptyList()              // do not infer inside self declaration (it is inferred there)
                         (tp.xscps != null) -> tp.xscps!!  // just forward existing? (TODO: assert above failed)
                         else -> {
-                            val def = tp.env(tp.tk.str)!! as Stmt.Typedef
+                            val def = tp.def()!!
                             tp.xscps = tp.xscps ?: def.xscp1s.first!!.map {
                                 c += 1  // infer implicit scope incrementally
                                 Scope(Tk.Scp(c + "", tp.tk.lin, tp.tk.col), null)

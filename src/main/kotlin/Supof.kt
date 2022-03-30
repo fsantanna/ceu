@@ -3,7 +3,7 @@
 //      becomes
 // var g: func @[] -> {@a,@b,@c} -> [/</^@a>@a,/</^@b>@b] -> /</^@c>@c
 fun Type.Func.mapLabels (up: Any): Type.Func {
-    val fst = this.xscps.first.let { if (it==null) emptyList() else listOf(it) }
+    val fst = listOf(this.xscps.first)
     val snd = this.xscps.second!!.map { it }
     val scps: List<String> = (fst + snd).map { it.scp1.str }
     val MAP: Map<String, String> = scps.zip((1..scps.size).map { 'a'+it-1+"" }).toMap()
@@ -11,7 +11,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
         return when (this) {
             is Type.Active, is Type.Actives, is Type.Par -> TODO()
             is Type.Unit, is Type.Nat -> this
-            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.aux() }, this.xscps)
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.aux() }, this.xscps, null)
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
