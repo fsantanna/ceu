@@ -171,7 +171,7 @@ object Lexer {
                 all().read().let { c1 = it.first; x1 = it.second }
                 when {
                     (x1 == '{') -> {
-                        alls.tk1 = Tk.Fix("@{", lin(), col())
+                        alls.tk1 = Tk.Fix("\${", lin(), col())
                     }
                     x1.isLetter() -> {
                         var pay = ""

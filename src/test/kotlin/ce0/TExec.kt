@@ -2068,19 +2068,39 @@ class TExec {
     @Test
     fun s01_maybe () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), a>
+            type Maybe $D{a} @[] = <(), ${D}a>
             var x: Maybe $D{_int}
-            set x = <.2 _10:_int>: <(),_int> --: Maybe
-
-            var f: Int2Int
-            set f = Int2Int {
-                set ret = arg
-            } 
-
+            set x = Maybe <.2 _10:_int>: <(),_int>
             output std x~!2
            """.trimIndent()
         )
         assert(out == "10\n") { out }
+    }
+    @Test
+    fun s02_maybe () {
+        val out = test(true, """
+            type Maybe $D{a} @[] = <(), ${D}a>
+            var x: Maybe $D{[()]}
+            var y: Maybe $D{()}
+            set x = y -- error
+           """.trimIndent()
+        )
+        assert(out == "ERR") { out }
+    }
+    @Test
+    fun s03_maybe () {
+        val out = test(true, """
+            type Maybe1 @[] = <(), _int>
+            type Maybe2 @[] = <(), _int>
+            var x: Maybe1
+            set x = Maybe1 <.2 _10:_int>: <(),_int>
+            output std x~!2
+            var y: Maybe2
+            set y = Maybe2 <.2 _10:_int>: <(),_int>
+            output std y~!2
+           """.trimIndent()
+        )
+        assert(out == "10\n10\n") { out }
     }
 
     // ALL

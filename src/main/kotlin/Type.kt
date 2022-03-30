@@ -52,7 +52,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
         return when (this) {
             is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Fix)
             is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
-            is Type.Par -> Type.Par(this.tk.clone() as Tk.id)
+            is Type.Par -> Type.Par(this.tk.clone() as Tk.Par)
             is Type.Named -> Type.Named (
                 this.tk.clone() as Tk.Id,
                 this.subs.map { it.clone() },
@@ -155,12 +155,12 @@ fun Type.toce (): String {
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
         is Type.Named   -> this.tk.str
         is Type.Nat     -> this.tk_.payload().replace('*','_')
+        is Type.Par     -> this.tk.str //.drop(1)
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
         is Type.Active  -> "S_" + this.tsk.toce() + "_S"
         is Type.Actives -> "SS_" + this.tsk.toce() + "_SS"
-        is Type.Par     -> error("bug found")
     }
 }
 

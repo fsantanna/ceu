@@ -27,12 +27,12 @@ sealed class Tk (val str: String, val lin: Int, val col: Int) {
 sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Unit    (val tk_: Tk.Fix): Type(tk_, null, null)
     data class Nat     (val tk_: Tk.Nat): Type(tk_, null, null)
+    data class Par     (val tk_: Tk.Par): Type(tk_, null, null)
     data class Tuple   (val tk_: Tk.Fix, val vec: List<Type>, val yids: List<Tk.id>?): Type(tk_, null, null)
     data class Union   (val tk_: Tk.Fix, val common: Type.Tuple?, val vec: List<Type>, val yids: List<Tk.Id>?): Type(tk_, null, null)
     data class Pointer (val tk_: Tk.Fix, var xscp: Scope?, val pln: Type): Type(tk_, null, null)
     data class Active  (val tk_: Tk.Fix, val tsk: Type): Type(tk_, null, null)
     data class Actives (val tk_: Tk.Fix, val len: Tk.Num?, val tsk: Type): Type(tk_, null, null)
-    data class Par     (val tk_: Tk.id): Type(tk_, null, null)
     data class Func (
         val tk_: Tk.Fix,
         var xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
@@ -106,7 +106,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
         val pars: List<Tk.id>,  // {a}
         var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
         val type: Type,         // = <...>
-        var xtype: Type?,
+        var xtype: Type?,       // because of +=
         var xisact: Boolean
     ) : Stmt(N++, tk_, null, null)
     data class XBreak  (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)

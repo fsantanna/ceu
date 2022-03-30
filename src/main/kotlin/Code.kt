@@ -13,12 +13,12 @@ fun Type.pos (): String {
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
+        is Type.Par     -> this.tk.str //.drop(1)
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()
         is Type.Active  -> this.tsk.pos() + "*"
         is Type.Actives -> "Tasks"
-        is Type.Par     -> error("bug found")
     }
 }
 
@@ -56,8 +56,7 @@ val TYPEX = mutableSetOf<String>()
 
 fun code_ft (tp: Type) {
     CODE.addFirst(when (tp) {
-        is Type.Par -> error("bug found")
-        is Type.Nat, is Type.Unit, is Type.Named -> Code("","","","","")
+        is Type.Nat, is Type.Unit, is Type.Par -> Code("","","","","")
         is Type.Pointer -> CODE.removeFirst()
         is Type.Active  -> CODE.removeFirst()
         is Type.Actives -> CODE.removeFirst()
@@ -113,16 +112,14 @@ fun code_ft (tp: Type) {
         }
         is Type.Tuple -> {
             val ce = tp.toce()
-
-            val type = """
+            val type    = """
                 // Type.Tuple.type
                 struct $ce;
                 void output_std_${ce}_ (${tp.pos()}* v);
                 void output_std_${ce}  (${tp.pos()}* v);
                 
             """.trimIndent()
-
-            val struct = """
+            val struct  = """
                 // Type.Tuple.struct
                 struct $ce {
                     ${tp.vec  // do not filter to keep correct i
@@ -150,16 +147,14 @@ fun code_ft (tp: Type) {
                 }
 
             """.trimIndent()
-
-            val codes = tp.vec.map { CODE.removeFirst() }.reversed()
-            val types = codes.map { it.type }.joinToString("")
-            val structs  = codes.map { it.struct  }.joinToString("")
+            val codes   = tp.vec.map { CODE.removeFirst() }.reversed()
+            val types   = codes.map { it.type }.joinToString("")
+            val structs = codes.map { it.struct  }.joinToString("")
             Code(types+type,structs+struct, "", "", "")
         }
         is Type.Union -> {
             val ce = tp.toce()
-
-            val type = """
+            val type    = """
                 // Type.Union.type
                 struct $ce;
                 void output_std_${ce}_ (${tp.pos()}* v);
@@ -226,11 +221,10 @@ fun code_ft (tp: Type) {
                 }
 
             """.trimIndent()
-
-            val codes = tp.vec.map { CODE.removeFirst() }.reversed()
-            val common = if (tp.common == null) Code("","","","","") else CODE.removeFirst()
-            val types = codes.map { it.type }.joinToString("")
-            val structs  = codes.map { it.struct  }.joinToString("")
+            val codes   = tp.vec.map { CODE.removeFirst() }.reversed()
+            val common  = if (tp.common == null) Code("","","","","") else CODE.removeFirst()
+            val types   = codes.map { it.type }.joinToString("")
+            val structs = codes.map { it.struct }.joinToString("")
             Code(common.type+types+type,common.struct+structs+struct, "", "", "")
         }
     }.let {
@@ -673,30 +667,40 @@ fun code_fs (s: Stmt) {
     CODE.addFirst(when (s) {
         is Stmt.Nop -> Code("", "","","", "")
         is Stmt.Typedef -> {
-            val unddef = """
+            val xtype = s.xtype!!.let { CODE.removeFirst() }
+            val type  = CODE.removeFirst()
+            if (s.pars.size > 0) {
+                Code("", "","","", "")
+            } else {
+                val unddef = """
                 #undef CEU_${s.tk.str}
                 #define CEU_${s.tk.str} CEU_${s.tk.str}_${s.n}
                 
             """.trimIndent()
 
-            val xtype = s.xtype!!.let { CODE.removeFirst() }
-            val type  = CODE.removeFirst()
-            fun Type.defs(pre: String): String {
-                return if (this !is Type.Union || this.yids == null) "" else {
-                    this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
-                        .joinToString("") +
-                            this.vec.mapIndexed { i, sub -> sub.defs(pre + '_' + this.yids[i].str) }
-                                .joinToString("")
+                fun Type.defs(pre: String): String {
+                    return if (this !is Type.Union || this.yids == null) "" else {
+                        this.yids.mapIndexed { i, id -> "#define CEU_${(pre + '_' + id.str).toUpperCase()} ${i + 1}\n" }
+                            .joinToString("") +
+                                this.vec.mapIndexed { i, sub -> sub.defs(pre + '_' + this.yids[i].str) }
+                                    .joinToString("")
+                    }
                 }
-            }
 
-            val src = """
+                val src = """
                 //#define output_std_${s.tk.str}_ output_std_${s.xtype!!.toce()}_
                 //#define output_std_${s.tk.str}  output_std_${s.xtype!!.toce()}
                 typedef ${s.xtype!!.pos()} CEU_${s.tk.str}_${s.n};
                 
             """.trimIndent()
-            Code(unddef+src+type.type+xtype!!.type+s.xtype!!.defs(s.tk.str), unddef+type.struct+xtype.struct, unddef+type.func+xtype.func, "", "")
+                Code(
+                    unddef + src + type.type + xtype!!.type + s.xtype!!.defs(s.tk.str),
+                    unddef + type.struct + xtype.struct,
+                    unddef + type.func + xtype.func,
+                    "",
+                    ""
+                )
+            }
         }
         is Stmt.Native -> if (s.istype) {
             Code("", s.tk_.payload().native(s,s.tk) + "\n", "", "", "")

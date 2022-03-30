@@ -15,7 +15,7 @@ object Parser
                     alls.acceptFix_err("]")
                     ret
                 }
-                val args = if (true || alls.hasln || !alls.checkFix("\${")) emptyList() else {
+                val args = if (alls.hasln || !alls.checkFix("\${")) emptyList() else {
                     val args = mutableListOf<Type>()
                     alls.acceptFix_err("\${")
                     while (true) {
@@ -30,8 +30,8 @@ object Parser
                 }
                 Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) })
             }
-            (alls.acceptVar("id")) -> {
-                val tk0 = alls.tk0 as Tk.id
+            (alls.acceptVar("Par")) -> {
+                val tk0 = alls.tk0 as Tk.Par
                 Type.Par(tk0)
             }
             alls.acceptFix("/") -> {
@@ -878,7 +878,7 @@ object Parser
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
 
-                val pars = if (true || !alls.checkFix("\${")) emptyList() else {
+                val pars = if (!alls.checkFix("\${")) emptyList() else {
                     alls.acceptFix_err("\${")
                     val pars = mutableListOf<Tk.id>()
                     while (alls.acceptVar("id")) {

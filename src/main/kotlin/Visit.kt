@@ -2,7 +2,7 @@ var EXPR_WTYPE = true
 
 fun Type.visit (ft: ((Type) -> Unit)?, fx: ((Any,Scope) -> Unit)?) {
     when (this) {
-        is Type.Unit, is Type.Nat -> {}
+        is Type.Unit, is Type.Nat, is Type.Par -> {}
         is Type.Tuple   -> this.vec.forEach { it.visit(ft,fx) }
         is Type.Union   -> { this.common?.visit(ft,fx) ; this.vec.forEach { it.visit(ft,fx) } }
         is Type.Active  -> this.tsk.visit(ft,fx)
