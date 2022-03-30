@@ -75,7 +75,7 @@ object Parser
                 val ids = if (haseq) mutableListOf(id) else null
 
                 while (true) {
-                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix(">")) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix("]")) {
                         break
                     }
                     if (haseq) {
@@ -372,7 +372,7 @@ object Parser
                 val ids = if (haseq) mutableListOf(id as Tk.id) else null
 
                 while (true) {
-                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix(">")) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix("]")) {
                         break
                     }
                     if (haseq) {

@@ -1178,7 +1178,6 @@ class TXExec {
         )
         assert(out == "<.1 [10]>\n") { out }
     }
-
     @Test
     fun todo_pxx_type_hier () {
         val out = test(
@@ -1241,6 +1240,24 @@ class TXExec {
            """.trimIndent()
         )
         assert(out == "1\n2\n2\n10\n3\n") { out }
+    }
+
+    // NO COMMA
+
+    @Test
+    fun p20_stretch_ok () {
+        val out = test(true, """
+            type Point = [
+                x: _int
+                y: _int
+            ]
+            var pt = Point [
+                _10
+                _20
+            ]
+            output std /pt
+        """.trimIndent())
+        assert(out == "[10,20]\n") { out }
     }
 
     // RETURN
