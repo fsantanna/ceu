@@ -779,45 +779,22 @@ object Parser
             this.expr().tostr(true)
         }
     }
+    fun input (dst: Expr?): Stmt {
+        alls.acceptFix("input")
+        val tk = alls.tk0 as Tk.Fix
+        alls.acceptVar_err("id")
+        val lib = (alls.tk0 as Tk.id)
+        val arg = this.expr()
+        val tp = if (CE1) {
+            if (!alls.acceptFix(":")) null else this.type()
+        } else {
+            alls.acceptFix_err(":")
+            this.type()
+        }
+        return Stmt.Input(tk, tp, dst, lib, arg)
+    }
     fun stmt (): Stmt {
         return when {
-            alls.acceptFix("set") -> {
-                val dst = this.attr().toExpr()
-                alls.acceptFix_err("=")
-                val tk0 = alls.tk0 as Tk.Fix
-                when {
-                    alls.acceptFix("await") -> {
-                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                        alls.acceptFix_err("spawn")
-                        val e = this.expr()
-                        All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                        await_spawn(e, dst)
-                    }
-                    alls.acceptFix("input") -> {
-                        val tk = alls.tk0 as Tk.Fix
-                        alls.acceptVar_err("id")
-                        val lib = (alls.tk0 as Tk.id)
-                        val arg = this.expr()
-                        val tp = if (CE1) {
-                            if (!alls.acceptFix(":")) null else this.type()
-                        } else {
-                            alls.acceptFix_err(":")
-                            this.type()
-                        }
-                        Stmt.Input(tk, tp, dst, lib, arg)
-                    }
-                    alls.checkFix("spawn") -> {
-                        val s = this.stmt()
-                        All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
-                        val ss = s as Stmt.SSpawn
-                        Stmt.SSpawn(ss.tk_, dst, ss.call)
-                    }
-                    else -> {
-                        val src = this.expr()
-                        Stmt.Set(tk0, dst, src)
-                    }
-                }
-            }
             alls.acceptFix("var") -> {
                 alls.acceptVar_err("id")
                 val tk_id = alls.tk0 as Tk.id
@@ -835,14 +812,7 @@ object Parser
                     val tk0 = alls.tk0 as Tk.Fix
                     val dst = Expr.Var(tk_id)
                     val src = when {
-                        alls.acceptFix("input") -> {
-                            val tk = alls.tk0 as Tk.Fix
-                            alls.acceptVar_err("id")
-                            val lib = (alls.tk0 as Tk.id)
-                            val arg = this.expr()
-                            val inp = if (!alls.acceptFix(":")) null else this.type()
-                            Stmt.Input(tk, inp, dst, lib, arg)
-                        }
+                        alls.checkFix("input") -> input(dst)
                         alls.checkFix("spawn") -> {
                             val s = this.stmt()
                             All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
@@ -864,14 +834,32 @@ object Parser
                     Stmt.Seq(tk_id, Stmt.Var(tk_id, tp), src)
                 }
             }
-            alls.acceptFix("input") -> {
-                val tk = alls.tk0 as Tk.Fix
-                alls.acceptVar_err("id")
-                val lib = (alls.tk0 as Tk.id)
-                val arg = this.expr()
-                val tp = if (!alls.acceptFix(":")) null else this.type()
-                Stmt.Input(tk, tp, null, lib, arg)
+            alls.acceptFix("set") -> {
+                val dst = this.attr().toExpr()
+                alls.acceptFix_err("=")
+                val tk0 = alls.tk0 as Tk.Fix
+                when {
+                    alls.acceptFix("await") -> {
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                        alls.acceptFix_err("spawn")
+                        val e = this.expr()
+                        All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
+                        await_spawn(e, dst)
+                    }
+                    alls.checkFix("input") -> input(dst)
+                    alls.checkFix("spawn") -> {
+                        val s = this.stmt()
+                        All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
+                        val ss = s as Stmt.SSpawn
+                        Stmt.SSpawn(ss.tk_, dst, ss.call)
+                    }
+                    else -> {
+                        val src = this.expr()
+                        Stmt.Set(tk0, dst, src)
+                    }
+                }
             }
+            alls.checkFix("input") -> input(null)
             alls.acceptFix("if") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val tst = this.expr()
