@@ -57,6 +57,23 @@ class TExec {
         assert(out == "1\n") { out }
     }
     @Test
+    fun a01_output4 () {
+        val out = all("""
+            native _{
+                void output_2 (struct U_Unit_int_U v) {
+                    switch (v.tag) {
+                        case 1: printf("()\n"); break;
+                        case 2: printf("%d\n", v._2); break;
+                    }
+                }
+            }
+            type Output $D{} @{} = <_,<(),_int>>
+            output Output $D{} @{} <.2 <.1>:<(),_int>>: <_,<(),_int>>
+            output Output $D{} @{} <.2 <.2 _10:_int>:<(),_int>>: <_,<(),_int>>
+        """.trimIndent())
+        assert(out == "()\n10\n") { out }
+    }
+    @Test
     fun a02_var () {
         val out = all("""
             var x: ()

@@ -733,6 +733,17 @@ class TParser {
         //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
         assert(s is Stmt.Output && s.arg.tk.str == "Output")
     }
+    @Test
+    fun c09_parser_stmt_output_err () {
+        All_restart(null, PushbackReader(StringReader("output Std \${} @{} _10"), 2))
+        Lexer.lex()
+        try {
+            Parser.stmts()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 8): expected \"Output\" constructor : have \"Std\"") { e.message!! }
+        }
+    }
 
     @Test
     fun c08_parser_stmt_input() {

@@ -1022,11 +1022,20 @@ object Parser
                 val tk = alls.tk0 as Tk.Fix
                 //alls.acceptVar_err("id")
                 //val lib = (alls.tk0 as Tk.id)
-                val arg = this.expr()
-                All_assert_tk(arg.tk, arg is Expr.Pak) { "expected constructor" }
-                arg as Expr.Pak
-                All_assert_tk(arg.e.tk, arg.e is Expr.UCons) { "expected union constructor" }
-                Stmt.Output(tk, arg)
+                val arg1 = this.expr()
+                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
+                arg1 as Expr.Pak
+                val arg2 = if (arg1.tk.str == "Output") arg1 else {
+                    All_assert_tk(arg1.tk, CE1) {
+                        "expected \"Output\" constructor : have \"${arg1.tk.str}\""
+                    }
+                    val noparens = arg1.tostr().removeSurrounding("(",")")
+                    All_nest("Output.$noparens") {
+                        this.expr()
+                    } as Expr.Pak
+                }
+                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
+                Stmt.Output(tk, arg2)
             }
 
             // CE1

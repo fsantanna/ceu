@@ -6,7 +6,10 @@ import org.junit.jupiter.api.TestMethodOrder
 class TXExec {
     @Test
     fun a01_output () {
-        val out = test(true, "output std ()")
+        val out = test(true, """
+            type Output $D{} @{} = <Std=_>
+            output Std ()
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
