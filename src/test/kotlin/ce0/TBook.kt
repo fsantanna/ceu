@@ -5,23 +5,23 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
 private val nums = """
-    type Num @{s} = </Num @{s} @s>
-    var zero: /(Num @{LOCAL})@LOCAL
-    set zero = Null: /(Num @{LOCAL}) @LOCAL
-    var one: /(Num @{LOCAL})@LOCAL
-    set one = new Num @{LOCAL} <.1 zero>:</Num @{LOCAL} @LOCAL>: @LOCAL
-    var two: /(Num @{LOCAL})@LOCAL
-    set two = new Num @{LOCAL} <.1 one>:</Num @{LOCAL} @LOCAL>: @LOCAL
-    var three: /(Num @{LOCAL})@LOCAL
-    set three = new Num @{LOCAL} <.1 two>:</Num @{LOCAL} @LOCAL>: @LOCAL
-    var four: /(Num @{LOCAL})@LOCAL
-    set four = new Num @{LOCAL} <.1 three>:</Num @{LOCAL} @LOCAL>: @LOCAL
-    var five: /(Num @{LOCAL})@LOCAL
-    set five = new Num @{LOCAL} <.1 four>:</Num @{LOCAL} @LOCAL>: @LOCAL
+    type Num $D{}@{s} = </Num $D{}@{s} @s>
+    var zero: /(Num $D{}@{LOCAL})@LOCAL
+    set zero = Null: /(Num $D{}@{LOCAL}) @LOCAL
+    var one: /(Num $D{}@{LOCAL})@LOCAL
+    set one = new Num $D{}@{LOCAL} <.1 zero>:</Num $D{}@{LOCAL} @LOCAL>: @LOCAL
+    var two: /(Num $D{}@{LOCAL})@LOCAL
+    set two = new Num $D{}@{LOCAL} <.1 one>:</Num $D{}@{LOCAL} @LOCAL>: @LOCAL
+    var three: /(Num $D{}@{LOCAL})@LOCAL
+    set three = new Num $D{}@{LOCAL} <.1 two>:</Num $D{}@{LOCAL} @LOCAL>: @LOCAL
+    var four: /(Num $D{}@{LOCAL})@LOCAL
+    set four = new Num $D{}@{LOCAL} <.1 three>:</Num $D{}@{LOCAL} @LOCAL>: @LOCAL
+    var five: /(Num $D{}@{LOCAL})@LOCAL
+    set five = new Num $D{}@{LOCAL} <.1 four>:</Num $D{}@{LOCAL} @LOCAL>: @LOCAL
 """.trimIndent()
 
 fun Num (ptr: Boolean, scope: String): String {
-    val ret = "Num @{$scope}"
+    val ret = "Num $D{} @{$scope}"
     return if (!ptr) ret else "/"+ret+"@"+scope
 }
 val NumTL  = Num(true,  "LOCAL")
@@ -38,7 +38,7 @@ private val clone = """
         if arg\~?Null {
             set ret = Null:$NumR1
         } else {
-            set ret = new $_NumR1 <.1 clone @{r1,a1} arg\~!1: @r1>:</Num @{r1} @r1>: @r1
+            set ret = new $_NumR1 <.1 clone @{r1,a1} arg\~!1: @r1>:</Num $D{} @{r1} @r1>: @r1
         }
     }
 """.trimIndent()
@@ -53,7 +53,7 @@ private val add = """
         if y\~?Null {
             set ret = clone @{r1,a1} x: @r1
         } else {
-            set ret = new $_NumR1 <.1 add @{r1,a1,b1} [x,y\~!1]: @r1>:</Num @{r1} @r1>: @r1
+            set ret = new $_NumR1 <.1 add @{r1,a1,b1} [x,y\~!1]: @r1>:</Num $D{} @{r1} @r1>: @r1
         }
     }
 """.trimIndent()
@@ -190,13 +190,13 @@ class TBook {
     fun pre_01_nums() {
         val out = all(
             """
-            type Num @{s} = </Num @{s} @s>
-            var zero: /(Num @{LOCAL})@LOCAL
-            set zero = Null: /(Num @{LOCAL}) @LOCAL
-            var one: (Num @{LOCAL})
-            set one = Num @{LOCAL} <.1 zero>:</Num @{LOCAL} @LOCAL>
-            var two: (Num @{LOCAL})
-            set two = Num @{LOCAL} <.1 /one>:</Num @{LOCAL} @LOCAL>
+            type Num $D{}@{s} = </Num $D{}@{s} @s>
+            var zero: /(Num $D{}@{LOCAL})@LOCAL
+            set zero = Null: /(Num $D{}@{LOCAL}) @LOCAL
+            var one: (Num $D{}@{LOCAL})
+            set one = Num $D{}@{LOCAL} <.1 zero>:</Num $D{}@{LOCAL} @LOCAL>
+            var two: (Num $D{}@{LOCAL})
+            set two = Num $D{}@{LOCAL} <.1 /one>:</Num $D{}@{LOCAL} @LOCAL>
             output std /two
         """.trimIndent()
         )
@@ -416,7 +416,7 @@ class TBook {
             var fact: func @{r1,a1}->$NumA1->$NumR1
             set fact = func @{r1,a1}->$NumA1->$NumR1 {
                 if arg\~?Null {
-                    set ret = new $_NumR1 <.1 Null:$NumR1>:</Num @{r1} @r1>: @r1
+                    set ret = new $_NumR1 <.1 Null:$NumR1>:</Num $D{} @{r1} @r1>: @r1
                 } else {
                     var x: $NumTL
                     set x = fact @{LOCAL,a1} arg\~!1
@@ -470,11 +470,11 @@ class TBook {
     val beq = """
         var beq: func @{} -> [$B,$B] -> $B
         set beq = func @{} -> [$B,$B] -> $B {
-            set ret = or [and arg, and [not arg.1, not arg.2]] 
+            set ret = or @{} [and @{} arg, and @{} [not @{} arg.1, not @{} arg.2]] 
         }
         var bneq: func @{} -> [$B,$B] -> $B
         set bneq = func @{} -> [$B,$B] -> $B {
-            set ret = not beq arg 
+            set ret = not @{} beq @{} arg 
         }        
     """.trimIndent()
 
@@ -513,7 +513,7 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = not <.1()>:<(),()>
+            set xxx = not @{} <.1()>:<(),()>
             output std /xxx
         """.trimIndent()
         )
@@ -533,9 +533,9 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = and [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = and @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             output std /xxx
-            set xxx = and [<.2()>:<(),()>,<.2()>:<(),()>]
+            set xxx = and @{} [<.2()>:<(),()>,<.2()>:<(),()>]
             output std /xxx
         """.trimIndent()
         )
@@ -554,11 +554,11 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = or [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = or @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             output std /xxx
-            set xxx = or [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = or @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             output std /xxx
-            set xxx = or [<.1()>:<(),()>,<.1()>:<(),()>]
+            set xxx = or @{} [<.1()>:<(),()>,<.1()>:<(),()>]
             output std /xxx
         """.trimIndent()
         )
@@ -573,20 +573,20 @@ class TBook {
             $or
             var eq: func @{} -> [$B,$B] -> $B
             set eq = func @{} -> [$B,$B] -> $B {
-                set ret = or [and arg, and [not arg.1, not arg.2]] 
+                set ret = or @{} [and @{} arg, and @{} [not @{} arg.1, not @{} arg.2]] 
             }
             var neq: func @{} -> [$B,$B] -> $B
             set neq = func @{} -> [$B,$B] -> $B {
-                set ret = not eq arg 
+                set ret = not @{} eq @{} arg 
             }
             var xxx: <(),()>
-            set xxx = eq [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = eq @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             output std /xxx
-            set xxx = neq [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = neq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             output std /xxx
-            set xxx = eq [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = eq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             output std /xxx
-            set xxx = eq [<.1()>:<(),()>,<.1()>:<(),()>]
+            set xxx = eq @{} [<.1()>:<(),()>,<.1()>:<(),()>]
             output std /xxx
         """.trimIndent()
         )
@@ -675,11 +675,11 @@ class TBook {
     }
 
     @Test
-    fun todo_ch_02_01_triangles_pg33 () {   // TODO: @{a1,b1}
+    fun ch_02_01_triangles_pg33 () {
         val Tri = "<(),(),(),()>"
         val out = all(
             """
-            type Error = <_int>
+            type Error $D{} @{} = <_int>
             $nums
             $clone
             $add
@@ -691,7 +691,7 @@ class TBook {
             $bton
             $ntob
             $or
-            -- 123
+            -- 125
             var analyse: func @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri
             set analyse = func @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri {
                 ${catch0(1)} {
@@ -705,9 +705,9 @@ class TBook {
                         set ret = <.2()>:$Tri
                         ${throw0(1)}
                     } else {}
-                    if bton (or [
-                        ntob (eq @{a1,b1} [arg.1,arg.2]),
-                        ntob (eq @{b1,c1} [arg.2,arg.3])
+                    if bton @{} (or @{} [
+                        ntob @{} (eq @{a1,b1} [arg.1,arg.2]),
+                        ntob @{} (eq @{b1,c1} [arg.2,arg.3])
                     ]) {
                         set ret = <.3()>:$Tri
                         ${throw0(1)}
