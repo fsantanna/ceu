@@ -60,7 +60,7 @@ fun code_ft (tp: Type) {
         is Type.Pointer -> CODE.removeFirst()
         is Type.Active  -> CODE.removeFirst()
         is Type.Actives -> CODE.removeFirst()
-        is Type.Named   -> if (tp.args.size == 0) Code("","","","","") else {
+        is Type.Named   -> if (tp.args!!.size == 0) Code("","","","","") else {
             val args = tp.args.map { CODE.removeFirst() }.reversed()
             val types = args.map { it.type }.joinToString("")
             val structs  = args.map { it.struct  }.joinToString("")

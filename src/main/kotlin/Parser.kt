@@ -10,24 +10,30 @@ object Parser
                     alls.acceptVar("Num") || (CE1 && alls.acceptVar("Id")) || alls.err_expected("field")
                     subs.add(alls.tk0)
                 }
-                val scps = if (!alls.acceptFix("@[")) null else {
-                    val ret = this.scp1s { }
-                    alls.acceptFix_err("}")
-                    ret
-                }
-                val args = if (alls.hasln || !alls.checkFix("\${")) emptyList() else {
+
+                val hasargs = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+                val args = if (!hasargs) null else {
                     val args = mutableListOf<Type>()
-                    alls.acceptFix_err("\${")
-                    while (true) {
-                        val tp = Parser.type()
-                        args.add(tp)
-                        if (!alls.acceptFix(",")) {
-                            break
+                    if (!alls.checkFix("}")) {
+                        while (true) {
+                            val tp = Parser.type()
+                            args.add(tp)
+                            if (!alls.acceptFix(",")) {
+                                break
+                            }
                         }
                     }
                     alls.acceptFix_err("}")
                     args
                 }
+
+                val hasats = if (CE1) alls.acceptFix("@{") else alls.acceptFix_err("@{")
+                val scps = if (!hasats) null else {
+                    val ret = this.scp1s { }
+                    alls.acceptFix_err("}")
+                    ret
+                }
+
                 Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) }, null)
             }
             (alls.acceptVar("Par")) -> {
@@ -43,7 +49,8 @@ object Parser
             (prefunc!=null || alls.acceptFix("func") || alls.acceptFix("task")) -> {
                 val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
-                val (scps, ctrs) = if (alls.checkFix("@{")) {
+                val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")
+                val (scps, ctrs) = if (hasats) {
                     val (x, y) = this.scopepars()
                     alls.acceptFix_err("->")
                     Pair(x, y)
@@ -479,7 +486,8 @@ object Parser
 
         // call
         if (alls.checkExpr() || alls.checkFix("@{")) {
-            val iscps = if (!alls.acceptFix("@{")) null else {
+            val hasats = if (CE1) alls.acceptFix("@{") else alls.acceptFix_err("@{")
+            val iscps = if (!hasats) null else {
                 val ret = this.scp1s { }
                 alls.acceptFix_err("}")
                 ret
@@ -878,20 +886,23 @@ object Parser
                 alls.acceptVar_err("Id")
                 val id = alls.tk0 as Tk.Id
 
-                val pars = if (!alls.checkFix("\${")) emptyList() else {
-                    alls.acceptFix_err("\${")
+                val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+                val pars = if (!haspars) emptyList() else {
                     val pars = mutableListOf<Tk.id>()
-                    while (alls.acceptVar("id")) {
-                        pars.add(alls.tk0 as Tk.id)
-                        if (!alls.acceptFix(",")) {
-                            break
+                    if (!alls.checkFix("}")) {
+                        while (alls.acceptVar("id")) {
+                            pars.add(alls.tk0 as Tk.id)
+                            if (!alls.acceptFix(",")) {
+                                break
+                            }
                         }
                     }
                     alls.acceptFix_err("}")
                     pars
                 }
 
-                val scps = if (alls.checkFix("@{")) this.scopepars() else Pair(null, null)
+                val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")
+                val scps = if (hasats) this.scopepars() else Pair(null, null)
                 (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
                 val isinc = (alls.tk0.str == "+=")
                 val tp = this.type()

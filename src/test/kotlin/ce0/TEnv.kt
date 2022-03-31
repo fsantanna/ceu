@@ -2136,7 +2136,7 @@ class TEnv {
     fun q00 () {
         val out = inp2env(
             """
-            var x: Unit
+            var x: Unit @{}
         """.trimIndent()
         )
         assert(out == "(ln 1, col 8): undeclared type \"Unit\"") { out }

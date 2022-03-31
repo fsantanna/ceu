@@ -15,7 +15,7 @@ fun Type.flattenLeft (): List<Type> {
     // TODO: func/union do not make sense?
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Par -> listOf(this)
-        is Type.Named   -> listOf(this) + this.args.map { it.flattenLeft() }.flatten()
+        is Type.Named   -> listOf(this) + this.args!!.map { it.flattenLeft() }.flatten()
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else it.flattenLeft() } + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
@@ -57,7 +57,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
                 this.tk.clone() as Tk.Id,
                 this.subs.map { it.clone() },
                 this.xisrec,
-                this.args.map { it.aux(lin, col) },
+                this.args!!.map { it.aux(lin, col) },
                 this.xscps?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) },
                 this.xdef
             )
@@ -200,7 +200,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
         is Type.Pointer -> Type.Pointer(this.tk_, this.xscp!!.idx(), this.pln.mapScps(dofunc,map))
         is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
         is Type.Union   -> Type.Union(this.tk_, this.common?.mapScps(dofunc,map) as Type.Tuple?, this.vec.map { it.mapScps(dofunc,map) }, this.yids)
-        is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args.map { it.mapScps(dofunc, map) },
+        is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args!!.map { it.mapScps(dofunc, map) },
                                         this.xscps!!.map { it.idx() }, null)
         is Type.Func -> if (!dofunc) this else {
             Type.Func(
@@ -222,7 +222,7 @@ fun Type.Named.def (): Stmt.Typedef? {
     val def = this.env(this.tk.str) as Stmt.Typedef?
     return when {
         (this.xdef != null) -> this.xdef!!
-        (def==null || this.args.size==0) -> def
+        (def==null || this.args!!.size==0) -> def
         else -> {
             this.xdef = def.instantiate(this.args)
             this.xdef!!

@@ -1,35 +1,37 @@
 # Ceu
 
-`TODO`
+Ceu is a synchronous reactive language that aims to offer a higher-level and
+safer alternative to C and C++.
+Ceu integrates *Structured Concurrency* and *Reactive Programming*, extending
+classical structured programming with two main functionalities:
 
-<!--
-0 - Core
+- Event Handling:
+    - An `await` statement to suspend a line of execution and wait for events.
+    - An `emit`  statement to broadcast events and awake awaiting lines of
+      execution.
+- Concurrency:
+    - A set of structured mechanisms to compose concurrent lines of execution.
 
-`Ce` is a simple language with algebraic data types, pointers, first-class
-functions, and region-based memory management.
-The main goal of `Ce` is to support safe memory management for dynamically
+Ceu also provides algebraic data types, subtyping, local inference, pointers,
+and region-based memory management.
+The goal of regions is to provide safe memory management for dynamically
 allocated data structures.
 
-An allocated data is always attached to a specific block and cannot move.
-When a block terminates, all attached allocations are automatically released.
-This prevents memory leaks.
-A pointer is also attached to a specific block and cannot point to data
-allocated in nested blocks.
-This prevents dangling pointer dereferencing.
-These ideas have been successfully adopted in Cyclone:
-https://cyclone.thelanguage.org/
+Ceu compiles to C and integrates seamlessly with C at the source level.
+Identifiers in C can be accessed with the `_` prefix.
+Ceu types and identifiers can also be accessed from C.
 
-`Ce0` is the most basic core version of `Ce` with no extensions (syntax sugar,
-type inference, etc).
+In summary, Ceu provides structured-reactive concurrency, region-based memory
+management, and source-level integration with C.
 
-See also `Ce1`: https://github.com/fsantanna/ce1
+Ceu is [free software](LICENSE.md).
 
 # INSTALL & RUN
 
 ```
 $ sudo make install
-$ vi x.ce   # output std ()
-$ ce0 x.ce
+$ vi x.ceu   # output std ()
+$ ceu x.ceu
 ()
 $
 ```
@@ -548,8 +550,9 @@ _(1 + 1)     _{2 * (1+1)}
 # 5. SYNTAX
 
 ```
-Stmt ::= { Stmt [`;`] }                             -- sequence                 call f() ; call g()
+Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
       |  `{´ BLOCK Stmt `}´                         -- block                    { @A call f() ; call g() }
+
       |  `var´ VAR `:´ Type                         -- variable declaration     var x: ()
       |  `set´ Expr `=´ (Expr|Stmt)                 -- assignment               set x = _1
       |  `native´ NAT                               -- native                   native _{ printf("hi"); }
@@ -588,74 +591,6 @@ Type ::= `(´ Type `)´                               -- group                  
       |  `func´ [BLOCK] Blocks `->´ Type `->´ Type  -- function                 func f : ()->() { return () }
 
 Blocks ::= `@[´ [BLOCK {`,´ BLOCK}] `]´             -- list of scopes           @[@LOCAL,@a1]
+
+BLOCK ::= @ [A-Za-z] [A-Za-z0-9_]*                  -- block identifier         @B1 @x
 ```
-
-# A. Memory Management
-
-`Ce` relies on the concept of hierarchical blocks to manage memory.
-`Ce` guarantees that the scope and lifetime of a given piece of data
-coincide and are always attached to a single fixed block.
-The scope refers to the visibility of the data, i.e., the ability to
-refer to it directly or indirectly through identifiers or pointers.
-The lifetime refers to the memory allocation, i.e., the period in
-which the data remains in memory.
-When the scope and lifetime coincide, access to memory is always safe,
-and programs prevent memory leaks and dangling pointer dereferencing.
-
-In the next example, a variable `x` that holds an integer is attached
-to an explicit block:
-
-```
-{
-    var x: _int     -- scope and lifetime of `x` is attached to enclosing block
-}
--- `x` is no longer in memory (lifetime), but neither can be referred (scope)
-```
-
-A pointer in `Ce` must statically specify a block, which restricts the data
-it can point to.
-A pointer can only point to data that is attached to a block that lives at
-least the same as the block specified in the pointer.
-`Ce` verifies that the pointer assignments respect this rule at compile time:
-
-```
-{ @A
-    var ptrA: /_int @A          -- `ptrA` is restricted to @A
-    { @B
-        var x: _int             -- `x` is attached to @B
-        var ptrB: /_int @B      -- `ptrB` is restricted to @B
-        { @C
-            var ptrC: /_int @C  -- `ptrC` is restricted to @C
-            set ptrA = /x       -- ERROR: `ptrA` lives longer than @B 
-            set ptrB = /x       -- OK: `ptrB` lives the same as @B
-            set ptrC = /x       -- OK: `ptrC` lives shorter than @B
-            ... ptrC\ ...       -- OK: dereference ok
-        }
-        ... ptrB\ ...           -- OK: dereference ok
-    }
-    ... ptrA\ ...               -- ERROR: dangling dereference if error was not detected  
-}
-```
-
-Just like with pointers, a dynamic allocation operation with `new` must also
-statically specify a block to which the data becomes attached.
-The operation returns a pointer with the same block of the allocation.
-`Ce` verifies if the same rules for pointer assignments apply to dynamic data:
-
-```
-{ @A
-    -- cannot assign `x` to any pointer with blocks outside @B
-    { @B
-        var x: /</^@A>@A
-        set x = new <.1 <.0>:T1>:T2: @A  -- newly allocated data is attached to @A
-                                         -- (T1 & T2 are the ommited types of the constructors)                                         
-        { @C
-            -- can assign `x` to any pointer with blocks inside @B
-        }
-    }
-}
-```
-
-`TODO: functions, calls, closures`
-
--->
