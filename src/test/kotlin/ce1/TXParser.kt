@@ -229,7 +229,7 @@ class TXParser {
 
     @Test
     fun c13_parser_func() {
-        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { return }"), 2))
+        All_restart(null, PushbackReader(StringReader("set f = func @{} -> () -> () { return }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         //println(s.dump())
@@ -242,7 +242,7 @@ class TXParser {
 
     @Test
     fun c15_parser_func() {
-        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { return }"), 2))
+        All_restart(null, PushbackReader(StringReader("set f = func @{} -> () -> () { return }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(

@@ -249,7 +249,7 @@ class TXBook {
             $lt
             -- 20
             -- returns narrower scope, guarantees both alive
-            var smaller = func @[a1,a2: a2>a1] -> [/Num@[a1],/Num@a2] -> /Num@a2 {
+            var smaller = func @{a1,a2: a2>a1} -> [/Num@{a1},/Num@a2] -> /Num@a2 {
                 if lt arg {
                     return arg.1
                 } else {

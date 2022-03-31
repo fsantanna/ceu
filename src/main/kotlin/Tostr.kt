@@ -31,7 +31,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
                 " $D{" + this.args.map { it.tostr(lc) }.joinToString(",") + "}"
             }
             val scps = this.xscps.let { if (it==null) "" else it.let {
-                if (it.size == 0) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]"
+                if (it.size == 0) "" else " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}"
             }}
             this.tk.str + pak_subs + args + scps
         }
@@ -47,7 +47,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }
                     .joinToString(",")
             }
-            val scps = this.xscps.second.let { if (it==null) "" else "@[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "] -> " }
+            val scps = this.xscps.second.let { if (it==null) "" else "@{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "} -> " }
             this.tk.str + " " + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
         }
     }.let {
@@ -92,7 +92,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
         is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk.str + ")"
         is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.str.anon2local() } + ")"
         is Expr.Call -> {
-            val inps = this.xscps.first.let { if (it==null) "" else " @[" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "]" }
+            val inps = this.xscps.first.let { if (it==null) "" else " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}" }
             val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.str.anon2local() }
             "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
         }
@@ -142,7 +142,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Throw -> "throw " + this.e.tostr(lc) + "\n"
         is Stmt.DLoop -> "loop " + this.i.tostr(lc) + " in " + this.tsks.tostr(lc) + " " + this.block.tostr(lc)
         is Stmt.Typedef -> {
-            val scps = this.xscp1s.first.let { if (it == null) "" else " @[" + this.xscp1s.first!!.map { it.str }.joinToString(",") + "]" }
+            val scps = this.xscp1s.first.let { if (it == null) "" else " @{" + this.xscp1s.first!!.map { it.str }.joinToString(",") + "}" }
             val op = if (this.isinc) " += " else " = "
             "type " + this.tk.str + scps + op + this.type.tostr(lc) + "\n"
         }

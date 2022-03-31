@@ -156,12 +156,12 @@ class TLexer {
     }
     @Test
     fun c04_scope () {
-        All_restart(null, PushbackReader(StringReader("@[]"), 2))
+        All_restart(null, PushbackReader(StringReader("@{}"), 2))
         Lexer.lex()
         //println(alls.tk1)
         //assert(alls.tk1.enu==TK.XSCPCST && (alls.tk1 as Tk.Scp1).lbl=="" && (alls.tk1 as Tk.Scp1).num==null)
         //assert(alls.tk1.enu==TK.ERR && (alls.tk1 as Tk.Err).err=="@")
-        assert(alls.tk1.str=="@[")
+        assert(alls.tk1.str=="@{")
     }
 
     // WCLOCK

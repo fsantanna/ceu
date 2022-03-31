@@ -69,7 +69,7 @@ class TParser {
 
     @Test
     fun a06_parser_type_func() {
-        All_restart(null, PushbackReader(StringReader("func @[] -> () -> ()"), 2))
+        All_restart(null, PushbackReader(StringReader("func @{} -> () -> ()"), 2))
         Lexer.lex()
         val tp = Parser.type()
         assert(tp is Type.Func && tp.inp is Type.Unit && tp.out is Type.Unit)
@@ -695,7 +695,7 @@ class TParser {
 
     @Test
     fun c07_parser_stmt_call() {
-        All_restart(null, PushbackReader(StringReader("call _printf:func@[]->()->() ()"), 2))
+        All_restart(null, PushbackReader(StringReader("call _printf:func@{}->()->() ()"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(s is Stmt.SCall && s.e.f is Expr.Nat && s.e.arg is Expr.Unit)
@@ -732,7 +732,7 @@ class TParser {
 
     @Test
     fun c08_parser_stmt_seq() {
-        All_restart(null, PushbackReader(StringReader("call f() ; call _printf:func@[]->()->() (); call g()"), 2))
+        All_restart(null, PushbackReader(StringReader("call f() ; call _printf:func@{}->()->() (); call g()"), 2))
         Lexer.lex()
         val s = Parser.stmts()
         assert(
@@ -823,7 +823,7 @@ class TParser {
 
     @Test
     fun c13_parser_func() {
-        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { }"), 2))
+        All_restart(null, PushbackReader(StringReader("set f = func @{} -> () -> () { }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(
@@ -846,7 +846,7 @@ class TParser {
 
     @Test
     fun c15_parser_func() {
-        All_restart(null, PushbackReader(StringReader("set f = func @[] -> () -> () { }"), 2))
+        All_restart(null, PushbackReader(StringReader("set f = func @{} -> () -> () { }"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(
@@ -1015,7 +1015,7 @@ class TParser {
 
     @Test
     fun noclo_d10_tassk() {
-        All_restart(null, PushbackReader(StringReader("active {} task @[]->()->()->()"), 2))
+        All_restart(null, PushbackReader(StringReader("active {} task @{}->()->()->()"), 2))
         Lexer.lex()
         val tp = Parser.type()
         assert(tp is Type.Actives && tp.tsk.tk.str == "task" && (tp.tsk as Type.Func).xscps.first.scp1.str == "LOCAL")

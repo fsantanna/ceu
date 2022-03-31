@@ -12,7 +12,7 @@ object Parser
                 }
                 val scps = if (!alls.acceptFix("@[")) null else {
                     val ret = this.scp1s { }
-                    alls.acceptFix_err("]")
+                    alls.acceptFix_err("}")
                     ret
                 }
                 val args = if (alls.hasln || !alls.checkFix("\${")) emptyList() else {
@@ -43,7 +43,7 @@ object Parser
             (prefunc!=null || alls.acceptFix("func") || alls.acceptFix("task")) -> {
                 val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
-                val (scps, ctrs) = if (alls.checkFix("@[")) {
+                val (scps, ctrs) = if (alls.checkFix("@{")) {
                     val (x, y) = this.scopepars()
                     alls.acceptFix_err("->")
                     Pair(x, y)
@@ -227,7 +227,7 @@ object Parser
         return scps
     }
     fun scopepars (): Pair<List<Tk.Scp>, List<Pair<String, String>>> {
-        alls.acceptFix_err("@[")
+        alls.acceptFix_err("@{")
         val scps = this.scp1s {
             All_assert_tk(it, it.str.none { it.isUpperCase() }) { "invalid scope parameter identifier" }
         }
@@ -244,7 +244,7 @@ object Parser
                 }
             }
         }
-        alls.acceptFix_err("]")
+        alls.acceptFix_err("}")
         return Pair(scps, ctrs)
     }
 
@@ -478,10 +478,10 @@ object Parser
         }
 
         // call
-        if (alls.checkExpr() || alls.checkFix("@[")) {
-            val iscps = if (!alls.acceptFix("@[")) null else {
+        if (alls.checkExpr() || alls.checkFix("@{")) {
+            val iscps = if (!alls.acceptFix("@{")) null else {
                 val ret = this.scp1s { }
-                alls.acceptFix_err("]")
+                alls.acceptFix_err("}")
                 ret
             }
             val arg = this.expr()
@@ -891,7 +891,7 @@ object Parser
                     pars
                 }
 
-                val scps = if (alls.checkFix("@[")) this.scopepars() else Pair(null, null)
+                val scps = if (alls.checkFix("@{")) this.scopepars() else Pair(null, null)
                 (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
                 val isinc = (alls.tk0.str == "+=")
                 val tp = this.type()

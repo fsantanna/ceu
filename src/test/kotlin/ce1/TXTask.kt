@@ -81,7 +81,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_int>
-            var f = task @[]->()->()->() {
+            var f = task @{}->()->()->() {
                 {
                     var x = _10:_int
                     await evt?2
@@ -105,14 +105,14 @@ class TXTask {
             var f : task ()->()->()
             var x : active task [()]->()->() = spawn f ()
         """.trimIndent())
-        assert(out == "(ln 2, col 36): invalid `spawn` : type mismatch :\n    active task @[] -> [()] -> () -> ()\n    active task @[] -> () -> () -> ()") { out }
+        assert(out == "(ln 2, col 36): invalid `spawn` : type mismatch :\n    active task @{} -> [()] -> () -> ()\n    active task @{} -> () -> () -> ()") { out }
     }
     @Test
     fun a05_args () {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_int>
-            var f = task @[]->_(char*)->()->() {
+            var f = task @{}->_(char*)->()->() {
                 output std arg
                 await evt?2
                 output std evt!2
@@ -170,7 +170,7 @@ class TXTask {
             }
             var x = spawn f ()
             
-            var g = task @[]->()->()->() {
+            var g = task @{}->()->()->() {
                 await evt?3
                 var e1 = evt!3
                 output std _(${D}e1+10):_int
@@ -464,8 +464,8 @@ class TXTask {
                     await evt?1
                     output std _1:_int
                 }
-                var xfg : active task @[]->()->()->()
-                var xh : active task @[]->()->()->()
+                var xfg : active task @{}->()->()->()
+                var xh : active task @{}->()->()->()
                 catch err?Xxx {
                     set xfg = spawn fg ()
                     set xh = spawn h ()
@@ -530,7 +530,7 @@ class TXTask {
     fun e01_spawn () {
         val out = test(true, """
             type Error = <Escape=_int>
-            spawn task @[]->()->()->() {
+            spawn task @{}->()->()->() {
                 output std ()
             } ()
         """.trimIndent())
@@ -546,7 +546,7 @@ class TXTask {
                 spawn f () in fs
             """.trimIndent()
         )
-        //assert(out == "(ln 3, col 7): invalid `spawn` : type mismatch : expected task : have func @[] -> () -> ()") { out }
+        //assert(out == "(ln 3, col 7): invalid `spawn` : type mismatch : expected task : have func @{} -> () -> ()") { out }
         assert(out == "(ln 3, col 7): invalid spawn : expected task") { out }
     }
     @Test
@@ -568,7 +568,7 @@ class TXTask {
                 spawn f () in fs
             """.trimIndent()
         )
-        assert(out == "(ln 3, col 1): invalid `spawn` : type mismatch :\n    task @[] -> [()] -> () -> ()\n    task @[] -> () -> () -> ()") { out }
+        assert(out == "(ln 3, col 1): invalid `spawn` : type mismatch :\n    task @{} -> [()] -> () -> ()\n    task @{} -> () -> () -> ()") { out }
     }
     @Test
     fun e02_spawn_free () {
@@ -602,7 +602,7 @@ class TXTask {
                 }
             }
         """.trimIndent())
-        assert(out == "(ln 5, col 10): invalid `loop` : type mismatch : expected task type : have task @[] -> () -> _int -> ()") { out }
+        assert(out == "(ln 5, col 10): invalid `loop` : type mismatch : expected task type : have task @{} -> () -> _int -> ()") { out }
 
     }
     @Test
@@ -616,7 +616,7 @@ class TXTask {
                 }
             }
         """.trimIndent())
-        assert(out == "(ln 5, col 5): invalid `loop` : type mismatch :\n    active task @[] -> () -> _int -> ()\n    active {} task @[] -> [()] -> _int -> ()") { out }
+        assert(out == "(ln 5, col 5): invalid `loop` : type mismatch :\n    active task @{} -> () -> _int -> ()\n    active {} task @{} -> [()] -> _int -> ()") { out }
 
     }
     @Test
@@ -866,7 +866,7 @@ class TXTask {
             type Error = <Escape=_int>
             type Event = <()>
             type Pair = [_int,_int]
-            type Xask = task @[] -> () -> Pair -> ()
+            type Xask = task @{} -> () -> Pair -> ()
             var t = Xask {
                 set pub = [_10,_20]
                 await _0
@@ -930,7 +930,7 @@ class TXTask {
             type Error = <Escape=_int>
             type Event = <()>
             type Pair = [_int,_int]
-            type Xask = task @[] -> () -> _int -> ()
+            type Xask = task @{} -> () -> _int -> ()
             var t = Xask {
                 set pub = _10
                 await _0
@@ -954,7 +954,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_uint64_t,_int>
-            var f = task @[]->()->()->() {
+            var f = task @{}->()->()->() {
                 output std _1:_int
                 await evt?3
                 output std _2:_int
@@ -973,8 +973,8 @@ class TXTask {
             type Error = <Escape=_int>
             type Event = <(),_uint64_t>
             type Event += <(),()>
-            var t: task @[] -> () -> () -> ()
-            set t = task @[] -> () -> () -> () {
+            var t: task @{} -> () -> () -> ()
+            set t = task @{} -> () -> () -> () {
                 var v: _int
                 set v = _1:_int
                 loop {
@@ -984,10 +984,10 @@ class TXTask {
                 }
             }
             
-            var l: active task  @[] -> () -> () -> ()
-            set l = spawn (task  @[] -> () -> () -> () {
+            var l: active task  @{} -> () -> () -> ()
+            set l = spawn (task  @{} -> () -> () -> () {
                 loop {
-                    var x: active task  @[] -> () -> () -> ()
+                    var x: active task  @{} -> () -> () -> ()
                     set x = spawn t _1:_int
                     await evt~?4
                 }
@@ -1007,7 +1007,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_uint64_t,_int>
-            var f = task @[]->_int->()->_int {
+            var f = task @{}->_int->()->_int {
                 return arg
             }
             spawn {
@@ -1022,7 +1022,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_uint64_t,_int>
-            var f = task @[]->_int->()->_int {
+            var f = task @{}->_int->()->_int {
                 --var v = arg
                 await evt?3
                 return arg
@@ -1045,7 +1045,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_uint64_t,_int>
-            var f = task @[]->_int->()->_int {
+            var f = task @{}->_int->()->_int {
                 --var v = arg
                 await evt?3
                 return arg
@@ -1068,7 +1068,7 @@ class TXTask {
         val out = test(true, """
             type Error = <Escape=_int>
             type Event = <(),_uint64_t,_int>
-            var f = task @[]->_int->()->_int {
+            var f = task @{}->_int->()->_int {
                 var v = arg
                 await evt?3
                 return v

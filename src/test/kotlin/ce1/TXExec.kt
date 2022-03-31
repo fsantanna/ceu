@@ -521,12 +521,12 @@ class TXExec {
             type Error = <Escape=_int>
             type List = </List>
             { @A
-                var pa: /List @[LOCAL] @LOCAL
-                set pa = new List.1@[A] Null: /(List @[A]) @A: @A
+                var pa: /List @{LOCAL} @LOCAL
+                set pa = new List.1@{A} Null: /(List @{A}) @A: @A
                 var f: func ()->()
-                set f = func @[]-> ()->() {
-                    var pf: /List @[A] @A
-                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
+                set f = func @{}-> ()->() {
+                    var pf: /List @{A} @A
+                    set pf = new List.1 @{A} Null: /List @{A} @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -542,12 +542,12 @@ class TXExec {
             type Error = <Escape=_int>
             type List = </List>
             { @A
-                var pa: /List @[LOCAL] @LOCAL
+                var pa: /List @{LOCAL} @LOCAL
                 set pa = new <.1 Null>
                 var f: func ()->()
-                set f = func @[]-> ()->() {
-                    var pf: /List @[A] @A
-                    set pf = new List.1 @[A] Null: /List @[A] @A: @A
+                set f = func @{}-> ()->() {
+                    var pf: /List @{A} @A
+                    set pf = new List.1 @{A} Null: /List @{A} @A: @A
                     set pa\!1 = pf
                     --output std pa
                 }
@@ -735,7 +735,7 @@ class TXExec {
     fun exx_func_alias () {
         val out = test(
             true, """
-                type Int2Int = func @[] -> () -> ()
+                type Int2Int = func @{} -> () -> ()
                 var f: Int2Int
                 set f = Int2Int {} 
                 output std ()
@@ -747,9 +747,9 @@ class TXExec {
     fun eyy_func_alias () {
         val out = test(true, """
             type Error = <Escape=_int>
-            type Int2Int = func @[] -> () -> ()
-            var f: func @[] -> () -> ()
-            set f = func @[] -> () -> () {}
+            type Int2Int = func @{} -> () -> ()
+            var f: func @{} -> () -> ()
+            set f = func @{} -> () -> () {}
             output std ()
         """.trimIndent())
         assert(out == "()\n") { out }
@@ -758,7 +758,7 @@ class TXExec {
     fun e13_func_alias () {
         val out = test(
             true, """
-                type Int2Int = func @[] -> _int -> _int
+                type Int2Int = func @{} -> _int -> _int
                 
                 var f: Int2Int
                 set f = Int2Int {
@@ -1237,16 +1237,16 @@ class TXExec {
             set e = <.4 [[10,10], <.2 [1,<.1>]>>
             
                 var t: Xask
-                    set t = Xask (task @[] -> () -> _int -> () {
+                    set t = Xask (task @{} -> () -> _int -> () {
                     output std (_2: _int)
                     set pub = _10:_int
                 }
                 )
                 output std (_1: _int)
                 var x: active Xask
-                set x = spawn active Xask ((t ~ ) @[] ())
-                var y: active task @[] -> () -> _int -> ()
-                set y = spawn ((t ~ ) @[] ())
+                set x = spawn active Xask ((t ~ ) @{} ())
+                var y: active task @{} -> () -> _int -> ()
+                set y = spawn ((t ~ ) @{} ())
                 output std ((x ~ ).pub)
                 output std (_3: _int)
            """.trimIndent()

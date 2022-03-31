@@ -39,12 +39,12 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         val inp: Type, val pub: Type?, val out: Type
     ): Type(tk_, null, null)
     data class Named (
-        val tk_: Tk.Id,
-        val subs: List<Tk>,
+        val tk_:    Tk.Id,
+        val subs:   List<Tk>,
         var xisrec: Boolean,
-        val args: List<Type>,  // {_int}
-        var xscps: List<Scope>?,
-        var xdef: Stmt.Typedef?     // typedef after args instantiation
+        val args:   List<Type>,     // ${_int}
+        var xscps:  List<Scope>?,   // @{a},    "?" diffs inference from empty
+        var xdef:   Stmt.Typedef?   // typedef after args instantiation
     ): Type(tk_, null, null)
 }
 

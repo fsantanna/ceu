@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
-val func0 = "call func @[] -> () -> ()"
+val func0 = "call func @{} -> () -> ()"
 fun catch0 (v: Int): String {
     return "catch _(task1->err.tag==1 && task1->err._1==$v)"
 }
@@ -45,7 +45,7 @@ class TExec {
     fun a01_output3 () {
         val out = all("""
             var x: _int
-            set x = ((_abs: _) @[] (_(-1): _))
+            set x = ((_abs: _) @{} (_(-1): _))
             output std x            
         """.trimIndent())
         assert(out == "1\n") { out }
@@ -249,8 +249,8 @@ class TExec {
     fun d01_f_int () {
         val out = all("""
             type Error = <_int>
-            var isEscRet : func @[] -> [Error,_int] -> _int
-            set isEscRet = func @[] -> [Error,_int] -> _int {
+            var isEscRet : func @{} -> [Error,_int] -> _int
+            set isEscRet = func @{} -> [Error,_int] -> _int {
                 if arg.1~?1 {
                     var v1: _int
                     set v1 = arg.1~!1
@@ -261,8 +261,8 @@ class TExec {
                     set ret = _0:_int
                 }
             }
-            var f: (func @[]-> _int -> _int)
-            set f = func@[]-> _int -> _int {
+            var f: (func @{}-> _int -> _int)
+            set f = func@{}-> _int -> _int {
                 catch isEscRet [err,_1:_int] {
                     set ret = arg
                     throw Error.1 _1:_int
@@ -278,8 +278,8 @@ class TExec {
     fun d02_f_unit () {
         val out = all("""
             type Error = <_int>
-            var f: (func @[]-> () -> ())
-            set f = func@[]-> ()->() { ${catch0(1)} { ${throw0(1)} } }
+            var f: (func @{}-> () -> ())
+            set f = func@{}-> ()->() { ${catch0(1)} { ${throw0(1)} } }
             var x: ()
             set x = f ()
             output std x
@@ -291,8 +291,8 @@ class TExec {
         val out = all("""
             var xxx: _int
             set xxx = _10:_int
-            var g: (func@[]-> () -> ())
-            set g = func@[]-> ()->() { output std xxx }
+            var g: (func@{}-> () -> ())
+            set g = func@{}-> ()->() { output std xxx }
             call g ()
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -302,17 +302,17 @@ class TExec {
         val out = all("""
             var xxx: _int
             set xxx = _10:_int
-            call (func @[]->()->() { output std xxx }) ()
+            call (func @{}->()->() { output std xxx }) ()
         """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun d03_fg () {
         val out = all("""
-            var f: (func@[]-> () -> ())
-            set f = func@[]-> ()->() { var x: _int; set x = _10: _int ; output std x }
-            var g: (func@[]-> () -> ())
-            set g = func@[]-> ()->() { call f () }
+            var f: (func@{}-> () -> ())
+            set f = func@{}-> ()->() { var x: _int; set x = _10: _int ; output std x }
+            var g: (func@{}-> () -> ())
+            set g = func@{}-> ()->() { call f () }
             call g ()
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -320,8 +320,8 @@ class TExec {
     @Test
     fun d04_arg () {
         val out = all("""
-        var f : (func@[]-> _int -> _int)
-        set f = func@[]-> _int->_int {
+        var f : (func@{}-> _int -> _int)
+        set f = func@{}-> _int->_int {
            set arg = _(${D}arg+1): _int
            set ret = arg
         }
@@ -348,8 +348,8 @@ class TExec {
         val out = all("""
         var x: _int
         set x = _10:_int
-        var f : (func@[]-> () -> _int)
-        set f = func@[]-> ()->_int {
+        var f : (func@{}-> () -> _int)
+        set f = func@{}-> ()->_int {
            set arg = _(${D}x+1): _int
            set ret = arg
         }
@@ -360,12 +360,12 @@ class TExec {
     @Test
     fun d04_arg_glb2 () {
         val out = all("""
-        var f : func @[] -> () -> ()
-        set f = func @[] -> () -> () {
+        var f : func @{} -> () -> ()
+        set f = func @{} -> () -> () {
             var xxx: _int
             set xxx = _10:_int
-            var g : func @[] -> () -> ()
-            set g = func @[] -> () -> () {
+            var g : func @{} -> () -> ()
+            set g = func @{} -> () -> () {
                output std _(${D}xxx): _int
             }
             call g ()
@@ -387,9 +387,9 @@ class TExec {
     @Test
     fun d05_func_var () {
         val out = all("""
-        var f: (func@[]-> _int->_int)
-        set f = func@[]-> _int->_int { set ret=arg }
-        var p: (func@[]-> _int->_int)
+        var f: (func@{}-> _int->_int)
+        set f = func@{}-> _int->_int { set ret=arg }
+        var p: (func@{}-> _int->_int)
         set p = f
         output std p _10: _int
         """.trimIndent())
@@ -398,11 +398,11 @@ class TExec {
     @Test
     fun d06_func_fg () {
         val out = all("""
-            var f: (func@[]-> _int->_int)
-            set f = func@[]-> _int->_int { set ret=arg }
-            var g: (func@[]-> [func@[]-> _int->_int, _int] -> _int)
-            set g = func@[]-> [func@[]-> _int->_int, _int] -> _int {
-               var f: (func@[]-> _int->_int)
+            var f: (func@{}-> _int->_int)
+            set f = func@{}-> _int->_int { set ret=arg }
+            var g: (func@{}-> [func@{}-> _int->_int, _int] -> _int)
+            set g = func@{}-> [func@{}-> _int->_int, _int] -> _int {
+               var f: (func@{}-> _int->_int)
                set f = arg.1
                var v: _int
                set v = f arg.2
@@ -415,26 +415,26 @@ class TExec {
     @Test
     fun d07_func_fg () {
         val out = all("""
-            var f:(func@[]->  _int->_int)
-            set f = func@[]-> _int->_int { set ret=arg }
-            var g:  (func@[i1]-> [(func@[]-> _int->_int), _int] -> _int)
-            set g = func@[i1]-> [(func@[]-> _int->_int), _int]-> _int {
-               var fx: (func@[]-> _int->_int)
+            var f:(func@{}->  _int->_int)
+            set f = func@{}-> _int->_int { set ret=arg }
+            var g:  (func@{i1}-> [(func@{}-> _int->_int), _int] -> _int)
+            set g = func@{i1}-> [(func@{}-> _int->_int), _int]-> _int {
+               var fx: (func@{}-> _int->_int)
                set fx = arg.1
                var v: _int
                set v = fx arg.2
                set ret = v
             }
             --var n: _int = _10: _int
-            output std g @[LOCAL] [f,_10:_int]
+            output std g @{LOCAL} [f,_10:_int]
         """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun d08_func_unit () {
         val out = all("""
-            var f: (func@[]->  ()->() )
-            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg }
+            var f: (func@{}->  ()->() )
+            set f = func@{}-> ()->() { var x:() ; set x = arg ; set ret=arg }
             var x:() ; set x = f ()
             output std x
         """.trimIndent())
@@ -443,8 +443,8 @@ class TExec {
     @Test
     fun d09_func_unit () {
         val out = all("""
-            var f: (func@[]-> ()->())
-            set f = func@[]-> ()->() { var x:() ; set x = arg ; set ret=arg }
+            var f: (func@{}-> ()->())
+            set f = func@{}-> ()->() { var x:() ; set x = arg ; set ret=arg }
             output std f ()
         """.trimIndent())
         assert(out == "()\n") { out }
@@ -666,7 +666,7 @@ class TExec {
     fun h01_loop () {
         val out = all("""
         type Error = <_int>
-        call func @[]->()->() {
+        call func @{}->()->() {
             ${catch0(1)} {
                 loop {
                    ${throw0(1)}
@@ -694,13 +694,13 @@ class TExec {
     @Test
     fun i02_ptr_func () {
         val out = all("""
-        var f : func@[i1]-> /_int@i1 -> ()
-        set f = func@[i1]-> /_int@i1 -> () {
+        var f : func@{i1}-> /_int@i1 -> ()
+        set f = func@{i1}-> /_int@i1 -> () {
            set arg\ = _(*${D}arg+1): _int
         }
         var x: _int
         set x = _1: _int
-        call f @[LOCAL] /x
+        call f @{LOCAL} /x
         output std x
         """.trimIndent())
         assert(out == "2\n") { out }
@@ -708,13 +708,13 @@ class TExec {
     @Test
     fun i03_ptr_func () {
         val out = all("""
-            var f: func@[i1]-> /_int@i1->_int
-            set f = func @[i1]->/_int@i1->_int { set ret = arg\ }
-            var g: func@[i1]-> /_int@i1->_int
+            var f: func@{i1}-> /_int@i1->_int
+            set f = func @{i1}->/_int@i1->_int { set ret = arg\ }
+            var g: func@{i1}-> /_int@i1->_int
             set g = f
             var x: _int
             set x = _10: _int
-            output std g @[LOCAL](/x)
+            output std g @{LOCAL}(/x)
         """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -752,14 +752,14 @@ class TExec {
     @Test
     fun i07_ptr_func_ok () {
         val out = all("""
-            var f : func@[i1]-> /_int@i1 -> /_int@i1
-            set f = func@[i1]-> /_int@i1 -> /_int@i1 {
+            var f : func@{i1}-> /_int@i1 -> /_int@i1
+            set f = func@{i1}-> /_int@i1 -> /_int@i1 {
                 set ret = arg
             }
             var v: _int
             set v = _10: _int
             var p: /_int@LOCAL
-            set p = f@[LOCAL] /v
+            set p = f@{LOCAL} /v
             output std p\
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -769,12 +769,12 @@ class TExec {
         val out = all("""
             var v: _int
             set v = _10: _int
-            var f : func@[i1]-> () -> /_int@i1
-            set f = func@[i1]-> () -> /_int@i1 {
+            var f : func@{i1}-> () -> /_int@i1
+            set f = func@{i1}-> () -> /_int@i1 {
                 set ret = /v
             }
             var p: /_int @LOCAL
-            set p = f @[LOCAL] ()
+            set p = f @{LOCAL} ()
             output std p\
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -782,8 +782,8 @@ class TExec {
     @Test
     fun i09_ptr_func_err () {
         val out = all("""
-            var f : func@[i1]-> () -> /_int@i1
-            set f = func@[i1]-> () -> /_int@i1 {
+            var f : func@{i1}-> () -> /_int@i1
+            set f = func@{i1}-> () -> /_int@i1 {
                 var v: _int; set v = _10: _int
                 set ret = /v   -- err
             }
@@ -794,8 +794,8 @@ class TExec {
     @Test
     fun i10_ptr_func_err () {
         val out = all("""
-            var f : func@[i1]-> /_int@i1 -> /_int@i1
-            set f = func@[i1]-> /_int@i1 -> /_int@i1 {
+            var f : func@{i1}-> /_int@i1 -> /_int@i1
+            set f = func@{i1}-> /_int@i1 -> /_int@i1 {
                 var ptr: /_int@LOCAL
                 set ptr = arg
                 set ret = ptr  -- err
@@ -807,8 +807,8 @@ class TExec {
     @Test
     fun i11_ptr_func_ok () {
         val out = all("""
-            var f : func@[i1]-> /_int@i1 -> /_int@i1
-            set f = func@[i1]-> /_int@i1 -> /_int@i1 {
+            var f : func@{i1}-> /_int@i1 -> /_int@i1
+            set f = func@{i1}-> /_int@i1 -> /_int@i1 {
                 var ptr: /_int@i1
                 set ptr = arg
                 set ret = ptr
@@ -816,7 +816,7 @@ class TExec {
             var v: _int
             set v = _10: _int
             var p: /_int@LOCAL
-            set p = f @[LOCAL] /v
+            set p = f @{LOCAL} /v
             output std p\
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -945,13 +945,13 @@ class TExec {
         val out = all("""
             var v: _int
             set v = _10: _int
-            var f : func@[i1]-> /_int@i1 -> /_int@i1
-            set f = func@[i1]-> /_int@i1 -> /_int@i1 {            
+            var f : func@{i1}-> /_int@i1 -> /_int@i1
+            set f = func@{i1}-> /_int@i1 -> /_int@i1 {            
                 set ret = /v
             }
             --{
                 var p: /_int @LOCAL
-                set p = f @[GLOBAL] /v: @GLOBAL
+                set p = f @{GLOBAL} /v: @GLOBAL
                 output std p\
             --}
         """.trimIndent())
@@ -960,14 +960,14 @@ class TExec {
     @Test
     fun f11_ptr_func () {
         val out = all("""
-            var f: (func@[i1]-> /_int@i1 -> /_int@i1)
-            set f = func@[i1]-> /_int@i1 -> /_int@i1 {
+            var f: (func@{i1}-> /_int@i1 -> /_int@i1)
+            set f = func@{i1}-> /_int@i1 -> /_int@i1 {
                 set ret = arg
             }
             var v: _int
             set v = _10: _int
             var p: /_int @LOCAL
-            set p = f @[LOCAL] /v: @LOCAL
+            set p = f @{LOCAL} /v: @LOCAL
             output std p\
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -1408,14 +1408,14 @@ class TExec {
     @Test
     fun noclo_m01_scope_a () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
+            type List @{a} = </List @{a} @a>
             { @A
-                var pa: /List @[LOCAL] @LOCAL
-                set pa = new List @[A] <.1 Null: /List @[A] @A>:</List @[A]>: @A
+                var pa: /List @{LOCAL} @LOCAL
+                set pa = new List @{A} <.1 Null: /List @{A} @A>:</List @{A}>: @A
                 var f: func ()->()
-                set f = func @[]-> ()->() {
-                    var pf: /List @[A] @A
-                    set pf = new List  @[A] <.1 Null: /List @[A] @A>:</List @[A] @A>: @A
+                set f = func @{}-> ()->() {
+                    var pf: /List @{A} @A
+                    set pf = new List  @{A} <.1 Null: /List @{A} @A>:</List @{A} @A>: @A
                     set pa\ ~ !1 = pf
                     --output std pa
                 }
@@ -1428,17 +1428,17 @@ class TExec {
     @Test
     fun m01_scope_f () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
-            var f: func@[i1]-> /(List @[i1])@i1->()
-            set f = func@[i1]-> /(List @[i1])@i1->() {
-                var pf: /(List @[i1]) @i1
+            type List @{a} = </List @{a} @a>
+            var f: func@{i1}-> /(List @{i1})@i1->()
+            set f = func@{i1}-> /(List @{i1})@i1->() {
+                var pf: /(List @{i1}) @i1
                 set pf = arg
                 output std pf
             }
             {
-                var x: /(List @[LOCAL]) @LOCAL
-                set x = new List @[LOCAL]<.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
-                call f @[LOCAL] x
+                var x: /(List @{LOCAL}) @LOCAL
+                set x = new List @{LOCAL}<.1 Null: /(List @{LOCAL}) @LOCAL>:</List @{LOCAL} @LOCAL>: @LOCAL
+                call f @{LOCAL} x
             }
         """.trimIndent())
         assert(out == "<.1 Null>\n") { out }
@@ -1446,15 +1446,15 @@ class TExec {
     @Test
     fun m02_scope_f () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
-            var f: func @[i1]->/(List @[i1])@i1->()
-            set f = func@[i1]-> /(List @[i1])@i1->() {
-                set arg\ ~  !1 = new List @[i1] <.1 Null:/(List @[i1])@i1>:</List @[i1] @i1>: @i1
+            type List @{a} = </List @{a} @a>
+            var f: func @{i1}->/(List @{i1})@i1->()
+            set f = func@{i1}-> /(List @{i1})@i1->() {
+                set arg\ ~  !1 = new List @{i1} <.1 Null:/(List @{i1})@i1>:</List @{i1} @i1>: @i1
             }
             {
-                var x: /(List @[LOCAL]) @LOCAL
-                set x = new List @[LOCAL] <.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
-                call f @[LOCAL] x
+                var x: /(List @{LOCAL}) @LOCAL
+                set x = new List @{LOCAL} <.1 Null: /(List @{LOCAL}) @LOCAL>:</List @{LOCAL} @LOCAL>: @LOCAL
+                call f @{LOCAL} x
                 output std x
             }
         """.trimIndent())
@@ -1463,16 +1463,16 @@ class TExec {
     @Test
     fun m03_scope_f () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
-            var f: func @[a1,a2] -> [/(List @[a1])@a1,/(List @[a2])@a2]->()
-            set f = func @[a1,a2]->[/(List @[a1])@a1,/(List @[a2])@a2]->() {
-                set arg.1\ ~ !1 = new List @[a1] <.1 Null:/(List @[a1])@a1>:</List @[a1] @a1>: @a1
-                set arg.2\ ~ !1 = new List @[a2]<.1 Null:/(List @[a2])@a2>:</List @[a2] @a2>: @a2
+            type List @{a} = </List @{a} @a>
+            var f: func @{a1,a2} -> [/(List @{a1})@a1,/(List @{a2})@a2]->()
+            set f = func @{a1,a2}->[/(List @{a1})@a1,/(List @{a2})@a2]->() {
+                set arg.1\ ~ !1 = new List @{a1} <.1 Null:/(List @{a1})@a1>:</List @{a1} @a1>: @a1
+                set arg.2\ ~ !1 = new List @{a2}<.1 Null:/(List @{a2})@a2>:</List @{a2} @a2>: @a2
             }
             {
-                var x: /(List @[LOCAL]) @LOCAL
-                set x = new List @[LOCAL] <.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
-                call f @[LOCAL,LOCAL] [x,x]
+                var x: /(List @{LOCAL}) @LOCAL
+                set x = new List @{LOCAL} <.1 Null: /(List @{LOCAL}) @LOCAL>:</List @{LOCAL} @LOCAL>: @LOCAL
+                call f @{LOCAL,LOCAL} [x,x]
                 output std x
             }
         """.trimIndent())
@@ -1481,15 +1481,15 @@ class TExec {
     @Test
     fun m04_scope_f () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
-            var f: func @[i1]->/(List @[i1])@i1->()
-            set f = func @[i1]->/(List @[i1])@i1->() {
-                set arg\ ~ !1 = new List @[i1] <.1 Null:/(List @[i1])@i1>:</List @[i1] @i1>: @i1
+            type List @{a} = </List @{a} @a>
+            var f: func @{i1}->/(List @{i1})@i1->()
+            set f = func @{i1}->/(List @{i1})@i1->() {
+                set arg\ ~ !1 = new List @{i1} <.1 Null:/(List @{i1})@i1>:</List @{i1} @i1>: @i1
             }
             {
-                var x: /(List @[LOCAL]) @LOCAL
-                set x = new List @[LOCAL] <.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
-                call f @[LOCAL] x
+                var x: /(List @{LOCAL}) @LOCAL
+                set x = new List @{LOCAL} <.1 Null: /(List @{LOCAL}) @LOCAL>:</List @{LOCAL} @LOCAL>: @LOCAL
+                call f @{LOCAL} x
                 output std x
             }
         """.trimIndent())
@@ -1501,7 +1501,7 @@ class TExec {
     @Test
     fun n01_pool () {
         val out = all("""
-            var f : func @[a1] -> /()@a1 -> /()@a1
+            var f : func @{a1} -> /()@a1 -> /()@a1
             output std ()
         """.trimIndent()
         )
@@ -1510,8 +1510,8 @@ class TExec {
     @Test
     fun n02_pool () {
         val out = all("""
-            var f : func @[a1]->/()@a1 -> /()@a1
-            set f = func @[a1]->/()@a1 -> /()@a1 {
+            var f : func @{a1}->/()@a1 -> /()@a1
+            set f = func @{a1}->/()@a1 -> /()@a1 {
                 set ret = arg
             }
             output std ()
@@ -1522,12 +1522,12 @@ class TExec {
     @Test
     fun n03_pool () {
         val out = all("""
-            var f :func@[i1]-> /_int@i1 -> /()@i1
-            set f = func@[i1]-> /_int@i1 -> /()@i1 {
+            var f :func@{i1}-> /_int@i1 -> /()@i1
+            set f = func@{i1}-> /_int@i1 -> /()@i1 {
                 set ret = arg
             }
             var x: _int
-            call f @[LOCAL] /x
+            call f @{LOCAL} /x
             output std ()
         """.trimIndent()
         )
@@ -1536,17 +1536,17 @@ class TExec {
     @Test
     fun n04_pool () {
         val out = all("""
-            var f : func@[i1]-> /_int@i1 -> /()@i1
-            set f = func@[i1]-> /_int@i1 -> /()@i1 {
+            var f : func@{i1}-> /_int@i1 -> /()@i1
+            set f = func@{i1}-> /_int@i1 -> /()@i1 {
                 set ret = arg
             }
-            var g : func@[i1]-> /_int@i1 -> /()@i1
-            set g = func@[i1]-> /_int@i1 -> /()@i1 {
-                set ret = f @[i1] arg: @i1
+            var g : func@{i1}-> /_int@i1 -> /()@i1
+            set g = func@{i1}-> /_int@i1 -> /()@i1 {
+                set ret = f @{i1} arg: @i1
             }
             var x: _int
             var px: /_int@LOCAL
-            set px = f @[LOCAL] /x: @LOCAL
+            set px = f @{LOCAL} /x: @LOCAL
             output std _(global.px == &global.x):_int
         """.trimIndent()
         )
@@ -1556,15 +1556,15 @@ class TExec {
     fun n05_pool_ff() {
         val out = all(
             """
-            var f: ( func@[]-> () -> () )
+            var f: ( func@{}-> () -> () )
             set f = func () -> () {
                 set ret = arg
             }
-            var g: func@[i1]-> [func@[]-> ()->(), ()] -> ()
-            set g = func@[i1]-> [(func ()->()), ()] -> () {
+            var g: func@{i1}-> [func@{}-> ()->(), ()] -> ()
+            set g = func@{i1}-> [(func ()->()), ()] -> () {
                 set ret = arg.1 arg.2
             }
-            output std g @[LOCAL] [f,()]
+            output std g @{LOCAL} [f,()]
         """.trimIndent()
         )
         assert(out == "()\n") { out }
@@ -1573,16 +1573,16 @@ class TExec {
     fun n06_pool_ff() {
         val out = all(
             """
-            var f: func@[i1]->/()@i1 -> /()@i1
-            set f = func@[i1]-> /()@i1 -> /()@i1 {
+            var f: func@{i1}->/()@i1 -> /()@i1
+            set f = func@{i1}-> /()@i1 -> /()@i1 {
                 set ret = arg
             }
-            var g: func@[i1]-> [ func@[i1]-> /()@i1->/()@i1, /()@i1] -> /()@i1
-            set g = func @[i1]->[func@[i1]-> /()@i1->/()@i1, /()@i1] -> /()@i1 {
-                set ret = arg.1 @[i1] arg.2: @i1
+            var g: func@{i1}-> [ func@{i1}-> /()@i1->/()@i1, /()@i1] -> /()@i1
+            set g = func @{i1}->[func@{i1}-> /()@i1->/()@i1, /()@i1] -> /()@i1 {
+                set ret = arg.1 @{i1} arg.2: @i1
             }
             var x: ()
-            output std g @[LOCAL] [f,/x]: @LOCAL
+            output std g @{LOCAL} [f,/x]: @LOCAL
         """.trimIndent()
         )
         assert(out == "_\n") { out }
@@ -1609,12 +1609,12 @@ class TExec {
     fun noclo_n13_pool_ups1 () {
         val out = all(
             """
-            var f : func @[] -> _int -> ()
-            set f = func @[] -> _int -> () { @A
+            var f : func @{} -> _int -> ()
+            set f = func @{} -> _int -> () { @A
                 var x: _int
                 set x = arg
-                var g : func @[] -> () -> _int
-                set g = func @[] -> () -> _int {
+                var g : func @{} -> () -> _int
+                set g = func @{} -> () -> _int {
                     set ret = x
                 }
                 output std g ()
@@ -1628,14 +1628,14 @@ class TExec {
     fun noclo_n14_pool_ups2 () {
         val out = all(
             """
-            var f : func @[] -> _int -> ()
-            set f = func @[] -> _int -> () { @A
+            var f : func @{} -> _int -> ()
+            set f = func @{} -> _int -> () { @A
                 var x: _int
                 set x = arg
-                var g : func@[] -> () -> _int
-                set g = func @[] -> () -> _int {
-                    var h : func @[] -> () -> _int
-                    set h = func @[] -> () -> _int {
+                var g : func@{} -> () -> _int
+                set g = func @{} -> () -> _int {
+                    var h : func @{} -> () -> _int
+                    set h = func @{} -> () -> _int {
                         set ret = x
                     }
                     output std h ()
@@ -1683,12 +1683,12 @@ class TExec {
     @Test
     fun o04_type_ptr () {
         val out = all("""
-            type Num @[s] = </Num @[s] @s>
-            type Ptr @[s] = /Num @[s] @s
-            var n1: /Num @[LOCAL]
-            set n1 = new Num @[LOCAL] <.1 Null:/Num @[LOCAL] @LOCAL>:</Num @[LOCAL] @LOCAL>
-            var n2: Ptr @[LOCAL]
-            set n2 = Ptr @[LOCAL] new Num @[LOCAL] <.1 Null:/Num @[LOCAL]>:</Num @[LOCAL] @LOCAL>
+            type Num @{s} = </Num @{s} @s>
+            type Ptr @{s} = /Num @{s} @s
+            var n1: /Num @{LOCAL}
+            set n1 = new Num @{LOCAL} <.1 Null:/Num @{LOCAL} @LOCAL>:</Num @{LOCAL} @LOCAL>
+            var n2: Ptr @{LOCAL}
+            set n2 = Ptr @{LOCAL} new Num @{LOCAL} <.1 Null:/Num @{LOCAL}>:</Num @{LOCAL} @LOCAL>
             output std n1
             output std n2
         """.trimIndent())
@@ -1697,9 +1697,9 @@ class TExec {
     @Test
     fun o05_type_ptr () {
         val out = all("""
-            type List @[s] = /<List @[s]> @s
-            var l: List @[LOCAL]
-            set l = new <.1 Null:List @[LOCAL]>:<List @[LOCAL]>
+            type List @{s} = /<List @{s}> @s
+            var l: List @{LOCAL}
+            set l = new <.1 Null:List @{LOCAL}>:<List @{LOCAL}>
             output std l
         """.trimIndent())
         //assert(out == "<.1 Null>\n") { out }
@@ -1709,8 +1709,8 @@ class TExec {
     @Test
     fun o07_type_pln () {
         val out = all("""
-            type Int  @[] = _int
-            type Pair @[] = [Int,Int]
+            type Int  @{} = _int
+            type Pair @{} = [Int,Int]
             var x: Int
             set x = _10:_int
             var xs: Pair
@@ -1722,8 +1722,8 @@ class TExec {
     @Test
     fun o08_type_pln () {
         val out = all("""
-            type Int  @[] = _int
-            type Pair @[] = <Int,Int>
+            type Int  @{} = _int
+            type Pair @{} = <Int,Int>
             var x: Int
             set x = _10:_int
             var xs: Pair
@@ -1735,8 +1735,8 @@ class TExec {
     @Test
     fun o09_type_pln () {
         val out = all("""
-            type T1 @[] = [()]
-            type T2 @[] = [T1]
+            type T1 @{} = [()]
+            type T2 @{} = [T1]
             output std ()
         """.trimIndent())
         //assert(out == "(ln 1, col 6): invalid type identifier") { out }
@@ -1745,8 +1745,8 @@ class TExec {
     @Test
     fun o10_type_pln () {
         val out = all("""
-            type Tx1 @[] = [()]
-            type Tx2 @[] = [Tx1]
+            type Tx1 @{} = [()]
+            type Tx2 @{} = [Tx1]
             output std ()
         """.trimIndent())
         assert(out == "()\n") { out }
@@ -1754,9 +1754,9 @@ class TExec {
     @Test
     fun o12_rect () {
         val out = all("""
-            type Point @[] = [_int,_int]
-            type Dims @[] = [_int,_int]
-            type Rect @[] = [Point,Dims]
+            type Point @{} = [_int,_int]
+            type Dims @{} = [_int,_int]
+            type Rect @{} = [Point,Dims]
             var rect: Rect
             set rect = Rect[Point [(_10: _int),(_10: _int)],Dims[(_5: _int),(_5: _int)]]
             output std /rect
@@ -1766,9 +1766,9 @@ class TExec {
     @Test
     fun o13_rect_dot () {
         val out = all("""
-            type Point @[] = [_int,_int]
-            type Dims @[] = [_int,_int]
-            type Rect @[] = [Point,Dims]
+            type Point @{} = [_int,_int]
+            type Dims @{} = [_int,_int]
+            type Rect @{} = [Point,Dims]
             var rect: Rect
             set rect = Rect [Point[(_10: _int),(_10: _int)],Dims[(_5: _int),(_5: _int)]]
             output std rect  ~ .2 ~  .1
@@ -1778,10 +1778,10 @@ class TExec {
     @Test
     fun o13_func_alias () {
         val out = all("""
-            type Int2Int = func @[] -> _int -> _int
+            type Int2Int = func @{} -> _int -> _int
             
             var f: Int2Int
-            set f = Int2Int func @[] -> _int -> _int {
+            set f = Int2Int func @{} -> _int -> _int {
                 set ret = arg
             }
             
@@ -1795,9 +1795,9 @@ class TExec {
     @Test
     fun o14_func_alias () {
         val out = all("""
-            type Xask @[] = task @[] -> () -> () -> ()
+            type Xask @{} = task @{} -> () -> () -> ()
             var t: Xask
-            set t = Xask(task @[] -> () -> () -> () {
+            set t = Xask(task @{} -> () -> () -> () {
             })
             output std ()
        """.trimIndent())
@@ -1806,18 +1806,18 @@ class TExec {
     @Test
     fun o15_func_alias () {
         val out = all("""
-            type Xask @[] = task @[] -> () -> _int -> ()
+            type Xask @{} = task @{} -> () -> _int -> ()
             var t: Xask
-                set t = Xask (task @[] -> () -> _int -> () {
+                set t = Xask (task @{} -> () -> _int -> () {
                 output std (_2: _int)
                 set pub = _10:_int
             }
             )
             output std (_1: _int)
             var x: active Xask
-            set x = spawn active Xask ((t ~ ) @[] ())
-            var y: active task @[] -> () -> _int -> ()
-            set y = spawn ((t ~ ) @[] ())
+            set x = spawn active Xask ((t ~ ) @{} ())
+            var y: active task @{} -> () -> _int -> ()
+            set y = spawn ((t ~ ) @{} ())
             output std ((x ~ ).pub)
             output std (_3: _int)
        """.trimIndent())
@@ -2079,7 +2079,7 @@ class TExec {
     @Test
     fun s01_maybe () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), ${D}a>
+            type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{_int}
             set x = Maybe $D{_int} <.2 _10:_int>: <(),_int>
             output std x~!2
@@ -2090,7 +2090,7 @@ class TExec {
     @Test
     fun s02_maybe_err () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), ${D}a>
+            type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{_int}
             set x = Maybe <.2 _10:_int>: <(),_int>  -- ERR: missing instance
             output std x~!2
@@ -2101,7 +2101,7 @@ class TExec {
     @Test
     fun s03_maybe_err () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), ${D}a>
+            type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{()}
             set x = Maybe $D{[()]} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
             output std x~!2
@@ -2112,7 +2112,7 @@ class TExec {
     @Test
     fun s04_maybe_err () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), ${D}a>
+            type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{()}
             set x = Maybe $D{()} <.2 [()]>: <(),[()]>   -- ERR: incompatible cons
             output std x~!2
@@ -2123,7 +2123,7 @@ class TExec {
     @Test
     fun s05_maybe_err () {
         val out = test(true, """
-            type Maybe $D{a} @[] = <(), ${D}a>
+            type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{[()]}
             var y: Maybe $D{()}
             set x = y   -- ERR: incompatible instances
@@ -2134,8 +2134,8 @@ class TExec {
     @Test
     fun s06_maybe_concrete () {
         val out = test(true, """
-            type Maybe1 @[] = <(), _int>
-            type Maybe2 @[] = <(), _int>
+            type Maybe1 @{} = <(), _int>
+            type Maybe2 @{} = <(), _int>
             var x: Maybe1
             set x = Maybe1 <.2 _10:_int>: <(),_int>
             output std x~!2
@@ -2153,7 +2153,7 @@ class TExec {
     fun z01 () {
         val out = all("""
         var inv : (func <(),()> -> <(),()>)
-        set inv = func@[]-> <(),()> -> <(),()> {
+        set inv = func@{}-> <(),()> -> <(),()> {
             if arg?1 {
                 set ret = <.2()>:<(),()>
             } else {
@@ -2215,7 +2215,7 @@ class TExec {
     fun z05_func_rec () {
         val out = all("""
         var i: _int; set i = _0: _int
-        var f: func@[]-> ()->()
+        var f: func@{}-> ()->()
         set f = func ()->() {
             if _(global.i == 10): _int {
                 
@@ -2232,12 +2232,12 @@ class TExec {
     @Test
     fun z06_type_complex () {
         val out = all("""
-            type List @[a] = <[(),/List@[a]@a]>
-            var x: /(List @[LOCAL]) @LOCAL
-            set x = new List @[LOCAL] <.1 [(),Null: /(List @[LOCAL])@LOCAL]>:<[(),/List@[LOCAL]@LOCAL]>: @LOCAL
-            var y: [(),/(List @[LOCAL]) @LOCAL]
-            set y = [(), new List @[LOCAL] <.1 [(),Null: /(List @[LOCAL])@LOCAL]>:<[(),/List@[LOCAL]@LOCAL]>: @LOCAL]
-            var z: [(),//(List @[LOCAL]) @LOCAL @LOCAL]
+            type List @{a} = <[(),/List@{a}@a]>
+            var x: /(List @{LOCAL}) @LOCAL
+            set x = new List @{LOCAL} <.1 [(),Null: /(List @{LOCAL})@LOCAL]>:<[(),/List@{LOCAL}@LOCAL]>: @LOCAL
+            var y: [(),/(List @{LOCAL}) @LOCAL]
+            set y = [(), new List @{LOCAL} <.1 [(),Null: /(List @{LOCAL})@LOCAL]>:<[(),/List@{LOCAL}@LOCAL]>: @LOCAL]
+            var z: [(),//(List @{LOCAL}) @LOCAL @LOCAL]
             set z = [(), /x]
             output std z.2\\ ~ !1.2
         """.trimIndent())
@@ -2246,10 +2246,10 @@ class TExec {
     @Test
     fun z07_type_complex_bug () {
         val out = all("""
-            type List @[a] = <[(),/List@[a]@a]>
-            var x: /(List @[LOCAL]) @LOCAL
-            set x = Null: /(List @[LOCAL]) @LOCAL
-            var z: [(),//(List @[LOCAL]) @LOCAL @LOCAL]
+            type List @{a} = <[(),/List@{a}@a]>
+            var x: /(List @{LOCAL}) @LOCAL
+            set x = Null: /(List @{LOCAL}) @LOCAL
+            var z: [(),//(List @{LOCAL}) @LOCAL @LOCAL]
             set z = [(), /x]
             output std z.2\
         """.trimIndent())
@@ -2258,10 +2258,10 @@ class TExec {
     @Test
     fun z07_type_complex () {
         val out = all("""
-            type List @[a] = <[(),/List@[a]@a]>
-            var x: /(List @[LOCAL]) @LOCAL
-            set x = Null: /(List @[LOCAL]) @LOCAL
-            var z: [(),//(List @[LOCAL]) @LOCAL @LOCAL]
+            type List @{a} = <[(),/List@{a}@a]>
+            var x: /(List @{LOCAL}) @LOCAL
+            set x = Null: /(List @{LOCAL}) @LOCAL
+            var z: [(),//(List @{LOCAL}) @LOCAL @LOCAL]
             set z = [(), /x]
             output std z.2\
         """.trimIndent())
@@ -2280,9 +2280,9 @@ class TExec {
     @Test
     fun z08_type_complex () {
         val out = all("""
-            type List @[a] = <[(),/List@[a]@a]>
-            var y : [(),/(List @[LOCAL]) @LOCAL]
-            set y = [(), new List @[LOCAL]<.1 [(),Null:/(List @[LOCAL]) @LOCAL]>:<[(),/List@[LOCAL]@LOCAL]>: @LOCAL]
+            type List @{a} = <[(),/List@{a}@a]>
+            var y : [(),/(List @{LOCAL}) @LOCAL]
+            set y = [(), new List @{LOCAL}<.1 [(),Null:/(List @{LOCAL}) @LOCAL]>:<[(),/List@{LOCAL}@LOCAL]>: @LOCAL]
             output std /y
         """.trimIndent())
         assert(out == "[(),<.1 [(),Null]>]\n") { out }
@@ -2290,22 +2290,22 @@ class TExec {
     @Test
     fun z08_func_arg () {
         val out = all("""
-            type List @[a] = </List @[a] @a>
-            var x1: /(List @[LOCAL]) @LOCAL
-            set x1 = Null: /(List @[LOCAL]) @LOCAL
+            type List @{a} = </List @{a} @a>
+            var x1: /(List @{LOCAL}) @LOCAL
+            set x1 = Null: /(List @{LOCAL}) @LOCAL
             var z1: _int
             set z1 = x1\~?Null
-            var x2: //(List @[LOCAL]) @LOCAL @LOCAL
+            var x2: //(List @{LOCAL}) @LOCAL @LOCAL
             set x2 = /x1
             var z2: _int
             set z2 = x2\\~?1
-            set x2\ = new List @[LOCAL]<.1 Null: /(List @[LOCAL]) @LOCAL>:</List @[LOCAL] @LOCAL>: @LOCAL
-            var f: func@[i1]-> //(List @[i1])@i1@i1->_int
-            set f = func@[i1]-> //(List @[i1])@i1@i1->_int {
+            set x2\ = new List @{LOCAL}<.1 Null: /(List @{LOCAL}) @LOCAL>:</List @{LOCAL} @LOCAL>: @LOCAL
+            var f: func@{i1}-> //(List @{i1})@i1@i1->_int
+            set f = func@{i1}-> //(List @{i1})@i1@i1->_int {
                 set ret = arg\\~?1
             }
             var z3: _int
-            set z3 = f @[LOCAL] x2
+            set z3 = f @{LOCAL} x2
             var xxx: _int
             set xxx = _(global.z1 + global.z2 + global.z3): _int
             output std xxx
@@ -2329,11 +2329,11 @@ class TExec {
     @Test
     fun z09_output_string () {
         val out = all("""
-            type List @[a] = <[_int,/List @[a] @a]>
+            type List @{a} = <[_int,/List @{a} @a]>
             var f: (func   ()->() )
             set f = func ()->() {
-                var s1: /(List @[LOCAL]) @LOCAL
-                set s1 = new List @[LOCAL] <.1 [_1:_int,Null: /(List @[LOCAL]) @LOCAL]>:<[_int,/List @[LOCAL] @LOCAL]>: @LOCAL
+                var s1: /(List @{LOCAL}) @LOCAL
+                set s1 = new List @{LOCAL} <.1 [_1:_int,Null: /(List @{LOCAL}) @LOCAL]>:<[_int,/List @{LOCAL} @LOCAL]>: @LOCAL
                 output std s1
             }
             call f ()
@@ -2343,11 +2343,11 @@ class TExec {
     @Test
     fun z10_output_string () {
         val out = all("""
-            type List @[a] = <[_int,/List @[a] @a]>
-            var f: func@[]-> ()->()
+            type List @{a} = <[_int,/List @{a} @a]>
+            var f: func@{}-> ()->()
             set f = func ()->() {
-                var s1: /(List @[LOCAL]) @LOCAL
-                set s1 = new List @[LOCAL]<.1 [_1:_int,Null: /(List @[LOCAL]) @LOCAL]>:<[_int,/List @[LOCAL] @LOCAL]>: @LOCAL
+                var s1: /(List @{LOCAL}) @LOCAL
+                set s1 = new List @{LOCAL}<.1 [_1:_int,Null: /(List @{LOCAL}) @LOCAL]>:<[_int,/List @{LOCAL} @LOCAL]>: @LOCAL
                 output std s1
             }
             call f ()
@@ -2357,15 +2357,15 @@ class TExec {
     @Test
     fun z10_return_move () {
         val out = all("""
-            type List @[a] = <[_int,/List @[a] @a]>
-            var f: func@[i]-> ()-><(),_int,/(List @[i])@i>
-            set f = func@[i]-> ()-><(),_int,/(List @[i])@i> {
-                var str: /(List @[i]) @i
-                set str = Null: /(List @[i]) @i
-                set ret = <.3 str>:<(),_int,/(List @[i])@i>
+            type List @{a} = <[_int,/List @{a} @a]>
+            var f: func@{i}-> ()-><(),_int,/(List @{i})@i>
+            set f = func@{i}-> ()-><(),_int,/(List @{i})@i> {
+                var str: /(List @{i}) @i
+                set str = Null: /(List @{i}) @i
+                set ret = <.3 str>:<(),_int,/(List @{i})@i>
             }
-            var x: <(),_int,/(List @[LOCAL])@LOCAL>
-            set x = f @[LOCAL] ()
+            var x: <(),_int,/(List @{LOCAL})@LOCAL>
+            set x = f @{LOCAL} ()
             output std x!3
         """.trimIndent())
         assert(out == "Null\n") { out }
@@ -2373,8 +2373,8 @@ class TExec {
     @Test
     fun z11_func_err () {
         val out = all("""
-            var f: func @[]->()->[()]
-            set f = func @[]->()->() {
+            var f: func @{}->()->[()]
+            set f = func @{}->()->() {
             }
         """.trimIndent())
         assert(out.startsWith("(ln 2, col 7): invalid assignment : type mismatch")) { out }
@@ -2382,10 +2382,10 @@ class TExec {
     @Test
     fun z12_union_tuple () {
         val out = all("""
-            type List @[a] = <[_int,/List @[a] @a]>
-            var tk2: <(),_int,/(List @[LOCAL]) @LOCAL>
-            set tk2 = <.3 Null:/(List @[LOCAL]) @LOCAL>: <(),_int,/(List @[LOCAL]) @LOCAL>
-            var s21: /<(),_int,/(List @[LOCAL]) @LOCAL> @LOCAL
+            type List @{a} = <[_int,/List @{a} @a]>
+            var tk2: <(),_int,/(List @{LOCAL}) @LOCAL>
+            set tk2 = <.3 Null:/(List @{LOCAL}) @LOCAL>: <(),_int,/(List @{LOCAL}) @LOCAL>
+            var s21: /<(),_int,/(List @{LOCAL}) @LOCAL> @LOCAL
             set s21 = /tk2
             output std s21\!3
         """.trimIndent())
@@ -2441,17 +2441,17 @@ class TExec {
         val out = all(
             """
             type Error = <_int>
-            var g : func @[]-> () -> ()
-            set g = func @[]-> () -> () {
+            var g : func @{}-> () -> ()
+            set g = func @{}-> () -> () {
             }
-            var f: func @[a1,b1] -> [()] -> ()
-            set f = func @[a1,b1] -> [()] -> () {   // extra [a1,b1] to xxx confuses task->f(.,.,XXX)
+            var f: func @{a1,b1} -> [()] -> ()
+            set f = func @{a1,b1} -> [()] -> () {   // extra [a1,b1] to xxx confuses task->f(.,.,XXX)
                 ${catch0(1)} {
                     call g ()
                     ${throw0(1)}
                 }
             }
-            call f @[LOCAL,LOCAL] [()]
+            call f @{LOCAL,LOCAL} [()]
         """.trimIndent()
         )
         assert(out == "<.2>\n<.3>\n<.1>\n<.4>\n") { out }
