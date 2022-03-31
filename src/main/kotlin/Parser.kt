@@ -757,10 +757,10 @@ object Parser
         }
         return ret
     }
-    fun await_spawn (e: Expr, dst: Expr?): Stmt {
+    fun await_spawn (s: Stmt, dst: Expr?): Stmt {
         return All_nest("""
         {
-            var tsk_$N = spawn ${e.tostr(true)}
+            var tsk_$N = ${s.tostr(true)}
             var st_$N = tsk_$N.status
             if _(${D}st_$N == TASK_AWAITING) {
                 await tsk_$N
@@ -805,15 +805,16 @@ object Parser
                         alls.checkFix("spawn") -> {
                             val s = this.stmt()
                             All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
-                            val ss = s as Stmt.SSpawn
-                            Stmt.SSpawn(ss.tk_, dst, ss.call)
+                            s as Stmt.SSpawn
+                            Stmt.SSpawn(s.tk_, dst, s.call)
                         }
                         alls.acceptFix("await") -> {
                             if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                            alls.acceptFix_err("spawn")
-                            val e = this.expr()
-                            All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                            await_spawn(e, dst)
+                            alls.checkFix_err("spawn")
+                            val s = this.stmt()
+                            All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
+                            s as Stmt.SSpawn
+                            await_spawn(s, dst)
                         }
                         else -> {
                             val src = this.expr()
@@ -835,15 +836,16 @@ object Parser
                     alls.checkFix("spawn") -> {
                         val s = this.stmt()
                         All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
-                        val ss = s as Stmt.SSpawn
-                        Stmt.SSpawn(ss.tk_, dst, ss.call)
+                        s as Stmt.SSpawn
+                        Stmt.SSpawn(s.tk_, dst, s.call)
                     }
                     alls.acceptFix("await") -> {
                         if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                        alls.acceptFix_err("spawn")
-                        val e = this.expr()
-                        All_assert_tk(e.tk, e.unpak() is Expr.Call) { "expected task call" }
-                        await_spawn(e, dst)
+                        alls.checkFix_err("spawn")
+                        val s = this.stmt()
+                        All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
+                        s as Stmt.SSpawn
+                        await_spawn(s, dst)
                     }
                     else -> {
                         val src = this.expr()
@@ -969,10 +971,13 @@ object Parser
                             this.stmt()
                         } as Stmt
                     }
-                    alls.acceptFix("spawn") -> {
+                    alls.checkFix("spawn") -> {
                         if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                        val e = this.expr()
-                        await_spawn(e, null)
+                        alls.checkFix_err("spawn")
+                        val s = this.stmt()
+                        All_assert_tk(s.tk, s is Stmt.SSpawn) { "unexpected dynamic `spawn`" }
+                        s as Stmt.SSpawn
+                        await_spawn(s, null)
                     }
                     else -> {
                         val e = this.expr()
