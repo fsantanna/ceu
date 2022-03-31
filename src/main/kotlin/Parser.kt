@@ -817,10 +817,12 @@ object Parser
                 }
                 when {
                     (tp==null && alls.acceptFix("var")) -> {
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         // var x var   <-- no type, no assign (used by intermediate compilation)
                         Stmt.Var(tk_id, null)
                     }
                     alls.checkFix("=") -> {
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         val dst = Expr.Var(tk_id)
                         val set = stmt_set(dst)
                         Stmt.Seq(tk_id, Stmt.Var(tk_id, tp), set)
@@ -837,6 +839,7 @@ object Parser
                 val dst = this.attr().toExpr()
                 stmt_set(dst)
             }
+
             alls.checkFix("input") -> {
                 alls.acceptFix("input")
                 val tk = alls.tk0 as Tk.Fix
@@ -1017,10 +1020,13 @@ object Parser
             alls.checkFix("catch") || alls.checkFix("{") -> this.block(null)
             alls.acceptFix("output") -> {
                 val tk = alls.tk0 as Tk.Fix
-                alls.acceptVar_err("id")
-                val lib = (alls.tk0 as Tk.id)
+                //alls.acceptVar_err("id")
+                //val lib = (alls.tk0 as Tk.id)
                 val arg = this.expr()
-                Stmt.Output(tk, lib, arg)
+                All_assert_tk(arg.tk, arg is Expr.Pak) { "expected constructor" }
+                arg as Expr.Pak
+                All_assert_tk(arg.e.tk, arg.e is Expr.UCons) { "expected union constructor" }
+                Stmt.Output(tk, arg)
             }
 
             // CE1
@@ -1058,7 +1064,6 @@ object Parser
                 }
                 f(tsts) as Stmt.If
             }
-
             alls.acceptFix("return") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 if (!alls.checkExpr()) {

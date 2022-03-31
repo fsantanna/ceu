@@ -33,12 +33,18 @@ class TExec {
 
     @Test
     fun a01_output () {
-        val out = all("output std ()")
+        val out = all("""
+            type Output $D{} @{} = <_>
+            output Output $D{} @{} <.1 ()>: <()>
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
     fun a01_output2 () {
-        val out = all("output std _10:_int")
+        val out = all("""
+            type Output $D{} @{} = <_>
+            output Output $D{} @{} <.1 _10:_int>: <_int>
+        """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
@@ -83,7 +89,10 @@ class TExec {
     }
     @Test
     fun a07_output_string () {
-        val out = all("output std _(\"hello\"):_(char*)")
+        val out = all("""
+            type Output $D{} @{} = <_>
+            output Output $D{} @{} <.1 _("hello"):_(char*)>: <_(char*)>
+        """.trimIndent())
         assert(out == "\"hello\"\n") { out }
     }
     @Test
@@ -190,9 +199,10 @@ class TExec {
     @Test
     fun b04_tuple_pp () {
         val out = all("""
+            type Output $D{} @{} = <_>
             var n: _int ; set n = _1: _int
             var x: [[_int,_int],[_int,_int]] ; set x = [[n,n],[n,n]]
-            output std /x
+            output Output $D{} @{} <.1 /x>: </[[_int,_int],[_int,_int]]>
         """.trimIndent())
         assert(out == "[[1,1],[1,1]]\n") { out }
     }

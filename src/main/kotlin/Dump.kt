@@ -68,7 +68,7 @@ fun Stmt.dump (spc: Int = 0): String {
                 (this.xtype?.dump(spc+4) ?: "") +
                 (if (this.dst == null) none(spc+4) else this.dst.dump(spc+4)) +
                 this.arg.dump(spc+4)
-        is Stmt.Output -> "Output " + this.lib.str + "\n" + this.arg.dump(spc+4)
+        is Stmt.Output -> "Output " + "\n" + this.arg.dump(spc+4)
         is Stmt.If -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
         is Stmt.Loop -> "Loop\n" + this.block.dump(spc+4)
         is Stmt.Block -> "Block" +

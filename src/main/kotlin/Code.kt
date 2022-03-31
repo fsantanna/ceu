@@ -905,10 +905,12 @@ fun code_fs (s: Stmt) {
             }
         }
         is Stmt.Output -> CODE.removeFirst().let {
-            val call = if (s.lib.str == "std") {
-                s.arg.wtype!!.output_std("", it.expr)
+            s.arg.e as Expr.UCons
+            val call = if (s.arg.e.tk_.str == "1") {    // output Output.1 ()
+                val ucons = (s.arg.e.wtype as Type.Union)
+                ucons.vec[0].output_std("", "((struct "+ucons.toce()+"*)&"+it.expr+")->_1")
             } else {
-                "output_${s.lib.str}(${it.expr});\n"
+                "output_${s.arg.tk.str}(${it.expr});\n"
             }
             Code(it.type, it.struct, it.func, it.stmt+call, "")
         }

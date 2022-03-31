@@ -118,7 +118,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Input -> (if (this.dst == null) "" else "set " + this.dst.tostr(lc) + " = ") +
             "input " + this.lib.str + " " + this.arg.tostr(lc) + this.xtype.let { if (it==null) "" else ": " + it.tostr(lc) } +
             "\n"
-        is Stmt.Output -> "output " + this.lib.str + " " + this.arg.tostr(lc) + "\n"
+        is Stmt.Output -> "output " + this.arg.tostr(lc) + "\n"
         is Stmt.If -> "if " + this.tst.tostr(lc) + "\n" + this.true_.tostr(lc) + "else\n" + this.false_.tostr(lc)
         is Stmt.Loop -> "loop " + this.block.tostr(lc)
         is Stmt.Block -> {
