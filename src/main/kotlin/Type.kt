@@ -15,9 +15,9 @@ fun Type.flattenLeft (): List<Type> {
     // TODO: func/union do not make sense?
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Par -> listOf(this)
-        is Type.Named   -> listOf(this) + this.args!!.map { it.flattenLeft() }.flatten()
+        is Type.Named   -> listOf(this) + (this.args?.map { it.flattenLeft() }?.flatten() ?: emptyList())
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Union   -> listOf(this) + this.common.let { if (it==null) emptyList() else it.flattenLeft() } + this.vec.map { it.flattenLeft() }.flatten()
+        is Type.Union   -> listOf(this) + (this.common?.flattenLeft() ?: emptyList()) + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
         is Type.Active  -> listOf(this) + this.tsk.flattenLeft()
         is Type.Actives -> listOf(this) + this.tsk.flattenLeft()
@@ -57,7 +57,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
                 this.tk.clone() as Tk.Id,
                 this.subs.map { it.clone() },
                 this.xisrec,
-                this.args!!.map { it.aux(lin, col) },
+                this.args?.map { it.aux(lin, col) },
                 this.xscps?.map { Scope(it.scp1.clone() as Tk.Scp, it.scp2) },
                 this.xdef
             )
