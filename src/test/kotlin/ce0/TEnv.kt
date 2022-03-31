@@ -43,7 +43,7 @@ class TEnv {
     }
     @Test
     fun a02_undeclared_func () {
-        val out = inp2env("call f ()")
+        val out = inp2env("call f @{} ()")
         assert(out == "(ln 1, col 6): undeclared variable \"f\"") { out }
     }
     @Test
@@ -333,7 +333,7 @@ class TEnv {
     fun c15_type_func_tup () {
         val out = inp2env("""
             var f: [func@{}->()->()]
-            call f.1 ()
+            call f.1 @{} ()
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -348,7 +348,7 @@ class TEnv {
     fun c17_type_func_err () {
         val out = inp2env("""
         var f: func@{}->()->(); set f = func@{}->()->() {
-            call arg.2 ()
+            call arg.2 @{} ()
         }
         """.trimIndent())
         assert(out.startsWith("(ln 2, col 14): invalid discriminator : type mismatch : expected tuple")) { out }
@@ -641,7 +641,7 @@ class TEnv {
                     output std pa
                 }
             }
-            call f()
+            call f @{} ()
         """.trimIndent())
         assert(out.startsWith("(ln 5, col 11): invalid assignment : type mismatch :"))
         //assert(out == "(ln 6, col 20): invalid access to \"pa\" : invalid closure declaration (ln 5)") { out }
@@ -652,7 +652,7 @@ class TEnv {
             var f: func @a->@{}->()->()
         """.trimIndent())
         //assert(out == "(ln 1, col 14): undeclared scope \"a\"") { out }
-        assert(out == "(ln 1, col 13): expected type : have \"@a\"") { out }
+        assert(out == "(ln 1, col 13): expected \"@{\" : have \"@a\"") { out }
     }
     @Test
     fun e08_ptr_ok () {
@@ -1694,7 +1694,7 @@ class TEnv {
     fun l15_err () {
         val out = inp2env("""
             var f: / (func@{i1}->()->())@LOCAL
-            call f\ ()
+            call f\ @{} ()
         """.trimIndent())
         assert(out == "(ln 2, col 7): invalid call : scope mismatch : expecting 1, have 0 argument(s)") { out }
     }
@@ -1718,17 +1718,17 @@ class TEnv {
     fun m06_pred_notunion () {
         val out = inp2env("""
             var l: ()
-            call _f:$F l?1
+            call _f:$F @{} l?1
         """.trimIndent())
-        assert(out == "(ln 2, col 27): invalid predicate : not an union") { out }
+        assert(out == "(ln 2, col 31): invalid predicate : not an union") { out }
     }
     @Test
     fun m06_disc_notunion () {
         val out = inp2env("""
             var l: ()
-            call _f:$F l!1
+            call _f:$F @{} l!1
         """.trimIndent())
-        assert(out == "(ln 2, col 27): invalid discriminator : not an union") { out }
+        assert(out == "(ln 2, col 31): invalid discriminator : not an union") { out }
     }
 
     // UNION SELF POINTER / HOLD
@@ -2064,7 +2064,7 @@ class TEnv {
                     --set pf = new <.1 <.0>: /</_int @A> @A>:</_int @A>: @A
                     set pa = pf
                 }
-                call f ()
+                call f @{} ()
                 output std pa
             }
         """.trimIndent())
@@ -2104,7 +2104,7 @@ class TEnv {
         val out = inp2env(
             """
             var f: func @{a1,b1} -> /()@a1 -> /()@b1
-            call f ()
+            call f @{} ()
         """.trimIndent()
         )
         assert(out == "(ln 2, col 6): invalid call : scope mismatch : expecting 2, have 0 argument(s)") { out }
@@ -2136,7 +2136,7 @@ class TEnv {
     fun q00 () {
         val out = inp2env(
             """
-            var x: Unit @{}
+            var x: Unit $D{} @{}
         """.trimIndent()
         )
         assert(out == "(ln 1, col 8): undeclared type \"Unit\"") { out }
@@ -2145,9 +2145,9 @@ class TEnv {
     fun q01 () {
         val out = inp2env(
             """
-            type Unit @{} = ()
-            var x: Unit
-            set x = Unit ()
+            type Unit $D{} @{} = ()
+            var x: Unit $D{} @{}
+            set x = Unit $D{} @{} ()
             output std x
         """.trimIndent()
         )
@@ -2157,9 +2157,9 @@ class TEnv {
     fun q02 () {
         val out = inp2env(
             """
-            type Unit @{} = ()
-            var x: Unit
-            var y: Unit
+            type Unit $D{} @{} = ()
+            var x: Unit $D{} @{}
+            var y: Unit $D{} @{}
             set x = y
         """.trimIndent()
         )
@@ -2169,8 +2169,8 @@ class TEnv {
     fun q03 () {
         val out = inp2env(
             """
-            type Unit @{} = ()
-            var x: Unit
+            type Unit $D{} @{} = ()
+            var x: Unit $D{} @{}
             var y: ()
             set y = x~
         """.trimIndent()
@@ -2181,10 +2181,10 @@ class TEnv {
     fun q04 () {
         val out = inp2env(
             """
-            type Unit @{} = ()
-            type Uxit @{} = ()
-            var x: Unit
-            var y: Uxit
+            type Unit $D{} @{} = ()
+            type Uxit $D{} @{} = ()
+            var x: Unit $D{} @{}
+            var y: Uxit $D{} @{}
             set y = x
         """.trimIndent()
         )
@@ -2194,9 +2194,9 @@ class TEnv {
     fun q05 () {
         val out = inp2env(
             """
-            type List @{} = </List @LOCAL>
-            var x: /List @LOCAL
-            var y: /List @LOCAL
+            type List $D{} @{} = </List $D{} @{} @LOCAL>
+            var x: /List $D{} @{} @LOCAL
+            var y: /List $D{} @{} @LOCAL
             set y = x
         """.trimIndent()
         )
@@ -2206,9 +2206,9 @@ class TEnv {
     fun q06 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            var x: /List @{LOCAL} @LOCAL
-            var y: /List @{LOCAL} @LOCAL
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            var x: /List $D{} @{LOCAL} @LOCAL
+            var y: /List $D{} @{LOCAL} @LOCAL
             set y = x
         """.trimIndent()
         )
@@ -2218,10 +2218,10 @@ class TEnv {
     fun q07 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            type PList @{} = /<List @{LOCAL}> @LOCAL
-            var x: PList
-            var y: PList
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            type PList $D{} @{} = /<List $D{} @{LOCAL}> @LOCAL
+            var x: PList $D{} @{}
+            var y: PList $D{} @{}
             set y = x
         """.trimIndent()
         )
@@ -2231,10 +2231,10 @@ class TEnv {
     fun q08 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            var x: /List @{LOCAL} @LOCAL
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            var x: /List $D{} @{LOCAL} @LOCAL
             {
-                var y: /List @{LOCAL} @LOCAL
+                var y: /List $D{} @{LOCAL} @LOCAL
                 set y = x
             }
         """.trimIndent()
@@ -2245,10 +2245,10 @@ class TEnv {
     fun q09 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            var x: /List @{LOCAL} @LOCAL
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            var x: /List $D{} @{LOCAL} @LOCAL
             {
-                var y: /List @{LOCAL} @LOCAL
+                var y: /List $D{} @{LOCAL} @LOCAL
                 set x = y
             }
         """.trimIndent()
@@ -2259,10 +2259,10 @@ class TEnv {
     fun q10 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            var x: /List @{LOCAL} @LOCAL
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            var x: /List $D{} @{LOCAL} @LOCAL
             {
-                var y: /List @{GLOBAL} @GLOBAL
+                var y: /List $D{} @{GLOBAL} @GLOBAL
                 set x = y
             }
         """.trimIndent()
@@ -2273,11 +2273,11 @@ class TEnv {
     fun q11 () {
         val out = inp2env(
             """
-            type List @{a} = </List @{a} @a>
-            type PList @{} = /<List @{LOCAL}> @LOCAL
-            var x: PList
+            type List $D{} @{a} = </List $D{} @{a} @a>
+            type PList $D{} @{} = /<List $D{} @{LOCAL}> @LOCAL
+            var x: PList $D{} @{}
             {
-                var y: PList
+                var y: PList $D{} @{}
                 set x = y
             }
         """.trimIndent()
@@ -2288,10 +2288,10 @@ class TEnv {
     fun q12 () {
         val out = inp2env(
             """
-            type PList @{a} = /<PList @{a}> @a
-            var x: PList @{LOCAL}
+            type PList $D{} @{a} = /<PList $D{} @{a}> @a
+            var x: PList $D{} @{LOCAL}
             {
-                var y: PList @{GLOBAL}
+                var y: PList $D{} @{GLOBAL}
                 set x = y
             }
         """.trimIndent()
@@ -2303,8 +2303,8 @@ class TEnv {
     fun q13 () {
         val out = inp2env(
             """
-            type Xxx @{a} = _int
-            var x: Xxx @{}
+            type Xxx $D{} @{a} = _int
+            var x: Xxx $D{} @{}
         """.trimIndent()
         )
         assert(out == "(ln 2, col 8): invalid type : scope mismatch : expecting 1, have 0 argument(s)") { out }
@@ -2312,14 +2312,14 @@ class TEnv {
     @Test
     fun q14 () {
         val out = inp2env("""
-            type List @{a} = </List @{a} @a>
+            type List $D{} @{a} = </List $D{} @{a} @a>
             { @A
-                var p1: /List @{LOCAL} @LOCAL
-                var p2: /List @{A} @A
-                set p1 = Null: /List @{LOCAL} @LOCAL
-                set p2 = Null: /List @{A} @A
-                set p1 = new List @{LOCAL} <.1 Null: /List @{LOCAL} @LOCAL>: </List @{LOCAL} @LOCAL>: @LOCAL
-                set p2 = new List @{A}     <.1 Null: /List @{A}     @A>:     </List @{A}     @A>:     @A
+                var p1: /List $D{} @{LOCAL} @LOCAL
+                var p2: /List $D{} @{A} @A
+                set p1 = Null: /List $D{} @{LOCAL} @LOCAL
+                set p2 = Null: /List $D{} @{A} @A
+                set p1 = new List $D{} @{LOCAL} <.1 Null: /List $D{} @{LOCAL} @LOCAL>: </List $D{} @{LOCAL} @LOCAL>: @LOCAL
+                set p2 = new List $D{} @{A}     <.1 Null: /List $D{} @{A}     @A>:     </List $D{} @{A}     @A>:     @A
                 set p1 = p2
                 set p2 = p1
             }
@@ -2330,13 +2330,13 @@ class TEnv {
     fun q15 () {
         val out = inp2env(
             """
-            type Pair @{a,b: b>a} = [/_int@a, /_int@b]
+            type Pair $D{} @{a,b: b>a} = [/_int@a, /_int@b]
             {
                 var x: _int
                 {
                     var y: _int
-                    var xy: Pair @{x,y}     -- OK
-                    var yx: Pair @{y,x}     -- NO
+                    var xy: Pair $D{} @{x,y}     -- OK
+                    var yx: Pair $D{} @{y,x}     -- NO
                 }
             }
         """.trimIndent()
@@ -2346,11 +2346,11 @@ class TEnv {
     @Test
     fun q16 () {
         val out = inp2env("""
-            type Tx @{a} = [/_int@a]
+            type Tx $D{} @{a} = [/_int@a]
             { @A
                 var x: _int
-                var t1: Tx @{LOCAL}
-                set t1 = Tx @{LOCAL} [/x]
+                var t1: Tx $D{} @{LOCAL}
+                set t1 = Tx $D{} @{LOCAL} [/x]
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -2358,11 +2358,11 @@ class TEnv {
     @Test
     fun q17 () {
         val out = inp2env("""
-            type Tx @{a} = </_int@a>
+            type Tx $D{} @{a} = </_int@a>
             { @A
                 var x: _int
-                var t1: Tx @{LOCAL}
-                set t1 = Tx @{LOCAL} <.1 /x>: </_int>
+                var t1: Tx $D{} @{LOCAL}
+                set t1 = Tx $D{} @{LOCAL} <.1 /x>: </_int>
             }
         """.trimIndent())
         assert(out == "OK") { out }
@@ -2395,7 +2395,7 @@ class TEnv {
                     output std pa
                 }
             }
-            call f()
+            call f @{} ()
         """.trimIndent())
         assert(out.startsWith("(ln 5, col 11): invalid assignment : type mismatch")) { out }
         //assert(out == "OK") { out }
@@ -2493,11 +2493,11 @@ class TEnv {
                     set h = func @{} -> () -> _int {
                         set ret = x
                     }
-                    output std h ()
+                    output std h @{} ()
                 }
-                call g ()
+                call g @{} ()
             }
-            call f _10:_int
+            call f @{} _10:_int
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2518,15 +2518,15 @@ class TEnv {
     @Test
     fun s02_err () {
         val out = inp2env("""
-            type Tx = [()]
-            output std Tx ()
+            type Tx $D{} @{} = [()]
+            output std Tx $D{} @{} ()
         """.trimIndent())
         assert(out.contains("(ln 2, col 12): invalid type pack : type mismatch :")) { out }
     }
     @Test
     fun s03_err () {
         val out = inp2env("""
-            type Tx = [()]
+            type Tx $D{} @{}= [()]
             output std ()~
         """.trimIndent())
         assert(out == "(ln 2, col 14): invalid type unpack : expected type alias : found ()") { out }
@@ -2534,9 +2534,9 @@ class TEnv {
     @Test
     fun s04_union () {
         val out = inp2env("""
-            type Tx = <()>
-            var t: Tx
-            set t = Tx <.1 ()>:<()>
+            type Tx $D{} @{}= <()>
+            var t: Tx $D{} @{}
+            set t = Tx $D{} @{}<.1 ()>:<()>
             var u: <()>
             set u = t~
         """.trimIndent())
@@ -2546,8 +2546,8 @@ class TEnv {
     @Test
     fun s05_event () {
         val out = inp2env("""
-            type Event = <(),_uint64_t,()>
-            emit <.3 ()>: Event
+            type Event $D{} @{} = <(),_uint64_t,()>
+            emit <.3 ()>: Event $D{} @{}
        """.trimIndent())
         assert(out == "(ln 2, col 15): invalid type : expected union type") { out }
     }
@@ -2555,15 +2555,15 @@ class TEnv {
     @Test
     fun s06 () {
         val out = inp2env("""
-            type Int2Int = func @{} -> _int -> _int
+            type Int2Int $D{} @{} = func @{} -> _int -> _int
             
-            var f: Int2Int
-            set f = Int2Int func @{} -> _int -> _int {
+            var f: Int2Int $D{} @{}
+            set f = Int2Int $D{} @{} func @{} -> _int -> _int {
                 set ret = arg
             }
             
             var x: _int
-            set x = f~ _10:_int
+            set x = f~ @{} _10:_int
             
             output std x
        """.trimIndent())
@@ -2573,18 +2573,18 @@ class TEnv {
     @Test
     fun s07_task_type () {
         val out = inp2env("""
-            type Xask = task ()->()->()
-            var t = Xask {}
-            var y = spawn t ()
+            type Xask $D{} @{}= task @{}->()->()->()
+            var t = Xask $D{} @{}{}
+            var y = spawn t @{} ()
         """.trimIndent())
         assert(out == "(ln 3, col 15): invalid call : not a function") { out }
     }
     @Test
     fun s08_task_type () {
         val out = inp2env("""
-            type Xask = task ()->()->()
-            var t = Xask {}
-            var y = spawn (t~) ()
+            type Xask $D{} @{} = task @{}->()->()->()
+            var t = Xask $D{} @{} {}
+            var y = spawn (t~) @{} ()
         """.trimIndent())
         assert(out == "OK") { out }
     }

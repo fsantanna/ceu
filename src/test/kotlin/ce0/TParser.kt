@@ -270,7 +270,7 @@ class TParser {
             error("impossible case")
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 1): expected expression : have \"Point\"") { e.message!! }
-            assert(e.message == "(ln 1, col 10): expected union constructor : have end of file") { e.message!! }
+            assert(e.message == "(ln 1, col 14): expected union constructor : have end of file") { e.message!! }
             //assert(e.message == "(ln 1, col 1): unexpected end of file") { e.message!! }
         }
     }
@@ -1048,17 +1048,38 @@ class TParser {
 
     @Test
     fun e01_typedef() {
-        All_restart(null, PushbackReader(StringReader("type Unit = ()"), 2))
+        All_restart(null, PushbackReader(StringReader("type Unit \${} @{} = ()"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(s is Stmt.Typedef && s.tk.str == "Unit" && s.type is Type.Unit)
     }
-
     @Test
     fun e02_typedef() {
-        All_restart(null, PushbackReader(StringReader("var x: Unit"), 2))
+        All_restart(null, PushbackReader(StringReader("var x: Unit \${} @{}"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         assert(s is Stmt.Var && s.xtype is Type.Named && (s.xtype as Type.Named).tk.str == "Unit")
+    }
+    @Test
+    fun e03_typedef() {
+        All_restart(null, PushbackReader(StringReader("var x: Unit \${}"), 2))
+        Lexer.lex()
+        try {
+            Parser.stmt()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 16): expected \"@{\" : have end of file") { e.message!! }
+        }
+    }
+    @Test
+    fun e04_typedef() {
+        All_restart(null, PushbackReader(StringReader("var x: Unit @{}"), 2))
+        Lexer.lex()
+        try {
+            Parser.stmt()
+            error("impossible case")
+        } catch (e: Throwable) {
+            assert(e.message == "(ln 1, col 13): expected \"\${\" : have \"@{\"") { e.message!! }
+        }
     }
 }
