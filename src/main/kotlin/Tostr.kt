@@ -109,7 +109,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
     return when (this) {
         is Stmt.Nop -> "\n"
         is Stmt.Native -> "native " + (if (this.istype) "type " else "") + this.tk.str + "\n"
-        is Stmt.Var -> "var " + this.tk.str + this.xtype.let { if (it==null) " = var" else (": "+it.tostr()) } + "\n"
+        is Stmt.Var -> "var " + this.tk.str + this.xtype.let { if (it==null) " var" else (": "+it.tostr()) } + "\n"
         is Stmt.Set -> "set " + this.dst.tostr(lc) + " = " + this.src.tostr(lc) + "\n"
         is Stmt.XBreak -> "break\n"
         is Stmt.XReturn -> "return\n"
