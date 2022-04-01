@@ -1029,8 +1029,8 @@ object Parser
                     All_assert_tk(arg1.tk, CE1) {
                         "expected \"Output\" constructor : have \"${arg1.tk.str}\""
                     }
-                    val noparens = arg1.tostr().removeSurrounding("(",")")
-                    All_nest("Output.$noparens") {
+                    val nopar = arg1.tostr().removeSurrounding("(",")")
+                    All_nest("Output.$nopar\n") {
                         this.expr()
                     } as Expr.Pak
                 }

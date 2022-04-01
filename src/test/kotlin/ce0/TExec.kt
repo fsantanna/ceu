@@ -60,10 +60,11 @@ class TExec {
     fun a01_output4 () {
         val out = all("""
             native _{
-                void output_2 (struct U_Unit_int_U v) {
-                    switch (v.tag) {
+                void output_2 (CEU_Output v) {
+                    assert(v.tag == 2);
+                    switch (v._2.tag) {
                         case 1: printf("()\n"); break;
-                        case 2: printf("%d\n", v._2); break;
+                        case 2: printf("%d\n", v._2._2); break;
                     }
                 }
             }

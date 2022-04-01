@@ -13,6 +13,24 @@ class TXExec {
         assert(out == "()\n") { out }
     }
     @Test
+    fun a01_output_2 () {
+        val out = test(true, """
+            native _{
+                void output_Oth (CEU_Output v) {
+                    assert(v.tag == CEU_OUTPUT_OTH);
+                    switch (v.Oth.tag) {
+                        case CEU_OUTPUT_OTH_FA: printf("()\n"); break;
+                        case CEU_OUTPUT_OTH_FB: printf("%d\n", v.Oth.Fb); break;
+                    }
+                }
+            }
+            type Output $D{} @{} = <Std=_,Oth=<Fa=(),Fb=_int>>
+            output Oth.Fa
+            output Oth.Fb _10
+        """.trimIndent())
+        assert(out == "()\n10\n") { out }
+    }
+    @Test
     fun a02_int_abs () {
         val out = test(
             true, """
