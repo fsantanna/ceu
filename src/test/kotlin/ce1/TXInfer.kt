@@ -83,6 +83,17 @@ class TXInfer {
             
         """.trimIndent()) { out }
     }
+    @Test
+    fun todo_h05_ret () {   // TODO: needs tostring(CE0/CE1)
+        val out = all("""
+            type Error = <Escape=_int>
+            spawn {
+                var opt: _int
+                var str = if _0 {()} else { if opt {()} else {()} }
+            }
+        """.trimIndent())
+        assert(out == "()\n()\n") { out }
+    }
     @Disabled // no more expr
     @Test
     fun a04_input () {
@@ -168,13 +179,12 @@ class TXInfer {
         val out = all("""
             type List = </List @LOCAL>
             var l: /List = Null
-            output std l
+            --output std l
         """.trimIndent())
         assert(out == """
             type List @{} = </List @GLOBAL>
             var l: /List @GLOBAL
             set l = Null: /List @GLOBAL
-            output std l
             
         """.trimIndent()) { out }
     }
@@ -183,13 +193,12 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var l: /List = Null
-            output std l
+            --output std l
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var l: /List @{GLOBAL} @GLOBAL
             set l = Null: /List @{GLOBAL} @GLOBAL
-            output std l
 
         """.trimIndent()) { out }
     }
@@ -198,13 +207,12 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var l: /List = new <.1 Null>
-            output std l
+            --output std l
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var l: /List @{GLOBAL} @GLOBAL
             set l = (new (List @{GLOBAL} <.1 Null: /List @{GLOBAL} @GLOBAL>: </List @{GLOBAL} @GLOBAL>): @GLOBAL)
-            output std l
 
         """.trimIndent()) { out }
     }
@@ -214,13 +222,12 @@ class TXInfer {
             type List = </List>
             var l = new List.1 Null
             --var l = new <.1 Null>:List
-            output std l
+            --output std l
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var l: /List @{GLOBAL} @GLOBAL
             set l = (new (List.1 @{GLOBAL} Null: /List @{GLOBAL} @GLOBAL): @GLOBAL)
-            output std l
 
         """.trimIndent()) { out }
     }
@@ -230,13 +237,12 @@ class TXInfer {
             type List = <Cons=/List>
             var l = new List.Cons Null
             --var l = new <.1 Null>:List
-            output std l
+            --output std l
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var l: /List @{GLOBAL} @GLOBAL
             set l = (new (List @{GLOBAL} <.1 Null: /List @{GLOBAL} @GLOBAL>: </List @{GLOBAL} @GLOBAL>): @GLOBAL)
-            output std l
             
         """.trimIndent()) { out }
     }
@@ -251,11 +257,16 @@ class TXInfer {
     @Test
     fun a13_input_ptr () {
         val out = all("""
+            $prelude1
+            type Input += <Pico=/()>
             var input_pico_Unit = func /() -> () {}
             var e: () = ()
-            input pico /e
+            input Pico /e
         """.trimIndent())
         assert(out == """
+            type Output @{} = <Std=_>
+            type Input @{} = <Std=_>
+            type Input @{i} += <Pico=/() @i>
             var input_pico_Unit: func @{i} -> /() @i -> ()
             set input_pico_Unit = (func @{i} -> /() @i -> () {
 
@@ -263,7 +274,7 @@ class TXInfer {
             )
             var e: ()
             set e = ()
-            input pico (/e): ()
+            input (Input.Pico @{GLOBAL} (/e)): ()
 
         """.trimIndent()) { out }
     }
@@ -301,20 +312,19 @@ class TXInfer {
     fun a17_task () {
         val out = all("""
             task f: ()->()->() {
-                output std _1:_int
+                --output std _1:_int
             }
             var x = spawn f ()
-            output std _2:_int
+            --output std _2:_int
         """.trimIndent())
         assert(out == """
             var f: task @{} -> () -> () -> ()
             set f = (task @{} -> () -> () -> () {
-            output std (_1: _int)
+            
             }
             )
             var x: active task @{} -> () -> () -> ()
             set x = spawn (f @{} ())
-            output std (_2: _int)
 
         """.trimIndent()) { out }
     }
@@ -344,9 +354,17 @@ class TXInfer {
     @Test
     fun b06_inp_err () {
         val out = all("""
-            input pico ()
+            $prelude1
+            type Input += <Pico=()>
+            input Pico ()
         """.trimIndent())
-        assert(out == "input pico (): ()\n") { out }
+        assert(out == """
+            type Output @{} = <Std=_>
+            type Input @{} = <Std=_>
+            type Input @{} += <Pico=()>
+            input (Input.Pico ()): ()
+            
+        """.trimIndent()) { out }
     }
 
     // POINTER ARGUMENTS / SCOPES
@@ -513,14 +531,13 @@ class TXInfer {
             type List = </List>
             var f : func /List -> /List
             var v = f Null
-            output std f v
+            --output std f v
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var f: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
             var v: /List @{GLOBAL} @GLOBAL
             set v = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL)
-            output std (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} v: @GLOBAL)
 
         """.trimIndent()) { out }
     }
@@ -637,7 +654,7 @@ class TXInfer {
             {
                 var x = ()
                 var f = func () -> () {
-                    output std x
+                    --output std x
                 }
                 call f ()
             }
@@ -648,7 +665,7 @@ class TXInfer {
             set x = ()
             var f: func @{} -> () -> ()
             set f = (func @{} -> () -> () {
-            output std x
+            
             }
             )
             call (f @{} ())
@@ -700,7 +717,7 @@ class TXInfer {
                 var x = ()
                 {
                     var f = func () -> () {
-                        output std x
+                        --output std x
                     }
                     call f ()
                 }
@@ -713,7 +730,7 @@ class TXInfer {
             {
             var f: func @{} -> () -> ()
             set f = (func @{} -> () -> () {
-            output std x
+            
             }
             )
             call (f @{} ())
@@ -762,13 +779,13 @@ class TXInfer {
         val out = all("""
             type List = </List>
             var f : func /List -> /List
-            output std f (f Null)
+            set _:_int = f (f Null)
         """.trimIndent())
         assert(out == """
             type List @{i} = </List @{i} @i>
             var f: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
-            output std (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL): @GLOBAL)
-
+            set (_: _int) = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL): @GLOBAL)
+            
         """.trimIndent()) { out }
     }
     @Test
@@ -804,7 +821,7 @@ class TXInfer {
                     set pa\!1 = pf
                 }
                 call f ()
-                output std pa
+                --output std pa
             }
         """.trimIndent())
         //assert(out == "<.1 <.1 Null>>\n") { out }
@@ -822,7 +839,6 @@ class TXInfer {
             }
             )
             call (f @{} ())
-            output std pa
             }
            
         """.trimIndent()) { out }
@@ -865,10 +881,10 @@ class TXInfer {
             spawn {
                 var x = ()
                 spawn {
-                    output std x
+                    --output std x
                 }
                 spawn {
-                    output std x
+                    --output std x
                 }
             }
         """.trimIndent())
@@ -877,11 +893,11 @@ class TXInfer {
             var x: ()
             set x = ()
             spawn ((task @{} -> _ -> _ -> _ {
-            output std x
+            
             }
             ) @{} ())
             spawn ((task @{} -> _ -> _ -> _ {
-            output std x
+            
             }
             ) @{} ())
             }
@@ -896,11 +912,11 @@ class TXInfer {
                 var x = ()
                 spawn {
                     spawn {
-                        output std x
+                        --output std x
                     }
                 }
                 spawn {
-                    output std x
+                    --output std x
                 }
             }
         """.trimIndent())
@@ -910,13 +926,13 @@ class TXInfer {
             set x = ()
             spawn ((task @{} -> _ -> _ -> _ {
             spawn ((task @{} -> _ -> _ -> _ {
-            output std x
+            
             }
             ) @{} ())
             }
             ) @{} ())
             spawn ((task @{} -> _ -> _ -> _ {
-            output std x
+            
             }
             ) @{} ())
             }
@@ -928,13 +944,13 @@ class TXInfer {
     fun noclo_g03_spawn_task () {
         val out = all("""
             var t = spawn {
-                output std ()
+                --output std ()
             }
         """.trimIndent())
         assert(out == """
             var t: active task @{} -> _ -> _ -> _
             set t = spawn ((task @{} -> _ -> _ -> _ {
-            output std ()
+            
             }
             ) @{} ())
             
@@ -946,29 +962,28 @@ class TXInfer {
             type Xask = task ()->_int->()
             var t : Xask
             set t = Xask {
-                output std _2:_int
+                --output std _2:_int
             }
-            output std _1:_int
+            --output std _1:_int
             var x : active Xask
             set x = spawn t ()
             var y = spawn t ()
-            output std x.pub
-            output std _3:_int
+            --output std x.pub
+            set _:_int = x.pub
+            --output std _3:_int
         """.trimIndent())
         assert(out == """
             type Xask @{} = task @{} -> () -> _int -> ()
             var t: Xask
             set t = (Xask (task @{} -> () -> _int -> () {
-            output std (_2: _int)
+            
             }
             ))
-            output std (_1: _int)
             var x: active Xask
             set x = spawn (active Xask ((t~) @{} (): @GLOBAL))
             var y: active task @{} -> () -> _int -> ()
             set y = spawn ((t~) @{} ())
-            output std ((x~).pub)
-            output std (_3: _int)
+            set (_: _int) = ((x~).pub)
             
         """.trimIndent()) { out }
     }
@@ -998,7 +1013,7 @@ class TXInfer {
             set x = y where {
                 var y = ()
             }
-            output std x
+            --output std x
         """.trimIndent())
         assert(out == """
             var x: ()
@@ -1007,7 +1022,6 @@ class TXInfer {
             set y = ()
             set x = y
             }
-            output std x
 
         """.trimIndent()) { out }
     }
@@ -1018,7 +1032,7 @@ class TXInfer {
             var x = y where {
                 var y = ()
             }
-            output std x
+            --output std x
         """.trimIndent())
         assert(out == """
             var x: ()
@@ -1027,7 +1041,6 @@ class TXInfer {
             set y = ()
             set x = y
             }
-            output std x
             
         """.trimIndent()) { out }
     }
@@ -1036,7 +1049,7 @@ class TXInfer {
     fun h03_until () {
         val out = all("""
             spawn {
-                output std () until _0
+                set _:_ = () until _0
             }
         """.trimIndent())
         assert(out == """
@@ -1044,7 +1057,7 @@ class TXInfer {
             {
             {
             loop {
-            output std ()
+            set (_: _) = ()
             if (_0: _int)
             {
             break
@@ -1065,7 +1078,7 @@ class TXInfer {
     fun h04_until_where () {
         val out = all("""
             spawn {
-                output std () until x where { var x = () }
+                set (_: _) = () until x where { var x = () }
             }
         """.trimIndent())
         assert(out == """
@@ -1073,7 +1086,7 @@ class TXInfer {
             {
             {
             loop {
-            output std ()
+            set (_: _) = ()
             {
             var x: ()
             set x = ()
@@ -1106,7 +1119,7 @@ class TXInfer {
     fun h06_where_until_where () {
         val out = all("""
             spawn {
-                output std y where { var y = () } until x where { var x:_int = _1 }
+                set (_: _) = y where { var y = () } until x where { var x:_int = _1 }
             }
         """.trimIndent())
         assert(out == """
@@ -1117,7 +1130,7 @@ class TXInfer {
             {
             var y: ()
             set y = ()
-            output std y
+            set (_: _) = y
             }
             {
             var x: _int
@@ -1142,11 +1155,11 @@ class TXInfer {
     @Test
     fun h07_err () {
         val out = all("""
-            output std v until _1 where {
+            set (_: _) = v until _1 where {
                 var v = ()
             }
         """.trimIndent())
-        assert(out == "(ln 1, col 12): undeclared variable \"v\"") { out }
+        assert(out == "(ln 1, col 14): undeclared variable \"v\"") { out }
     }
 
     @Test
@@ -1197,7 +1210,7 @@ class TXInfer {
             var lte: func [_imt,_int] -> _int
             spawn {
                 every 1h5min2s20ms {
-                    output std ()
+                    --output std ()
                 }
             }
         """.trimIndent())
@@ -1210,14 +1223,14 @@ class TXInfer {
             {
             loop {
             {
-            var ms_14: _int
-            set ms_14 = (_3902020: _int)
+            var ms_12: _int
+            set ms_12 = (_3902020: _int)
             {
             {
             loop {
             await ((evt~)?3)
-            set ms_14 = (sub @{} [ms_14,((evt~)!3)])
-            if (lte @{} [ms_14,(_0: _int)])
+            set ms_12 = (sub @{} [ms_12,((evt~)!3)])
+            if (lte @{} [ms_12,(_0: _int)])
             {
             break
             }
@@ -1230,7 +1243,7 @@ class TXInfer {
             }
             }
             {
-            output std ()
+            
             }
             }
             }
@@ -1285,13 +1298,13 @@ class TXInfer {
         val out = all("""
             type TPico = <()>
             spawn {
-                output std TPico.1
+                set (_: _) = TPico.1
             }
         """.trimIndent())
         assert(out == """
             type TPico @{} = <()>
             spawn ((task @{} -> _ -> _ -> _ {
-            output std (TPico.1 ())
+            set (_: _) = (TPico.1 ())
             }
             ) @{} ())
             
@@ -1302,13 +1315,13 @@ class TXInfer {
         val out = all("""
             type TPico = <(),[_int,_int]>
             spawn {
-                output std TPico.2 [_1,_2]
+                set (_: _) = TPico.2 [_1,_2]
             }
         """.trimIndent())
         assert(out == """
             type TPico @{} = <(),[_int,_int]>
             spawn ((task @{} -> _ -> _ -> _ {
-            output std (TPico.2 [(_1: _int),(_2: _int)])
+            set (_: _) = (TPico.2 [(_1: _int),(_2: _int)])
             }
             ) @{} ())
             
@@ -1335,9 +1348,9 @@ class TXInfer {
     @Test
     fun f08_err_e_not_declared () {
         val out = all("""
-            output std e?3
+            set _:_int = e?3
         """.trimIndent())
-        assert(out == "(ln 1, col 12): undeclared variable \"e\"") { out }
+        assert(out == "(ln 1, col 14): undeclared variable \"e\"") { out }
     }
     @Test
     fun f09_func_alias () {
@@ -1352,7 +1365,7 @@ class TXInfer {
             var x: _int
             set x = f _10:_int
             
-            output std x
+            --output std x
        """.trimIndent())
         assert(out == """
             type Int2Int @{} = func @{} -> _int -> _int
@@ -1363,7 +1376,6 @@ class TXInfer {
             ))
             var x: _int
             set x = ((f~) @{} (_10: _int))
-            output std x
             
         """.trimIndent()) { out }
     }
@@ -1377,7 +1389,7 @@ class TXInfer {
             }
             spawn {
                 var x = await f _1
-                output std x
+                --output std x
             }
         """.trimIndent())
         assert(out == "(ln 6, col 19): expected \"spawn\" : have \"f\"") { out }
@@ -1392,7 +1404,7 @@ class TXInfer {
             }
             spawn {
                 var x = await spawn f _1
-                output std x
+                --output std x
             }
         """.trimIndent())
         assert(out == """
@@ -1420,7 +1432,6 @@ class TXInfer {
             }
             set x = (tsk_27.ret)
             }
-            output std x
             }
             ) @{} ())
             
@@ -1432,7 +1443,7 @@ class TXInfer {
         val out = all("""
             type Xask = task ()->()->()
             var t = Xask {}
-            output std ()
+            --output std ()
         """.trimIndent())
         assert(out == """
             type Xask @{} = task @{} -> () -> () -> ()
@@ -1441,7 +1452,6 @@ class TXInfer {
             
             }
             ))
-            output std ()
             
         """.trimIndent()) { out }
     }
@@ -1506,14 +1516,14 @@ class TXInfer {
         val out = all("""
             var b: [x:_int,y:_int] = [_10,_10]
             var c = b
-            output std c.x
+            set _:_int = c.x
         """.trimIndent())
         assert(out == """
             var b: [x:_int,y:_int]
             set b = [(_10: _int),(_10: _int)]
             var c: [x:_int,y:_int]
             set c = b
-            output std (c.x)
+            set (_: _int) = (c.x)
 
         """.trimIndent()) { out }
     }
@@ -1523,7 +1533,7 @@ class TXInfer {
             type Point = [x:_int,y:_int]
             var b: Point = [_10,_10]
             var c = b
-            output std c.x
+            set (_:_int) = (c.x)
         """.trimIndent())
         assert(out == """
             type Point @{} = [x:_int,y:_int]
@@ -1531,7 +1541,7 @@ class TXInfer {
             set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
-            output std ((c~).x)
+            set (_: _int) = ((c~).x)
 
         """.trimIndent()) { out }
     }
@@ -1541,7 +1551,7 @@ class TXInfer {
             type Point = [x:_int,y:_int]
             var b: Point = [x=_10,y=_10]
             var c = b
-            output std c.x
+            set (_:_int) = ((c~).x)
         """.trimIndent())
         assert(out == """
             type Point @{} = [x:_int,y:_int]
@@ -1549,7 +1559,7 @@ class TXInfer {
             set b = (Point [(_10: _int),(_10: _int)])
             var c: Point
             set c = b
-            output std ((c~).x)
+            set (_: _int) = ((c~).x)
             
         """.trimIndent()) { out }
     }
@@ -1559,7 +1569,7 @@ class TXInfer {
             type Point = [x:_int,y:_int]
             var b: Point = [x=_10,z=_10]
             var c = b
-            output std c.x
+            set (_:_int) = (c.x)
         """.trimIndent())
         assert(out == "(ln 2, col 23): invalid constructor : unknown discriminator \"z\"") { out }
     }
@@ -1569,9 +1579,9 @@ class TXInfer {
             type Point = [x:_int,y:_int]
             var b: Point = [x=_10,y=_10]
             var c = b
-            output std c.z
+            set (_:_int) = (c.z)
         """.trimIndent())
-        assert(out == "(ln 4, col 14): invalid discriminator : unknown \"z\"") { out }
+        assert(out == "(ln 4, col 19): invalid discriminator : unknown \"z\"") { out }
     }
     @Test
     fun d11_tuple_err () {
@@ -1579,7 +1589,7 @@ class TXInfer {
             type Point = [x:_int,y:_int]
             var b: Point = [y=_10,x=_10]
             var c = b
-            output std c.z
+            --output std c.z
         """.trimIndent())
         assert(out == "(ln 2, col 17): invalid constructor : invalid position for \"y\"") { out }
     }
@@ -1711,8 +1721,8 @@ class TXInfer {
     fun g01_ifs_stmt () {
         val out = all("""
             ifs {
-                _0 { output std _999:_int }
-                _1 { output std _1:_int   }
+                _0 { set _:_ = _999:_int }
+                _1 { set _:_ = _1:_int   }
             }
            """.trimIndent()
         )
@@ -1720,13 +1730,13 @@ class TXInfer {
         assert(out == """
             if (_0: _int)
             {
-            output std (_999: _int)
+            set (_: _) = (_999: _int)
             }
             else
             {
             if (_1: _int)
             {
-            output std (_1: _int)
+            set (_: _) = (_1: _int)
             }
             else
             {
@@ -1735,7 +1745,7 @@ class TXInfer {
             }
             }
             }
-
+            
         """.trimIndent()) { out }
     }
     @Test
@@ -1758,19 +1768,19 @@ class TXInfer {
     @Test
     fun g04_ifs_expr () {
         val out = all("""
-            output std ifs {
+            set _:_ = ifs {
                 _0:_int { _999:_int }
                 _1:_int { _1:_int   }
             }
            """.trimIndent()
         )
         //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
-        assert(out == "output std (if (_0: _int) { (_999: _int)}  else { (if (_1: _int) { (_1: _int)}  else { (_((assert(0 && \"runtime error : missing \\\"ifs\\\" case\"),0);): _int) }) })\n") { out }
+        assert(out == "set (_: _) = (if (_0: _int) { (_999: _int)}  else { (if (_1: _int) { (_1: _int)}  else { (_((assert(0 && \"runtime error : missing \\\"ifs\\\" case\"),0);): _int) }) })\n") { out }
     }
     @Test
     fun g05_ifs_expr () {
         val out = all("""
-            output std ifs {
+            set _:_ = ifs {
             }
        """.trimIndent())
         assert(out == "(ln 2, col 1): expected expression : have \"}\"") { out }
@@ -1778,21 +1788,10 @@ class TXInfer {
     @Test
     fun g06_ifs_expr () {
         val out = all("""
-            output std ifs {
+            set _:_ = ifs {
                 else {}
             }
        """.trimIndent())
         assert(out == "(ln 2, col 5): expected expression : have \"else\"") { out }
-    }
-    @Test
-    fun todo_h05_ret () {   // TODO: needs tostring(CE0/CE1)
-        val out = all("""
-            type Error = <Escape=_int>
-            spawn {
-                var opt: _int
-                var str = if _0 {()} else { if opt {()} else {()} }
-            }
-        """.trimIndent())
-        assert(out == "()\n()\n") { out }
     }
 }

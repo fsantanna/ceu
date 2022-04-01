@@ -3,5 +3,5 @@ var f = func _int -> _int {
 }
 
 var g = func () -> () {
-    output std ()
+    output Output ${} @{} <.1>: <()>
 }
