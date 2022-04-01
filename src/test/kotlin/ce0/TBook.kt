@@ -4,7 +4,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
+fun output0num (v: String): String {
+    return output0(v, "/(Num $D{}@{LOCAL})@LOCAL")
+}
 private val nums = """
+    $Output0
     type Num $D{}@{s} = </Num $D{}@{s} @s>
     var zero: /(Num $D{}@{LOCAL})@LOCAL
     set zero = Null: /(Num $D{}@{LOCAL}) @LOCAL
@@ -188,8 +192,8 @@ class TBook {
 
     @Test
     fun pre_01_nums() {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             type Num $D{}@{s} = </Num $D{}@{s} @s>
             var zero: /(Num $D{}@{LOCAL})@LOCAL
             set zero = Null: /(Num $D{}@{LOCAL}) @LOCAL
@@ -197,9 +201,9 @@ class TBook {
             set one = Num $D{}@{LOCAL} <.1 zero>:</Num $D{}@{LOCAL} @LOCAL>
             var two: (Num $D{}@{LOCAL})
             set two = Num $D{}@{LOCAL} <.1 /one>:</Num $D{}@{LOCAL} @LOCAL>
-            output std /two
-        """.trimIndent()
-        )
+            ${output0num("/two")}
+        """.trimIndent())
+        println(output0num("/two"))
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
@@ -209,7 +213,7 @@ class TBook {
             $nums
             $clone
             $add
-            output std add @{LOCAL,LOCAL,LOCAL} [two,one]: @LOCAL
+            ${output0num("add @{LOCAL,LOCAL,LOCAL} [two,one]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -220,7 +224,7 @@ class TBook {
             """
             $nums
             $clone
-            output std clone @{LOCAL,LOCAL} two: @LOCAL
+            ${output0num("clone @{LOCAL,LOCAL} two: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 Null>>\n") { out }
@@ -233,7 +237,7 @@ class TBook {
             $clone
             $add
             $mul
-            output std mul @{LOCAL,LOCAL,LOCAL} [two, add @{LOCAL,LOCAL,LOCAL} [two,one]]
+            ${output0num("mul @{LOCAL,LOCAL,LOCAL} [two, add @{LOCAL,LOCAL,LOCAL} [two,one]]")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -244,8 +248,8 @@ class TBook {
             """
             $nums
             $lt
-            output std lt @{LOCAL,LOCAL} [two, one]
-            output std lt @{LOCAL,LOCAL} [one, two]
+            ${output0("lt @{LOCAL,LOCAL} [two, one]","_int")}
+            ${output0("lt @{LOCAL,LOCAL} [one, two]","_int")}
         """.trimIndent()
         )
         assert(out == "0\n1\n") { out }
@@ -258,7 +262,7 @@ class TBook {
             $clone
             $add
             $sub
-            output std sub @{LOCAL,LOCAL,LOCAL} [three, two]
+            ${output0num("sub @{LOCAL,LOCAL,LOCAL} [three, two]")}
         """.trimIndent()
         )
         assert(out == "<.1 Null>\n") { out }
@@ -269,8 +273,8 @@ class TBook {
             """
             $nums
             $eq
-            output std eq @{LOCAL,LOCAL} [three, two]
-            output std eq @{LOCAL,LOCAL} [one, one]
+            ${output0("eq @{LOCAL,LOCAL} [three, two]","_int")}
+            ${output0("eq @{LOCAL,LOCAL} [one, one]","_int")}
         """.trimIndent()
         )
         assert(out == "0\n1\n") { out }
@@ -290,7 +294,7 @@ class TBook {
             set square = func @{r1,a1}-> $NumA1 -> $NumR1 {
                 set ret = mul @{r1,a1,a1} [arg,arg]: @r1
             }
-            output std square @{LOCAL,LOCAL} two
+            ${output0num("square @{LOCAL,LOCAL} two")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 Null>>>>\n") { out }
@@ -310,8 +314,8 @@ class TBook {
                     set ret = arg.2
                 }
             }
-            output std smaller @{LOCAL,LOCAL} [one,two]: @LOCAL
-            output std smaller @{LOCAL,LOCAL} [two,one]: @LOCAL
+            ${output0num("smaller @{LOCAL,LOCAL} [one,two]: @LOCAL")}
+            ${output0num("smaller @{LOCAL,LOCAL} [two,one]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 Null>\n<.1 Null>\n") { out }
@@ -333,7 +337,7 @@ class TBook {
             set f_three = func @{r1}-> $NumR1 -> $NumR1 {
                 set ret = three
             }
-            output std f_three @{LOCAL} one
+            ${output0num("f_three @{LOCAL} one")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -345,10 +349,10 @@ class TBook {
             """
             var infinity: func @{r1}-> () -> $NumR1
             set infinity = func @{r1}-> () -> $NumR1 {
-                output std _10:_int
+                ${output0num("_10:_int")}
                 set ret = new $_NumR1 @r1 <.1 infinity() @r1>:</Num @{r1} @r1>
             }
-            output std infinity @{LOCAL} ()
+            ${output0num("infinity @{LOCAL} ()")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -372,7 +376,7 @@ class TBook {
                     set ret = mul @{r1,a1,b1} [arg.1,arg.2]: @r1
                 }
             }
-            output std multiply @{LOCAL,LOCAL,LOCAL} [two,three]
+            ${output0num("multiply @{LOCAL,LOCAL,LOCAL} [two,three]")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -396,7 +400,7 @@ class TBook {
             set twice = func @{r1,a1}-> [func @{r1,a1}-> $NumA1->$NumR1, $NumA1] -> $NumR1 {
                 set ret = arg.1 @{r1,r1} (arg.1 @{r1,a1} arg.2: @r1): @r1
             }
-            output std twice @{LOCAL,LOCAL} [square,two]: @LOCAL
+            ${output0num("twice @{LOCAL,LOCAL} [square,two]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>>>>>>>>>>>\n") { out }
@@ -424,7 +428,7 @@ class TBook {
                 }
             }
             
-            output std fact @{LOCAL,LOCAL} three
+            ${output0num("fact @{LOCAL,LOCAL} three")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -504,6 +508,7 @@ class TBook {
     fun ch_02_01_not_pg30 () {
         val out = all(
             """
+            $Output0
             var not: func @{} -> <(),()> -> <(),()>
             set not = func @{} -> <(),()> -> <(),()> {
                 if arg?1 {
@@ -514,7 +519,7 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = not @{} <.1()>:<(),()>
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
         """.trimIndent()
         )
         assert(out == "<.2>\n") { out }
@@ -522,8 +527,8 @@ class TBook {
 
     @Test
     fun ch_02_01_and_pg30 () {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             var and: func @{} -> [$B,$B] -> $B
             set and = func @{} -> [$B,$B] -> $B {
                 if arg.1?1 {
@@ -534,17 +539,16 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = and @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = and @{} [<.2()>:<(),()>,<.2()>:<(),()>]
-            output std /xxx
-        """.trimIndent()
-        )
+            ${output0("/xxx","/<(),()>")}
+        """.trimIndent())
         assert(out == "<.1>\n<.2>\n") { out }
     }
     @Test
     fun ch_02_01_or_pg30 () {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             var or: func @{} -> [$B,$B] -> $B
             set or = func @{} -> [$B,$B] -> $B {
                 if arg.1?2 {
@@ -555,19 +559,19 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = or @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = or @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = or @{} [<.1()>:<(),()>,<.1()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
         """.trimIndent()
         )
         assert(out == "<.2>\n<.2>\n<.1>\n") { out }
     }
     @Test
     fun ch_02_01_eq_neq_pg31 () {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             $not
             $and
             $or
@@ -581,22 +585,20 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = eq @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = neq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = eq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            output std /xxx
+            ${output0("/xxx","/<(),()>")}
             set xxx = eq @{} [<.1()>:<(),()>,<.1()>:<(),()>]
-            output std /xxx
-        """.trimIndent()
-        )
+            ${output0("/xxx","/<(),()>")}
+        """.trimIndent())
         assert(out == "<.1>\n<.2>\n<.1>\n<.2>\n") { out }
     }
 
     @Test
     fun ch_02_01_mod_pg33 () {
-        val out = all(
-            """
+        val out = all("""
             $nums
             $clone
             $add
@@ -614,7 +616,7 @@ class TBook {
             }
             var v: $NumTL
             set v = mod @{LOCAL,LOCAL,LOCAL} [three,two]
-            output std v
+            ${output0num("v")}
         """.trimIndent()
         )
         assert(out == "<.1 Null>\n") { out }
@@ -666,9 +668,9 @@ class TBook {
             set n1979 = sub @{LOCAL,LOCAL,LOCAL} [n1980,one]
             var x: $B
             set x = leap @{LOCAL} n1980
-            output std /x
+            ${output0num("/x")}
             set x = leap @{LOCAL} n1979
-            output std /x
+            ${output0num("/x")}
         """.trimIndent()
         )
         assert(out == "<.2>\n<.1>\n") { out }
@@ -719,13 +721,13 @@ class TBook {
             set n10 = mul @{LOCAL,LOCAL,LOCAL} [five,two]
             var v: $Tri
             set v = analyse @{LOCAL,LOCAL,LOCAL} [n10,n10,n10]
-            output std /v
+            ${output0("/v",'/'+Tri)}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [one,five,five]
-            output std /v
+            ${output0("/v",'/'+Tri)}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [one,one,five]
-            output std /v
+            ${output0("/v",'/'+Tri)}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [two,four,five]
-            output std /v
+            ${output0("/v",'/'+Tri)}
         """.trimIndent()
         )
         assert(out == "<.2>\n<.3>\n<.1>\n<.4>\n") { out }
