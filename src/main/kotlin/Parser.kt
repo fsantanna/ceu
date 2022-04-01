@@ -640,9 +640,10 @@ object Parser
         var e = when {
             alls.acceptVar("id") -> Attr.Var(alls.tk0 as Tk.id)
             alls.acceptVar("Nat") -> {
+                val tk0 = alls.tk0
                 alls.acceptFix_err(":")
                 val tp = this.type()
-                Attr.Nat(alls.tk0 as Tk.Nat, tp)
+                Attr.Nat(tk0 as Tk.Nat, tp)
             }
             alls.acceptFix("\\") -> {
                 val tk0 = alls.tk0 as Tk.Fix

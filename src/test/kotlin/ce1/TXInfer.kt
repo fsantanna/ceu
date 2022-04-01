@@ -5,6 +5,24 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.PushbackReader
 import java.io.StringReader
 
+val prelude1 = """
+    type Output = <
+        Std = _
+    >
+    type Input = <
+        Std = _
+    >
+    
+""".trimIndent()
+
+/*
+fun rem (out: String): String {
+    out.split("\n").let {
+        it.drop(1).takeLast(it.size-1)
+    }
+}
+ */
+
 @TestMethodOrder(Alphanumeric::class)
 class TXInfer {
 
@@ -53,10 +71,17 @@ class TXInfer {
         val out = all("var rct = [_1]")
         assert(out == "(ln 1, col 12): invalid inference : undetermined type") { out }
     }
-    @Test
-    fun a03_input () {
-        val out = all("var x: _int = input Std ()")
-        assert(out == "var x: _int\nset x = input std (): _int\n") { out }
+    @Test   // TODO: Std -> .1
+    fun a03_input_output () {
+        val out = all(prelude1+"var x: _int = input Std ()\noutput Std ()\n")
+        assert(out == """
+            type Output @{} = <Std=_>
+            type Input @{} = <Std=_>
+            var x: _int
+            set x = input (Input.Std ()): _int
+            output (Output.Std ())
+            
+        """.trimIndent()) { out }
     }
     @Disabled // no more expr
     @Test
@@ -69,14 +94,14 @@ class TXInfer {
         val out = all("""
             var y: _int = _10
             var x: /_int = /_y
-            output std x\
+            set _:_int = x\
         """.trimIndent())
         assert(out == """
             var y: _int
             set y = (_10: _int)
             var x: /_int @GLOBAL
             set x = (/(_y: _int))
-            output std (x\)
+            set (_: _int) = (x\)
             
         """.trimIndent()) { out }
     }
@@ -85,14 +110,14 @@ class TXInfer {
         val out = all("""
             var y: /_int = _10
             var x: _int = _y\
-            output std x\
+            set _:_int = x\
         """.trimIndent())
         assert(out == """
             var y: /_int @GLOBAL
             set y = (_10: /_int @GLOBAL)
             var x: _int
             set x = ((_y: /_int @GLOBAL)\)
-            output std (x\)
+            set (_: _int) = (x\)
             
         """.trimIndent()) { out }
     }
