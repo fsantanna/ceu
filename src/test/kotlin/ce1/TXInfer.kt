@@ -55,7 +55,7 @@ class TXInfer {
     }
     @Test
     fun a03_input () {
-        val out = all("var x: _int = input std ()")
+        val out = all("var x: _int = input Std ()")
         assert(out == "var x: _int\nset x = input std (): _int\n") { out }
     }
     @Disabled // no more expr

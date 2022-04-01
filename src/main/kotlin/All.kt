@@ -194,8 +194,8 @@ fun exec (cmd: String): Pair<Boolean,String> {
     return exec(cmd.split(' '))
 }
 
-fun test (infer: Boolean, inp: String): String {
-    CE1 = infer
+fun test (ce1: Boolean, inp: String): String {
+    CE1 = ce1
     val (ok1,out1) = ce2c(null, inp)
     if (!ok1) {
         return out1

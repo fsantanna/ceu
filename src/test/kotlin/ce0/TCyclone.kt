@@ -24,8 +24,8 @@ class TCyclone {
 
     @Test
     fun strcpy_01() {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             var scpy:     (func @{a1,b1}-> [/_char@a1,/_char@b1] -> /_char@a1)
             set scpy = func @{a1,b1}-> [/_char@a1,/_char@b1] -> /_char@a1 {
                 set ret = arg.1
@@ -37,15 +37,14 @@ class TCyclone {
                 set s1 = scpy @{GLOBAL,LOCAL} [s1,s2]: @GLOBAL
                 set s2 = scpy @{LOCAL,GLOBAL} [s2,s1]   -- TODO: should be ok @a1/@b1
             }
-            output std ()
-        """.trimIndent()
-        )
+            ${output0("()", "()")}
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
     fun strdup_02() {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             var sdup:     (func @{i1}-> /_char@i1 -> /_char@GLOBAL)
             set sdup = func @{i1}-> /_char@i1 -> /_char@GLOBAL {
                 var xxx: /_char @GLOBAL -- new ...
@@ -58,15 +57,14 @@ class TCyclone {
                 --set s1 = sdup @{LOCAL} s2: @GLOBAL
                 set s2 = sdup @{GLOBAL} s1: @GLOBAL
             }
-            output std ()
-        """.trimIndent()
-        )
+            ${output0("()", "()")}
+        """.trimIndent())
         assert(out == "()\n") { out }
     }
     @Test
     fun fact_03 () {
-        val out = all(
-            """
+        val out = all("""
+            $Output0
             var fact: (func @{i1}->[/_int@i1,_int] -> ())
             set fact = func @{i1} ->[/_int@i1,_int] -> () { @F
                 var x: _int
@@ -81,9 +79,8 @@ class TCyclone {
             }
             var x: _int
             call fact @{LOCAL} [/x, _6:_int]
-            output std x
-        """.trimIndent()
-        )
+            ${output0("x", "_int")}
+        """.trimIndent())
         assert(out == "720\n") { out }
     }
 }
