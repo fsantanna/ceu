@@ -758,7 +758,6 @@ class TParser {
     fun c08_parser_stmt_input_err() {
         All_restart(null, PushbackReader(StringReader("set x = input Std \${} @{} (): _int"), 2))
         Lexer.lex()
-        val s = Parser.stmt()
         try {
             Parser.stmts()
             error("impossible case")
@@ -782,11 +781,11 @@ class TParser {
 
     @Test
     fun c09_parser_stmt_input() {
-        All_restart(null, PushbackReader(StringReader("input std (): _int"), 2))
+        All_restart(null, PushbackReader(StringReader("input Input \${} @{} <.1>:<_>: _int"), 2))
         Lexer.lex()
         val s = Parser.stmt()
         //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
-        assert(s is Stmt.Input && s.xtype is Type.Nat && s.dst == null && s.arg.e is Expr.Unit)
+        assert(s is Stmt.Input && s.xtype is Type.Nat && s.dst == null && s.arg.e is Expr.UCons)
     }
 
     // STMT_SEQ

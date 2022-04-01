@@ -13,6 +13,14 @@ class TXExec {
         assert(out == "()\n") { out }
     }
     @Test
+    fun a01_output_3 () {
+        val out = test(true, """
+            type Output $D{} @{} = <Std=_>
+            output Std _("Clicked!"):_(char*)
+        """.trimIndent())
+        assert(out == "\"Clicked!\"\n") { out }
+    }
+    @Test
     fun a01_input_output () {
         val out = test(true, """
             type Input  $D{} @{} = <Std=_>

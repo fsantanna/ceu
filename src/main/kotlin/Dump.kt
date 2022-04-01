@@ -34,7 +34,7 @@ fun Expr.dump (spc: Int = 0): String {
     return "[${this.tk.lin}] " + " ".repeat(spc) + "Expr." + when (this) {
         is Expr.Unit  -> "Unit\n"
         is Expr.Var   -> "Var '" + this.tk.str + "'\n"
-        is Expr.Nat   -> "Nat '" + this.tk.str + "'\n"
+        is Expr.Nat   -> "Nat '" + this.tk.str + "'\n" + this.xtype?.dump(spc+4)
         is Expr.Cast  -> "Cast\n" + this.e.dump(spc+4) + this.type.dump(spc+4)
         is Expr.Pak   -> "Pak\n" + (this.xtype?.dump(spc+4)?:none(spc+4)) + this.e.dump(spc+4)
         is Expr.Unpak -> "Unpak\n" + this.e.dump(spc+4)

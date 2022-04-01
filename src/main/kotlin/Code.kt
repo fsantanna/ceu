@@ -911,13 +911,14 @@ fun code_fs (s: Stmt) {
             val idx = s.arg.e.tk.str
             val call = if (idx=="1" || idx=="Std") { // output Output.1 ()
                 val v = s.arg.e.arg
-                v.visit(::code_fs,::code_fe,null,null)
+                v.visit(::code_fs,::code_fe,::code_ft,null)
                 val x = CODE.removeFirst()
                 v.wtype!!.output_std("", x.expr)
             } else {
                 //val fld = if (idx.toIntOrNull() == null) idx else "_"+idx
                 "output_$idx(${it.expr});\n"
             }
+            // TODO: removed it.stmt, only interested in Expr (but may fail for some Exprs)
             Code(it.type, it.struct, it.func, it.stmt+call, "")
         }
         is Stmt.Block -> {

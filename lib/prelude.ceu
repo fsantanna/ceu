@@ -7,3 +7,11 @@ type Event = <
     Task  = _uint64_t
     Timer = _int
 >
+
+type Output = <
+    Std = _
+>
+
+type Input = <
+    Std = _
+>

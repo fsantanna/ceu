@@ -38,8 +38,8 @@ class TEnv {
 
     @Test
     fun a01_undeclared_var () {
-        val out = inp2env("output std x")
-        assert(out == "(ln 1, col 12): undeclared variable \"x\"") { out }
+        val out = inp2env("call x @{} ()")
+        assert(out == "(ln 1, col 6): undeclared variable \"x\"") { out }
     }
     @Test
     fun a02_undeclared_func () {
@@ -75,24 +75,24 @@ class TEnv {
     fun b01_user_tuple_out () {
         val out = inp2env("""
             var x: [(),()]
-            output std(x.3)
+            set x.3 = _
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid discriminator : out of bounds") { out }
+        assert(out == "(ln 2, col 7): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun b02_user_sub_undeclared () {
         val out = inp2env("""
             var x: <(),()>
-            output std(x.0)
+            set x.0 = _
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid discriminator : type mismatch : expected tuple : have <(),()>") { out }
+        assert(out == "(ln 2, col 7): invalid discriminator : type mismatch : expected tuple : have <(),()>") { out }
     }
     @Test
     fun b04_user_disc_cons_err () {
         val out = inp2env("""
-            output std ()!1
+            call ()!1 @{} ()
         """.trimIndent())
-        assert(out == "(ln 1, col 15): invalid discriminator : not an union") { out }
+        assert(out == "(ln 1, col 9): invalid discriminator : not an union") { out }
     }
     @Test
     fun b07_user_out_err1 () {
@@ -111,7 +111,7 @@ class TEnv {
     @Test
     fun todo_b09_user_err () {
         val out = inp2env("""
-            type List = List
+            type List $D{} @{} = List $D{} @{}
         """.trimIndent())
         assert(out == "ERR: recursive must be pointer") { out }
     }
@@ -148,9 +148,9 @@ class TEnv {
         val out = inp2env("""
             var l: <()>
             set l = <.1 ()>:<()>
-            output std l!2
+            set l!2 = ()
         """.trimIndent())
-        assert(out == "(ln 3, col 14): invalid discriminator : out of bounds") { out }
+        assert(out == "(ln 3, col 7): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun b15_pool_err () {
@@ -298,9 +298,9 @@ class TEnv {
     fun c12_type_dnref () {
         val out = inp2env("""
             var x: ()
-            output std x\
+            set x\ = ()
         """.trimIndent())
-        assert(out == "(ln 2, col 13): invalid operand to `\\´ : not a pointer") { out }
+        assert(out == "(ln 2, col 6): invalid operand to `\\´ : not a pointer") { out }
     }
     @Test
     fun c12_type_dnref2 () {
@@ -376,54 +376,54 @@ class TEnv {
     fun c14_tup_disc_err () {
         val out = inp2env("""
             var x: [()]
-            output std x!2
+            set x!2 = ()
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid discriminator : not an union") { out }
+        assert(out == "(ln 2, col 7): invalid discriminator : not an union") { out }
     }
     @Test
     fun c15_tup_disc_err () {
         val out = inp2env("""
             var x: [()]
-            output std x.2
+            set x.2 = ()
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid discriminator : out of bounds")
+        assert(out == "(ln 2, col 7): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun c16_tup_disc_err () {
         val out = inp2env("""
-            output std [()].2
+            call [()].2 @{} ()
         """.trimIndent())
         //assert(out == "(ln 1, col 17): invalid discriminator : unexpected constructor") { out }
-        assert(out == "(ln 1, col 17): invalid discriminator : out of bounds") { out }
+        assert(out == "(ln 1, col 11): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun c17_uni_disc_err () {
         val out = inp2env("""
             var x: <()>
-            output std x.2
+            set x.2 = ()
         """.trimIndent())
-        assert(out.startsWith("(ln 2, col 14): invalid discriminator : type mismatch : expected tuple"))
+        assert(out.startsWith("(ln 2, col 7): invalid discriminator : type mismatch : expected tuple"))
     }
     @Test
     fun c18_uni_disc_err () {
         val out = inp2env("""
             var x: <()>
-            output std x!2
+            set x!2 = ()
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid discriminator : out of bounds")
+        assert(out == "(ln 2, col 7): invalid discriminator : out of bounds")
     }
     @Test
     fun c19_uni_disc_err () {
         val out = inp2env("""
-            output std <.1()>:<()>!2
+            set _:_int = <.1()>:<()>!2
         """.trimIndent())
         //assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
-        assert(out == "(ln 1, col 24): invalid discriminator : out of bounds") { out }
+        assert(out == "(ln 1, col 26): invalid discriminator : out of bounds") { out }
     }
     @Test
     fun c19_uni_pred_err () {
         val out = inp2env("""
-            output std <.1()>:<()>?1
+            set _:_int = <.1()>:<()>?1
         """.trimIndent())
         //assert(out == "(ln 1, col 24): invalid discriminator : unexpected constructor") { out }
         assert(out == "OK") { out }
@@ -431,7 +431,7 @@ class TEnv {
     @Test
     fun c20_uni_disc_err () {
         val out = inp2env("""
-            output std <.2()>:<(),()>!2
+            set _:_ = <.2()>:<(),()>!2
         """.trimIndent())
         //assert(out == "(ln 1, col 27): invalid discriminator : unexpected constructor") { out }
         assert(out == "OK") { out }
@@ -478,9 +478,9 @@ class TEnv {
     @Test
     fun c24_ucons () {
         val out = inp2env("""
-            output std <.2 ()>: <()>
+            set _:_ = <.2 ()>: <()>
         """.trimIndent())
-        assert(out == "(ln 1, col 14): invalid constructor : out of bounds") { out }
+        assert(out == "(ln 1, col 13): invalid constructor : out of bounds") { out }
     }
 
     // POINTERS / SCOPE / @GLOBAL
@@ -638,7 +638,7 @@ class TEnv {
                 var pa: ()
                 set pa = ()
                 set f = func @{}->()->() {  -- set [] vs [@A]
-                    output std pa
+                    set _:_ = pa
                 }
             }
             call f @{} ()
@@ -949,7 +949,7 @@ class TEnv {
     fun e24_err () {
         val out = inp2env("""
             var x: /</_int @LOCAL> @LOCAL
-            output std [x,x]
+            set _:_ = [x,x]
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -987,7 +987,7 @@ class TEnv {
             var y: /_int @LOCAL
             set y = /z
             set p = /y
-            output std p\\
+            set _:_ = p\\
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -1035,7 +1035,7 @@ class TEnv {
             set v = _10: _int
             var p: /_int @LOCAL
             set p = f @{LOCAL} /v
-            output std p\
+            set _:_ = p\
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -1050,7 +1050,7 @@ class TEnv {
             }
             var p: /_int @LOCAL
             set p = f @{LOCAL} (): @LOCAL
-            output std p\
+            set _:_ = p\
         """.trimIndent())
         //assert(out == "(ln 3, col 13): undeclared variable \"v\"") { out }
         assert(out == "OK") { out }
@@ -1077,7 +1077,7 @@ class TEnv {
             }
             var p: /_int @LOCAL
             set p = f @{LOCAL} ()
-            output std p\
+            set _:_ = p\
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -1304,7 +1304,7 @@ class TEnv {
             var p: /_int @LOCAL
             set p = /v.1
             set p\ = _20: _int
-            output std v
+            set _:_ = v
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -1552,7 +1552,7 @@ class TEnv {
             var f: func@{i1}-> //</_int@i1>@i1@i1 -> ()
             set f = func@{i1}->//</_int@i1>@i1@i1 -> ()
             {
-                output std arg
+                set _:_ = arg
             }
             call f @{LOCAL} /x.1
         """.trimIndent())
@@ -1611,7 +1611,7 @@ class TEnv {
             var f: func@{i1}->//</_int@i1>@i1@i1 -> ()
             set f = func@{i1}->//</_int@i1>@i1@i1 -> ()
             {
-                output std arg
+                set _:_ = arg
             }
             call f @{LOCAL} /x.1
         """.trimIndent())
@@ -1753,7 +1753,7 @@ class TEnv {
             var x: <[()]>
             var y: /() @LOCAL
             set y = /x!1.1  -- can't point to .1 inside union (union might change)
-            output std y
+            --output std y
         """.trimIndent())
         assert(out == "(ln 3, col 9): invalid operand to `/´ : union discriminator") { out }
     }
@@ -1764,7 +1764,6 @@ class TEnv {
             set x = <.2 [()]>:<(),[()]>
             var y: /() @LOCAL
             set y = /x!2.1  -- crossing udisc
-            output std y
         """.trimIndent())
         assert(out == "(ln 4, col 9): invalid operand to `/´ : union discriminator") { out }
     }
@@ -1774,7 +1773,6 @@ class TEnv {
             var x: </() @LOCAL>
             var y: /() @LOCAL
             set y = /x!1\   -- ok: crosses udisc but dnrefs a pointer before the upref
-            output std y
         """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -1784,7 +1782,6 @@ class TEnv {
             var x: </() @LOCAL>
             var y: //() @LOCAL @LOCAL
             set y = //x!1\   -- no: upref after dnref fires the problem again
-            output std y
         """.trimIndent())
         assert(out == "(ln 3, col 9): invalid operand to `/´ : union discriminator") { out }
     }
@@ -1792,9 +1789,9 @@ class TEnv {
     fun o07_bug () {
         val out = inp2env("""
             var z: //<()> @LOCAL @LOCAL
-            output std z\!1
+            set _:_ = z\!1
         """.trimIndent())
-        assert(out == "(ln 2, col 15): invalid discriminator : not an union") { out }
+        assert(out == "(ln 2, col 14): invalid discriminator : not an union") { out }
     }
 
     // FUNC / POOL
@@ -1973,7 +1970,7 @@ class TEnv {
             set g = func@{a1}-> () -> (func@{a1}->()->()) {
                 var f:(func@{b1}->() -> ())     -- this is @LOCAL, cant return it
                 set f = func@{b1}->() -> () {
-                    output std ()
+
                 }           
                 set ret = f                 -- can't return pointer @LOCAL
             }
@@ -2037,7 +2034,7 @@ class TEnv {
             """
             var f:                  /(func @{i1} -> () -> ())@LOCAL
             var g: /(func @{i1} -> /(func @{i1} -> () -> ())@i1 -> ())@LOCAL
-            output std g\ @{LOCAL} f
+            set _:_ = g\ @{LOCAL} f
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2048,7 +2045,7 @@ class TEnv {
             """
             var f:                  /(func @{i1} -> /()@i1 -> ())@LOCAL
             var g: /(func @{i1} -> /(func @{i1} -> /()@i1 -> ())@i1 -> ())@LOCAL
-            output std g\ @{LOCAL} f
+            set _:_ = g\ @{LOCAL} f
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2065,7 +2062,7 @@ class TEnv {
                     set pa = pf
                 }
                 call f @{} ()
-                output std pa
+                --output std pa
             }
         """.trimIndent())
         //assert(out == "(ln 7, col 16): invalid assignment : cannot modify an upalue") { out }
@@ -2148,7 +2145,7 @@ class TEnv {
             type Unit $D{} @{} = ()
             var x: Unit $D{} @{}
             set x = Unit $D{} @{} ()
-            output std x
+            --output std x
         """.trimIndent()
         )
         assert(out == "OK") { out }
@@ -2392,7 +2389,7 @@ class TEnv {
                 var pa: ()
                 set pa = ()
                 set f = func @{}->()->() {  -- set [] vs [@A]
-                    output std pa
+                    set _:_ = pa
                 }
             }
             call f @{} ()
@@ -2461,7 +2458,7 @@ class TEnv {
             {
                 var x: /</_int@LOCAL>@LOCAL
                 set f = func @{}->() -> () {
-                    output std x
+                    set _:_ = x
                 }
             }
         """.trimIndent()
@@ -2493,7 +2490,7 @@ class TEnv {
                     set h = func @{} -> () -> _int {
                         set ret = x
                     }
-                    output std h @{} ()
+                    set _:_ = h @{} ()
                 }
                 call g @{} ()
             }
@@ -2508,28 +2505,28 @@ class TEnv {
     @Test
     fun s01_err () {
         val out = inp2env("""
-            output std ():+()
+            set _:_ = ():+()
         """.trimIndent())
         //assert(out == "(ln 1, col 16): expected alias type") { out }
         //assert(out == "(ln 1, col 14): expected statement : have `:+´") { out }
-        assert(out == "(ln 1, col 14): expected statement : have \":\"") { out }
+        assert(out == "(ln 1, col 13): expected statement : have \":\"") { out }
     }
 
     @Test
     fun s02_err () {
         val out = inp2env("""
             type Tx $D{} @{} = [()]
-            output std Tx $D{} @{} ()
+            set _:_ = Tx $D{} @{} ()
         """.trimIndent())
-        assert(out.contains("(ln 2, col 12): invalid type pack : type mismatch :")) { out }
+        assert(out.contains("(ln 2, col 11): invalid type pack : type mismatch :")) { out }
     }
     @Test
     fun s03_err () {
         val out = inp2env("""
             type Tx $D{} @{}= [()]
-            output std ()~
+            set _:_ = ()~
         """.trimIndent())
-        assert(out == "(ln 2, col 14): invalid type unpack : expected type alias : found ()") { out }
+        assert(out == "(ln 2, col 13): invalid type unpack : expected type alias : found ()") { out }
     }
     @Test
     fun s04_union () {
@@ -2565,7 +2562,7 @@ class TEnv {
             var x: _int
             set x = f~ @{} _10:_int
             
-            output std x
+            --output std x
        """.trimIndent())
         assert(out == "OK") { out }
     }
@@ -2574,17 +2571,17 @@ class TEnv {
     fun s07_task_type () {
         val out = inp2env("""
             type Xask $D{} @{}= task @{}->()->()->()
-            var t = Xask $D{} @{}{}
-            var y = spawn t @{} ()
+            var t: Xask $D{} @{}
+            spawn t @{} ()
         """.trimIndent())
-        assert(out == "(ln 3, col 15): invalid call : not a function") { out }
+        assert(out == "(ln 3, col 7): invalid call : not a function") { out }
     }
     @Test
     fun s08_task_type () {
         val out = inp2env("""
             type Xask $D{} @{} = task @{}->()->()->()
-            var t = Xask $D{} @{} {}
-            var y = spawn (t~) @{} ()
+            var t: Xask $D{} @{}
+            spawn (t~) @{} ()
         """.trimIndent())
         assert(out == "OK") { out }
     }

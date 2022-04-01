@@ -257,3 +257,5 @@ spawn tk2
 await_all [tk1,tk2]
 await_any [tk1,tk2]
 
+output Std xxx
+input Std xxx
