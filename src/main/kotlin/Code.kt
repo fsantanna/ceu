@@ -22,7 +22,7 @@ fun Type.pos (): String {
     }
 }
 
-fun Type.output_std (c: String, arg: String): String {
+fun Type.output_Std (c: String, arg: String): String {
     val pln_from_ptr_to_tup_or_uni: Type? = this.unpak().let {
         if (it !is Type.Pointer) null else {
             it.pln.unpak().let {
@@ -31,12 +31,12 @@ fun Type.output_std (c: String, arg: String): String {
         }
     }
     return when {
-        (pln_from_ptr_to_tup_or_uni != null) ->"output_std_${pln_from_ptr_to_tup_or_uni.toce()}$c($arg);\n"
+        (pln_from_ptr_to_tup_or_uni != null) ->"output_Std_${pln_from_ptr_to_tup_or_uni.toce()}$c($arg);\n"
         this is Type.Pointer || this is Type.Func -> {
             if (c == "_") "putchar('_');\n" else "puts(\"_\");\n"
         }
         this is Type.Nat -> {
-            val out = "output_std_${this.toce()}$c"
+            val out = "output_Std_${this.toce()}$c"
             """
                 
                 #ifdef $out
@@ -48,7 +48,7 @@ fun Type.output_std (c: String, arg: String): String {
                 
             """.trimIndent()
         }
-        else -> "output_std_${this.unpak().toce()}$c($arg);\n"
+        else -> "output_Std_${this.unpak().toce()}$c($arg);\n"
     }
 }
 
@@ -123,8 +123,8 @@ fun code_ft (tp: Type) {
             val type    = """
                 // Type.Tuple.type
                 struct $ce;
-                void output_std_${ce}_ (${tp.pos()}* v);
-                void output_std_${ce}  (${tp.pos()}* v);
+                void output_Std_${ce}_ (${tp.pos()}* v);
+                void output_Std_${ce}  (${tp.pos()}* v);
                 
             """.trimIndent()
             val struct  = """
@@ -135,7 +135,7 @@ fun code_ft (tp: Type) {
                         .joinToString("")
                     }
                 };
-                void output_std_${ce}_ (${tp.pos()}* v) {
+                void output_Std_${ce}_ (${tp.pos()}* v) {
                     printf("[");
                     ${tp.vec
                         .mapIndexed { i,sub ->
@@ -143,14 +143,14 @@ fun code_ft (tp: Type) {
                                 is Type.Union, is Type.Tuple -> "&v->_${i + 1}"
                                 else -> "v->_${i + 1}"
                             }
-                            sub.output_std("_", s)
+                            sub.output_Std("_", s)
                         }
                         .joinToString("putchar(',');\n")
                     }
                     printf("]");
                 }
-                void output_std_${ce} (${tp.pos()}* v) {
-                    output_std_${ce}_(v);
+                void output_Std_${ce} (${tp.pos()}* v) {
+                    output_Std_${ce}_(v);
                     puts("");
                 }
 
@@ -165,8 +165,8 @@ fun code_ft (tp: Type) {
             val type    = """
                 // Type.Union.type
                 struct $ce;
-                void output_std_${ce}_ (${tp.pos()}* v);
-                void output_std_${ce} (${tp.pos()}* v);
+                void output_Std_${ce}_ (${tp.pos()}* v);
+                void output_Std_${ce} (${tp.pos()}* v);
 
             """.trimIndent()
             val struct  = """
@@ -196,7 +196,7 @@ fun code_ft (tp: Type) {
                     };
                     int tag;
                 };
-                void output_std_${ce}_ (${tp.pos()}* v) {
+                void output_Std_${ce}_ (${tp.pos()}* v) {
                     // TODO: only if tp.isrec
                     if (v == NULL) {
                         printf("Null");
@@ -208,8 +208,8 @@ fun code_ft (tp: Type) {
                             .mapIndexed { i,sub ->
                                 val s = when (sub.unpak()) {
                                     is Type.Unit -> ""
-                                    is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_std("_", "&v->_${i+1}")
-                                    else -> "putchar(' ');\n" + sub.output_std("_", "v->_${i+1}")
+                                    is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_Std("_", "&v->_${i+1}")
+                                    else -> "putchar(' ');\n" + sub.output_Std("_", "v->_${i+1}")
                                 }
                                 """
                                 case ${i+1}:
@@ -222,8 +222,8 @@ fun code_ft (tp: Type) {
                     }
                     putchar('>');
                 }
-                void output_std_${ce} (${tp.pos()}* v) {
-                    output_std_${ce}_(v);
+                void output_Std_${ce} (${tp.pos()}* v) {
+                    output_Std_${ce}_(v);
                     puts("");
                 }
 
@@ -496,12 +496,12 @@ fun code_fe (e: Expr) {
             val tpf  = e.f.wtype!!.noact()
             val upspawn = e.upspawn()
             when {
-                (e.f is Expr.Var && e.f.tk.str=="output_std") -> {
+                (e.f is Expr.Var && e.f.tk.str=="output_Std") -> {
                     Code (
                         f.type + arg.type,
                         f.struct + arg.struct,
                         f.func + arg.func,
-                        f.stmt + arg.stmt + e.arg.wtype!!.output_std("", arg.expr),
+                        f.stmt + arg.stmt + e.arg.wtype!!.output_Std("", arg.expr),
                         ""
                     )
                 }
@@ -695,8 +695,8 @@ fun code_fs (s: Stmt) {
                 }
 
                 val src = """
-                //#define output_std_${s.tk.str}_ output_std_${s.xtype!!.toce()}_
-                //#define output_std_${s.tk.str}  output_std_${s.xtype!!.toce()}
+                //#define output_Std_${s.tk.str}_ output_Std_${s.xtype!!.toce()}_
+                //#define output_Std_${s.tk.str}  output_Std_${s.xtype!!.toce()}
                 typedef ${s.xtype!!.pos()} CEU_${s.tk.str}_${s.n};
                 
             """.trimIndent()
@@ -913,7 +913,7 @@ fun code_fs (s: Stmt) {
                 val v = s.arg.e.arg
                 v.visit(::code_fs,::code_fe,::code_ft,null)
                 val x = CODE.removeFirst()
-                v.wtype!!.output_std("", x.expr)
+                v.wtype!!.output_Std("", x.expr)
             } else {
                 //val fld = if (idx.toIntOrNull() == null) idx else "_"+idx
                 "output_$idx(${it.expr});\n"
@@ -1038,16 +1038,17 @@ fun Stmt.code (): String {
         
         #define input_1_int(x)       ({ int _x ; scanf("%d",&_x) ; _x ; })
         #define input_Std_int(x)     input_1_int(x)
-        #define output_std_Unit_(x)  (x, printf("()"))
-        #define output_std_Unit(x)   (output_std_Unit_(x), puts(""))
-        #define output_std_int_(x)   printf("%d",x)
-        #define output_std_int(x)    (output_std_int_(x), puts(""))
-        #define output_std_float_(x) printf("%f",x)
-        #define output_std_float(x)  (output_std_float_(x), puts(""))
-        #define output_std_char__(x) printf("\"%s\"",x)
-        #define output_std_char_(x)  (output_std_char__(x), puts(""))
-        #define output_std_Ptr_(x)   printf("%p",x)
-        #define output_std_Ptr(x)    (output_std_Ptr_(x), puts(""))
+        
+        #define output_Std_Unit_(x)  (x, printf("()"))
+        #define output_Std_Unit(x)   (output_Std_Unit_(x), puts(""))
+        #define output_Std_int_(x)   printf("%d",x)
+        #define output_Std_int(x)    (output_Std_int_(x), puts(""))
+        #define output_Std_float_(x) printf("%f",x)
+        #define output_Std_float(x)  (output_Std_float_(x), puts(""))
+        #define output_Std_char__(x) printf("\"%s\"",x)
+        #define output_Std_char_(x)  (output_Std_char__(x), puts(""))
+        #define output_Std_Ptr_(x)   printf("%p",x)
+        #define output_Std_Ptr(x)    (output_Std_Ptr_(x), puts(""))
         
         ///
         

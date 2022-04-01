@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.Alphanumeric
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -20,6 +21,7 @@ class TXExec {
         """.trimIndent())
         assert(out == "\"Clicked!\"\n") { out }
     }
+    @Disabled
     @Test
     fun a01_input_output () {
         val out = test(true, """

@@ -123,14 +123,14 @@ class TCode {
             #include <stdlib.h>
             
             #define input_std_int(x)     ({ int _x ; scanf("%d",&_x) ; _x ; })
-            #define output_std_Unit_(x)  printf("()")
-            #define output_std_Unit(x)   (output_std_Unit_(x), puts(""))
-            #define output_std_int_(x)   printf("%d",x)
-            #define output_std_int(x)    (output_std_int_(x), puts(""))
-            #define output_std_char__(x) printf("\"%s\"",x)
-            #define output_std_char_(x)  (output_std_char__(x), puts(""))
-            #define output_std_Ptr_(x)   printf("%p",x)
-            #define output_std_Ptr(x)    (output_std_Ptr_(x), puts(""))
+            #define output_Std_Unit_(x)  printf("()")
+            #define output_Std_Unit(x)   (output_Std_Unit_(x), puts(""))
+            #define output_Std_int_(x)   printf("%d",x)
+            #define output_Std_int(x)    (output_Std_int_(x), puts(""))
+            #define output_Std_char__(x) printf("\"%s\"",x)
+            #define output_Std_char_(x)  (output_Std_char__(x), puts(""))
+            #define output_Std_Ptr_(x)   printf("%p",x)
+            #define output_Std_Ptr(x)    (output_Std_Ptr_(x), puts(""))
 
             typedef struct Pool {
                 void* val;

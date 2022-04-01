@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
+val Output0 = "type Output $D{} @{} = <_>"
+fun output0 (v: String, tp: String): String {
+    return "output Output $D{} @{} <.1 $v>: <$tp>"
+}
+
 val func0 = "call func @{} -> () -> ()"
 fun catch0 (v: Int): String {
     return "catch _(task1->err.tag==1 && task1->err._1==$v)"
@@ -50,9 +55,10 @@ class TExec {
     @Test
     fun a01_output3 () {
         val out = all("""
+            $Output0
             var x: _int
             set x = ((_abs: _) @{} (_(-1): _))
-            output std x            
+            ${output0("x","_int")}            
         """.trimIndent())
         assert(out == "1\n") { out }
     }
@@ -77,9 +83,10 @@ class TExec {
     @Test
     fun a02_var () {
         val out = all("""
+            $Output0
             var x: ()
             set x = ()
-            output std x
+            ${output0("x","()")}
         """.trimIndent())
         assert(out == "()\n") { out }
     }
@@ -91,17 +98,19 @@ class TExec {
     @Test
     fun a05_int () {
         val out = all("""
+            $Output0
             var x: _int
             set x = _10: _int
-            output std x
+            ${output0("x","_int")}
         """.trimIndent())
         assert(out == "10\n") { out }
     }
     @Test
     fun a06_int () {
         val out = all("""
+            $Output0
             var x: _int
-            output std _10:_int
+            ${output0("_10:_int","_int")}
         """.trimIndent())
         assert(out == "10\n") { out }
     }
@@ -134,38 +143,42 @@ class TExec {
     @Test
     fun a09_int_abs () {
         val out = all("""
+            $Output0
             var x: _int
             set x = _abs:_ @{} _(-1): _int
-            output std x
+            ${output0("x","_int")}
         """.trimIndent())
         assert(out == "1\n") { out }
     }
     @Test
     fun a10_int_set () {
         val out = all("""
+            $Output0
             var x: _int
             set x = _10: _int
             set x = _(-20): _int
-            output std x
+            ${output0("x","_int")}
         """.trimIndent())
         assert(out == "-20\n") { out }
     }
     @Test
     fun a11_unk () {
         val out = all("""
+            $Output0
             var x: _int
             set x = _(-20): _int
-            output std x
+            ${output0("x","_int")}
         """.trimIndent())
-        assert(out == "-20\n")
+        assert(out == "-20\n") { out }
     }
     @Test
     fun a12_set () {
         val out = all("""
+            $Output0
             var x: ()
             set x = ()
             set x = ()
-            output std x
+            ${output0("x","()")}
         """.trimIndent())
         assert(out == "()\n")
     }
@@ -175,11 +188,12 @@ class TExec {
     @Test
     fun b01_tuple_units () {
         val out = all("""
+            $Output0
             var x : [(),()]
             set x = [(),()]
             var y: ()
             set y = x.1
-            native _{ output_std_Unit(${D}y); }
+            native _{ output_Std_Unit(${D}y); }
         """.trimIndent())
         assert(out == "()\n") { out }
     }
@@ -501,14 +515,14 @@ class TExec {
         val out = all("""
             native _{
                 void output_f (int x) {
-                    output_std_int(x);
+                    output_Std_int(x);
                 }
             }
             output f _10: _int
         """.trimIndent())
         assert(out == "10\n") { out }
     }
-    //@Disabled   // needs user input
+    @Disabled   // needs user input
     @Test
     fun e04_inp () {
         val out = all("""

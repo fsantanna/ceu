@@ -83,7 +83,7 @@ class TXParser {
         Lexer.lex()
         val s = Parser.stmt()
         println(s.dump())
-        //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_std")
+        //assert(s is Stmt.Call && s.call.f is Expr.Dnref && ((s.call.f as Expr.Dnref).ptr is Expr.Var) && ((s.call.f as Expr.Dnref).ptr as Expr.Var).tk_.str=="output_Std")
         assert(s is Stmt.Output && s.arg.tk.str == "Output")
     }
 
