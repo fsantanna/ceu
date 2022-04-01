@@ -13,6 +13,16 @@ class TXExec {
         assert(out == "()\n") { out }
     }
     @Test
+    fun a01_input_output () {
+        val out = test(true, """
+            type Input  $D{} @{} = <Std=_>
+            type Output $D{} @{} = <Std=_>
+            var x:_int = input Std ()
+            output Std x
+        """.trimIndent())
+        assert(out == "()\n") { out }
+    }
+    @Test
     fun a01_output_2 () {
         val out = test(true, """
             native _{

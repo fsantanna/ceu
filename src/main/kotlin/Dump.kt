@@ -64,7 +64,7 @@ fun Stmt.dump (spc: Int = 0): String {
         is Stmt.XReturn -> "Return\n"
         is Stmt.Seq -> "Seq\n" + this.s1.dump(spc+4) + this.s2.dump(spc+4)
         is Stmt.SCall -> "SCall\n" + this.e.dump(spc+4)
-        is Stmt.Input -> "Input " + this.lib.str + "\n" +
+        is Stmt.Input -> "Input " + "\n" +
                 (this.xtype?.dump(spc+4) ?: "") +
                 (if (this.dst == null) none(spc+4) else this.dst.dump(spc+4)) +
                 this.arg.dump(spc+4)

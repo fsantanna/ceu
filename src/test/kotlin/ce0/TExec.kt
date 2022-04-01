@@ -508,13 +508,15 @@ class TExec {
         """.trimIndent())
         assert(out == "10\n") { out }
     }
-    @Disabled   // needs user input
+    //@Disabled   // needs user input
     @Test
     fun e04_inp () {
         val out = all("""
+            type Output $D{} @{} = <_>
+            type Input  $D{} @{} = <_>
             var x: _int
-            set x = input std (): _int
-            output std x
+            set x = input Input $D{} @{} <.1>:<_>: _int
+            output Output $D{} @{} <.1 x>:<_>
         """.trimIndent())
         assert(out == "10\n") { out }
     }

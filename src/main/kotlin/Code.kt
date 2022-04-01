@@ -892,15 +892,17 @@ fun code_fs (s: Stmt) {
             Code("", "", "", src, "")
         }
         is Stmt.Input -> {
+            s.arg.e as Expr.UCons
+            val idx = s.arg.e.tk.str
             val arg = CODE.removeFirst()
             if (s.dst == null) {
                 val tp  = CODE.removeFirst()
-                val src = "input_${s.lib.str}_${s.xtype!!.toce()}(${arg.expr});\n"
+                val src = "input_${idx}_${s.xtype!!.toce()}(${arg.expr});\n"
                 Code(tp.type+arg.type, tp.struct+arg.struct, tp.func+arg.func, arg.stmt + src, "")
             } else {
                 val dst = CODE.removeFirst()
                 val tp  = CODE.removeFirst()
-                val src = "${dst.expr} = input_${s.lib.str}_${s.xtype!!.toce()}(${arg.expr});\n"
+                val src = "${dst.expr} = input_${idx}_${s.xtype!!.toce()}(${arg.expr});\n"
                 Code(tp.type+arg.type+dst.type, tp.struct+arg.struct+dst.struct, tp.func+arg.func+dst.func, arg.stmt+dst.stmt+src, "")
             }
         }
@@ -913,7 +915,8 @@ fun code_fs (s: Stmt) {
                 val x = CODE.removeFirst()
                 v.wtype!!.output_std("", x.expr)
             } else {
-                "output_$idx(${it.expr}._$idx);\n"
+                //val fld = if (idx.toIntOrNull() == null) idx else "_"+idx
+                "output_$idx(${it.expr});\n"
             }
             Code(it.type, it.struct, it.func, it.stmt+call, "")
         }
@@ -1032,7 +1035,8 @@ fun Stmt.code (): String {
         #include <stdlib.h>
         #include <string.h>
         
-        #define input_std_int(x)     ({ int _x ; scanf("%d",&_x) ; _x ; })
+        #define input_1_int(x)       ({ int _x ; scanf("%d",&_x) ; _x ; })
+        #define input_Std_int(x)     input_1_int(x)
         #define output_std_Unit_(x)  (x, printf("()"))
         #define output_std_Unit(x)   (output_std_Unit_(x), puts(""))
         #define output_std_int_(x)   printf("%d",x)

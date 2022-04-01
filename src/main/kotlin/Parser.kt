@@ -785,7 +785,7 @@ object Parser
         return when {
             alls.checkFix("input") -> {
                 val s = this.stmt() as Stmt.Input
-                Stmt.Input(s.tk_, s.xtype, dst, s.lib, s.arg)
+                Stmt.Input(s.tk_, s.xtype, dst, s.arg)
             }
             alls.checkFix("spawn") -> {
                 val s = this.stmt()
@@ -840,20 +840,6 @@ object Parser
                 stmt_set(dst)
             }
 
-            alls.checkFix("input") -> {
-                alls.acceptFix("input")
-                val tk = alls.tk0 as Tk.Fix
-                alls.acceptVar_err("id")
-                val lib = (alls.tk0 as Tk.id)
-                val arg = this.expr()
-                val tp = if (CE1) {
-                    if (!alls.acceptFix(":")) null else this.type()
-                } else {
-                    alls.acceptFix_err(":")
-                    this.type()
-                }
-                Stmt.Input(tk, tp, null, lib, arg)
-            }
             alls.acceptFix("if") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val tst = this.expr()
@@ -1018,10 +1004,34 @@ object Parser
                 }
             }
             alls.checkFix("catch") || alls.checkFix("{") -> this.block(null)
+            alls.checkFix("input") -> {
+                alls.acceptFix("input")
+                val tk = alls.tk0 as Tk.Fix
+
+                val arg1 = this.expr()
+                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
+                arg1 as Expr.Pak
+                val arg2 = if (arg1.tk.str == "Input") arg1 else {
+                    All_assert_tk(arg1.tk, CE1) {
+                        "expected \"Input\" constructor : have \"${arg1.tk.str}\""
+                    }
+                    val nopar = arg1.tostr().removeSurrounding("(",")")
+                    All_nest("Input.$nopar\n") {
+                        this.expr()
+                    } as Expr.Pak
+                }
+                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
+
+                val tp = if (CE1) {
+                    if (!alls.acceptFix(":")) null else this.type()
+                } else {
+                    alls.acceptFix_err(":")
+                    this.type()
+                }
+                Stmt.Input(tk, tp, null, arg2)
+            }
             alls.acceptFix("output") -> {
                 val tk = alls.tk0 as Tk.Fix
-                //alls.acceptVar_err("id")
-                //val lib = (alls.tk0 as Tk.id)
                 val arg1 = this.expr()
                 All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
                 arg1 as Expr.Pak

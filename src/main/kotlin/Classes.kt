@@ -94,7 +94,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Await  (val tk_: Tk.Fix, val e: Expr): Stmt(N++, tk_, null, null)
     data class Emit   (val tk_: Tk.Fix, val tgt: Any, val e: Expr): Stmt(N++, tk_, null, null)
     data class Throw  (val tk_: Tk.Fix, val e: Expr): Stmt(N++, tk_, null, null)
-    data class Input  (val tk_: Tk.Fix, var xtype: Type?, val dst: Expr?, val lib: Tk.id, val arg: Expr): Stmt(N++, tk_, null, null)
+    data class Input  (val tk_: Tk.Fix, var xtype: Type?, val dst: Expr?, val arg: Expr.Pak): Stmt(N++, tk_, null, null)
     data class Output (val tk_: Tk.Fix, val arg: Expr.Pak): Stmt(N++, tk_, null, null)
     data class Seq    (val tk_: Tk, val s1: Stmt, val s2: Stmt) : Stmt(N++, tk_, null, null)
     data class If     (val tk_: Tk.Fix, val tst: Expr, val true_: Block, val false_: Block) : Stmt(N++, tk_, null, null)
