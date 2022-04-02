@@ -871,6 +871,37 @@ class TXExec {
         """.trimIndent())
         assert(out == "False = 1\nTrue = 2\nx = 0\n") { out }
     }
+    @Test
+    fun e20_clone() {
+        val out = test(true, """
+            type Num = </Num>    
+            var f : func () -> /Num
+            set f = func () -> /Num {
+                return Null
+            }
+            output Std f ()
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun e21_func() {
+        val out = test(true, """
+            func clone: /Num -> /Num {
+            }
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun e21_clone() {
+        val out = test(true, """
+            type Num = </Num>    
+            var clone = func /Num -> /Num {
+                return new <.1 clone arg\!1>
+            }
+            call clone Null
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
 
     // WHERE / UNTIL
 
@@ -945,7 +976,7 @@ class TXExec {
                 output () f _10
             """.trimIndent()
         )
-        assert(out == "(ln 2, col 9): expected variable identifier : have \"()\"") { out }
+        assert(out == "(ln 9, col 8): expected variable identifier : have \"()\"") { out }
     }
     @Test
     fun g04_include_err () {
@@ -969,7 +1000,7 @@ class TXExec {
                 set x = [ptr,ptr]
             """.trimIndent()
         )
-        assert(out.contains("error: excess elements in struct initializer")) { out }
+        assert(out.contains("excess elements in struct initializer")) { out }
     }
     @Test
     fun h02_cast_ok () {
@@ -1018,7 +1049,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 10, col 14): invalid discriminator : unknown discriminator \"Common\"") { out }
+        assert(out == "(ln 10, col 15): invalid discriminator : unknown discriminator \"Common\"") { out }
     }
     @Test
     fun p03_hier_name () {

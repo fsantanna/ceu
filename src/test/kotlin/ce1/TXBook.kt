@@ -168,7 +168,7 @@ class TXBook {
     fun pre_03_clone() {
         val out = test(true, """
             $nums
-         {   $clone
+            $clone
             var n = clone two
             output Std n
         """.trimIndent())
@@ -207,6 +207,8 @@ class TXBook {
             $clone
             $add
             $sub
+            --var zzz = sub [three, two]
+            --output Std zzz
             output Std sub [three, two]
         """.trimIndent())
         assert(out == "<.1 Null>\n") { out }

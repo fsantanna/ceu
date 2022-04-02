@@ -137,7 +137,7 @@ fun Expr.xinfTypes (inf: Type?) {
         }
         is Expr.UCons -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
-                "invalid inference : xxx undetermined type"
+                "invalid inference : undetermined type"
             }
             this.check(this.xtype ?: inf!!)
             val num = ((this.xtype ?: inf) as Type.Union).yids.let { this.tk.field2num(it) }!!
