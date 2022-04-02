@@ -889,7 +889,7 @@ class TXExec {
             func clone: /Num -> /Num {
             }
         """.trimIndent())
-        assert(out == "Null\n") { out }
+        assert(out == "(ln 8, col 14): undeclared type \"Num\"") { out }
     }
     @Test
     fun e21_clone() {

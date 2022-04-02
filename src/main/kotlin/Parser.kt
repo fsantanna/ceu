@@ -37,16 +37,6 @@ object Parser
 
                 Type.Named(tk0, subs, false, args, scps?.map { Scope(it,null) }, null)
             }
-            (alls.acceptVar("Par")) -> {
-                val tk0 = alls.tk0 as Tk.Par
-                Type.Par(tk0)
-            }
-            alls.acceptFix("/") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val pln = this.type()
-                val scp = alls.acceptVar("Scp")
-                Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
-            }
             (prefunc!=null || alls.acceptFix("func") || alls.acceptFix("task")) -> {
                 val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
@@ -75,6 +65,16 @@ object Parser
                         ctrs
                     ),
                     inp, pub, out)
+            }
+            (alls.acceptVar("Par")) -> {
+                val tk0 = alls.tk0 as Tk.Par
+                Type.Par(tk0)
+            }
+            alls.acceptFix("/") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val pln = this.type()
+                val scp = alls.acceptVar("Scp")
+                Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
             }
             alls.acceptFix("()") -> Type.Unit(alls.tk0 as Tk.Fix)
             alls.acceptVar("Nat") -> Type.Nat(alls.tk0 as Tk.Nat)
