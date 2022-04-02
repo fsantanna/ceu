@@ -1,3 +1,5 @@
+import java.lang.Integer.max
+
 // Need to infer:
 //  var x: ? = ...
 //  var x: _int = input std: ?
@@ -340,16 +342,14 @@ fun Expr.xinfTypes (inf: Type?) {
                                 emptyList()
                             }
 
-                            val ret1s: List<Tk.Scp> = if (inf == null) {
-                                // no attribution expected, save to @LOCAL as shortest scope possible
-                                ftp.out.flattenLeft()
+                            val ret1s: List<Tk.Scp> = let {
+                                val ftps = ftp.out.flattenLeft()
                                     .map { it.toScp1s() }
                                     .flatten()
+                                    // no attribution expected, save to @LOCAL as shortest scope possibl
                                     .map { Tk.Scp(ftp.localBlockScp1Id(), ftp.tk.lin, ftp.tk.col) }
-                            } else {
-                                inf.flattenLeft()
-                                   .map { it.toScp1s() }
-                                   .flatten()
+                                val infs = inf?.flattenLeft()?.map { it.toScp1s() }?.flatten() ?: emptyList()
+                                infs + ftps.takeLast(max(0,ftps.size-infs.size))
                             }//.filter { it.isscopepar() }  // ignore constant labels (they not args)
 
                             val inp_out = let {
