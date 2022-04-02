@@ -336,11 +336,13 @@ fun Expr.xinfTypes (inf: Type?) {
                                 }
                             }
 
+                            /*
                             val clo: List<Pair<Tk.Scp,Tk.Scp>> = if (this.upspawn()==null && inf is Type.Func) {
                                 listOf(Pair((ftp.out as Type.Func).xscps.first.scp1,inf.xscps.first.scp1))
                             } else {
                                 emptyList()
                             }
+                             */
 
                             val ret1s: List<Tk.Scp> = let {
                                 val ftps = ftp.out.flattenLeft()
@@ -366,7 +368,7 @@ fun Expr.xinfTypes (inf: Type?) {
 
                             // [ (inp,arg), (out,ret) ] ==> remove all repeated inp/out
                             // TODO: what if out/ret are not the same for the removed reps?
-                            val scp1s: List<Tk.Scp> = (clo + inp_out)
+                            val scp1s: List<Tk.Scp> = (/*clo +*/ inp_out)
                                 .filter { it.first.isscopepar() }  // ignore constant labels (they not args)
                                 .distinctBy { it.first.str }
                                 .map { it.second }
