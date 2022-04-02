@@ -552,9 +552,11 @@ _(1 + 1)     _{2 * (1+1)}
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
       |  `{´ BLOCK Stmt `}´                         -- block                    { @A call f() ; call g() }
+      |  `var´ VAR [`:´ Type] [`=´ (Expr | VStmt)]  -- variable declaration     var x: _int = f ()
+      |  `set´ Expr `=´ (Expr | VStmt)              -- assignment               set x = _10
+            VStmt ::= (`input` | `spawn` | `await`) ... -- TODO(new,do)
 
-      |  `var´ VAR `:´ Type                         -- variable declaration     var x: ()
-      |  `set´ Expr `=´ (Expr|Stmt)                 -- assignment               set x = _1
+
       |  `native´ NAT                               -- native                   native _{ printf("hi"); }
       |  `call´ Expr                                -- call                     call f ()
       |  `input´ VAR Expr `:´ Type                  -- data input               input std (): _int
@@ -592,5 +594,6 @@ Type ::= `(´ Type `)´                               -- group                  
 
 Blocks ::= `@[´ [BLOCK {`,´ BLOCK}] `]´             -- list of scopes           @[@LOCAL,@a1]
 
-BLOCK ::= @ [A-Za-z] [A-Za-z0-9_]*                  -- block identifier         @B1 @x
+BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1 @x
+VAR   ::= [a-z][A-Za-z0-9_]*
 ```

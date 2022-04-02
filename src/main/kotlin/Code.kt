@@ -173,7 +173,7 @@ fun code_ft (tp: Type) {
                 // Type.Union.struct
                 struct $ce {
                     union {
-                        ${if (tp.wup.let { it is Stmt.Typedef && it.tk.str=="Event" }) "char _ceu[${EVENT_SIZE}];" else "" }
+                        ${if (tp.wup.let { it is Stmt.Typedef && (it.tk.str=="Event" || it.tk.str=="Error") }) "char _ceu[${EVENT_SIZE}];" else "" }
                         ${if (tp.common == null) "" else { """
                             union {
                                 ${tp.common.pos()} _0;            
@@ -1097,6 +1097,7 @@ fun Stmt.code (): String {
         
         typedef struct _CEU_Error {
             union {
+                char _ceu[${EVENT_SIZE}];  // max payload size
                 int Escape;
             };
             _CEU_ERROR tag;
