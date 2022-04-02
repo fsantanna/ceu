@@ -65,7 +65,8 @@ class TXInfer {
     fun a03_input_output () {
         val out = all(prelude1+"var x: _int = input Std ()\noutput Std ()\n")
         assert(out == """
-            type Output @{} = <Std=_>
+            type Error @{} = <Escape=()>
+            type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             var x: _int
             set x = input (Input.Std ()): _int
@@ -76,7 +77,6 @@ class TXInfer {
     @Test
     fun todo_h05_ret () {   // TODO: needs tostring(CE0/CE1)
         val out = all("""
-            type Error = <Escape=_int>
             spawn {
                 var opt: _int
                 var str = if _0 {()} else { if opt {()} else {()} }
@@ -230,6 +230,7 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
+            type Error @{} = <Escape=()>
             type List @{i} = </List @{i} @i>
             var l: /List @{GLOBAL} @GLOBAL
             set l = (new (List @{GLOBAL} <.1 Null: /List @{GLOBAL} @GLOBAL>: </List @{GLOBAL} @GLOBAL>): @GLOBAL)
@@ -254,7 +255,8 @@ class TXInfer {
             input Pico /e
         """.trimIndent())
         assert(out == """
-            type Output @{} = <Std=_>
+            type Error @{} = <Escape=()>
+            type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             type Input @{i} += <Pico=/() @i>
             var input_pico_Unit: func @{i} -> /() @i -> ()
@@ -349,7 +351,8 @@ class TXInfer {
             input Pico ()
         """.trimIndent())
         assert(out == """
-            type Output @{} = <Std=_>
+            type Error @{} = <Escape=()>
+            type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             type Input @{} += <Pico=()>
             input (Input.Pico ()): ()
@@ -775,6 +778,18 @@ class TXInfer {
             type List @{i} = </List @{i} @i>
             var f: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
             set (_: _int) = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL): @GLOBAL)
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun e03_scp () {
+        val out = all("""
+            var clone: func () -> /_int
+            call clone ()
+        """.trimIndent())
+        assert(out == """
+            var clone: func @{i} -> () -> /_int @i
+            call (clone @{GLOBAL} (): @GLOBAL)
             
         """.trimIndent()) { out }
     }

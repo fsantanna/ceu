@@ -195,6 +195,7 @@ fun exec (cmd: String): Pair<Boolean,String> {
 }
 
 val prelude1 = """
+    type Error = <Escape=()>
     type Output = <
         Std = _(void*)
     >
@@ -211,7 +212,8 @@ fun test (ce1: Boolean, inp: String): String {
         return out1
     }
     File("out.c").writeText(out1)
-    val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
+    //val (ok2,out2) = exec("gcc -Werror out.c -o out.exe")
+    val (ok2,out2) = exec("gcc out.c -o out.exe")
     if (!ok2) {
         return out2
     }

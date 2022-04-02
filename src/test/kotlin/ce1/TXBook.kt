@@ -148,7 +148,7 @@ class TXBook {
             var zero: /Num = Null
             var one:   Num = <.1 zero>
             var two:   Num = <.1 /one>
-            output std /two
+            output Std /two
         """.trimIndent()
         )
         assert(out == "<.1 <.1 Null>>\n") { out }
@@ -156,69 +156,68 @@ class TXBook {
     @Test
     fun pre_02_add() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
-            output std add [two,one]
+            var n = add [two,one]
+            output Std n
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
     @Test
     fun pre_03_clone() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
-            $clone
-            output std clone two
+         {   $clone
+            var n = clone two
+            output Std n
         """.trimIndent())
         assert(out == "<.1 <.1 Null>>\n") { out }
     }
     @Test
     fun pre_04_mul() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
             $mul
             var x = add [two,one]
-            output std mul [two, x]
-            --output std mul [two, add [two,one]]
+            var n = mul [two, x]
+            output Std n
+            --output Std mul [two, add [two,one]]
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
     @Test
     fun pre_05_lt() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $lt
-            output std lt [two, one]
-            output std lt [one, two]
+            var n1 = lt [two, one]
+            var n2 = lt [one, two]
+            output Std n1
+            output Std n2
         """.trimIndent())
         assert(out == "0\n1\n") { out }
     }
     @Test
     fun pre_06_sub() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
             $sub
-            output std sub [three, two]
+            output Std sub [three, two]
         """.trimIndent())
         assert(out == "<.1 Null>\n") { out }
     }
     @Test
     fun pre_07_eq() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $eq
-            output std eq [three, two]
-            output std eq [one, one]
+            output Std eq [three, two]
+            output Std eq [one, one]
         """.trimIndent())
         assert(out == "0\n1\n") { out }
     }
@@ -228,7 +227,6 @@ class TXBook {
     @Test
     fun ch_01_01_square_pg02() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -236,7 +234,7 @@ class TXBook {
             var square = func /Num -> /Num {
                 return mul [arg,arg]
             }
-            output std square two
+            output Std square two
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 <.1 Null>>>>\n") { out }
     }
@@ -244,7 +242,6 @@ class TXBook {
     @Test
     fun ch_01_01_smaller_pg02() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $lt
             -- 20
@@ -256,8 +253,8 @@ class TXBook {
                     return arg.2
                 }
             }
-            output std smaller [one,two]
-            output std smaller [two,one]
+            output Std smaller [one,two]
+            output Std smaller [two,one]
         """.trimIndent())
         assert(out == "<.1 Null>\n<.1 Null>\n") { out }
     }
@@ -272,12 +269,11 @@ class TXBook {
     @Test
     fun ch_01_02_three_pg05() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             var f_three = func /Num -> /Num {
                 return three
             }
-            output std f_three one
+            output Std f_three one
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
@@ -285,13 +281,12 @@ class TXBook {
     @Test
     fun ch_01_02_infinity_pg05() {
         val out = test(true, """
-            type Error = <Escape=()>
             var infinity : func () -> /Num
             set infinity = func () -> /Num {
-                output std _10:_int
+                output Std _10:_int
                 return new <.1 infinity ()>
             }
-            output std infinity ()
+            output Std infinity ()
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
     }
@@ -301,7 +296,6 @@ class TXBook {
     @Test
     fun ch_01_03_multiply_pg09() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -313,7 +307,7 @@ class TXBook {
                     return mul [arg.1,arg.2]
                 }
             }
-            output std multiply [two,three]
+            output Std multiply [two,three]
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
@@ -323,7 +317,6 @@ class TXBook {
     @Test
     fun ch_01_04_twice_pg11() {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -334,7 +327,7 @@ class TXBook {
             var twice = func [func /Num->/Num, /Num] -> /Num {
                 return arg.1 (arg.1 arg.2)
             }
-            output std twice [square,two]
+            output Std twice [square,two]
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>>>>>>>>>>>\n") { out }
     }
@@ -344,7 +337,6 @@ class TXBook {
     @Test
     fun ch_01_05_fact_pg23 () {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -360,7 +352,7 @@ class TXBook {
                 }
             }
             
-            output std fact three
+            output Std fact three
         """.trimIndent())
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
     }
@@ -431,7 +423,6 @@ class TXBook {
     @Test
     fun ch_02_01_not_pg30 () {
         val out = test(true, """
-            type Error = <Escape=()>
             var not = func <(),()> -> <(),()> {
                 if arg?1 {
                     return <.2>
@@ -440,7 +431,7 @@ class TXBook {
                 }
             }
             var xxx = not <.1>
-            output std /xxx
+            output Std /xxx
         """.trimIndent())
         assert(out == "<.2>\n") { out }
     }
@@ -448,7 +439,6 @@ class TXBook {
     @Test
     fun ch_02_01_and_pg30 () {
         val out = test(true, """
-            type Error = <Escape=()>
             var and = func [$B,$B] -> $B {
                 if arg.1?1 {
                     return <.1>
@@ -457,16 +447,15 @@ class TXBook {
                 }
             }
             var xxx = and [<.1>,<.2>]
-            output std /xxx
+            output Std /xxx
             set xxx = and [<.2>,<.2>]
-            output std /xxx
+            output Std /xxx
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n") { out }
     }
     @Test
     fun ch_02_01_or_pg30 () {
         val out = test(true, """
-            type Error = <Escape=()>
             var or = func [$B,$B] -> $B {
                 if arg.1?2 {
                     return <.2>
@@ -475,18 +464,17 @@ class TXBook {
                 }
             }
             var xxx = or [<.1>,<.2>]
-            output std /xxx
+            output Std /xxx
             set xxx = or [<.2>,<.1>]
-            output std /xxx
+            output Std /xxx
             set xxx = or [<.1>,<.1>]
-            output std /xxx
+            output Std /xxx
         """.trimIndent())
         assert(out == "<.2>\n<.2>\n<.1>\n") { out }
     }
     @Test
     fun ch_02_01_eq_neq_pg31 () {
         val out = test(true, """
-            type Error = <Escape=()>
             $not
             $and
             $or
@@ -497,11 +485,11 @@ class TXBook {
                 return not eq arg 
             }
             var xxx = eq [<.1>,<.2>]
-            output std /xxx
+            output Std /xxx
             set xxx = neq [<.2>,<.1>]
-            output std /xxx
+            output Std /xxx
             set xxx = eq [<.1>,<.1>]
-            output std /xxx
+            output Std /xxx
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n<.2>\n") { out }
     }
@@ -509,7 +497,6 @@ class TXBook {
     @Test
     fun ch_02_01_mod_pg33 () {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -526,7 +513,7 @@ class TXBook {
                 }
             }
             var v = mod [three,two]
-            output std v
+            output Std v
         """.trimIndent())
         assert(out == "<.1 Null>\n") { out }
     }
@@ -535,7 +522,6 @@ class TXBook {
     @Test
     fun ch_02_01_leap_pg33 () {
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -564,9 +550,9 @@ class TXBook {
             var n1980 = sub [n2000,n20]
             var n1979 = sub [n1980,one]
             var x = leap n1980
-            output std /x
+            output Std /x
             set x = leap n1979
-            output std /x
+            output Std /x
         """.trimIndent())
         assert(out == "<.2>\n<.1>\n") { out }
     }
@@ -575,7 +561,6 @@ class TXBook {
     fun ch_02_01_triangles_pg33 () {
         val Tri = "<(),(),(),()>"
         val out = test(true, """
-            type Error = <Escape=()>
             $nums
             $clone
             $add
@@ -606,13 +591,13 @@ class TXBook {
             }
             var n10 = mul [five,two]
             var v = analyse [n10,n10,n10]
-            output std /v
+            output Std /v
             set v = analyse [one,five,five]
-            output std /v
+            output Std /v
             set v = analyse [one,one,five]
-            output std /v
+            output Std /v
             set v = analyse [two,four,five]
-            output std /v
+            output Std /v
         """.trimIndent())
         assert(out == "<.2>\n<.3>\n<.1>\n<.4>\n") { out }
     }

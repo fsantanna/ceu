@@ -192,6 +192,14 @@ class TEnv {
         //assert(out == "(ln 1, col 19): invalid pointer : missing pool label") { out }
         assert(out == "(ln 1, col 10): invalid function type : missing scope argument") { out }
     }
+    @Test
+    fun b19_scp_ok () {
+        val out = inp2env("""
+            var clone: func @{a} -> () -> /_int@a
+            call clone @{LOCAL} ()
+        """.trimIndent())
+        assert(out == "OK") { out }
+    }
 
     // TYPE
 

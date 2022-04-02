@@ -94,7 +94,6 @@ class TXExec {
     @Test
     fun a06_call () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func _int -> _int {
                 return arg
             }
@@ -106,7 +105,6 @@ class TXExec {
     @Test
     fun a07_call_fg () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func ()->() {
                 var x = _10:_int
                 output Std x
@@ -133,7 +131,6 @@ class TXExec {
     @Test
     fun a09_func_if () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var inv = func <(),()> -> <(),()> {
                 if arg?1 {
                     return <.2>
@@ -150,7 +147,6 @@ class TXExec {
     @Test
     fun a10_loop () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var i: _int = _1
             var n = _0: _int
             spawn {
@@ -243,7 +239,6 @@ class TXExec {
     @Test
     fun a18_loop () {
         val out = test(true, """
-            type Error = <Escape=_int>
             spawn {
                 loop {
                    break
@@ -277,7 +272,7 @@ class TXExec {
                 output Std p1\
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 11, col 12): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("(ln 12, col 12): invalid assignment : type mismatch")) { out }
     }
 
     // old disabled
@@ -411,7 +406,6 @@ class TXExec {
     @Test
     fun c01 () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func /_int@k1 -> () {
                set arg\ = _(*${D}arg+1)
                return
@@ -425,7 +419,6 @@ class TXExec {
     @Test
     fun c02_fact () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var fact : func [/_int,_int] -> ()
             set fact = func [/_int,_int] -> () {
                 var x = _1: _int
@@ -444,7 +437,6 @@ class TXExec {
     @Test
     fun c03 () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type List = </List>
             var f = func /List->() {
                 var pf = arg
@@ -461,7 +453,6 @@ class TXExec {
     @Test
     fun c04_ptr_arg () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type List = </List>
             var f = func /List->() {
                 set arg\!1 = new <.1 Null>
@@ -478,7 +469,6 @@ class TXExec {
     @Test
     fun c05_ptr_arg_two () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type List = </List>
             var f = func [/List,/List]->() {
                 set arg.1\!1 = new <.1 Null>
@@ -502,12 +492,11 @@ class TXExec {
                 output Std (f ())
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 8, col 5): invalid return : type mismatch")) { out }
+        assert(out.startsWith("(ln 9, col 5): invalid return : type mismatch")) { out }
     }
     @Test
     fun c07_ptr_arg_ret () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func /_int@a1 -> /_int@a1 {
                 return arg
             }
@@ -520,7 +509,6 @@ class TXExec {
     @Test
     fun c08_call_call () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func /_int@k1 -> /()@k1 {
                 return arg
             }
@@ -536,7 +524,6 @@ class TXExec {
     @Test
     fun c09_func_arg () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func () -> () {
                 return arg
             }
@@ -553,7 +540,6 @@ class TXExec {
     @Test
     fun d01 () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type List = </List>
             { @A
                 var pa: /List @{LOCAL} @LOCAL
@@ -574,7 +560,6 @@ class TXExec {
     @Test
     fun d02 () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type List = </List>
             { @A
                 var pa: /List @{LOCAL} @LOCAL
@@ -607,7 +592,7 @@ class TXExec {
             """.trimIndent()
         )
         //assert(out == "()\n") { out }
-        assert(out.startsWith("(ln 10, col 11): invalid assignment : type mismatch :")) { out }
+        assert(out.startsWith("(ln 11, col 11): invalid assignment : type mismatch :")) { out }
     }
 
     // TYPE / ALIAS
@@ -693,7 +678,7 @@ class TXExec {
         )
         //assert(out == "<.1 Null>\n") { out }
         //assert(out == "(ln 3, col 18): invalid type : expected pointer to alias type\n") { out }
-        assert(out == "(ln 7, col 6): invalid recursive type : cannot be a pointer") { out }
+        assert(out == "(ln 8, col 6): invalid recursive type : cannot be a pointer") { out }
     }
     @Test
     fun e09_bool() {
@@ -756,7 +741,6 @@ class TXExec {
     @Test
     fun e12_ucons_type () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type TPico = <(),[_int,_int]>
             spawn {
                 var t1 = TPico.1
@@ -782,7 +766,6 @@ class TXExec {
     @Test
     fun eyy_func_alias () {
         val out = test(true, """
-            type Error = <Escape=_int>
             type Int2Int = func @{} -> () -> ()
             var f: func @{} -> () -> ()
             set f = func @{} -> () -> () {}
@@ -857,7 +840,7 @@ class TXExec {
                 var x = r.pos
             """.trimIndent()
         )
-        assert(out == "(ln 9, col 11): invalid discriminator : unknown \"pos\"") { out }
+        assert(out == "(ln 10, col 11): invalid discriminator : unknown \"pos\"") { out }
     }
     @Test
     fun e18_types_yids () {
@@ -904,7 +887,6 @@ class TXExec {
     @Test
     fun f02_until () {
         val out = test(true, """
-            type Error = <Escape=_int>
             spawn {
                 output Std () until _1
             }
@@ -915,7 +897,6 @@ class TXExec {
     @Test
     fun todo_03_err () {
         val out = test(true, """
-            type Error = <Escape=_int>
             spawn {
                 output Std () until ()
             }
@@ -925,7 +906,6 @@ class TXExec {
     @Test
     fun f05_err () {
         val out = test(true, """
-            type Error = <Escape=_int>
             spawn {
                 output Std v where {
                     var v = ()
@@ -942,7 +922,6 @@ class TXExec {
     @Test
     fun g01_include () {
         val out = test(true, """
-            type Error = <Escape=_int>
             ^"test-func-1.ceu"
             output Std f _10
         """.trimIndent())
@@ -951,7 +930,6 @@ class TXExec {
     @Test
     fun g02_include () {
         val out = test(true, """
-            type Error = <Escape=_int>
             var f = func _int -> _int {
                 return arg
             }
@@ -967,7 +945,7 @@ class TXExec {
                 output () f _10
             """.trimIndent()
         )
-        assert(out == "(ln 2, col 8): expected variable identifier : have \"()\"") { out }
+        assert(out == "(ln 2, col 9): expected variable identifier : have \"()\"") { out }
     }
     @Test
     fun g04_include_err () {
@@ -1040,7 +1018,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 9, col 14): invalid discriminator : unknown discriminator \"Common\"") { out }
+        assert(out == "(ln 10, col 14): invalid discriminator : unknown discriminator \"Common\"") { out }
     }
     @Test
     fun p03_hier_name () {
@@ -1051,7 +1029,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 7, col 26): missing subtype or field identifiers") { out }
+        assert(out == "(ln 8, col 26): missing subtype or field identifiers") { out }
     }
     @Test
     fun p04_hier_name () {
@@ -1170,7 +1148,7 @@ class TXExec {
             output Std h!Bbb!Ccc!Eee.1
            """.trimIndent()
         )
-        assert(out == "(ln 8, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
+        assert(out == "(ln 9, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
     }
     @Test
     fun p16_type_hier_cast_ok () {
@@ -1232,7 +1210,7 @@ class TXExec {
             type Button = _int + <(),()> -- ERR: [_int] + ...
            """.trimIndent()
         )
-        assert(out == "(ln 7, col 20): expected statement : have \"+\"") { out }
+        assert(out == "(ln 8, col 20): expected statement : have \"+\"") { out }
     }
     @Test
     fun q04_type_hier_err () {
@@ -1240,7 +1218,7 @@ class TXExec {
             type Button = [_int] + () -- ERR: ... + <...>
            """.trimIndent()
         )
-        assert(out == "(ln 7, col 24): expected \"<\" : have \"()\"") { out }
+        assert(out == "(ln 8, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun q05_type_hier () {
@@ -1368,7 +1346,6 @@ class TXExec {
     @Test
     fun q01_return () {
         val out = test(true, """
-            type Error = <Escape=_int>
             func f: ()->() {
                 output Std _1:_int
                 return
@@ -1381,7 +1358,6 @@ class TXExec {
     @Test
     fun todo_qxx_return () {
         val out = test(true, """
-            type Error = <Escape=_int>
             func f: ()->() {
                 output Std _1:_int
                 do {
@@ -1397,7 +1373,6 @@ class TXExec {
     @Test
     fun todo_q02_return () {
         val out = test(true, """
-            type Error = <Escape=_int>
             func f: ()->() { @X
                 output Std _1:_int
                 do {
@@ -1413,7 +1388,6 @@ class TXExec {
     @Test
     fun todo_q03_return () {
         val out = test(true, """
-            type Error = <Escape=_int>
             func f: _int->_int {
                 var ret = _0:_int
                 do { @Y

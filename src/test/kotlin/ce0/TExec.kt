@@ -784,14 +784,14 @@ class TExec {
     fun i02_ptr_func () {
         val out = all("""
             $Output0
-        var f : func@{i1}-> /_int@i1 -> ()
-        set f = func@{i1}-> /_int@i1 -> () {
-           set arg\ = _(*${D}arg+1): _int
-        }
-        var x: _int
-        set x = _1: _int
-        call f @{LOCAL} /x
-        ${output0("x","_int")}
+            var f : func@{i1}-> /_int@i1 -> ()
+            set f = func@{i1}-> /_int@i1 -> () {
+               set arg\ = _(*${D}arg+1): _int
+            }
+            var x: _int
+            set x = _1: _int
+            call f @{LOCAL} /x
+            ${output0("x","_int")}
         """.trimIndent())
         assert(out == "2\n") { out }
     }
