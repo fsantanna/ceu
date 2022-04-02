@@ -70,8 +70,13 @@ fun Expr.xinfTypes (inf: Type?) {
             this.e.wtype!!.react_noalias(this)
         }
         is Expr.Upref -> {
-            All_assert_tk(this.tk, inf==null || inf is Type.Pointer) { "invalid inference : type mismatch"}
-            this.pln.xinfTypes((inf as Type.Pointer?)?.pln)
+            All_assert_tk(this.tk, inf==null || inf is Type.Nat || inf is Type.Pointer) { "invalid inference : type mismatch"}
+            val pln = when (inf) {
+                is Type.Nat -> inf
+                is Type.Pointer -> inf.pln
+                else -> null
+            }
+            this.pln.xinfTypes(pln)
             this.pln.wtype!!.let {
                 val base = this.toBaseVar()
                 val blk  = base?.env(base?.tk.str)?.ups_first { it is Stmt.Block || it is Expr.Func }

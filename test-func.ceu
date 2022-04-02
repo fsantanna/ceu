@@ -1,7 +1,0 @@
-var f = func _int -> _int {
-    set ret = arg
-}
-
-var g = func () -> () {
-    output Output ${} @{} <.1>: <()>
-}

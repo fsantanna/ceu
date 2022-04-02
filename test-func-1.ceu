@@ -1,0 +1,7 @@
+func f: _int -> _int {
+    set ret = arg
+}
+
+func g: () -> () {
+    output Std ()
+}

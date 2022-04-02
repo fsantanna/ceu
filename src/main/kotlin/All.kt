@@ -194,9 +194,19 @@ fun exec (cmd: String): Pair<Boolean,String> {
     return exec(cmd.split(' '))
 }
 
+val prelude1 = """
+    type Output = <
+        Std = _(void*)
+    >
+    type Input = <
+        Std = _
+    >
+    
+""".trimIndent()
+
 fun test (ce1: Boolean, inp: String): String {
     CE1 = ce1
-    val (ok1,out1) = ce2c(null, inp)
+    val (ok1,out1) = ce2c(null, (if (ce1) prelude1 else "")+inp)
     if (!ok1) {
         return out1
     }

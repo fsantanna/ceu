@@ -5,16 +5,6 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.PushbackReader
 import java.io.StringReader
 
-val prelude1 = """
-    type Output = <
-        Std = _
-    >
-    type Input = <
-        Std = _
-    >
-    
-""".trimIndent()
-
 /*
 fun rem (out: String): String {
     out.split("\n").let {

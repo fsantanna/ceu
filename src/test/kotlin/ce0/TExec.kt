@@ -2017,7 +2017,7 @@ class TExec {
     }
     @Test
     fun p03_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Hier $D{} @{} = <[_int],<<[_int],[_int]>,[_int]>>
             var h: Hier $D{} @{}
@@ -2033,7 +2033,7 @@ class TExec {
     }
     @Test
     fun p04_type_hier () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Button $D{} @{} = <<[_int,_int,(),_int]>, [_int]> -- Up/Down
             var e: Button $D{} @{}
@@ -2051,7 +2051,7 @@ class TExec {
 
     @Test
     fun q01_type_hier () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Button $D{} @{} = <_int,_int> -- Up/Down
             var e: Button $D{} @{}
@@ -2062,66 +2062,8 @@ class TExec {
         assert(out == "<.2 10>\n") { out }
     }
     @Test
-    fun q02_type_hier_err () {
-        val out = test(true, """
-            type Button = _int + <(),()> -- ERR: [_int] + ...
-           """.trimIndent()
-        )
-        assert(out == "(ln 1, col 20): expected statement : have \"+\"") { out }
-    }
-    @Test
-    fun q03_type_hier_err () {
-        val out = test(true, """
-            type Button = [_int] + () -- ERR: ... + <...>
-           """.trimIndent()
-        )
-        assert(out == "(ln 1, col 24): expected \"<\" : have \"()\"") { out }
-    }
-    @Test
-    fun q04_type_hier () {
-        val out = test(true, """
-            $Output0
-            type Button $D{} @{} = [_int] + <(),()> -- Up/Down
-            var e: Button $D{} @{}
-            set e = Button $D{} @{} <.2 [_10:_int]>:<[_int],[_int]>
-            ${output0("/e","/Button $D{} @{}")}
-           """.trimIndent()
-        )
-        assert(out == "<.2 [10]>\n") { out }
-    }
-    @Test
-    fun q05_type_hier () {
-        val out = test(true, """
-            $Output0
-            type Button $D{} @{} = [_int]+ <[_int,()]+ <[_int]>, ()> -- Up/Down
-            var e: Button $D{} @{}
-            set e = Button $D{} @{}
-                <.1
-                    <.1
-                        [_1:_int,_2:_int,(),_4:_int]
-                    >: <[_int,_int,(),_int]>
-                >: <<[_int,_int,(),_int]>,[_int]>
-            ${output0("/e","/Button $D{} @{}")}
-           """.trimIndent()
-        )
-        assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
-    }
-    @Test
-    fun q06_type_hier () {
-        val out = test(true, """
-            $Output0
-            type Button $D{} @{} = [_int] + <(),()> -- Up/Down
-            var e: Button $D{} @{}
-            set e = Button $D{} @{} <.2 [_10:_int]>:<[_int],[_int]>
-            ${output0("/e","/Button $D{} @{}")}
-            ${output0("e~!0.1","_int")}
-           """.trimIndent()
-        )
-        assert(out == "<.2 [10]>\n10\n") { out }
-    }
-    @Test
     fun q07_type_err () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Button $D{} @{} = <(),()> -- Up/Down
             var e: Button $D{} @{}
@@ -2134,7 +2076,7 @@ class TExec {
     }
     @Test
     fun q08_type_hier () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             var e: [_int]+<(),()>
             set e = <.2 [_10:_int]>:[_int]+<(),()>
@@ -2146,7 +2088,7 @@ class TExec {
     }
     @Test
     fun q09_type_hier_sub () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Button $D{} @{} = <(),()> -- Up/Down
             var dn: Button.2 $D{} @{}
@@ -2158,7 +2100,7 @@ class TExec {
     }
     @Test
     fun q10_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Button $D{} @{} = <(),()> -- Up/Down
             var dn: Button.2 $D{} @{}
             set dn = Button $D{} @{} <.2 ()>:<(),()>
@@ -2168,7 +2110,7 @@ class TExec {
     }
     @Test
     fun q11_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Button $D{} @{} = <(),()> -- Up/Down
             var dn: Button.2 $D{} @{}
             set dn = Button.1 $D{} @{} ()
@@ -2178,7 +2120,7 @@ class TExec {
     }
     @Test
     fun q12_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Hier $D{} @{} = [_int] + <(),<(),()>>
             var h: Hier $D{} @{}
@@ -2190,7 +2132,7 @@ class TExec {
     }
     @Test
     fun q13_type_hier_sub_ok () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
             var h: Hier $D{} @{}
@@ -2206,7 +2148,7 @@ class TExec {
     }
     @Test
     fun q14_type_hier_sub_err () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
             var h: Hier $D{} @{}
@@ -2222,7 +2164,7 @@ class TExec {
 
     @Test
     fun r01_if_ok () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             ${output0("if _0 {_999:_int} else {_1:_int}","_int")}
            """.trimIndent()
@@ -2233,7 +2175,7 @@ class TExec {
 
     @Test
     fun r01_if_err () {
-        val out = test(true, """
+        val out = test(false, """
             var x: ()
             set x = if _0 {()} else {[()]}
            """.trimIndent()
@@ -2246,7 +2188,7 @@ class TExec {
 
     @Test
     fun s01_maybe () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{_int}
@@ -2258,7 +2200,7 @@ class TExec {
     }
     @Test
     fun s02_maybe_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{_int}
             set x = Maybe $D{} @{} <.2 _10:_int>: <(),_int>  -- ERR: missing instance
@@ -2268,7 +2210,7 @@ class TExec {
     }
     @Test
     fun s03_maybe_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{()}
             set x = Maybe $D{[()]} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
@@ -2278,7 +2220,7 @@ class TExec {
     }
     @Test
     fun s04_maybe_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{()}
             set x = Maybe $D{()} <.2 [()]>: <(),[()]>   -- ERR: incompatible cons
@@ -2288,7 +2230,7 @@ class TExec {
     }
     @Test
     fun s05_maybe_err () {
-        val out = test(true, """
+        val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
             var x: Maybe $D{[()]}
             var y: Maybe $D{()}
@@ -2299,7 +2241,7 @@ class TExec {
     }
     @Test
     fun s06_maybe_concrete () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
             type Maybe1 $D{} @{} = <(), _int>
             type Maybe2 $D{} @{} = <(), _int>
@@ -2613,11 +2555,11 @@ class TExec {
     }
     @Test
     fun z17_include () {
-        val out = test(true, """
+        val out = test(false, """
             $Output0
-            type Error $D{} @{} = <Escape=_int>
-            ^"test-func.ceu"
-            call g ()
+            type Error $D{} @{} = <_int>
+            ^"test-func-0.ceu"
+            call g @{} ()
             """.trimIndent()
         )
         assert(out == "()\n") { out }
