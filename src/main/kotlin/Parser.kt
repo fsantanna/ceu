@@ -773,7 +773,7 @@ object Parser
             this.stmts()
         } as Stmt
     }
-    fun event (): String {
+    fun await_event (): String {
         return if (alls.acceptVar("Clk")) {
             "" + alls.tk0.str + "ms"
         } else {
@@ -810,6 +810,7 @@ object Parser
     }
     fun stmt (): Stmt {
         return when {
+            // variables
             alls.acceptFix("var") -> {
                 alls.acceptVar_err("id")
                 val tk_id = alls.tk0 as Tk.id
@@ -841,7 +842,64 @@ object Parser
                 stmt_set(dst)
             }
 
-            alls.acceptFix("if") -> {
+            // invocations
+            alls.acceptFix("output") -> {
+                val tk = alls.tk0 as Tk.Fix
+                val arg1 = this.expr()
+                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
+                arg1 as Expr.Pak
+                val arg2 = if (arg1.tk.str == "Output") arg1 else {
+                    All_assert_tk(arg1.tk, CE1) {
+                        "expected \"Output\" constructor : have \"${arg1.tk.str}\""
+                    }
+                    val nopar = arg1.tostr().removeSurrounding("(",")")
+                    All_nest("Output.$nopar\n") {
+                        this.expr()
+                    } as Expr.Pak
+                }
+                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
+                Stmt.Output(tk, arg2)
+            }
+            alls.checkFix("input")   -> {
+                alls.acceptFix("input")
+                val tk = alls.tk0 as Tk.Fix
+
+                val arg1 = this.expr()
+                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
+                arg1 as Expr.Pak
+                val arg2 = if (arg1.tk.str == "Input") arg1 else {
+                    All_assert_tk(arg1.tk, CE1) {
+                        "expected \"Input\" constructor : have \"${arg1.tk.str}\""
+                    }
+                    val nopar = arg1.tostr().removeSurrounding("(",")")
+                    All_nest("Input.$nopar\n") {
+                        this.expr()
+                    } as Expr.Pak
+                }
+                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
+
+                val tp = if (CE1) {
+                    if (!alls.acceptFix(":")) null else this.type()
+                } else {
+                    alls.acceptFix_err(":")
+                    this.type()
+                }
+                Stmt.Input(tk, tp, null, arg2)
+            }
+            alls.acceptFix("native") -> {
+                val istype = alls.acceptFix("type")
+                alls.acceptVar_err("Nat")
+                Stmt.Native(alls.tk0 as Tk.Nat, istype)
+            }
+            alls.acceptFix("call")   -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val e = this.expr()
+                All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
+                Stmt.SCall(tk0, e.unpak() as Expr.Call)
+            }
+
+            // control flow
+            alls.acceptFix("if")     -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val tst = this.expr()
                 val true_ = this.block(null)
@@ -852,46 +910,65 @@ object Parser
                 }
                 Stmt.If(tk0, tst, true_, false_)
             }
-            alls.acceptFix("type") -> {
-                alls.acceptVar_err("Id")
-                val id = alls.tk0 as Tk.Id
-
-                val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
-                val pars = if (!haspars) emptyList() else {
-                    val pars = mutableListOf<Tk.id>()
-                    if (!alls.checkFix("}")) {
-                        while (alls.acceptVar("id")) {
-                            pars.add(alls.tk0 as Tk.id)
-                            if (!alls.acceptFix(",")) {
-                                break
-                            }
-                        }
+            alls.acceptFix("loop")   -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val catch = if (!CE1) null else {
+                    //All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
+                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
+                        this.expr()
+                    } as Expr
+                }
+                if (alls.checkFix("catch") || alls.checkFix("{")) {
+                    val block = this.block(if (alls.checkFix("catch")) null else catch)
+                    // add additional block to break out w/ goto and cleanup
+                    Stmt.Block(
+                        block.tk_, null, null,
+                        Stmt.Loop(tk0, block)
+                    )
+                } else {
+                    val i = this.expr()
+                    All_assert_tk(alls.tk0, i is Expr.Var) {
+                        "expected variable expression"
                     }
-                    alls.acceptFix_err("}")
-                    pars
+                    alls.acceptFix_err("in")
+                    val tsks = this.expr()
+                    val block = this.block(if (alls.checkFix("catch")) null else catch)
+                    // add additional block to break out w/ goto and cleanup
+                    Stmt.Block(
+                        block.tk_, null, null,
+                        Stmt.DLoop(tk0, i as Expr.Var, tsks, block)
+                    )
                 }
-
-                val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")
-                val scps = if (hasats) this.scopepars() else Pair(null, null)
-                (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
-                val isinc = (alls.tk0.str == "+=")
-                val tp = this.type()
-                if (isinc) {
-                    All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
-                }
-                Stmt.Typedef(id, isinc, pars, scps, tp, null, true)
             }
-            alls.acceptFix("native") -> {
-                val istype = alls.acceptFix("type")
-                alls.acceptVar_err("Nat")
-                Stmt.Native(alls.tk0 as Tk.Nat, istype)
-            }
-            alls.acceptFix("call") -> {
+            alls.acceptFix("throw")  -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
-                All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
-                Stmt.SCall(tk0, e.unpak() as Expr.Call)
+                Stmt.Throw(tk0, e)
             }
+            alls.checkFix("catch") || alls.checkFix("{") -> this.block(null)
+            alls.acceptFix("return") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                if (!alls.checkExpr()) {
+                    Stmt.XReturn(alls.tk0 as Tk.Fix)
+                } else {
+                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                    val tk0 = alls.tk0
+                    val e = this.expr()
+                    All_nest(tk0.lincol("""
+                        set ret = ${e.tostr(true)}
+                        return
+                        
+                    """.trimIndent())) {
+                        this.stmts()
+                    } as Stmt
+                }
+            }
+            alls.acceptFix("break") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                Stmt.XBreak(alls.tk0 as Tk.Fix)
+            }
+
+            // tasks
             alls.acceptFix("spawn") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 if (alls.checkFix("{")) {
@@ -920,6 +997,18 @@ object Parser
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
                 Stmt.Pause(tk0, e, false)
+            }
+
+            // events
+            alls.acceptFix("emit") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val tgt = if (alls.acceptVar("Scp")) {
+                    Scope(alls.tk0 as Tk.Scp, null)
+                } else {
+                    this.expr_dots(null)
+                }
+                val e = this.expr()
+                Stmt.Emit(tk0, tgt, e)
             }
             alls.acceptFix("await") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -959,98 +1048,56 @@ object Parser
                     }
                 }
             }
-            alls.acceptFix("emit") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val tgt = if (alls.acceptVar("Scp")) {
-                    Scope(alls.tk0 as Tk.Scp, null)
-                } else {
-                    this.expr_dots(null)
-                }
-                val e = this.expr()
-                Stmt.Emit(tk0, tgt, e)
-            }
-            alls.acceptFix("throw") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val e = this.expr()
-                Stmt.Throw(tk0, e)
-            }
-            alls.acceptFix("loop") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val catch = if (!CE1) null else {
-                    //All_nest("if err?Escape {if eq [err!Escape,_10] {_1} else {_0}} else {_0}") {
-                    All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
-                        this.expr()
-                    } as Expr
-                }
-                if (alls.checkFix("catch") || alls.checkFix("{")) {
-                    val block = this.block(if (alls.checkFix("catch")) null else catch)
-                    // add additional block to break out w/ goto and cleanup
-                    Stmt.Block(
-                        block.tk_, null, null,
-                        Stmt.Loop(tk0, block)
-                    )
-                } else {
-                    val i = this.expr()
-                    All_assert_tk(alls.tk0, i is Expr.Var) {
-                        "expected variable expression"
-                    }
-                    alls.acceptFix_err("in")
-                    val tsks = this.expr()
-                    val block = this.block(if (alls.checkFix("catch")) null else catch)
-                    // add additional block to break out w/ goto and cleanup
-                    Stmt.Block(
-                        block.tk_, null, null,
-                        Stmt.DLoop(tk0, i as Expr.Var, tsks, block)
-                    )
-                }
-            }
-            alls.checkFix("catch") || alls.checkFix("{") -> this.block(null)
-            alls.checkFix("input") -> {
-                alls.acceptFix("input")
-                val tk = alls.tk0 as Tk.Fix
 
-                val arg1 = this.expr()
-                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
-                arg1 as Expr.Pak
-                val arg2 = if (arg1.tk.str == "Input") arg1 else {
-                    All_assert_tk(arg1.tk, CE1) {
-                        "expected \"Input\" constructor : have \"${arg1.tk.str}\""
-                    }
-                    val nopar = arg1.tostr().removeSurrounding("(",")")
-                    All_nest("Input.$nopar\n") {
-                        this.expr()
-                    } as Expr.Pak
-                }
-                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
+            // types
+            alls.acceptFix("type") -> {
+                alls.acceptVar_err("Id")
+                val id = alls.tk0 as Tk.Id
 
-                val tp = if (CE1) {
-                    if (!alls.acceptFix(":")) null else this.type()
-                } else {
-                    alls.acceptFix_err(":")
-                    this.type()
-                }
-                Stmt.Input(tk, tp, null, arg2)
-            }
-            alls.acceptFix("output") -> {
-                val tk = alls.tk0 as Tk.Fix
-                val arg1 = this.expr()
-                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
-                arg1 as Expr.Pak
-                val arg2 = if (arg1.tk.str == "Output") arg1 else {
-                    All_assert_tk(arg1.tk, CE1) {
-                        "expected \"Output\" constructor : have \"${arg1.tk.str}\""
+                val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+                val pars = if (!haspars) emptyList() else {
+                    val pars = mutableListOf<Tk.id>()
+                    if (!alls.checkFix("}")) {
+                        while (alls.acceptVar("id")) {
+                            pars.add(alls.tk0 as Tk.id)
+                            if (!alls.acceptFix(",")) {
+                                break
+                            }
+                        }
                     }
-                    val nopar = arg1.tostr().removeSurrounding("(",")")
-                    All_nest("Output.$nopar\n") {
-                        this.expr()
-                    } as Expr.Pak
+                    alls.acceptFix_err("}")
+                    pars
                 }
-                All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
-                Stmt.Output(tk, arg2)
+
+                val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")
+                val scps = if (hasats) this.scopepars() else Pair(null, null)
+                (CE1 && alls.acceptFix("+=")) || alls.acceptFix_err("=")
+                val isinc = (alls.tk0.str == "+=")
+                val tp = this.type()
+                if (isinc) {
+                    All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
+                }
+                Stmt.Typedef(id, isinc, pars, scps, tp, null, true)
             }
 
             // CE1
 
+            alls.acceptFix("func") || alls.acceptFix("task") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                val tk = alls.tk0 as Tk.Fix
+                alls.acceptVar_err("id")
+                val id = alls.tk0 as Tk.id
+                alls.acceptFix_err(":")
+                val tp = this.type(prefunc=tk) //as Type.Func
+                alls.checkFix_err("{")  // no catch
+                val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
+                    this.expr()
+                } as Expr
+                val blk = this.block(catch)
+                All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
+                    this.stmt()
+                } as Stmt
+            }
             alls.acceptFix("ifs") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val tk0 = alls.tk0 as Tk.Fix
@@ -1084,47 +1131,6 @@ object Parser
                 }
                 f(tsts) as Stmt.If
             }
-            alls.acceptFix("return") -> {
-                if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                if (!alls.checkExpr()) {
-                    Stmt.XReturn(alls.tk0 as Tk.Fix)
-                } else {
-                    if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                    val tk0 = alls.tk0
-                    val e = this.expr()
-                    All_nest(
-                        tk0.lincol(
-                            """
-                        set ret = ${e.tostr(true)}
-                        return
-                        
-                    """.trimIndent()
-                        )
-                    ) {
-                        this.stmts()
-                    } as Stmt
-                }
-            }
-            alls.acceptFix("break") -> {
-                if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                Stmt.XBreak(alls.tk0 as Tk.Fix)
-            }
-            alls.acceptFix("func") || alls.acceptFix("task") -> {
-                if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                val tk = alls.tk0 as Tk.Fix
-                alls.acceptVar_err("id")
-                val id = alls.tk0 as Tk.id
-                alls.acceptFix_err(":")
-                val tp = this.type(prefunc=tk) //as Type.Func
-                alls.checkFix_err("{")  // no catch
-                val catch = All_nest("_(task1->err.tag==CEU_ERROR_ESCAPE && task1->err.Escape==$N)") {
-                    this.expr()
-                } as Expr
-                val blk = this.block(catch)
-                All_nest("var ${id.str} = ${tp.tostr(true)} ${blk.tostr(true)}\n") {
-                    this.stmt()
-                } as Stmt
-            }
             alls.acceptFix("defer") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val blk = this.block(null)
@@ -1142,7 +1148,7 @@ object Parser
             }
             alls.acceptFix("every") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                val evt = this.event()
+                val evt = this.await_event()
                 val blk = this.block(null)
                 All_nest("""
                     loop {
@@ -1151,6 +1157,32 @@ object Parser
                     }
                     
                 """.trimIndent()) {
+                    this.stmt()
+                } as Stmt
+            }
+            alls.acceptFix("pauseif") -> {
+                if (!CE1) alls.err_tk_unexpected(alls.tk0)
+                val pred = this.expr() as Expr.UPred
+                val blk = this.block(null)
+                All_nest(
+                    """
+                    {
+                        var tsk_$N = spawn ${blk.tostr(true)}
+                        watching tsk_$N {
+                            loop {
+                                await ${pred.tostr(true)}
+                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.str}
+                                if x_$N {
+                                    pause tsk_$N
+                                } else {
+                                    resume tsk_$N
+                                }
+                            }
+                        }
+                    }
+                    
+                """.trimIndent()
+                ) {
                     this.stmt()
                 } as Stmt
             }
@@ -1204,35 +1236,9 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.acceptFix("pauseif") -> {
-                if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                val pred = this.expr() as Expr.UPred
-                val blk = this.block(null)
-                All_nest(
-                    """
-                    {
-                        var tsk_$N = spawn ${blk.tostr(true)}
-                        watching tsk_$N {
-                            loop {
-                                await ${pred.tostr(true)}
-                                var x_$N = ${pred.uni.tostr(true)}!${pred.tk.str}
-                                if x_$N {
-                                    pause tsk_$N
-                                } else {
-                                    resume tsk_$N
-                                }
-                            }
-                        }
-                    }
-                    
-                """.trimIndent()
-                ) {
-                    this.stmt()
-                } as Stmt
-            }
             alls.acceptFix("watching") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
-                val evt = this.event()
+                val evt = this.await_event()
                 val blk = this.block(null)
                 All_nest(
                     """

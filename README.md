@@ -26,6 +26,7 @@ management, and source-level integration with C.
 
 Ceu is [free software](LICENSE.md).
 
+<!--
 # INSTALL & RUN
 
 ```
@@ -546,29 +547,74 @@ In this case, a native token can contain any other characters:
 ```
 _(1 + 1)     _{2 * (1+1)}
 ```
+-->
 
 # 5. SYNTAX
 
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
       |  `{´ BLOCK Stmt `}´                         -- block                    { @A call f() ; call g() }
+
+        // variables
       |  `var´ VAR [`:´ Type] [`=´ (Expr | VStmt)]  -- variable declaration     var x: _int = f ()
       |  `set´ Expr `=´ (Expr | VStmt)              -- assignment               set x = _10
             VStmt ::= (`input` | `spawn` | `await`) ... -- TODO(new,do)
 
-
-      |  `native´ NAT                               -- native                   native _{ printf("hi"); }
+        // invocations
+      |  `output´ Expr                              -- data output              output Std x
+      |  `input´ Expr [`:´ Type]                    -- data input               input Std (): _int
+      |  `native´ [`type´] NAT                      -- native                   native _{ printf("hi"); }
       |  `call´ Expr                                -- call                     call f ()
-      |  `input´ VAR Expr `:´ Type                  -- data input               input std (): _int
-      |  `output´ VAR Expr                          -- data output              output std [(),_10]
-      |  `if´ Expr `{´ Stmt `}´ `else´ `{´ Stmt `}´ -- conditional              if x { ... } else { ... }
-      |  `loop´ `{´ Stmt `}´                        -- loop                     loop { ... }
-      |  `break´                                    -- loop break               break
-      |  `return´                                   -- function return          return
 
+        // control flow
+      |  `if´ Expr Block [`else´ Block]             -- conditional              if cnd { ... } else { ... }
+      |  `loop´ Block                               -- loop                     loop { ... }
+      |  `loop´ Expr `in´ Expr Block                -- loop tasks               loop tsk in tsks { ... }
+      |  `throw´ Expr                               -- throw exception          throw Error.Escape v
+      |  `catch´ Expr Block                         -- catch exception          catch Error?Escape { ... }
+      |  `return´ [Expr]                            -- function return          return v
+      |  `break´                                    -- loop break               break
+
+        // tasks
+      |  `spawn´ Expr [`in´ Expr]                   -- spawn task               spawn t () in ts
+      |  `pause´ Expr                               -- pause task               pause t
+      |  `resume´ Expr                              -- resume task              resume t
+
+        // events
+      |  `emit´ [BLOCK | Expr] Expr                 -- emit event               emit @A Event.Timer v
+      |  `await´ Event                              -- await event              await Event?Timer
+
+        // types
+      |  `type´ TYPE [Pars] [Scps] [`=´ | `+=´] Type -- type declaration        type Bool = <True=(),False=()>
+
+        // derived statements
+
+      |  `func´ VAR `:´ Type Block Expr             -- function declaration     func f: ()->() { ... }
+      |  `task´ VAR `:´ Type Block Expr             -- task declaration         task t: ()->()->() { ... }
+      |  `ifs´ `{´ { Expr Block } [`else´ Block] `}´ -- conditionals             ifs { cnd1 {} `\n´ cnd2 {} `\n´ else {} }
+
+      |  `spawn´ Block                              -- task block               spawn { ... }
+      |  `defer´ Block                              -- task declaration         defer { ... }
+      |  `await´ TIMER                              -- await timer              await 10s
+      |  `await´ `spawn´ Expr                       -- await spawned task       await spawn t
+      |  `every´ [Expr | TIMER] Block               -- every block              every cnd { ... }
+      |  `pauseif´ Expr Block                       -- pause block              pauseif cnd { ... }
+      |  `par´ Block { `with´ Block }               -- parallel block           par { ... } with { ... }
+      |  `parand´ Block { `with´ Block }            -- parallel and block       parand { ... } with { ... }
+      |  `paror´ Block { `with´ Block }             -- parallel or block        paror { ... } with { ... }
+      |  `watching´ [Expr | TIMER] Block            -- watching or block        watching 500ms { ... }
+
+BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
+VAR   ::= [a-z][A-Za-z0-9_]*                        -- variable identifier      x  f  pt
+TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          Null  Int  Event
+NAT   ::= _[A-Za-z0-9_]* | _{...} | _(...)          -- native identifier        _errno  _{(1+2)*x}  _(char*)
+TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier         1s  1h10min  20ms
+```
+
+<!--
 Expr ::= `(´ Expr `)´                               -- group                    (x)
       |  `(´ `)´                                    -- unit                     ()
-      |  NAT `:´ Type                               -- native expression        _10: _int
+      |  NAT `:´ Type                               -- native expression        v: _int
       |  VAR                                        -- variable identifier      i
       |  `/´ Expr                                   -- upref                    /x
       |  Expr `\´                                   -- dnref                    x\
@@ -593,7 +639,4 @@ Type ::= `(´ Type `)´                               -- group                  
       |  `func´ [BLOCK] Blocks `->´ Type `->´ Type  -- function                 func f : ()->() { return () }
 
 Blocks ::= `@[´ [BLOCK {`,´ BLOCK}] `]´             -- list of scopes           @[@LOCAL,@a1]
-
-BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1 @x
-VAR   ::= [a-z][A-Za-z0-9_]*
-```
+-->
