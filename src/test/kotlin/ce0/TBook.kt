@@ -519,7 +519,7 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = not @{} <.1()>:<(),()>
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.2>\n") { out }
@@ -539,9 +539,9 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = and @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = and @{} [<.2()>:<(),()>,<.2()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n") { out }
     }
@@ -559,11 +559,11 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = or @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = or @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = or @{} [<.1()>:<(),()>,<.1()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.2>\n<.2>\n<.1>\n") { out }
@@ -585,13 +585,13 @@ class TBook {
             }
             var xxx: <(),()>
             set xxx = eq @{} [<.1()>:<(),()>,<.2()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = neq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = eq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
             set xxx = eq @{} [<.1()>:<(),()>,<.1()>:<(),()>]
-            ${output0("/xxx","/<(),()>")}
+            ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n<.1>\n<.2>\n") { out }
     }
@@ -721,13 +721,13 @@ class TBook {
             set n10 = mul @{LOCAL,LOCAL,LOCAL} [five,two]
             var v: $Tri
             set v = analyse @{LOCAL,LOCAL,LOCAL} [n10,n10,n10]
-            ${output0("/v",'/'+Tri)}
+            ${output0("/v",'/'+Tri+"@LOCAL")}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [one,five,five]
-            ${output0("/v",'/'+Tri)}
+            ${output0("/v",'/'+Tri+"@LOCAL")}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [one,one,five]
-            ${output0("/v",'/'+Tri)}
+            ${output0("/v",'/'+Tri+"@LOCAL")}
             set v = analyse @{LOCAL,LOCAL,LOCAL} [two,four,five]
-            ${output0("/v",'/'+Tri)}
+            ${output0("/v",'/'+Tri+"@LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.2>\n<.3>\n<.1>\n<.4>\n") { out }

@@ -50,6 +50,7 @@ fun String.toErr (): String {
         "Id"  -> "type identifier"
         "ID"  -> "uppercase identifier"
         "Num" -> "number"
+        "Scp" -> "scope identifier"
         else   -> TODO(this.toString())
     }
 }

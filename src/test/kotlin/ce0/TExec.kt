@@ -237,7 +237,7 @@ class TExec {
             type Output $D{} @{} = <_>
             var n: _int ; set n = _1: _int
             var x: [[_int,_int],[_int,_int]] ; set x = [[n,n],[n,n]]
-            output Output $D{} @{} <.1 /x>: </[[_int,_int],[_int,_int]]>
+            output Output $D{} @{} <.1 /x>: </[[_int,_int],[_int,_int]]@LOCAL>
         """.trimIndent())
         assert(out == "[[1,1],[1,1]]\n") { out }
     }
@@ -248,8 +248,8 @@ class TExec {
             var n: _int ; set n = _1: _int
             var x: [[_int,_int],[_int,_int]] ; set x = [[n,n],[n,n]]
             var y: [_int,[_int,_int]] ; set y = [n,[n,n]]
-            ${output0("/x","/[[_int,_int],[_int,_int]]")}
-            ${output0("/y","/[_int,[_int,_int]]")}
+            ${output0("/x","/[[_int,_int],[_int,_int]]@LOCAL")}
+            ${output0("/y","/[_int,[_int,_int]]@LOCAL")}
         """.trimIndent())
         assert(out == "[[1,1],[1,1]]\n[1,[1,1]]\n") { out }
     }
@@ -285,7 +285,7 @@ class TExec {
             var y: _(char*); set y = _("hello"): _(char*)
             var n: _int; set n = _10: _int
             var x: [_int,_(char*)]; set x = [n,y]
-            ${output0("/x","/[_int,_(char*)]")}
+            ${output0("/x","/[_int,_(char*)]@LOCAL")}
         """.trimIndent())
         assert(out == "[10,\"hello\"]\n") { out }
     }
@@ -530,7 +530,7 @@ class TExec {
         val out = all("""
             $Output0
             var x: [(),()]; set x = [(),()]
-            ${output0("/x","/[(),()]")}
+            ${output0("/x","/[(),()]@LOCAL")}
         """.trimIndent())
         assert(out == "[(),()]\n")
     }
@@ -606,7 +606,7 @@ class TExec {
             $Output0
             var b : <(),()>
             set b = <.1()>:<(),()>
-            ${output0("/b","/<(),()>")}
+            ${output0("/b","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n") { out }
     }
@@ -624,7 +624,7 @@ class TExec {
             set yy = x!1
             var zz: <()>
             set zz = yy!1
-            ${output0("/zz","/<()>")}
+            ${output0("/zz","/<()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n") { out }
     }
@@ -634,7 +634,7 @@ class TExec {
             $Output0
             var s: <[_int,_int,_int,_int],_int,_int>
             set s = <.1 [_1:_int,_2:_int,_3:_int,_4:_int]>:<[_int,_int,_int,_int],_int,_int>
-            ${output0("/s","/<[_int,_int,_int,_int],_int,_int>")}
+            ${output0("/s","/<[_int,_int,_int,_int],_int,_int>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1 [1,2,3,4]>\n") { out }
     }
@@ -644,7 +644,7 @@ class TExec {
             $Output0
             var x: <[<()>,<()>]>
             set x = <.1 [<.1()>:<()>,<.1()>:<()>]>:<[<()>,<()>]>
-            ${output0("/x","/<[<()>,<()>]>")}
+            ${output0("/x","/<[<()>,<()>]>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1 [<.1>,<.1>]>\n") { out }
     }
@@ -933,7 +933,7 @@ class TExec {
             var p: /_int @LOCAL
             set p = /v.1
             set p\ = _20: _int
-            ${output0("/v","/ [_int,_int]")}
+            ${output0("/v","/ [_int,_int]@LOCAL")}
         """.trimIndent())
         assert(out == "[20,20]\n") { out }
     }
@@ -956,7 +956,7 @@ class TExec {
             var v: [_int]; set v = [_10:_int]
             var p: /_int@LOCAL; set p = /v.1
             set p\ = _20: _int
-            ${output0("/v","/[_int]")}
+            ${output0("/v","/[_int]@LOCAL")}
         """.trimIndent())
         assert(out == "[20]\n") { out }
     }
@@ -1367,7 +1367,7 @@ class TExec {
             type List $D{} @{} = </List $D{} @{} @LOCAL>
             var t: [_int,/List $D{} @{} @LOCAL]
             set t = [_10:_int, new List $D{} @{} <.1 Null:/List $D{} @{} @LOCAL>:</List $D{} @{} @LOCAL>: @LOCAL]
-            ${output0("/t","/[_int,/List $D{} @{} @LOCAL]")}
+            ${output0("/t","/[_int,/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[10,<.1 Null>]\n") { out }
     }
@@ -1382,7 +1382,7 @@ class TExec {
             set t1 = [l]
             var t2: [/List $D{} @{} @LOCAL]
             set t2 = [t1.1]
-            ${output0("/t2","/[/List $D{} @{} @LOCAL]")}
+            ${output0("/t2","/[/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[Null]\n") { out }
     }
@@ -1397,7 +1397,7 @@ class TExec {
             set t1 = [l]
             var t2: [/List $D{} @{} @LOCAL]
             set t2 = [t1.1]
-            ${output0("/t2","/[/List $D{} @{} @LOCAL]")}
+            ${output0("/t2","/[/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[Null]\n") { out }
     }
@@ -1412,7 +1412,7 @@ class TExec {
             set t1 = [l]
             var t2: [/List $D{} @{} @LOCAL]
             set t2 = [t1.1]
-            ${output0("/t2","/[/List $D{} @{} @LOCAL]")}
+            ${output0("/t2","/[/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[<.1 Null>]\n") { out }
     }
@@ -1454,7 +1454,7 @@ class TExec {
             var t3: [(),/List $D{} @{} @LOCAL]
             set t3 = [(), new List $D{} @{} <.1 l2\ ~ !1>:</List $D{} @{} @LOCAL>: @LOCAL]
             ${output0("l1","/List $D{} @{} @LOCAL")}
-            ${output0("/t3","/[(),/List $D{} @{} @LOCAL]")}
+            ${output0("/t3","/[(),/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "<.1 Null>\n[(),<.1 <.1 Null>>]\n") { out }
     }
@@ -1467,7 +1467,7 @@ class TExec {
             set l1 = [new List $D{} @{} <.1 Null:/List $D{} @{} @LOCAL>:</List $D{} @{} @LOCAL>: @LOCAL]
             var l2: [/List $D{} @{} @LOCAL]
             set l2 = l1
-            ${output0("/l2","/[/List $D{} @{} @LOCAL]")}
+            ${output0("/l2","/[/List $D{} @{} @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[<.1 Null>]\n") { out }
     }
@@ -1541,7 +1541,7 @@ class TExec {
             type List $D{} @{a} = </List $D{} @{a} @a>
             { @A
                 var pa: /List $D{} @{LOCAL} @LOCAL
-                set pa = new List $D{} @{A} <.1 Null: /List $D{} @{A} @A>:</List $D{} @{A}>: @A
+                set pa = new List $D{} @{A} <.1 Null: /List $D{} @{A} @A>:</List $D{} @{A}@LOCAL>: @A
                 var f: func @{}->()->()
                 set f = func @{}-> ()->() {
                     var pf: /List $D{} @{A} @A
@@ -1722,7 +1722,7 @@ class TExec {
                 set ret = arg.1 @{i1} arg.2: @i1
             }
             var x: ()
-            ${output0("g @{LOCAL} [f,/x]: @LOCAL","/()")}
+            ${output0("g @{LOCAL} [f,/x]: @LOCAL","/()@LOCAL")}
         """.trimIndent()
         )
         assert(out == "_\n") { out }
@@ -1811,7 +1811,7 @@ class TExec {
         type Pair $D{} @{}= [_int,_int]
         var x: Pair $D{} @{}
         set x = Pair $D{} @{} [_1:_int,_2:_int] 
-        ${output0("/x","/Pair $D{} @{}")}
+        ${output0("/x","/Pair $D{} @{}@LOCAL")}
         """.trimIndent())
         assert(out == "[1,2]\n") { out }
     }
@@ -1832,11 +1832,11 @@ class TExec {
             $Output0
             type Num $D{} @{s} = </Num $D{} @{s} @s>
             type Ptr $D{} @{s} = /Num $D{} @{s} @s
-            var n1: /Num $D{} @{LOCAL}
+            var n1: /Num $D{} @{LOCAL} @LOCAL
             set n1 = new Num $D{} @{LOCAL} <.1 Null:/Num $D{} @{LOCAL} @LOCAL>:</Num $D{} @{LOCAL} @LOCAL>
             var n2: Ptr $D{} @{LOCAL}
-            set n2 = Ptr $D{} @{LOCAL} new Num $D{} @{LOCAL} <.1 Null:/Num $D{} @{LOCAL}>:</Num $D{} @{LOCAL} @LOCAL>
-            ${output0("n1","/Num $D{} @{LOCAL}")}
+            set n2 = Ptr $D{} @{LOCAL} new Num $D{} @{LOCAL} <.1 Null:/Num $D{} @{LOCAL} @LOCAL>:</Num $D{} @{LOCAL} @LOCAL>
+            ${output0("n1","/Num $D{} @{LOCAL} @LOCAL")}
             ${output0("n2","Ptr $D{} @{LOCAL}")}
         """.trimIndent())
         assert(out == "<.1 Null>\n<.1 Null>\n") { out }
@@ -1864,7 +1864,7 @@ class TExec {
             set x = _10:_int
             var xs: Pair $D{} @{}
             set xs = Pair $D{} @{} [x,x]
-            ${output0("/xs","/Pair $D{} @{}")}
+            ${output0("/xs","/Pair $D{} @{} @LOCAL")}
         """.trimIndent())
         assert(out == "[10,10]\n") { out }
     }
@@ -1878,7 +1878,7 @@ class TExec {
             set x = _10:_int
             var xs: Pair $D{} @{}
             set xs = Pair$D{} @{}<.1 x>:<Int$D{} @{},Int$D{} @{}>
-            ${output0("/xs","/Pair $D{} @{}")}
+            ${output0("/xs","/Pair $D{} @{} @LOCAL")}
         """.trimIndent())
         assert(out == "<.1 10>\n") { out }
     }
@@ -1912,7 +1912,7 @@ class TExec {
             type Rect $D{} @{} = [Point$D{} @{},Dims$D{} @{}]
             var rect: Rect $D{} @{}
             set rect = Rect$D{} @{}[Point $D{} @{}[(_10: _int),(_10: _int)],Dims$D{} @{}[(_5: _int),(_5: _int)]]
-            ${output0("/rect","/Rect $D{} @{}")}
+            ${output0("/rect","/Rect $D{} @{} @LOCAL")}
         """.trimIndent())
         assert(out == "[[10,10],[5,5]]\n") { out }
     }
@@ -2003,7 +2003,7 @@ class TExec {
 
         var e: Event $D{} @{}
         set e = Event$D{} @{} <.4 <.2 <.1 [Point$D{} @{} [_10:_int,_10:_int],_1:_int]>:<[Point$D{} @{},_int],[Point$D{} @{},_int]>>:<[Point$D{} @{}],<[Point$D{} @{},_int],[Point$D{} @{},_int]>>>:<_int,(),<_int,_int>,<[Point$D{} @{}],<[Point$D{} @{},_int],[Point$D{} @{},_int]>>>
-        ${output0("/e","/Event $D{} @{}")}
+        ${output0("/e","/Event $D{} @{} @LOCAL")}
        """.trimIndent())
         assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
     }
@@ -2043,7 +2043,7 @@ class TExec {
                         [_1:_int,_2:_int,(),_4:_int]
                     >: <[_int,_int,(),_int]>
                 >: <<[_int,_int,(),_int]>,[_int]>
-            ${output0("/e","/Button $D{} @{}")}
+            ${output0("/e","/Button $D{} @{} @LOCAL")}
            """.trimIndent()
         )
         assert(out == "<.1 <.1 [1,2,(),4]>>\n") { out }
@@ -2056,7 +2056,7 @@ class TExec {
             type Button $D{} @{} = <_int,_int> -- Up/Down
             var e: Button $D{} @{}
             set e = Button $D{} @{} <.2 _10:_int>:<_int,_int>
-            ${output0("/e","/Button $D{} @{}")}
+            ${output0("/e","/Button $D{} @{} @LOCAL")}
            """.trimIndent()
         )
         assert(out == "<.2 10>\n") { out }
@@ -2068,7 +2068,7 @@ class TExec {
             type Button $D{} @{} = <(),()> -- Up/Down
             var e: Button $D{} @{}
             set e = Button $D{} @{} <.2 ()>:<(),()>
-            ${output0("/e","/Button $D{} @{}")}
+            ${output0("/e","/Button $D{} @{} @LOCAL")}
             ${output0("e~!0","_int")}
            """.trimIndent()
         )
@@ -2080,7 +2080,7 @@ class TExec {
             $Output0
             var e: [_int]+<(),()>
             set e = <.2 [_10:_int]>:[_int]+<(),()>
-            ${output0("/e","/[_int]+<(),()>")}
+            ${output0("/e","/[_int]+<(),()>@LOCAL")}
             ${output0("e!0.1","_int")}
            """.trimIndent()
         )
@@ -2093,7 +2093,7 @@ class TExec {
             type Button $D{} @{} = <(),()> -- Up/Down
             var dn: Button.2 $D{} @{}
             set dn = Button.2 $D{} @{} ()
-            ${output0("/dn","/Button.2 $D{} @{}")}
+            ${output0("/dn","/Button.2 $D{} @{}@LOCAL")}
            """.trimIndent()
         )
         assert(out == "<.2>\n") { out }
@@ -2274,7 +2274,7 @@ class TExec {
             set a = <.2()>: <(),()>
             var b: <(),()>
             set b = inv @{} a
-            ${output0("/b","/<(),()>")}
+            ${output0("/b","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n") { out }
     }
@@ -2402,7 +2402,7 @@ class TExec {
             type List $D{}@{a} = <[(),/List$D{}@{a}@a]>
             var y : [(),/(List $D{}@{LOCAL}) @LOCAL]
             set y = [(), new List$D{} @{LOCAL}<.1 [(),Null:/(List $D{}@{LOCAL}) @LOCAL]>:<[(),/List$D{}@{LOCAL}@LOCAL]>: @LOCAL]
-            ${output0("/y","/[(),/(List $D{}@{LOCAL}) @LOCAL]")}
+            ${output0("/y","/[(),/(List $D{}@{LOCAL}) @LOCAL]@LOCAL")}
         """.trimIndent())
         assert(out == "[(),<.1 [(),Null]>]\n") { out }
     }

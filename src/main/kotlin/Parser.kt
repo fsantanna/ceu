@@ -73,7 +73,7 @@ object Parser
             alls.acceptFix("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val pln = this.type()
-                val scp = alls.acceptVar("Scp")
+                val scp = if (CE1) alls.acceptVar("Scp") else alls.acceptVar_err("Scp")
                 Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
             }
             alls.acceptFix("()") -> Type.Unit(alls.tk0 as Tk.Fix)

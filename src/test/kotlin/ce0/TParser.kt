@@ -117,11 +117,11 @@ class TParser {
 
     @Test
     fun a09_parser_type_ptr_err() {
-        All_restart(null, PushbackReader(StringReader("/()"), 2))
+        All_restart(null, PushbackReader(StringReader("/()@LOCAL"), 2))
         Lexer.lex()
         val t = Parser.type()
-        //assert(t is Type.Pointer && t.xscp!!.scp1.str=="LOCAL")
-        assert(t is Type.Pointer && t.xscp == null)
+        assert(t is Type.Pointer && t.xscp!!.scp1.str=="LOCAL")
+        //assert(t is Type.Pointer && t.xscp == null)
         //assert(e.message == "(ln 1, col 4): expected `@´ : have end of file") { e.message!! }
     }
 
@@ -658,7 +658,7 @@ class TParser {
         } catch (e: Throwable) {
             //assert(e.message == "(ln 1, col 11): expected `@´ : have \"@\"") { e.message!! }
             //assert(e.message == "(ln 1, col 12): expected identifier : have 1") { e.message!! }
-            assert(e.message == "(ln 1, col 11): expected statement : have \"@\"") { e.message!! }
+            assert(e.message == "(ln 1, col 11): expected scope identifier : have \"@\"") { e.message!! }
         }
     }
 

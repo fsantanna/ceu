@@ -2370,6 +2370,18 @@ class TEnv {
                 set t1 = Tx $D{} @{LOCAL} <.1 /x>: </_int>
             }
         """.trimIndent())
+        assert(out == "(ln 5, col 45): expected scope identifier : have \">\"") { out }
+    }
+    @Test
+    fun q18 () {
+        val out = inp2env("""
+            type Tx $D{} @{a} = </_int@a>
+            { @A
+                var x: _int
+                var t1: Tx $D{} @{LOCAL}
+                set t1 = Tx $D{} @{LOCAL} <.1 /x>: </_int@LOCAL>
+            }
+        """.trimIndent())
         assert(out == "OK") { out }
     }
 
