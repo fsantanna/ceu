@@ -272,7 +272,7 @@ class TXExec {
                 output Std p1\
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 11, col 12): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("(ln 13, col 12): invalid assignment : type mismatch")) { out }
     }
 
     // old disabled
@@ -889,7 +889,7 @@ class TXExec {
             func clone: /Num -> /Num {
             }
         """.trimIndent())
-        assert(out == "(ln 8, col 14): undeclared type \"Num\"") { out }
+        assert(out == "(ln 9, col 14): undeclared type \"Num\"") { out }
     }
     @Test
     fun e21_clone() {

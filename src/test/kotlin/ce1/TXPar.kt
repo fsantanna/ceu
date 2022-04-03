@@ -246,11 +246,11 @@ class TXPar {
     @Test
     fun d01_pause () {
         val out = test(true, """
-            type Event += <()>
+            type Event += <Xxx=()>
             spawn {
-                pauseon evt?3 {
+                pauseon evt?Timer {
                     output Std _1:_int
-                    await evt?4
+                    await evt?Xxx
                     output Std _5:_int
                 }
             }
@@ -303,12 +303,13 @@ class TXPar {
     }
     @Test
     fun e03_defer_err () {
-        val out = test(false, """
+        val out = test(true, """
             defer {
                 output Std _2:_int
             }
         """.trimIndent())
-        assert(out == "(ln 11, col 31): undeclared type \"Event\"") { out }
+        //assert(out == "(ln 11, col 31): undeclared type \"Event\"") { out }
+        assert(out == "2\n") { out }
     }
 
     //

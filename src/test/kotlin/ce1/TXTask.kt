@@ -936,14 +936,14 @@ class TXTask {
     fun g02_spawn_abort () {
         val out = test(true, """
             --type Event = <(),_uint64_t>
-            type Event += <(),()>
+            type Event += <Aaa=(),Bbb=()>
             var t: task @{} -> () -> () -> ()
             set t = task @{} -> () -> () -> () {
                 var v: _int
                 set v = _1:_int
                 loop {
                     output Std v
-                    await evt~?3
+                    await evt~?Aaa
                     set v = _(${D}v+1):_int
                 }
             }
@@ -953,13 +953,13 @@ class TXTask {
                 loop {
                     var x: active task  @{} -> () -> () -> ()
                     set x = spawn t _1:_int
-                    await evt~?4
+                    await evt~?Bbb
                 }
             }) ()
             
-            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
-            emit @GLOBAL Event <.4 ()>: <(),_uint64_t,(),()>
-            emit @GLOBAL Event <.3 ()>: <(),_uint64_t,(),()>
+            emit @GLOBAL Event.Aaa
+            emit @GLOBAL Event.Bbb
+            emit @GLOBAL Event.Aaa
             
        """.trimIndent())
         assert(out == "1\n2\n1\n2\n") { out }
