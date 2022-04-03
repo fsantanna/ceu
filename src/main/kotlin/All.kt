@@ -196,6 +196,7 @@ fun exec (cmd: String): Pair<Boolean,String> {
 
 val prelude1 = """
     type Error = <Escape=()>
+    type Event = <Kill=(),Task=_uint64_t,Timer=_int>
     type Output = <
         Std = _(void*)
     >

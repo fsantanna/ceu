@@ -110,7 +110,7 @@ class TXPar {
     @Test
     fun b01_par () {
         val out = test(true, """
-            type Event = <(),_int>
+            --type Event = <(),_int>
             spawn {
                 par {
                     output Std ()
@@ -126,7 +126,7 @@ class TXPar {
     @Test
     fun b02_parand () {
         val out = test(true, """
-            type Event = <(),_uint64_t,()>
+            --type Event = <(),_uint64_t,()>
             spawn {
                 parand {
                     await evt?3
@@ -146,7 +146,7 @@ class TXPar {
     @Test
     fun b03_paror () {
         val out = test(true, """
-            type Event = <(),_uint64_t,()>
+            --type Event = <(),_uint64_t,()>
             spawn {
                 paror {
                     await evt?3
@@ -167,7 +167,7 @@ class TXPar {
     @Test
     fun b04_watching () {
         val out = test(true, """
-            type Event = <(),_uint64_t,()>
+            --type Event = <(),_uint64_t,()>
             spawn {
                 watching evt?3 {
                     await _0
@@ -182,7 +182,7 @@ class TXPar {
     @Test
     fun b05_spawn_every () {
         val out = test(true, """
-            type Event = <(),_uint64_t,_int>
+            --type Event = <(),_uint64_t,_int>
             spawn {
                 every evt?3 {
                     output Std ()
@@ -199,7 +199,7 @@ class TXPar {
     @Test
     fun c01_clk () {
         val out = test(true, """
-            type Event = <(),_int,_int>
+            --type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
             }
@@ -222,7 +222,7 @@ class TXPar {
     @Test
     fun c02_clk () {
         val out = test(true, """
-            type Event = <(),_int,_int>
+            --type Event = <(),_int,_int>
             var sub = func [_int,_int] -> _int {
                 return _(${D}arg._1 - ${D}arg._2)
             }
@@ -246,9 +246,9 @@ class TXPar {
     @Test
     fun d01_pause () {
         val out = test(true, """
-            type Event = <(),_uint64_t,_int,()>
+            type Event += <()>
             spawn {
-                pauseif evt?3 {
+                pauseon evt?3 {
                     output Std _1:_int
                     await evt?4
                     output Std _5:_int
@@ -270,7 +270,7 @@ class TXPar {
     @Test
     fun e01_defer () {
         val out = test(true, """
-            type Event = <(),_uint64_t,_int>
+            --type Event = <(),_uint64_t,_int>
             spawn {
                 defer {
                     output Std _2:_int
@@ -286,7 +286,7 @@ class TXPar {
     @Test
     fun e02_defer_block () {
         val out = test(true, """
-            type Event = <(),_uint64_t,_int>
+            --type Event = <(),_uint64_t,_int>
             spawn {
                 {
                     defer {
@@ -303,7 +303,7 @@ class TXPar {
     }
     @Test
     fun e03_defer_err () {
-        val out = test(true, """
+        val out = test(false, """
             defer {
                 output Std _2:_int
             }
@@ -316,7 +316,7 @@ class TXPar {
     @Test
     fun f01_multi () {
         val out = test(true, """
-            type Event = <(),_uint64_t>
+            --type Event = <(),_uint64_t>
             task bbb: () -> () -> _int {
                 output Std _111:_int
                 return _3
@@ -335,7 +335,7 @@ class TXPar {
     @Test
     fun f02_multi () {
         val out = test(true, """
-            type Event = <(),_uint64_t,()>
+            --type Event = <(),_uint64_t,()>
             task fff: () -> () -> () {
                 output Std _222:_int
                 await _0
@@ -354,19 +354,19 @@ class TXPar {
     fun f03_multi_err () {
         val out = test(
             true, """
-                type Event = <(),_uint64_t,()>
+                --type Event = <(),_uint64_t,()>
                 task fff: () -> () -> () {
                 }
                 await fff ()
             """.trimIndent()
         )
-        assert(out == "(ln 11, col 7): invalid call : unexpected task") { out }
+        assert(out == "(ln 12, col 7): invalid call : unexpected task") { out }
     }
     @Test
     fun f04_multi_err () {
         val out = test(
             true, """
-                type Event = <(),_uint64_t,()>
+                --type Event = <(),_uint64_t,()>
                 task fff: () -> () -> () {
                     output Std _222:_int
                     await _0
@@ -374,25 +374,25 @@ class TXPar {
                 call fff ()
             """.trimIndent()
         )
-        assert(out == "(ln 13, col 6): invalid call : unexpected task") { out }
+        assert(out == "(ln 14, col 6): invalid call : unexpected task") { out }
     }
     @Test
     fun f05_multi_err () {
         val out = test(
             true, """
-                type Event = <(),_uint64_t,()>
+                --type Event = <(),_uint64_t,()>
                 func fff: () -> () {
                     output Std _222:_int
                 }
                 spawn fff ()
             """.trimIndent()
         )
-        assert(out == "(ln 12, col 7): invalid spawn : expected task") { out }
+        assert(out == "(ln 13, col 7): invalid spawn : expected task") { out }
     }
     @Test
     fun f06_multi () {
         val out = test(true, """
-            type Event = <(),_uint64_t>
+            --type Event = <(),_uint64_t>
             task aaa: () -> () -> _int {
                 spawn {
                     return _1
@@ -409,7 +409,7 @@ class TXPar {
     @Test
     fun f07_multi () {
         val out = test(true, """
-            type Event = <(),_uint64_t>
+            --type Event = <(),_uint64_t>
             task aaa: () -> () -> _int {
                 par {
                     await _0

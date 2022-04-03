@@ -272,7 +272,7 @@ class TXExec {
                 output Std p1\
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 12, col 12): invalid assignment : type mismatch")) { out }
+        assert(out.startsWith("(ln 11, col 12): invalid assignment : type mismatch")) { out }
     }
 
     // old disabled
@@ -492,7 +492,7 @@ class TXExec {
                 output Std (f ())
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 9, col 5): invalid return : type mismatch")) { out }
+        assert(out.startsWith("(ln 10, col 5): invalid return : type mismatch")) { out }
     }
     @Test
     fun c07_ptr_arg_ret () {
@@ -592,7 +592,7 @@ class TXExec {
             """.trimIndent()
         )
         //assert(out == "()\n") { out }
-        assert(out.startsWith("(ln 11, col 11): invalid assignment : type mismatch :")) { out }
+        assert(out.startsWith("(ln 12, col 11): invalid assignment : type mismatch :")) { out }
     }
 
     // TYPE / ALIAS
@@ -678,7 +678,7 @@ class TXExec {
         )
         //assert(out == "<.1 Null>\n") { out }
         //assert(out == "(ln 3, col 18): invalid type : expected pointer to alias type\n") { out }
-        assert(out == "(ln 8, col 6): invalid recursive type : cannot be a pointer") { out }
+        assert(out == "(ln 9, col 6): invalid recursive type : cannot be a pointer") { out }
     }
     @Test
     fun e09_bool() {
@@ -840,7 +840,7 @@ class TXExec {
                 var x = r.pos
             """.trimIndent()
         )
-        assert(out == "(ln 10, col 11): invalid discriminator : unknown \"pos\"") { out }
+        assert(out == "(ln 11, col 11): invalid discriminator : unknown \"pos\"") { out }
     }
     @Test
     fun e18_types_yids () {
@@ -849,11 +849,11 @@ class TXExec {
                 type False = ()
                 type Bool = <False=(), True=()>
                 type Xxx = <True=(), False=()>
-                type Event = <False=False,Bool=Bool,Xxx=Xxx>
+                type XEvent = <False=False,Bool=Bool,Xxx=Xxx>
                 var b = Bool.False
                 var x = Xxx.False
                 var f = False ()
-                output Std _CEU_EVENT_FALSE:_int
+                output Std _CEU_XEVENT_FALSE:_int
                 output Std _CEU_XXX_FALSE:_int
                 output Std _CEU_BOOL_FALSE:_int
             """.trimIndent()
@@ -976,7 +976,7 @@ class TXExec {
                 output () f _10
             """.trimIndent()
         )
-        assert(out == "(ln 9, col 8): expected variable identifier : have \"()\"") { out }
+        assert(out == "(ln 10, col 8): expected field : have \"()\"") { out }
     }
     @Test
     fun g04_include_err () {
@@ -1019,10 +1019,9 @@ class TXExec {
 
     @Test
     fun p01_type_hier () {
-        val out = test(
-            true, """
+        val out = test(true, """
             type Point = [_int,_int]
-            type Event = <
+            type XEvent = <
                 _int,
                 (),
                 <_int,_int>,    -- Key.Up/Down
@@ -1034,7 +1033,7 @@ class TXExec {
                     >
                 >
             >
-            var e = Event <.4 <.2 <.1 [Point [_10:_int,_10:_int],_1:_int]>:<[Point,_int],[Point,_int]>>:<[Point],<[Point,_int],[Point,_int]>>>:<_int,(),<_int,_int>,<[Point],<[Point,_int],[Point,_int]>>>
+            var e = XEvent <.4 <.2 <.1 [Point [_10:_int,_10:_int],_1:_int]>:<[Point,_int],[Point,_int]>>:<[Point],<[Point,_int],[Point,_int]>>>:<_int,(),<_int,_int>,<[Point],<[Point,_int],[Point,_int]>>>
             output Std /e
            """.trimIndent()
         )
@@ -1049,7 +1048,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 10, col 15): invalid discriminator : unknown discriminator \"Common\"") { out }
+        assert(out == "(ln 11, col 15): invalid discriminator : unknown discriminator \"Common\"") { out }
     }
     @Test
     fun p03_hier_name () {
@@ -1060,7 +1059,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 8, col 26): missing subtype or field identifiers") { out }
+        assert(out == "(ln 9, col 26): missing subtype or field identifiers") { out }
     }
     @Test
     fun p04_hier_name () {
@@ -1092,7 +1091,7 @@ class TXExec {
         val out = test(
             true, """
             type Point = [_int,_int]
-            type Event = <
+            type XEvent = <
                 Xxx = _int
                 Yyy = ()
                 Key = <_int,_int>  -- Key.Up/Down
@@ -1104,7 +1103,7 @@ class TXExec {
                     >
                 >
             >
-            var e = Event.Mouse.Button.Up [Point [_10:_int,_10:_int],_1:_int]
+            var e = XEvent.Mouse.Button.Up [Point [_10:_int,_10:_int],_1:_int]
             output Std /e
            """.trimIndent()
         )
@@ -1137,7 +1136,7 @@ class TXExec {
         val out = test(
             true, """
             type Point = ()
-            type Event = [Point] + <()>
+            type XEvent = [Point] + <()>
             output Std ()
            """.trimIndent()
         )
@@ -1179,7 +1178,7 @@ class TXExec {
             output Std h!Bbb!Ccc!Eee.1
            """.trimIndent()
         )
-        assert(out == "(ln 9, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
+        assert(out == "(ln 10, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
     }
     @Test
     fun p16_type_hier_cast_ok () {
@@ -1241,7 +1240,7 @@ class TXExec {
             type Button = _int + <(),()> -- ERR: [_int] + ...
            """.trimIndent()
         )
-        assert(out == "(ln 8, col 20): expected statement : have \"+\"") { out }
+        assert(out == "(ln 9, col 20): expected statement : have \"+\"") { out }
     }
     @Test
     fun q04_type_hier_err () {
@@ -1249,7 +1248,7 @@ class TXExec {
             type Button = [_int] + () -- ERR: ... + <...>
            """.trimIndent()
         )
-        assert(out == "(ln 8, col 24): expected \"<\" : have \"()\"") { out }
+        assert(out == "(ln 9, col 24): expected \"<\" : have \"()\"") { out }
     }
     @Test
     fun q05_type_hier () {

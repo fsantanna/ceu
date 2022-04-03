@@ -1021,8 +1021,8 @@ object Parser
                             {
                                 var ms_$N: _int = _${clk.str}
                                 loop {
-                                    await evt?3
-                                    set ms_$N = sub [ms_$N, evt!3]
+                                    await evt?Timer
+                                    set ms_$N = sub [ms_$N, evt!Timer]
                                     if lte [ms_$N,_0] {
                                         break
                                     }
@@ -1137,7 +1137,7 @@ object Parser
                 All_nest(
                     """
                     spawn {
-                        await evt?1
+                        await evt?Kill
                         ${blk.tostr(true)}
                     }
                     
@@ -1160,7 +1160,7 @@ object Parser
                     this.stmt()
                 } as Stmt
             }
-            alls.acceptFix("pauseif") -> {
+            alls.acceptFix("pauseon") -> {
                 if (!CE1) alls.err_tk_unexpected(alls.tk0)
                 val pred = this.expr() as Expr.UPred
                 val blk = this.block(null)
@@ -1225,8 +1225,8 @@ object Parser
                             if _($chks) {
                                 break
                             }
-                            await evt?2
-                            var tk_$N = evt!2
+                            await evt?Task
+                            var tk_$N = evt!Task
                             $sets
                         }
                     }

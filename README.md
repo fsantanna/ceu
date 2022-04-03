@@ -553,7 +553,7 @@ _(1 + 1)     _{2 * (1+1)}
 
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
-      |  `{´ BLOCK Stmt `}´                         -- block                    { @A call f() ; call g() }
+      |  `{´ BLOCK Stmt `}´                         -- block                    { @A ... }
 
         // variables
       |  `var´ VAR [`:´ Type] [`=´ (Expr | VStmt)]  -- variable declaration     var x: _int = f ()

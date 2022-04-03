@@ -499,7 +499,7 @@ class TXDisabled {
     fun noclo_a06_par2 () {
         val out = test(
             true, """
-                type Event = <(),_int>
+                --type Event = <(),_int>
                 var build = func @{r1} -> () -> task @r1->()->()->() {
                     set ret = task @r1->()->()->() {
                         output std _1:_int

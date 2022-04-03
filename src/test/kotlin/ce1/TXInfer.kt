@@ -66,6 +66,7 @@ class TXInfer {
         val out = all(prelude1+"var x: _int = input Std ()\noutput Std ()\n")
         assert(out == """
             type Error @{} = <Escape=()>
+            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
             type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             var x: _int
@@ -256,6 +257,7 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Error @{} = <Escape=()>
+            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
             type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             type Input @{i} += <Pico=/() @i>
@@ -352,6 +354,7 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Error @{} = <Escape=()>
+            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
             type Output @{} = <Std=_(void*)>
             type Input @{} = <Std=_>
             type Input @{} += <Pico=()>
@@ -1170,7 +1173,7 @@ class TXInfer {
     @Test
     fun h08_wclock () {
         val out = all("""
-            type Event = <(),(),(),(),_int>
+            type Event = <Kill=(),Task=(),Timer=()>
             var sub: func [_imt,_int] -> _int
             var lte: func [_imt,_int] -> _int
             spawn {
@@ -1178,7 +1181,7 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Event @{} = <(),(),(),(),_int>
+            type Event @{} = <Kill=(),Task=(),Timer=()>
             var sub: func @{} -> [_imt,_int] -> _int
             var lte: func @{} -> [_imt,_int] -> _int
             spawn ((task @{} -> _ -> _ -> _ {
@@ -1188,8 +1191,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt~)?3)
-            set ms_8 = (sub @{} [ms_8,((evt~)!3)])
+            await ((evt~)?Timer)
+            set ms_8 = (sub @{} [ms_8,((evt~)!Timer)])
             if (lte @{} [ms_8,(_0: _int)])
             {
             break
@@ -1210,7 +1213,7 @@ class TXInfer {
     @Test
     fun h09_wclock () {
         val out = all("""
-            type Event = <(),(),(),(),_int>
+            type Event = <Kill=(),Task=(),Timer=()>
             var sub: func [_imt,_int] -> _int
             var lte: func [_imt,_int] -> _int
             spawn {
@@ -1220,7 +1223,7 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Event @{} = <(),(),(),(),_int>
+            type Event @{} = <Kill=(),Task=(),Timer=()>
             var sub: func @{} -> [_imt,_int] -> _int
             var lte: func @{} -> [_imt,_int] -> _int
             spawn ((task @{} -> _ -> _ -> _ {
@@ -1233,8 +1236,8 @@ class TXInfer {
             {
             {
             loop {
-            await ((evt~)?3)
-            set ms_12 = (sub @{} [ms_12,((evt~)!3)])
+            await ((evt~)?Timer)
+            set ms_12 = (sub @{} [ms_12,((evt~)!Timer)])
             if (lte @{} [ms_12,(_0: _int)])
             {
             break
