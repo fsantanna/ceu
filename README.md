@@ -1,7 +1,7 @@
 # Ceu
 
 Ceu is a synchronous reactive language that aims to offer a higher-level and
-safer alternative to C and C++.
+safer alternative to C/C++.
 Ceu integrates *Structured Concurrency* and *Reactive Programming*, extending
 classical structured programming with two main functionalities:
 
@@ -563,7 +563,7 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
         // invocations
       |  `output´ Expr                              -- data output              output Std x
       |  `input´ Expr [`:´ Type]                    -- data input               input Std (): _int
-      |  `native´ [`type´] NAT                      -- native                   native _{ printf("hi"); }
+      |  `native´ [`type´] NAT                      -- native statement         native _{ printf("hi"); }
       |  `call´ Expr                                -- call                     call f ()
 
         // control flow
@@ -604,6 +604,9 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
       |  `paror´ Block { `with´ Block }             -- parallel or block        paror { ... } with { ... }
       |  `watching´ [Expr | TIMER] Block            -- watching or block        watching 500ms { ... }
 
+Expr ::= `(´ Expr `)´                               -- group                    (x)
+
+
 BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
 VAR   ::= [a-z][A-Za-z0-9_]*                        -- variable identifier      x  f  pt
 TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          Null  Int  Event
@@ -612,7 +615,6 @@ TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier     
 ```
 
 <!--
-Expr ::= `(´ Expr `)´                               -- group                    (x)
       |  `(´ `)´                                    -- unit                     ()
       |  NAT `:´ Type                               -- native expression        v: _int
       |  VAR                                        -- variable identifier      i
