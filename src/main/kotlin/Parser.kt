@@ -282,7 +282,7 @@ object Parser
                     alls.checkExpr() -> {
                         this.expr()
                     }
-                    // Func {}
+                    // active Task {}
                     alls.checkFix("{") -> {
                         val block = this.block(null)
                         Expr.Func(id, null, block)

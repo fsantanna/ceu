@@ -73,8 +73,13 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
             val hassubs = this.xtype?.noact().let { it!=null && ((it as Type.Named).subs.size > 0) }
             if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc,true) + " " + this.e.tostr(lc,hassubs) + ")")
         }
-        is Expr.Unpak -> this.e.wtype.let { if (it==null || it.noact() !is Type.Named) this.e.tostr(lc) else ("(" + this.e.tostr(lc) + "~" +
-                "" + ")") }
+        is Expr.Unpak -> this.e.wtype.let {
+            if (it==null || it.noact() !is Type.Named) {
+                this.e.tostr(lc)
+            } else {
+                ("(" + this.e.tostr(lc) + "~" + "" + ")")
+            }
+        }
         is Expr.Upref -> "(/" + this.pln.tostr(lc) + ")"
         is Expr.Dnref -> "(" + this.ptr.tostr(lc) + "\\)"
         is Expr.TCons -> "[" + this.arg.map { it.tostr(lc) }.joinToString(",") + "]"
@@ -96,7 +101,9 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
             val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.str.anon2local() }
             "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
         }
-        is Expr.Func -> "("+ this.ftp()!!.tostr(lc) + " " + this.block.tostr(lc) + ")"
+        is Expr.Func -> {
+            "("+ (this.ftp()?.tostr(lc) ?: "null") + " " + this.block.tostr(lc) + ")"
+        }
         is Expr.If   -> "(if "+ this.tst.tostr(lc) + " { " + this.true_.tostr(lc) + "}  else { " + this.false_.tostr(lc) + " })"
     }.let {
         if (!lc) it else {

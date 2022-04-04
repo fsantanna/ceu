@@ -58,7 +58,7 @@ fun Stmt.dump (spc: Int = 0): String {
     return "[${this.tk.lin}] " + " ".repeat(spc) + "Stmt." + when (this) {
         is Stmt.Nop -> "Nop\n"
         is Stmt.Native -> "Native " + this.tk.str + "\n"
-        is Stmt.Var -> "Var " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: "")
+        is Stmt.Var -> "Var " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: " ".repeat(spc+8)+"no type\n")
         is Stmt.Set -> "Set\n" + this.dst.dump(spc+4) + this.src.dump(spc+4)
         is Stmt.XBreak -> "Break\n"
         is Stmt.XReturn -> "Return\n"

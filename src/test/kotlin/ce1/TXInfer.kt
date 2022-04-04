@@ -30,6 +30,7 @@ class TXInfer {
             s.xinfScp1s()
             check_01_before_tps(s)
             //println(s.dump())
+            //println(s.tostr())
             s.xinfTypes(null)
             s.setScp2s()
             return s.tostr()
@@ -322,6 +323,62 @@ class TXInfer {
 
         """.trimIndent()) { out }
     }
+    @Test
+    fun a18_clone_rec () {
+        val out = all("""
+            type Num = </Num>    
+            var clone = func /Num -> /Num {
+                return new <.1 clone arg\!1>
+            }
+            call clone Null
+        """.trimIndent())
+        assert(out == """
+            type Num @{i} = </Num @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
+            set ret = (new (Num @{l} <.1 (clone @{j,j,l,l} (((arg\)~)!1): @l)>: </Num @{l} @l>): @k)
+            return
+            }
+            )
+            call (clone @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /Num @{GLOBAL} @GLOBAL: @GLOBAL)
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun a19_clone() {
+        val out = all("""
+            type Num = </Num>    
+            var clone = func /Num -> /Num {
+            }
+        """.trimIndent())
+        assert(out == """
+            type Num @{i} = </Num @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
+            
+            }
+            )
+            
+        """.trimIndent()) { out }
+    }
+    @Test
+    fun a20_clone() {
+        val out = all("""
+            type Num = </Num>    
+            var clone : func /Num -> /Num
+            set clone = func /Num -> /Num {
+            }
+        """.trimIndent())
+        assert(out == """
+            type Num @{i} = </Num @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
+            
+            }
+            )
+            
+        """.trimIndent()) { out }
+    }
 
     // inference error
 
@@ -436,7 +493,17 @@ class TXInfer {
         """.trimIndent()
         )
         //assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
-        assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
+        //assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
+        assert(out == """
+            var fact: func @{i} -> [/_int @i,_int] -> ()
+            set fact = (func @{i} -> [/_int @i,_int] -> () {
+            var x: _int
+            set x = (_1: _int)
+            call (fact @{LOCAL} [(/x),(_: _int)])
+            }
+            )
+            
+        """.trimIndent()) { out }
     }
     @Test
     fun c06_new_return0 () {

@@ -513,6 +513,30 @@ class TExec {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
+    @Test
+    fun d10_func_rec () {
+        val out = all("""
+            type Num $D{} @{} = </Num$D{}@{}@LOCAL>    
+            var clone : func @{} -> /Num$D{}@{}@LOCAL -> /Num$D{}@{}@LOCAL
+            set clone = func @{} -> /Num$D{}@{}@LOCAL -> /Num$D{}@{}@LOCAL {
+                set ret = new <.1 clone @{} arg\~!1>:</Num$D{}@{}@LOCAL>
+            }
+            call clone @{} Null
+        """.trimIndent())
+        assert(out == "(ln 4, col 15): invalid `new` : expected named type") { out }
+    }
+    @Test
+    fun d11_func_rec () {
+        val out = all("""
+            type Num $D{} @{} = </Num$D{}@{}@GLOBAL>    
+            var clone : func @{} -> /Num$D{}@{}@GLOBAL -> /Num$D{}@{}@GLOBAL
+            set clone = func @{} -> /Num$D{}@{}@GLOBAL -> /Num$D{}@{}@GLOBAL {
+                set ret = new Num $D{} @{} <.1 clone @{} arg\~!1>:</Num$D{}@{}@GLOBAL>
+            }
+            call clone @{} Null
+        """.trimIndent())
+        assert(out.contains("Assertion `&(*(task1->arg)) != NULL' failed.")) { out }
+    }
 
     // INPUT / OUTPUT
 

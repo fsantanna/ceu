@@ -14,8 +14,7 @@ private val nums = """
 """.trimIndent()
 
 private val clone = """
-    var clone : func /Num -> /Num
-    set clone = func /Num -> /Num {
+    func clone: /Num -> /Num {
         if arg\?Null {
             return Null
         } else {
@@ -25,8 +24,7 @@ private val clone = """
 """.trimIndent()
 
 private val add = """
-    var add : func [/Num,/Num] -> /Num
-    set add = func [/Num,/Num] -> /Num {
+    func add: [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
         if y\?Null {
@@ -38,8 +36,7 @@ private val add = """
 """.trimIndent()
 
 private val mul = """
-    var mul : func [/Num,/Num] -> /Num
-    set mul = func [/Num,/Num] -> /Num {
+    func mul: [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
         if y\?Null {
@@ -52,8 +49,7 @@ private val mul = """
 """.trimIndent()
 
 private val lt = """
-    var lt : func [/Num,/Num] -> _int
-    set lt = func [/Num,/Num] -> _int {
+    func lt: [/Num,/Num] -> _int {
         if arg.2\?Null {
             return _0
         } else {
@@ -67,8 +63,7 @@ private val lt = """
 """.trimIndent()
 
 private val sub = """
-    var sub : func [/Num,/Num] -> /Num
-    set sub = func [/Num,/Num] -> /Num {
+    func sub: [/Num,/Num] -> /Num {
         var x = arg.1
         var y = arg.2
         if x\?Null {
@@ -84,8 +79,7 @@ private val sub = """
 """.trimIndent()
 
 private val mod = """
-    var mod : func [/Num,/Num] -> /Num
-    set mod = func [/Num,/Num] -> /Num {
+    func mod: [/Num,/Num] -> /Num {
         if lt arg {
             return clone arg.1
         } else {
@@ -96,8 +90,7 @@ private val mod = """
 """.trimIndent()
 
 private val eq = """
-    var eq : func [/Num,/Num] -> _int
-    set eq = func [/Num,/Num] -> _int {
+    func eq: [/Num,/Num] -> _int {
         var x = arg.1
         var y = arg.2
         if x\?Null {
@@ -113,8 +106,7 @@ private val eq = """
 """.trimIndent()
 
 private val lte = """
-    var lte : func  [/Num,/Num] -> _int
-    set lte = func  [/Num,/Num] -> _int {
+    func lte: [/Num,/Num] -> _int {
         var islt = lt [arg.1\!1,arg.2\!1]
         var iseq = eq [arg.1\!1,arg.2\!1]
         return _(${D}islt || ${D}iseq)
@@ -233,7 +225,7 @@ class TXBook {
             $clone
             $add
             $mul
-            var square = func /Num -> /Num {
+            func square: /Num -> /Num {
                 return mul [arg,arg]
             }
             output Std square two
@@ -248,7 +240,7 @@ class TXBook {
             $lt
             -- 20
             -- returns narrower scope, guarantees both alive
-            var smaller = func @{a1,a2: a2>a1} -> [/Num@{a1},/Num@a2] -> /Num@a2 {
+            func smaller: @{a1,a2: a2>a1} -> [/Num@{a1},/Num@a2] -> /Num@a2 {
                 if lt arg {
                     return arg.1
                 } else {
@@ -272,7 +264,7 @@ class TXBook {
     fun ch_01_02_three_pg05() {
         val out = test(true, """
             $nums
-            var f_three = func /Num -> /Num {
+            func f_three: /Num -> /Num {
                 return three
             }
             output Std f_three one
@@ -302,7 +294,7 @@ class TXBook {
             $clone
             $add
             $mul
-            var multiply = func [/Num,/Num] -> /Num {
+            func multiply: [/Num,/Num] -> /Num {
                 if arg.1\?Null {
                     return Null
                 } else {
@@ -323,10 +315,10 @@ class TXBook {
             $clone
             $add
             $mul
-            var square = func /Num -> /Num {
+            func square: /Num -> /Num {
                 return mul [arg,arg]
             }
-            var twice = func [func /Num->/Num, /Num] -> /Num {
+            func twice: [func /Num->/Num, /Num] -> /Num {
                 return arg.1 (arg.1 arg.2)
             }
             output Std twice [square,two]
@@ -344,8 +336,7 @@ class TXBook {
             $add
             $mul
             
-            var fact : func /Num->/Num
-            set fact = func /Num->/Num {
+            func fact: /Num->/Num {
                 if arg\?Null {
                     return new <.1 Null>
                 } else {
@@ -366,7 +357,7 @@ class TXBook {
 
     val B = "<(),()>"
     val and = """
-        var and = func [$B,$B] -> $B {
+        func and: [$B,$B] -> $B {
             if arg.1?1 {
                 return <.1>:<(),()>
             } else {
@@ -375,7 +366,7 @@ class TXBook {
         }        
     """.trimIndent()
     val or = """
-        var or = func [$B,$B] -> $B {
+        func or: [$B,$B] -> $B {
             if arg.1?2 {
                 return <.2>:<(),()>
             } else {
@@ -384,7 +375,7 @@ class TXBook {
         }        
     """.trimIndent()
     val not = """
-        var not = func <(),()> -> <(),()> {
+        func not: <(),()> -> <(),()> {
             if arg?1 {
                 return <.2>:<(),()>
             } else {
@@ -394,16 +385,16 @@ class TXBook {
     """.trimIndent()
 
     val beq = """
-        var beq = func [$B,$B] -> $B {
+        func beq: [$B,$B] -> $B {
             return or [and arg, and [not arg.1, not arg.2]] 
         }
-        var bneq = func [$B,$B] -> $B {
+        func bneq: [$B,$B] -> $B {
             return not beq arg 
         }        
     """.trimIndent()
 
     val ntob = """
-        var ntob = func _int -> $B {
+        func ntob: _int -> $B {
             if arg {
                 return <.2>:$B
             } else {
@@ -413,7 +404,7 @@ class TXBook {
     """.trimIndent()
 
     val bton = """
-        var bton = func $B -> _int {
+        func bton: $B -> _int {
             if arg?2 {
                 return _1: _int
             } else {
@@ -425,7 +416,7 @@ class TXBook {
     @Test
     fun ch_02_01_not_pg30 () {
         val out = test(true, """
-            var not = func <(),()> -> <(),()> {
+            func not: <(),()> -> <(),()> {
                 if arg?1 {
                     return <.2>
                 } else {
@@ -441,7 +432,7 @@ class TXBook {
     @Test
     fun ch_02_01_and_pg30 () {
         val out = test(true, """
-            var and = func [$B,$B] -> $B {
+            func and: [$B,$B] -> $B {
                 if arg.1?1 {
                     return <.1>
                 } else {
@@ -458,7 +449,7 @@ class TXBook {
     @Test
     fun ch_02_01_or_pg30 () {
         val out = test(true, """
-            var or = func [$B,$B] -> $B {
+            func or: [$B,$B] -> $B {
                 if arg.1?2 {
                     return <.2>
                 } else {
@@ -480,10 +471,10 @@ class TXBook {
             $not
             $and
             $or
-            var eq = func [$B,$B] -> $B {
+            func eq: [$B,$B] -> $B {
                 return or [and arg, and [not arg.1, not arg.2]]
             }
-            var neq = func [$B,$B] -> $B {
+            func neq: [$B,$B] -> $B {
                 return not eq arg 
             }
             var xxx = eq [<.1>,<.2>]
@@ -505,8 +496,7 @@ class TXBook {
             $lt
             $sub
             -- 51
-            var mod : func [/Num,/Num] -> /Num
-            set mod = func [/Num,/Num] -> /Num {
+            func mod: [/Num,/Num] -> /Num {
                 if lt arg {
                     return clone arg.1
                 } else {
@@ -540,7 +530,7 @@ class TXBook {
             var n100 = mul [n10,n10]
             var n400 = mul [four,n100]
             
-            var leap = func /Num -> $B {
+            func leap: /Num -> $B {
                 var mod4 = mod [arg,four]
                 var mod100 = mod [arg,n100]
                 var mod400 = mod [arg,n400]
@@ -575,7 +565,7 @@ class TXBook {
             $ntob
             $or
             -- 119
-            var analyse = func [/Num,/Num,/Num] -> $Tri {
+            func analyse: [/Num,/Num,/Num] -> $Tri {
                 var xy = add [arg.1,arg.2]
                 if lte[xy,arg.3] {
                     return <.1>

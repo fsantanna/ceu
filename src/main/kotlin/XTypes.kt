@@ -428,6 +428,14 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         is Stmt.Nop, is Stmt.Native, is Stmt.Typedef, is Stmt.XBreak, is Stmt.XReturn -> {}
         is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this.tk,this) }
         is Stmt.Set -> {
+            this.wup.let {
+                if (it is Stmt.Seq && it.s2==this && it.s1 is Stmt.Var && it.s1.xtype==null) {
+                    if (this.src is Expr.Func) {
+                        // TODO: remove hack
+                        it.s1.xtype = this.src.xtype!!
+                    }
+                }
+            }
             try {
                 this.dst.xinfTypes(null)
                 this.src.xinfTypes(this.dst.wtype!!)

@@ -9,17 +9,16 @@ fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
     Lexer.lex()
     try {
         val s = Parser.stmts()
-        //println(s.tostr())
         s.setUps(null)
         s.setScp1s()
         s.setEnvs(null)
         check_00_after_envs(s)
         s.xinfScp1s()
         check_01_before_tps(s)
-        //println(s.dump())
         s.xinfTypes(null)
         s.setScp2s()
         check_02_after_tps(s)
+        //println(s.tostr())
         return Pair(true, s.code())
     } catch (e: Throwable) {
         CODE.clear()

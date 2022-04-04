@@ -62,7 +62,7 @@ fun Scope.isNestIn (sub: Scope, up: Any): Boolean {
 
 fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
     return when {
-        (this is Type.Nat  || sub is Type.Nat) -> true
+        (this is Type.Nat || sub is Type.Nat) -> true
         (this is Type.Active && sub is Type.Actives) -> this.tsk.isSupOf(sub.tsk)
         (this is Type.Active && sub is Type.Active)  -> this.tsk.isSupOf(sub.tsk)
         (this is Type.Named && sub is Type.Named)    -> {    // TODO: check scopes

@@ -892,13 +892,27 @@ class TXExec {
         assert(out == "(ln 9, col 14): undeclared type \"Num\"") { out }
     }
     @Test
-    fun e21_clone() {
+    fun e22_clone() {
         val out = test(true, """
             type Num = </Num>    
             var clone = func /Num -> /Num {
+                return Null
                 return new <.1 clone arg\!1>
             }
-            call clone Null
+            output Std clone Null
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun e23_clone() {
+        val out = test(true, """
+            type Num = </Num>    
+            var clone : func /Num -> /Num
+            set clone = func /Num -> /Num {
+                return Null
+                return new <.1 clone arg\!1>
+            }
+            output Std clone Null
         """.trimIndent())
         assert(out == "Null\n") { out }
     }
