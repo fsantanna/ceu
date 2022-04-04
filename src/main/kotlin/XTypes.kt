@@ -291,8 +291,10 @@ fun Expr.xinfTypes (inf: Type?) {
             val s = this.env(this.tk.str)!!
             val ret = when {
                 (s !is Stmt.Var)  -> s.getType()
+                // TODO: hack to substitute s.xtype if currently "_" (see x18_clone_rec)
+                //(s.xtype.let { it==null || it is Type.Nat && it.tk.str=="_" }) -> {
                 (s.xtype == null) -> {
-                    s.xtype = inf
+                    s.xtype = inf       // set var.xtype=inf if Stmt.Var doesn't know its type yet
                     inf
                 }
                 else              -> s.xtype!!
