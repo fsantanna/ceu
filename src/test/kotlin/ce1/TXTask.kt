@@ -105,13 +105,12 @@ class TXTask {
     @Test
     fun a05_args () {
         val out = test(true, """
-            --type Event = <(),_int>
             var f = task @{}->_(char*)->()->() {
                 output Std arg
                 await evt?2
-                output Std evt!2
+                output Std evt!2::_int
                 await evt?2
-                output Std evt!2
+                output Std evt!2::_int
             }
             var x = spawn f _("hello")
             emit @GLOBAL <.2 _10>
@@ -367,13 +366,11 @@ class TXTask {
 
     @Test
     fun c00_err () {
-        val out = test(
-            true, """
-                var f : task ()->()->()
-                var x : task ()->()->()
-                set x = spawn f ()
-            """.trimIndent()
-        )
+        val out = test(true, """
+            var f : task ()->()->()
+            var x : task ()->()->()
+            set x = spawn f ()
+        """.trimIndent())
         assert(out.startsWith("(ln 11, col 9): invalid `spawn` : type mismatch : expected active task")) { out }
     }
     @Test

@@ -43,7 +43,7 @@ fun Type.output_Std (c: String, arg: String): String {
                     $out($arg);
                 #else
                     //assert(0 && "$out");
-                    putchar('_');
+                    puts("_");
                 #endif
                 
             """.trimIndent()

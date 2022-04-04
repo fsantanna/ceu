@@ -51,6 +51,13 @@ class TXExec {
         assert(out == "()\n10\n") { out }
     }
     @Test
+    fun a01_output_4 () {
+        val out = test(true, """
+            output Std _10:_uint64_t
+        """.trimIndent())
+        assert(out == "_\n") { out }
+    }
+    @Test
     fun a02_int_abs () {
         val out = test(true, """
             var x: _int
