@@ -2215,8 +2215,8 @@ class TExec {
         val out = test(false, """
             $Output0
             type Maybe $D{a} @{} = <(), ${D}a>
-            var x: Maybe $D{_int}
-            set x = Maybe $D{_int} <.2 _10:_int>: <(),_int>
+            var x: Maybe $D{_int} @{}
+            set x = Maybe $D{_int} @{} <.2 _10:_int>: <(),_int>
             ${output0("x~!2","_int")}
            """.trimIndent()
         )
@@ -2226,7 +2226,7 @@ class TExec {
     fun s02_maybe_err () {
         val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
-            var x: Maybe $D{_int}
+            var x: Maybe $D{_int} @{}
             set x = Maybe $D{} @{} <.2 _10:_int>: <(),_int>  -- ERR: missing instance
            """.trimIndent()
         )
@@ -2236,8 +2236,8 @@ class TExec {
     fun s03_maybe_err () {
         val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
-            var x: Maybe $D{()}
-            set x = Maybe $D{[()]} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
+            var x: Maybe $D{()} @{}
+            set x = Maybe $D{[()]} @{} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
            """.trimIndent()
         )
         assert(out == "(ln 3, col 7): invalid assignment : type mismatch :\n    Maybe $D{()}\n    Maybe $D{[()]}") { out }
@@ -2246,8 +2246,8 @@ class TExec {
     fun s04_maybe_err () {
         val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
-            var x: Maybe $D{()}
-            set x = Maybe $D{()} <.2 [()]>: <(),[()]>   -- ERR: incompatible cons
+            var x: Maybe $D{()} @{}
+            set x = Maybe $D{()} @{} <.2 [()]>: <(),[()]>   -- ERR: incompatible cons
            """.trimIndent()
         )
         assert(out == "(ln 3, col 9): invalid type pack : type mismatch :\n    <(),()>\n    <(),[()]>") { out }
@@ -2256,8 +2256,8 @@ class TExec {
     fun s05_maybe_err () {
         val out = test(false, """
             type Maybe $D{a} @{} = <(), ${D}a>
-            var x: Maybe $D{[()]}
-            var y: Maybe $D{()}
+            var x: Maybe $D{[()]} @{}
+            var y: Maybe $D{()} @{}
             set x = y   -- ERR: incompatible instances
            """.trimIndent()
         )
