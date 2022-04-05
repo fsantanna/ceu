@@ -499,7 +499,7 @@ class TXInfer {
             set fact = (func @{i} -> [/_int @i,_int] -> () {
             var x: _int
             set x = (_1: _int)
-            call (fact @{LOCAL} [(/x),(_: _int)])
+            call (fact @{X} [(/x),(_: _int)])
             }
             )
             

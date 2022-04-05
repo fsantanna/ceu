@@ -63,13 +63,12 @@ fun Type.nonat_ (): Type? {
     return if (this is Type.Nat && this.tk.str=="_") null else this
 }
 fun Any.env (id: String): Any? {
-    // keep types apart from var/block
-    val xid = if (id.istype()) id else id.toUpperCase()
     return this.env_first_map {
         when {
-            (it is Stmt.Typedef && it.tk.str==xid)                       -> it
-            (it is Stmt.Var     && it.tk.str.toUpperCase()==xid)         -> it
-            (it is Stmt.Block   && (it.scp1?.str==xid || "B"+it.n==xid)) -> it
+            (it is Stmt.Typedef && it.tk.str==id)                       -> it
+            (it is Stmt.Var     && it.tk.str==id)                       -> it
+            (it is Stmt.Var     && it.tk.str.toUpperCase()==id)         -> it.ups_first_block()
+            (it is Stmt.Block   && (it.scp1?.str==id || "B"+it.n==id)) -> it
             (it is Expr.Func) -> {
                 when {
                     (it.ftp() == null) -> if (id in listOf("arg","pub","ret","evt","err")) true else null

@@ -4,10 +4,13 @@ fun Scope.check (up: Any) {
         (id == "GLOBAL") -> true
         (id == "LOCAL") -> true
         (up.ups_first { it is Type.Func || it is Stmt.Typedef } != null) -> true  // (@i1 -> ...)
+        (up.env(id) != null) -> true
+        /*
         up.env(id).let {                              // { @aaa ... @aaa }
             it is Stmt.Block && (id==it.scp1?.str || id=="B"+it.n) ||
             it is Stmt.Var   && id==it.tk.str.toUpperCase()
         } -> true
+         */
         (up.ups_first {                                     // [@i1, ...] { @i1 }
             it is Stmt.Typedef && (it.xscp1s.first!!.any { it.str==id })
          || it is Expr.Func    && (it.ftp()?.xscps?.second?.any { it.scp1.str==id } ?: false)
