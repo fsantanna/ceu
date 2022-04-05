@@ -581,7 +581,7 @@ class TTask {
                 set x = spawn f @{} ()
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 3, col 5): invalid `spawn` : type mismatch : expected active task")) { out }
+        assert(out.startsWith("(ln 3, col 9): invalid `spawn` : type mismatch : expected active task")) { out }
     }
     @Test
     fun c05_throw_err () {

@@ -152,7 +152,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
                 if (s.dst != null) {
                     val dst = s.dst.wtype
-                    All_assert_tk(s.dst.tk, dst is Type.Active) {
+                    All_assert_tk(s.tk, dst is Type.Active) {
                         "invalid `spawn` : type mismatch : expected active task : have ${s.dst.wtype!!.tostr()}"
                     }
                     All_assert_tk(s.tk, dst!!.isSupOf(call)) {
