@@ -53,17 +53,14 @@ fun Expr.xinfTypes (inf: Type?) {
                         )
                     }
                 }
-                (inf != null) -> {
+                (inf?.noact() is Type.Named) -> {
                     this.e.xinfTypes(inf.react_noalias(this))
-                    if (inf.noact() is Type.Named) {
-                        //this.isact = tp is Type.Active
-                        this.xtype = inf
-                    }
+                    this.xtype = inf
                     inf
                 }
                 else -> {
-                    this.e.xinfTypes(null)
-                    this.e.wtype!!.react_noalias(this)
+                    this.e.xinfTypes(inf?.react_noalias(this))
+                    this.e.wtype!! //.react_noalias(this)
                 }
             }
         }
