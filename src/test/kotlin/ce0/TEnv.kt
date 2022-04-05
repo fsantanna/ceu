@@ -2460,15 +2460,16 @@ class TEnv {
                 set v = _10: _int
                 var f : func @{a} -> () -> /_int@a
                 set f = func @{a} -> () -> /_int@a {
-                    set ret = /v
-                }
+                    set ret = /v    -- ERR: scope is outside func
+                }                   -- although f lives as much as v, f might escape?
                 var p: /_int @LOCAL
                 {
                     set p = f @{A} (): @A
                 }
             }
         """.trimIndent())
-        assert(out == "OK") { out }
+        //assert(out == "OK") { out }
+        assert(out == "(ln 6, col 17): invalid return : type mismatch :\n    /_int @a\n    /_int @V") { out }
     }
     @Test
     fun noclo_r07() {
