@@ -605,6 +605,9 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
       |  `watching´ [Expr | TIMER] Block            -- watching or block        watching 500ms { ... }
 
 Expr ::= `(´ Expr `)´                               -- group                    (x)
+      |  `(´ `)´                                    -- unit                     ()
+      |  VAR                                        -- variable                 i
+      |  NAT [`:´ Type]                             -- native expression        v: _int
 
 
 BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
@@ -615,9 +618,6 @@ TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier     
 ```
 
 <!--
-      |  `(´ `)´                                    -- unit                     ()
-      |  NAT `:´ Type                               -- native expression        v: _int
-      |  VAR                                        -- variable identifier      i
       |  `/´ Expr                                   -- upref                    /x
       |  Expr `\´                                   -- dnref                    x\
       |  `[´ Expr {`,´ Expr} `]´                    -- tuple constructor        [x,()]

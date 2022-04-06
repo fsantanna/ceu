@@ -258,8 +258,18 @@ object Parser
 
     fun expr_one (preid: Tk.id?): Expr {
         return when {
-            // Bool.False, Pair [x,y], active Task {}
+            alls.acceptFix("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
+            (preid!=null || alls.acceptVar("id")) -> Expr.Var(alls.tk0 as Tk.id)
+            alls.acceptVar("Nat") -> {
+                val tk0 = alls.tk0 as Tk.Nat
+                val tp = if (!alls.acceptFix(":")) null else {
+                    this.type()
+                }
+                Expr.Nat(tk0, tp)
+            }
+
             alls.acceptFix("active") || alls.checkVar("Id") -> {
+                // Bool.False, Pair [x,y], active Task {}
                 val isact = (alls.tk0.str == "active")
                 alls.checkVar_err("Id")
                 val id = alls.tk1
@@ -293,13 +303,6 @@ object Parser
                     }
                 }
                 Expr.Pak(id, e, isact, tp)
-            }
-            alls.acceptVar("Nat") -> {
-                val tk0 = alls.tk0 as Tk.Nat
-                val tp = if (!alls.acceptFix(":")) null else {
-                    this.type()
-                }
-                Expr.Nat(tk0, tp)
             }
             alls.acceptFix("Null") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -367,8 +370,6 @@ object Parser
                 alls.acceptFix_err("}")
                 Expr.If(tk0 as Tk.Fix, e, t, f)
             }
-            alls.acceptFix("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
-            (preid!=null || alls.acceptVar("id")) -> Expr.Var(alls.tk0 as Tk.id)
             alls.acceptFix("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
