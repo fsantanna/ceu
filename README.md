@@ -2,23 +2,23 @@
 
 Ceu is a synchronous reactive language that aims to offer a higher-level and
 safer alternative to C/C++.
-Ceu integrates *Structured Concurrency* and *Reactive Programming*, extending
+Ceu reconciles *Structured Concurrency* with *Reactive Programming*, extending
 classical structured programming with two main functionalities:
 
+- Concurrency:
+    - A set of structured mechanisms to compose concurrent lines of execution.
 - Event Handling:
     - An `await` statement to suspend a line of execution and wait for events.
     - An `emit`  statement to broadcast events and awake awaiting lines of
       execution.
-- Concurrency:
-    - A set of structured mechanisms to compose concurrent lines of execution.
 
 Ceu also provides algebraic data types, subtyping, local inference, pointers,
 and region-based memory management.
 The goal of regions is to provide safe memory management for dynamically
 allocated data structures.
 
-Ceu compiles to C and integrates seamlessly with C at the source level.
-Identifiers in C can be accessed with the `_` prefix.
+Ceu compiles to C and integrates seamlessly with it at the source level.
+C identifiers can be accessed with the `_` prefix.
 Ceu types and identifiers can also be accessed from C.
 
 In summary, Ceu provides structured-reactive concurrency, region-based memory
@@ -549,7 +549,7 @@ _(1 + 1)     _{2 * (1+1)}
 ```
 -->
 
-# 5. SYNTAX
+# SYNTAX
 
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
@@ -591,7 +591,7 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
 
       |  `func´ VAR `:´ Type Block Expr             -- function declaration     func f: ()->() { ... }
       |  `task´ VAR `:´ Type Block Expr             -- task declaration         task t: ()->()->() { ... }
-      |  `ifs´ `{´ { Expr Block } [`else´ Block] `}´ -- conditionals             ifs { cnd1 {} `\n´ cnd2 {} `\n´ else {} }
+      |  `ifs´ `{´ { Expr Block } [`else´ Block] `}´ -- conditionals            ifs { cnd1 {} `\n´ cnd2 {} `\n´ else {} }
 
       |  `spawn´ Block                              -- task block               spawn { ... }
       |  `defer´ Block                              -- task declaration         defer { ... }
@@ -610,8 +610,8 @@ Expr ::= `(´ Expr `)´                               -- group                  
       |  NAT [`:´ Type]                             -- native expression        v: _int
       |  Null [`:´ Type]                            -- Null constructor         Null: /List
       |  [`active´] TYPE [Expr]                     -- named constructor        Bool.True  Point [_10,_10]  active Task ()
-      |  `[´ [VAR `=´] Expr {`,´ [VAR `=´] Expr} `]´ -- tuple constructor        [x,()]  [x=_10,y=_20]
-      |  `<´ `.´ (NUM | TYPE) [Expr] `>´ [`:´ Type]  -- union constructor        <.1 ()>: <(),()>  <.True>
+      |  `[´ [VAR `=´] Expr {`,´ [VAR `=´] Expr} `]´ -- tuple constructor       [x,()]  [x=_10,y=_20]
+      |  `<´ `.´ (NUM | TYPE) [Expr] `>´ [`:´ Type]  -- union constructor       <.1 ()>: <(),()>  <.True>
       |  `new´ Expr [`:´ SCOPE]                     -- union allocation         new List.Cons: @LOCAL
       |  `if´ Expr `{´ Expr `}´ `else´ `{´ Expr `}´ -- if expression            if cnd { ... } else { ... }
       |  [`func´ | `task´] Type Block               -- function expression      func ()->() { ... }
@@ -627,17 +627,17 @@ Expr ::= `(´ Expr `)´                               -- group                  
         // derived expressions
 
       |  TYPE Block                                 -- function expression      Func { ... }
-      |  `ifs´ `{´ {Expr `{´ Expr `}´} [`else´ `{´ Expr `}´] `}´ -- conditionals             ifs { cnd1 {e1} `\n´ cnd2 {e2} `\n´ else {e3} }
+      |  `ifs´ `{´ {Expr `{´ Expr `}´} [`else´ `{´ Expr `}´] `}´ -- conditionals  ifs { cnd1 {e1} `\n´ cnd2 {e2} `\n´ else {e3} }
 
 Type ::= `(´ Type `)´                               -- group                    (func ()->())
       |  `(´ `)´                                    -- unit                     ()
       |  NAT                                        -- native type              _char
       |  PARAM                                      -- parameter type           $a1  $X
       |  `/´ Type [SCOPE]                           -- pointer                  /_int@S
-      |  TYPE { `.´ (NUM | TYPE) } [Params] [Scopes] -- named type               Bool  Bool.1  Bool.False
-      |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                    [(),()]  [x:_int,y:_int]
-      |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                  </List>  <False=(),True=()>
-      |  [`func´ | `task´] [Scopes `->´] Type [`->´ Type] `->´ Type  -- function                 func f : ()->() { return () }
+      |  TYPE { `.´ (NUM | TYPE) } [Params] [Scopes] -- named type              Bool  Bool.1  Bool.False
+      |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                   [(),()]  [x:_int,y:_int]
+      |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                 </List>  <False=(),True=()>
+      |  [`func´ | `task´] [Scopes `->´] Type [`->´ Type] `->´ Type  -- function  func f : ()->() { return () }
 
         // derived types
 
