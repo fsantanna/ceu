@@ -621,7 +621,7 @@ class TTask {
                 ${output0("_2:_int","_int")}
                 catch err~?1 {
                     ${output0("_3:_int","_int")}
-                    { throw Error.1  $D{} @{}}
+                    { throw Error.1  $D{} @{} ()}
                     ${output0("_999:_int","_int")}
                 }
                 ${output0("_4:_int","_int")}
@@ -643,7 +643,7 @@ class TTask {
                 ${output0("_2:_int","_int")}
                 catch err~?2 {
                     ${output0("_3:_int","_int")}
-                    throw Error.1 $D{} @{}
+                    throw Error.1 $D{} @{} ()
                     ${output0("_999:_int","_int")}
                 }
                 ${output0("_4:_int","_int")}
@@ -666,7 +666,7 @@ class TTask {
                 catch err~?1 {
                     catch err~?2 {
                         ${output0("_3:_int","_int")}
-                        throw Error.1 $D{} @{}
+                        throw Error.1 $D{} @{} ()
                         ${output0("_999:_int","_int")}
                     }
                     ${output0("_999:_int","_int")}
@@ -696,7 +696,7 @@ class TTask {
                     }
                     var x : active task @{}->()->()->()
                     set x = spawn f @{} ()
-                    throw Error.1 $D{} @{}
+                    throw Error.1 $D{} @{} ()
                }
                ${output0("_2:_int","_int")}
            }
@@ -730,7 +730,7 @@ class TTask {
                     var y : active task @{}->()->()->()
                     set y = spawn g @{} ()
                     ${output0("_0:_int","_int")}
-                    throw Error.1 $D{} @{}
+                    throw Error.1 $D{} @{} ()
                     ${output0("_999:_int","_int")}
                 }
                 ${output0("_2:_int","_int")}
@@ -766,7 +766,7 @@ class TTask {
                     set xf = spawn f @{} ()
                     var xg : active task @{}->()->()->()
                     set xg = spawn g @{} ()
-                    throw Error.1 $D{} @{}
+                    throw Error.1 $D{} @{} ()
                 }
                 var h : task @{}->()->()->()
                 set h = task @{}->()->()->() {
@@ -796,7 +796,7 @@ class TTask {
             type Event $D{} @{} = <(),_uint64_t,_int>
             var xxx : func @{}->()->()
             set xxx = func @{}->()->() {
-                throw Error.1 $D{} @{}
+                throw Error.1 $D{} @{} ()
             }
             var h : task @{}->()->()->()
             set h = task @{}->()->()->() {

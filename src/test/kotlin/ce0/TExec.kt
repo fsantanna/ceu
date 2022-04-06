@@ -2010,7 +2010,7 @@ class TExec {
             $Output0
             type Unit $D{} @{} = ()
             var u: Unit $D{} @{}
-            set u = Unit $D{} @{}
+            set u = Unit $D{} @{} ()
             ${output0("u~","()")}
        """.trimIndent())
         assert(out == "()\n") { out }

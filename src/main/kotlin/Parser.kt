@@ -289,6 +289,7 @@ object Parser
                     // Bool.False
                     (tp.subs.size > 0) -> {
                         var ret = if (alls.checkExpr()) this.expr() else {
+                            if (!CE1) alls.err_tk_unexpected(alls.tk1)
                             Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                         }
                         for (tk in tp.subs.reversed()) {
@@ -308,7 +309,10 @@ object Parser
                         Expr.Func(id, null, block)
                     }
                     // Unit
-                    else -> Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
+                    else -> {
+                        if (!CE1) alls.err_tk_unexpected(alls.tk1)
+                        Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
+                    }
                 }
                 Expr.Pak(id, e, isact, tp)
             }
