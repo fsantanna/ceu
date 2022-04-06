@@ -2121,7 +2121,7 @@ class TExec {
             set dn = Button $D{} @{} <.2 ()>:<(),()>
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button") { out }
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{}\n    Button $D{}") { out }
     }
     @Test
     fun q11_type_hier_sub_err () {
@@ -2131,7 +2131,7 @@ class TExec {
             set dn = Button.1 $D{} @{} ()
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button.1") { out }
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{}\n    Button.1 $D{}") { out }
     }
 
     // IF / EXPR

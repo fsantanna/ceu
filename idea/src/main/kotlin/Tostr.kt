@@ -27,8 +27,8 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
             val pak_subs = if (!ispak) "" else {
                 this.subs.map { '.' + it.str }.joinToString("")
             }
-            val args = if (this.args!!.size == 0) "" else {
-                " $D{" + this.args.map { it.tostr(lc) }.joinToString(",") + "}"
+            val args = if (this.xargs == null) "" else {
+                " $D{" + this.xargs!!.map { it.tostr(lc) }.joinToString(",") + "}"
             }
             val scps = this.xscps.let { if (it==null) "" else it.let {
                 if (it.size == 0) "" else " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}"

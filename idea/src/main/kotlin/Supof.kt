@@ -11,7 +11,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
         return when (this) {
             is Type.Active, is Type.Actives, is Type.Par -> TODO()
             is Type.Unit, is Type.Nat -> this
-            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args!!.map { it.aux() }, this.xscps, null)
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.xargs!!.map { it.aux() }, this.xscps, null)
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
@@ -71,7 +71,7 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
             (this.tk.str == sub.tk.str) &&
             (this.subs.size <= sub.subs.size) &&
             this.subs.zip(sub.subs).all { it.first.str==it.second.str } &&
-            this.args!!.zip(sub.args!!).all { it.first.isSupOf(it.second) }
+            this.xargs!!.zip(sub.xargs!!).all { it.first.isSupOf(it.second) }
         }
         (this::class != sub::class) -> false
         (this is Type.Unit && sub is Type.Unit) -> true

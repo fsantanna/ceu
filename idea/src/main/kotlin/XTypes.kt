@@ -14,7 +14,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
             is Type.Pointer -> Type.Pointer(this.tk_, Scope(to,null), this.pln.aux())
-            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.args?.map { it.aux() },
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.xargs?.map { it.aux() },
                 /*listOf(to),*/ this.xscps!!.map{Scope(to,null)}, null)   // TODO: wrong
         }
     }

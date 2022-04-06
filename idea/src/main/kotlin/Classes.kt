@@ -42,7 +42,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
         val tk_:    Tk.Id,
         val subs:   List<Tk>,
         var xisrec: Boolean,
-        val args:   List<Type>?,    // ${_int},     "?" diffs inference from empty (only CE1)
+        var xargs:  List<Type>?,    // ${_int},     "?" diffs inference from empty (only CE1)
         var xscps:  List<Scope>?,   // @{a},        "?" diffs inference from empty (only CE1)
         var xdef:   Stmt.Typedef?   // typedef after args instantiation
     ): Type(tk_, null, null)

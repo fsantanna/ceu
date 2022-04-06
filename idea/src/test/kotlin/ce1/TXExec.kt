@@ -606,13 +606,11 @@ class TXExec {
 
     @Test
     fun e01_type () {
-        val out = test(
-            true, """
-                type List = </List @LOCAL>
-                var l: /List = Null
-                output Std l
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type List = </List @LOCAL>
+            var l: /List = Null
+            output Std l
+        """.trimIndent())
         assert(out == "Null\n") { out }
     }
     @Test
