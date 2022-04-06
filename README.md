@@ -6,14 +6,16 @@ Ceu reconciles *Structured Concurrency* with *Reactive Programming*, extending
 classical structured programming with two main functionalities:
 
 - Concurrency:
-    - A set of structured mechanisms to compose concurrent lines of execution.
+    - A set of structured mechanisms to compose concurrent lines of execution
+      (e.g., `spawn`, `paror`, `pauseon`).
 - Event Handling:
     - An `await` statement to suspend a line of execution and wait for events.
     - An `emit`  statement to broadcast events and awake awaiting lines of
       execution.
 
-Ceu also provides algebraic data types, subtyping, local inference, pointers,
-and region-based memory management.
+Ceu also provides algebraic data types with subtyping and inheritance,
+(TODO: parametric polymorphism), local type inference, and region-based memory
+management.
 The goal of regions is to provide safe memory management for dynamically
 allocated data structures.
 
@@ -598,7 +600,7 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
       |  `await´ TIMER                              -- await timer              await 10s
       |  `await´ `spawn´ Expr                       -- await spawned task       await spawn t
       |  `every´ [Expr | TIMER] Block               -- every block              every cnd { ... }
-      |  `pauseif´ Expr Block                       -- pause block              pauseif cnd { ... }
+      |  `pauseon´ Expr Block                       -- pause block              pauseon cnd { ... }
       |  `par´ Block { `with´ Block }               -- parallel block           par { ... } with { ... }
       |  `parand´ Block { `with´ Block }            -- parallel and block       parand { ... } with { ... }
       |  `paror´ Block { `with´ Block }             -- parallel or block        paror { ... } with { ... }
