@@ -608,28 +608,35 @@ Expr ::= `(´ Expr `)´                               -- group                  
       |  `(´ `)´                                    -- unit                     ()
       |  VAR                                        -- variable                 i
       |  NAT [`:´ Type]                             -- native expression        v: _int
+      |  Null [`:´ Type]                            -- Null constructor         Null: /List
+      |  [`active´] TYPE [Expr]                     -- named constructor        Bool.True  Point [_10,_10]  active Task ()
+      |  `[´ [VAR `=´] Expr {`,´ [VAR `=´] Expr} `]´ -- tuple constructor        [x,()]  [x=_10,y=_20]
+      |  `<´ `.´ (NUM | TYPE) [Expr] `>´ [`:´ Type]  -- union constructor        <.1 ()>: <(),()>  <.True>
+      |  `new´ Expr [`:´ BLOCK]                     -- union allocation         new List.Cons: @LOCAL
+      |  `if´ Expr `{´ Expr `}´ `else´ `{´ Expr `}´ -- if expression            if cnd { ... } else { ... }
+      |  [`func´ | `task´] Type Block               -- function expression      func ()->() { ... }
+      |  Expr Blocks Expr [`:´ BLOCK]               -- function call            f @[@S] x: @LOCAL
+      |  `/´ Expr                                   -- upref                    /x
+      |  Expr `\´                                   -- dnref                    x\
+      |  Expr `::´ Type                             -- cast                     x::_long  x::Super.Sub
+      |  Expr `~´                                   -- unpack                   x~
+      |  Expr `.´ [NUM | VAR]                       -- tuple discriminator      x.1  pt.x
+      |  Expr `!´ [NUM | TYPE]                      -- union discriminator      x!1  x!Cons
+      |  Expr `?´ [NUM | TYPE | `Null´]             -- union predicate          x?2  x?Null
 
+        // derived expressions
+
+      |  TYPE Block                                 -- function expression      Func { ... }
+      |  `ifs´ `{´ { Expr `{´ Expr `}´ } [`else´ `{´ Expr `}´] `}´ -- conditionals             ifs { cnd1 {e1} `\n´ cnd2 {e2} `\n´ else {e3} }
 
 BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
 VAR   ::= [a-z][A-Za-z0-9_]*                        -- variable identifier      x  f  pt
-TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          Null  Int  Event
+TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          False  Int  Event
 NAT   ::= _[A-Za-z0-9_]* | _{...} | _(...)          -- native identifier        _errno  _{(1+2)*x}  _(char*)
 TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier         1s  1h10min  20ms
 ```
 
 <!--
-      |  `/´ Expr                                   -- upref                    /x
-      |  Expr `\´                                   -- dnref                    x\
-      |  `[´ Expr {`,´ Expr} `]´                    -- tuple constructor        [x,()]
-      |  Expr `.´ NUM                               -- tuple discriminator      x.1
-      |  `<´ `.´ NUM Expr `>´ `:´ Type              -- union constructor        <.1 ()>: <(),()>
-      |  `<´ `.´ 0 `>´ `:´ Type                     -- union null pointer       <.0>: /</?>
-      |  `new´ Expr.Union `:´ BLOCK                 -- union allocation         new <...>: @LOCAL
-      |  Expr `!´ NUM                               -- union discriminator      x!1
-      |  Expr `?´ NUM                               -- union predicate          x?0
-      |  Expr Blocks Expr [`:´ BLOCK]               -- function call            f @[@S] x: @LOCAL
-      |  Type.Func [Upvals] Stmt.Block              -- function body            func ()->() { ... }
-            Upvals ::= `[´ VAR {`,´ VAR} `]´
 
 Type ::= `(´ Type `)´                               -- group                    (func ()->())
       |  `(´ `)´                                    -- unit                     ()

@@ -407,18 +407,6 @@ object Parser
                 alls.acceptFix_err("}")
                 Expr.If(tk0 as Tk.Fix, e, t, f)
             }
-
-            alls.acceptFix("/") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val e = this.expr()
-                All_assert_tk(
-                    alls.tk0,
-                    e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.Dnref || e is Expr.Upref
-                ) {
-                    "unexpected operand to `/´"
-                }
-                Expr.Upref(tk0, e)
-            }
             alls.checkFix("task") || alls.checkFix("func") -> {
                 val tk = alls.tk1 as Tk.Fix
                 val tp = this.type() as Type.Func
@@ -430,6 +418,17 @@ object Parser
                 }
                 val block = this.block(if (alls.checkFix("catch")) null else catch)
                 Expr.Func(tk, tp, block)
+            }
+            alls.acceptFix("/") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val e = this.expr()
+                All_assert_tk(
+                    alls.tk0,
+                    e is Expr.Nat || e is Expr.Var || e is Expr.TDisc || e is Expr.Dnref || e is Expr.Upref
+                ) {
+                    "unexpected operand to `/´"
+                }
+                Expr.Upref(tk0, e)
             }
 
             // CE1
