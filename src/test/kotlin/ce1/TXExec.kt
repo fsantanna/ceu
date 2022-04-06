@@ -1235,6 +1235,67 @@ class TXExec {
         )
         assert(out.contains("main: Assertion `(global.h1)._2.tag == 2' failed.")) { out }
     }
+    @Test
+    fun p18_type_hier_err () {
+        val out = test(true, """
+        type Button $D{} @{}= [_int] + () -- ERR: ... + <...>
+       """.trimIndent())
+        //assert(out == "(ln 1, col 22): unexpected \"+\"") { out }
+        assert(out == "(ln 9, col 31): expected \"<\" : have \"()\"") { out }
+    }
+    @Test
+    fun p19_type_hier () {
+        val out = test(true, """
+            --$Output0
+            var e: [_int]+<(),()>
+            set e = <.2 [_10:_int]>:[_int]+<(),()>
+            ${output0("/e","/[_int]+<(),()>@LOCAL")}
+            ${output0("e!0.1","_int")}
+           """.trimIndent()
+        )
+        assert(out == "<.2 [10]>\n10\n") { out }
+    }
+    @Test
+    fun p20_type_hier_sub_ok () {
+        val out = test(true, """
+            --$Output0
+            type Hier $D{} @{} = [_int] + <(),<(),()>>
+            var h: Hier $D{} @{}
+            set h = Hier.2.2 $D{} @{} [_10:_int]
+            ${output0("h~!0.1","_int")}
+           """.trimIndent()
+        )
+        assert(out == "10\n") { out }
+    }
+    @Test
+    fun p21_type_hier_sub_ok () {
+        val out = test(true, """
+            --$Output0
+            type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
+            var h: Hier $D{} @{}
+            set h = Hier.2.1.2 $D{} @{} [_10:_int]
+            ${output0("h~?2","_int")}
+            ${output0("h~?2?1","_int")}
+            ${output0("h~?2?1?1","_int")}
+            ${output0("h~?2?1?2","_int")}
+            ${output0("h~!2!1!2.1","_int")}
+           """.trimIndent()
+        )
+        assert(out == "1\n1\n0\n1\n10\n") { out }
+    }
+    @Test
+    fun p22_type_hier_sub_err () {
+        val out = test(true, """
+            --$Output0
+            type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
+            var h: Hier $D{} @{}
+            set h = Hier.2.1.2 $D{} @{} [_10:_int]
+            ${output0("h~?2","_int")}
+           """.trimIndent()
+        )
+        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
+        assert(out == "1\n") { out }
+    }
 
     // STRETCH
 

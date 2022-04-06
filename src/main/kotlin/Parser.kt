@@ -66,22 +66,22 @@ object Parser
                     ),
                     inp, pub, out)
             }
-            (alls.acceptVar("Par")) -> {
-                val tk0 = alls.tk0 as Tk.Par
-                Type.Par(tk0)
+            alls.acceptFix("(") -> {
+                val tp = this.type()
+                alls.acceptFix_err(")")
+                tp
             }
+            alls.acceptFix("()") -> Type.Unit(alls.tk0 as Tk.Fix)
+            alls.acceptVar("Nat") -> Type.Nat(alls.tk0 as Tk.Nat)
             alls.acceptFix("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val pln = this.type()
                 val scp = if (CE1) alls.acceptVar("Scp") else alls.acceptVar_err("Scp")
                 Type.Pointer(tk0, if (!scp) null else Scope(alls.tk0 as Tk.Scp,null), pln)
             }
-            alls.acceptFix("()") -> Type.Unit(alls.tk0 as Tk.Fix)
-            alls.acceptVar("Nat") -> Type.Nat(alls.tk0 as Tk.Nat)
-            alls.acceptFix("(") -> {
-                val tp = this.type()
-                alls.acceptFix_err(")")
-                tp
+            (alls.acceptVar("Par")) -> {
+                val tk0 = alls.tk0 as Tk.Par
+                Type.Par(tk0)
             }
             alls.acceptFix("[") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -115,7 +115,7 @@ object Parser
                 alls.acceptFix_err("]")
                 Type.Tuple(tk0, tps, ids as List<Tk.id>?).let {
                     if (!alls.acceptFix("+")) it else {
-                        //if (!CE1) alls.err_tk0_unexpected()
+                        if (!CE1) alls.err_tk_unexpected(alls.tk0)
                         alls.checkFix_err("<")
                         val uni = this.type() as Type.Union
 
@@ -164,6 +164,7 @@ object Parser
                     }
                 }
             }
+
             alls.acceptFix("<") -> {
                 val tk0 = alls.tk0 as Tk.Fix
 

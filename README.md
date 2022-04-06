@@ -553,7 +553,7 @@ _(1 + 1)     _{2 * (1+1)}
 
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
-      |  `{´ BLOCK Stmt `}´                         -- block                    { @A ... }
+      |  `{´ SCOPE Stmt `}´                         -- block                    { @A ... }
 
         // variables
       |  `var´ VAR [`:´ Type] [`=´ (Expr | VStmt)]  -- variable declaration     var x: _int = f ()
@@ -581,7 +581,7 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
       |  `resume´ Expr                              -- resume task              resume t
 
         // events
-      |  `emit´ [BLOCK | Expr] Expr                 -- emit event               emit @A Event.Timer v
+      |  `emit´ [SCOPE | Expr] Expr                 -- emit event               emit @A Event.Timer v
       |  `await´ Event                              -- await event              await Event?Timer
 
         // types
@@ -612,10 +612,10 @@ Expr ::= `(´ Expr `)´                               -- group                  
       |  [`active´] TYPE [Expr]                     -- named constructor        Bool.True  Point [_10,_10]  active Task ()
       |  `[´ [VAR `=´] Expr {`,´ [VAR `=´] Expr} `]´ -- tuple constructor        [x,()]  [x=_10,y=_20]
       |  `<´ `.´ (NUM | TYPE) [Expr] `>´ [`:´ Type]  -- union constructor        <.1 ()>: <(),()>  <.True>
-      |  `new´ Expr [`:´ BLOCK]                     -- union allocation         new List.Cons: @LOCAL
+      |  `new´ Expr [`:´ SCOPE]                     -- union allocation         new List.Cons: @LOCAL
       |  `if´ Expr `{´ Expr `}´ `else´ `{´ Expr `}´ -- if expression            if cnd { ... } else { ... }
       |  [`func´ | `task´] Type Block               -- function expression      func ()->() { ... }
-      |  Expr Blocks Expr [`:´ BLOCK]               -- function call            f @[@S] x: @LOCAL
+      |  Expr Scopes Expr [`:´ SCOPE]               -- function call            f @[@S] x: @LOCAL
       |  `/´ Expr                                   -- upref                    /x
       |  Expr `\´                                   -- dnref                    x\
       |  Expr `::´ Type                             -- cast                     x::_long  x::Super.Sub
@@ -627,9 +627,23 @@ Expr ::= `(´ Expr `)´                               -- group                  
         // derived expressions
 
       |  TYPE Block                                 -- function expression      Func { ... }
-      |  `ifs´ `{´ { Expr `{´ Expr `}´ } [`else´ `{´ Expr `}´] `}´ -- conditionals             ifs { cnd1 {e1} `\n´ cnd2 {e2} `\n´ else {e3} }
+      |  `ifs´ `{´ {Expr `{´ Expr `}´} [`else´ `{´ Expr `}´] `}´ -- conditionals             ifs { cnd1 {e1} `\n´ cnd2 {e2} `\n´ else {e3} }
 
-BLOCK ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
+Type ::= `(´ Type `)´                               -- group                    (func ()->())
+      |  `(´ `)´                                    -- unit                     ()
+      |  NAT                                        -- native type              _char
+      |  PARAM                                      -- parameter type           $a1  $X
+      |  `/´ Type [SCOPE]                           -- pointer                  /_int@S
+      |  TYPE { `.´ (NUM | TYPE) } [Params] [Scopes] -- named type               Bool  Bool.1  Bool.False
+      |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                    [(),()]  [x:_int,y:_int]
+      |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                  <(),()>  <False=(),True=()>
+      |  Type.Tuple `+´ Type.Union                  -- type inheritance         [...] + <...>
+
+Params ::= `${´ [TYPE {`,´ TYPE}] `}´               -- list of type parameters  ${a,b}
+Scopes ::= `@{´ [SCOPE {`,´ SCOPE}] `}´             -- list of scopes           @{LOCAL,a1}
+
+PARAM ::= $[A-Za-z][A-Za-z0-9_]*                    -- type parameter           $a1  $X
+SCOPE ::= @[A-Za-z][A-Za-z0-9_]*                    -- block identifier         @B1  @x
 VAR   ::= [a-z][A-Za-z0-9_]*                        -- variable identifier      x  f  pt
 TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          False  Int  Event
 NAT   ::= _[A-Za-z0-9_]* | _{...} | _(...)          -- native identifier        _errno  _{(1+2)*x}  _(char*)
@@ -638,14 +652,7 @@ TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier     
 
 <!--
 
-Type ::= `(´ Type `)´                               -- group                    (func ()->())
-      |  `(´ `)´                                    -- unit                     ()
-      |  NAT                                        -- native type              _char
-      |  `^´ { `^´ }                                -- recursive type           ^^
-      |  `/´ Type BLOCK                             -- pointer                  /_int@S
-      |  `[´ Type {`,´ Type} `]´                    -- tuple                    [(),()]
       |  `<´ Type {`,´ Type} `>´                    -- union                    <(),/^@S>
-      |  `func´ [BLOCK] Blocks `->´ Type `->´ Type  -- function                 func f : ()->() { return () }
+      |  `func´ [SCOPE] Blocks `->´ Type `->´ Type  -- function                 func f : ()->() { return () }
 
-Blocks ::= `@[´ [BLOCK {`,´ BLOCK}] `]´             -- list of scopes           @[@LOCAL,@a1]
 -->

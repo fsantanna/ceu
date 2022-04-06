@@ -2043,14 +2043,6 @@ class TExec {
         assert(out == "<.4 <.2 <.1 [[10,10],1]>>>\n") { out }
     }
     @Test
-    fun p02_type_hier_err () {
-        val out = all("""
-        type Button $D{} @{}= [_int] + () -- ERR: ... + <...>
-       """.trimIndent())
-        //assert(out == "(ln 1, col 22): unexpected \"+\"") { out }
-        assert(out == "(ln 1, col 31): expected \"<\" : have \"()\"") { out }
-    }
-    @Test
     fun p03_type_hier_sub_ok () {
         val out = test(false, """
             $Output0
@@ -2110,18 +2102,6 @@ class TExec {
         assert(out == "(ln 6, col 30): invalid discriminator : out of bounds") { out }
     }
     @Test
-    fun q08_type_hier () {
-        val out = test(false, """
-            $Output0
-            var e: [_int]+<(),()>
-            set e = <.2 [_10:_int]>:[_int]+<(),()>
-            ${output0("/e","/[_int]+<(),()>@LOCAL")}
-            ${output0("e!0.1","_int")}
-           """.trimIndent()
-        )
-        assert(out == "<.2 [10]>\n10\n") { out }
-    }
-    @Test
     fun q09_type_hier_sub () {
         val out = test(false, """
             $Output0
@@ -2152,47 +2132,6 @@ class TExec {
            """.trimIndent()
         )
         assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2\n    Button.1") { out }
-    }
-    @Test
-    fun q12_type_hier_sub_ok () {
-        val out = test(false, """
-            $Output0
-            type Hier $D{} @{} = [_int] + <(),<(),()>>
-            var h: Hier $D{} @{}
-            set h = Hier.2.2 $D{} @{} [_10:_int]
-            ${output0("h~!0.1","_int")}
-           """.trimIndent()
-        )
-        assert(out == "10\n") { out }
-    }
-    @Test
-    fun q13_type_hier_sub_ok () {
-        val out = test(false, """
-            $Output0
-            type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
-            var h: Hier $D{} @{}
-            set h = Hier.2.1.2 $D{} @{} [_10:_int]
-            ${output0("h~?2","_int")}
-            ${output0("h~?2?1","_int")}
-            ${output0("h~?2?1?1","_int")}
-            ${output0("h~?2?1?2","_int")}
-            ${output0("h~!2!1!2.1","_int")}
-           """.trimIndent()
-        )
-        assert(out == "1\n1\n0\n1\n10\n") { out }
-    }
-    @Test
-    fun q14_type_hier_sub_err () {
-        val out = test(false, """
-            $Output0
-            type Hier $D{} @{} = [_int] + <(),<<(),()>,()>>
-            var h: Hier $D{} @{}
-            set h = Hier.2.1.2 $D{} @{} [_10:_int]
-            ${output0("h~?2","_int")}
-           """.trimIndent()
-        )
-        //assert(out == "(ln 4, col 16): expected \"?\" : have end of file") { out }
-        assert(out == "1\n") { out }
     }
 
     // IF / EXPR
