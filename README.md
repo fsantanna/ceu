@@ -636,7 +636,11 @@ Type ::= `(´ Type `)´                               -- group                  
       |  `/´ Type [SCOPE]                           -- pointer                  /_int@S
       |  TYPE { `.´ (NUM | TYPE) } [Params] [Scopes] -- named type               Bool  Bool.1  Bool.False
       |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                    [(),()]  [x:_int,y:_int]
-      |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                  <(),()>  <False=(),True=()>
+      |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                  </List>  <False=(),True=()>
+      |  [`func´ | `task´] [Scopes `->´] Type [`->´ Type] `->´ Type  -- function                 func f : ()->() { return () }
+
+        // derived types
+
       |  Type.Tuple `+´ Type.Union                  -- type inheritance         [...] + <...>
 
 Params ::= `${´ [TYPE {`,´ TYPE}] `}´               -- list of type parameters  ${a,b}
@@ -649,10 +653,3 @@ TYPE  ::= [A-Z][A-Za-z0-9_]*                        -- type identifier          
 NAT   ::= _[A-Za-z0-9_]* | _{...} | _(...)          -- native identifier        _errno  _{(1+2)*x}  _(char*)
 TIMER ::= { [0-9]+ [`ms´|`s´|`min´|`h´] }           -- timer identifier         1s  1h10min  20ms
 ```
-
-<!--
-
-      |  `<´ Type {`,´ Type} `>´                    -- union                    <(),/^@S>
-      |  `func´ [SCOPE] Blocks `->´ Type `->´ Type  -- function                 func f : ()->() { return () }
-
--->

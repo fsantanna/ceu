@@ -164,7 +164,6 @@ object Parser
                     }
                 }
             }
-
             alls.acceptFix("<") -> {
                 val tk0 = alls.tk0 as Tk.Fix
 
