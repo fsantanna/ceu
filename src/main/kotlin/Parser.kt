@@ -303,11 +303,6 @@ object Parser
                     alls.checkExpr() -> {
                         this.expr()
                     }
-                    // active Task {}
-                    alls.checkFix("{") -> {
-                        val block = this.block(null)
-                        Expr.Func(id, null, block)
-                    }
                     // Unit
                     else -> {
                         if (!CE1) alls.err_tk_unexpected(alls.tk1)
