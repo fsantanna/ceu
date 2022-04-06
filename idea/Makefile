@@ -8,5 +8,5 @@ install:
 	#freechains --version
 
 test:
-	echo "output std ()" > /tmp/tst.ce
+	echo "^\"../lib/prelude.ceu\" ; output Std ()" > /tmp/tst.ce
 	ceu /tmp/tst.ce
