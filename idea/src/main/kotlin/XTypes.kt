@@ -21,6 +21,30 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     return this.aux().clone(this.tk,up)
 }
 
+fun Type.xinfTypes (inf: Type?) {
+    when (this) {
+        is Type.Unit, is Type.Nat, is Type.Par -> {}
+        is Type.Tuple   -> this.vec.forEach { it.xinfTypes(null) }
+        is Type.Union   -> {
+            this.common?.xinfTypes(null)
+            this.vec.forEach { it.xinfTypes(null) }
+        }
+        is Type.Pointer -> this.pln.xinfTypes(null)
+        is Type.Active  -> this.tsk.xinfTypes(null)
+        is Type.Actives -> this.tsk.xinfTypes(null)
+        is Type.Func    -> {
+            this.inp.xinfTypes(null)
+            this.pub?.xinfTypes(null)
+            this.out.xinfTypes(null)
+        }
+        is Type.Named   -> {
+            if (this.xargs == null) {
+                this.xargs = emptyList()
+            }
+        }
+    }
+}
+
 fun Expr.xinfTypes (inf: Type?) {
     /*
     val inf = if (inf_ !is Type.Named) inf_ else {
@@ -30,6 +54,7 @@ fun Expr.xinfTypes (inf: Type?) {
     this.wtype = when (this) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
+            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -37,10 +62,12 @@ fun Expr.xinfTypes (inf: Type?) {
             this.xtype!!
         }
         is Expr.Cast -> {
+            this.type.xinfTypes(null)
             this.e.xinfTypes(inf)
             this.type
         }
         is Expr.Pak -> {
+            this.xtype?.xinfTypes(null)
             when {
                 (this.xtype != null) -> {
                     val tp = this.xtype!!
@@ -133,6 +160,7 @@ fun Expr.xinfTypes (inf: Type?) {
             Type.Tuple(this.tk_, this.arg.map { it.wtype!! }, null)
         }
         is Expr.UCons -> {
+            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -153,6 +181,7 @@ fun Expr.xinfTypes (inf: Type?) {
             }
         }
         is Expr.UNull -> {
+            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -179,6 +208,7 @@ fun Expr.xinfTypes (inf: Type?) {
             )
         }
         is Expr.Func -> {
+            this.xtype?.xinfTypes(null)
             if (this.xtype == null) {
                 assert(inf != null) { "bug found" }
                 All_assert_tk(this.tk, inf is Type.Func) {
@@ -424,8 +454,19 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         return Type.Unit(Tk.Fix("()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.Typedef, is Stmt.XBreak, is Stmt.XReturn -> {}
-        is Stmt.Var -> { this.xtype = this.xtype ?: inf?.clone(this.tk,this) }
+        is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn -> {}
+        is Stmt.Typedef -> {
+            this.type.xinfTypes(null)
+            this.xtype?.xinfTypes(null)
+        }
+        is Stmt.Var -> {
+            //println("STMT.VAR")
+            //println(this.tostr())
+            this.xtype = this.xtype ?: inf?.clone(this.tk,this)
+            this.xtype?.xinfTypes(null)
+            //println(">>>")
+            //println(this.xtype)
+        }
         is Stmt.Set -> {
             this.wup.let {
                 if (it is Stmt.Seq && it.s2==this && it.s1 is Stmt.Var && it.s1.xtype==null) {
@@ -477,6 +518,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             //    "invalid inference : undetermined type"
             //}
             // inf is at least Unit
+            this.xtype?.xinfTypes(null)
             this.arg.xinfTypes(null)
             this.dst?.xinfTypes(null)
             this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this.tk,this) ?: unit()

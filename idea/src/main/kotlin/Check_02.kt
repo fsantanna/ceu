@@ -215,6 +215,9 @@ fun check_02_after_tps (s: Stmt) {
                 val dst = s.dst.wtype!!
                 val src = s.src.wtype!!
                 //println(">>> NEW") ;
+                //println(s.dst.dump())
+                //println(s.dst.wtype?.dump())
+                //println(s.dst.tk.col)
                 //println(s.dst) ; println(s.dst.dump()) ; println(dst.dump()) ; println(dst.tostr())
                 //println(s.src) ; println(s.src.dump()) ; println(src.dump()) ; println(src.tostr())
                 All_assert_tk(s.tk, dst.isSupOf(src)) {

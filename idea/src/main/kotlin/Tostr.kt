@@ -131,7 +131,7 @@ fun Stmt.tostr (lc: Boolean = false): String {
         is Stmt.Block -> {
             val catch = this.catch.let {
                 // do not generate explicit catch from auto-generated implicit CEU_ERROR_ESCAPE
-                if (it == null || (it as Expr.Nat).tk.str.contains("CEU_ERROR_ESCAPE")) "" else {
+                if (it==null || (it is Expr.Nat && it.tk.str.contains("CEU_ERROR_ESCAPE"))) "" else {
                     "catch " + it.tostr(lc) + " "
                 }
             }

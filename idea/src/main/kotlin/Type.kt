@@ -222,7 +222,7 @@ fun Type.Named.def (): Stmt.Typedef? {
     val def = this.env(this.tk.str) as Stmt.Typedef?
     return when {
         (this.xdef != null) -> this.xdef!!
-        (def==null || this.xargs!!.size==0) -> def
+        (def==null || this.xargs==null || this.xargs!!.size==0) -> def
         else -> {
             this.xdef = def.instantiate(this.xargs!!)
             this.xdef!!

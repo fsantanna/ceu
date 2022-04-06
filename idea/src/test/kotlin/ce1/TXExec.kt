@@ -442,6 +442,14 @@ class TXExec {
         assert(out == "720\n") { out }
     }
     @Test
+    fun cXX () {
+        val out = test(true, """
+            type List = ()
+            var f = func List->() {}
+        """.trimIndent())
+        assert(out == "<.1 Null>\n") { out }
+    }
+    @Test
     fun c03 () {
         val out = test(true, """
             type List = </List>
@@ -1207,7 +1215,7 @@ class TXExec {
             output Std h!Bbb!Ccc!Eee.1
            """.trimIndent()
         )
-        assert(out == "(ln 10, col 17): invalid assignment : type mismatch :\n    Hier.Aaa\n    Hier.Bbb.Ccc.Eee") { out }
+        assert(out == "(ln 10, col 17): invalid assignment : type mismatch :\n    Hier.Aaa $D{}\n    Hier.Bbb.Ccc.Eee $D{}") { out }
     }
     @Test
     fun p16_type_hier_cast_ok () {

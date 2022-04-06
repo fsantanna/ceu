@@ -553,6 +553,8 @@ _(1 + 1)     _{2 * (1+1)}
 
 # SYNTAX
 
+`TODO: fields`
+
 ```
 Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence                 call f() ; call g()
       |  `{´ SCOPE Stmt `}´                         -- block                    { @A ... }
@@ -640,9 +642,6 @@ Type ::= `(´ Type `)´                               -- group                  
       |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                   [(),()]  [x:_int,y:_int]
       |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                 </List>  <False=(),True=()>
       |  [`func´ | `task´] [Scopes `->´] Type [`->´ Type] `->´ Type  -- function  func f : ()->() { return () }
-
-        // derived types
-
       |  Type.Tuple `+´ Type.Union                  -- type inheritance         [...] + <...>
 
 Params ::= `${´ [TYPE {`,´ TYPE}] `}´               -- list of type parameters  ${a,b}

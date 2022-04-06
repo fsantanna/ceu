@@ -11,9 +11,8 @@ object Parser
                     subs.add(alls.tk0)
                 }
 
-                // TODO: args=null -> args=emptyList (should be null to be inferrable)
                 val hasargs = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
-                val args = if (!hasargs) emptyList() else {
+                val args = if (!hasargs) null else {
                     val args = mutableListOf<Type>()
                     if (!alls.checkFix("}")) {
                         while (true) {

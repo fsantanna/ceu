@@ -11,7 +11,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
         return when (this) {
             is Type.Active, is Type.Actives, is Type.Par -> TODO()
             is Type.Unit, is Type.Nat -> this
-            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.xargs!!.map { it.aux() }, this.xscps, null)
+            is Type.Named   -> Type.Named(this.tk_, this.subs, this.xisrec, this.xargs?.map { it.aux() }, this.xscps, null)
             is Type.Tuple   -> Type.Tuple(this.tk_, this.vec.map { it.aux() }, this.yids)
             is Type.Union   -> Type.Union(this.tk_, this.common?.aux() as Type.Tuple?, this.vec.map { it.aux() }, this.yids)
             is Type.Func    -> this
