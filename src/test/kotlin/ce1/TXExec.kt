@@ -923,6 +923,16 @@ class TXExec {
         """.trimIndent())
         assert(out == "Null\n") { out }
     }
+    @Test
+    fun o16_unit_alias () {
+        val out = test(true, """
+            type Unit = ()
+            var u: Unit
+            set u = Unit
+            output Std u
+       """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 
     // WHERE / UNTIL
 

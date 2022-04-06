@@ -265,6 +265,9 @@ class TParser {
     fun b11_parser_var() {
         All_restart(null, PushbackReader(StringReader("Point \${} @{}"), 2))
         Lexer.lex()
+        val e = Parser.expr()
+        assert(e is Expr.Pak && e.tk.str=="Point")
+        /*
         try {
             Parser.expr()
             error("impossible case")
@@ -273,6 +276,7 @@ class TParser {
             assert(e.message == "(ln 1, col 14): expected union constructor : have end of file") { e.message!! }
             //assert(e.message == "(ln 1, col 1): unexpected end of file") { e.message!! }
         }
+         */
     }
 
     // PARENS, TUPLE

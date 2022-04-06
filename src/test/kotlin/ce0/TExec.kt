@@ -2004,6 +2004,17 @@ class TExec {
        """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
+    @Test
+    fun o16_unit_alias () {
+        val out = all("""
+            $Output0
+            type Unit $D{} @{} = ()
+            var u: Unit $D{} @{}
+            set u = Unit $D{} @{}
+            ${output0("u~","()")}
+       """.trimIndent())
+        assert(out == "()\n") { out }
+    }
 
     // TYPE / HIER
 

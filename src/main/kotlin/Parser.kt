@@ -267,7 +267,17 @@ object Parser
                 }
                 Expr.Nat(tk0, tp)
             }
-
+            alls.acceptFix("Null") -> {
+                val tk0 = alls.tk0 as Tk.Fix
+                val tp = if (!alls.acceptFix(":")) null else {
+                    val tp = this.type()
+                    All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Named) {
+                        "invalid type : expected pointer to alias type"
+                    }
+                    tp
+                }
+                Expr.UNull(tk0, tp as Type.Pointer?)
+            }
             alls.acceptFix("active") || alls.checkVar("Id") -> {
                 // Bool.False, Pair [x,y], active Task {}
                 val isact = (alls.tk0.str == "active")
@@ -297,24 +307,12 @@ object Parser
                         val block = this.block(null)
                         Expr.Func(id, null, block)
                     }
-                    else -> {
-                        alls.err_expected("union constructor")
-                        error("unreachable code")
-                    }
+                    // Unit
+                    else -> Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                 }
                 Expr.Pak(id, e, isact, tp)
             }
-            alls.acceptFix("Null") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-                val tp = if (!alls.acceptFix(":")) null else {
-                    val tp = this.type()
-                    All_assert_tk(tp.tk,tp is Type.Pointer && tp.pln is Type.Named) {
-                        "invalid type : expected pointer to alias type"
-                    }
-                    tp
-                }
-                Expr.UNull(tk0, tp as Type.Pointer?)
-            }
+
             alls.acceptFix("<") -> {
                 alls.acceptFix_err(".")
 
