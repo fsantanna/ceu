@@ -258,8 +258,13 @@ object Parser
 
     fun expr_one (preid: Tk.id?): Expr {
         return when {
-            alls.acceptFix("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
             (preid!=null || alls.acceptVar("id")) -> Expr.Var(alls.tk0 as Tk.id)
+            alls.acceptFix("(") -> {
+                val e = this.expr()
+                alls.acceptFix_err(")")
+                e
+            }
+            alls.acceptFix("()") -> Expr.Unit(alls.tk0 as Tk.Fix)
             alls.acceptVar("Nat") -> {
                 val tk0 = alls.tk0 as Tk.Nat
                 val tp = if (!alls.acceptFix(":")) null else {
@@ -317,7 +322,36 @@ object Parser
                 }
                 Expr.Pak(id, e, isact, tp)
             }
+            alls.acceptFix("[") -> {
+                val tk0 = alls.tk0 as Tk.Fix
 
+                val hasid = alls.acceptVar("id")
+                val id = alls.tk0
+                val haseq = alls.acceptFix("=")
+                if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
+
+                val e = this.expr(if (hasid && !haseq) (id as Tk.id) else null)
+                val es = mutableListOf(e)
+                val ids = if (haseq) mutableListOf(id as Tk.id) else null
+
+                while (true) {
+                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix("]")) {
+                        break
+                    }
+                    if (haseq) {
+                        alls.acceptVar_err("id")
+                        ids!!.add(alls.tk0 as Tk.id)
+                        alls.acceptFix("=")
+                    }
+                    val e2 = this.expr()
+                    es.add(e2)
+                }
+                alls.acceptFix_err("]")
+                val ret = Expr.TCons(tk0, es, ids)
+                if (!CE1) ret else {
+                    Expr.Pak(ret.tk, ret, null, null)
+                }
+            }
             alls.acceptFix("<") -> {
                 alls.acceptFix_err(".")
 
@@ -373,6 +407,7 @@ object Parser
                 alls.acceptFix_err("}")
                 Expr.If(tk0 as Tk.Fix, e, t, f)
             }
+
             alls.acceptFix("/") -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
@@ -383,41 +418,6 @@ object Parser
                     "unexpected operand to `/´"
                 }
                 Expr.Upref(tk0, e)
-            }
-            alls.acceptFix("(") -> {
-                val e = this.expr()
-                alls.acceptFix_err(")")
-                e
-            }
-            alls.acceptFix("[") -> {
-                val tk0 = alls.tk0 as Tk.Fix
-
-                val hasid = alls.acceptVar("id")
-                val id = alls.tk0
-                val haseq = alls.acceptFix("=")
-                if (!(CE1 || !haseq)) alls.err_tk_unexpected(alls.tk0)
-
-                val e = this.expr(if (hasid && !haseq) (id as Tk.id) else null)
-                val es = mutableListOf(e)
-                val ids = if (haseq) mutableListOf(id as Tk.id) else null
-
-                while (true) {
-                    if (!(alls.acceptFix(",") || (CE1 && alls.hasln)) || alls.checkFix("]")) {
-                        break
-                    }
-                    if (haseq) {
-                        alls.acceptVar_err("id")
-                        ids!!.add(alls.tk0 as Tk.id)
-                        alls.acceptFix("=")
-                    }
-                    val e2 = this.expr()
-                    es.add(e2)
-                }
-                alls.acceptFix_err("]")
-                val ret = Expr.TCons(tk0, es, ids)
-                if (!CE1) ret else {
-                    Expr.Pak(ret.tk, ret, null, null)
-                }
             }
             alls.checkFix("task") || alls.checkFix("func") -> {
                 val tk = alls.tk1 as Tk.Fix
