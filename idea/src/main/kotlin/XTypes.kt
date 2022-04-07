@@ -472,13 +472,18 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 if (it is Stmt.Seq && it.s2==this && it.s1 is Stmt.Var && it.s1.xtype==null) {
                     if (this.src is Expr.Func) {
                         // TODO: remove hack
-                        it.s1.xtype = this.src.xtype!!
+                        it.s1.xtype = this.src.xtype!!.clone(it.s1.tk, it.s1)
+                        it.s1.xtype!!.xinfTypes(null)
                     }
                 }
             }
             try {
                 this.dst.xinfTypes(null)
+                //println("-=-=-")
+                //println(this.tostr())
+                //println(this.dst.dump())
                 this.src.xinfTypes(this.dst.wtype!!)
+                //println("ok")
             } catch (e: Throwable){
                 if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e

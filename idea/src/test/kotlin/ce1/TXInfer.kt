@@ -66,13 +66,13 @@ class TXInfer {
     fun a03_input_output () {
         val out = all(prelude1+"var x: _int = input Std ()\noutput Std ()\n")
         assert(out == """
-            type Error @{} = <Escape=()>
-            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
-            type Output @{} = <Std=_(void*)>
-            type Input @{} = <Std=_>
+            type Error $D{} @{} = <Escape=()>
+            type Event $D{} @{} = <Kill=(),Task=_uint64_t,Timer=_int>
+            type Output $D{} @{} = <Std=_(void*)>
+            type Input $D{} @{} = <Std=_>
             var x: _int
-            set x = input (Input.Std ()): _int
-            output (Output.Std ())
+            set x = input (Input.Std $D{} ()): _int
+            output (Output.Std $D{} ())
             
         """.trimIndent()) { out }
     }
@@ -174,9 +174,9 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
-            type List @{} = </List @GLOBAL>
-            var l: /List @GLOBAL
-            set l = Null: /List @GLOBAL
+            type List $D{} @{} = </List $D{} @GLOBAL>
+            var l: /List $D{} @GLOBAL
+            set l = Null: /List $D{} @GLOBAL
             
         """.trimIndent()) { out }
     }
@@ -188,9 +188,9 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var l: /List @{GLOBAL} @GLOBAL
-            set l = Null: /List @{GLOBAL} @GLOBAL
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var l: /List $D{} @{GLOBAL} @GLOBAL
+            set l = Null: /List $D{} @{GLOBAL} @GLOBAL
 
         """.trimIndent()) { out }
     }
@@ -202,9 +202,9 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var l: /List @{GLOBAL} @GLOBAL
-            set l = (new (List @{GLOBAL} <.1 Null: /List @{GLOBAL} @GLOBAL>: </List @{GLOBAL} @GLOBAL>): @GLOBAL)
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var l: /List $D{} @{GLOBAL} @GLOBAL
+            set l = (new (List $D{} @{GLOBAL} <.1 Null: /List $D{} @{GLOBAL} @GLOBAL>: </List $D{} @{GLOBAL} @GLOBAL>): @GLOBAL)
 
         """.trimIndent()) { out }
     }
@@ -217,9 +217,9 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var l: /List @{GLOBAL} @GLOBAL
-            set l = (new (List.1 @{GLOBAL} Null: /List @{GLOBAL} @GLOBAL): @GLOBAL)
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var l: /List $D{} @{GLOBAL} @GLOBAL
+            set l = (new (List.1 $D{} @{GLOBAL} Null: /List $D{} @{GLOBAL} @GLOBAL): @GLOBAL)
 
         """.trimIndent()) { out }
     }
@@ -233,9 +233,9 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Error @{} = <Escape=()>
-            type List @{i} = </List @{i} @i>
-            var l: /List @{GLOBAL} @GLOBAL
-            set l = (new (List @{GLOBAL} <.1 Null: /List @{GLOBAL} @GLOBAL>: </List @{GLOBAL} @GLOBAL>): @GLOBAL)
+            type List $D{} @{i} = </List $D$D{} @{i} @i>
+            var l: /List $D{} @{GLOBAL} @GLOBAL
+            set l = (new (List $D{} @{GLOBAL} <.1 Null: /List $D{} @{GLOBAL} @GLOBAL>: </List $D{} @{GLOBAL} @GLOBAL>): @GLOBAL)
             
         """.trimIndent()) { out }
     }
@@ -257,11 +257,11 @@ class TXInfer {
             input Pico /e
         """.trimIndent())
         assert(out == """
-            type Error @{} = <Escape=()>
-            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
-            type Output @{} = <Std=_(void*)>
-            type Input @{} = <Std=_>
-            type Input @{i} += <Pico=/() @i>
+            type Error $D{} @{} = <Escape=()>
+            type Event $D{} @{} = <Kill=(),Task=_uint64_t,Timer=_int>
+            type Output $D{} @{} = <Std=_(void*)>
+            type Input $D{} @{} = <Std=_>
+            type Input $D{} @{i} += <Pico=/() @i>
             var input_pico_Unit: func @{i} -> /() @i -> ()
             set input_pico_Unit = (func @{i} -> /() @i -> () {
 
@@ -269,7 +269,7 @@ class TXInfer {
             )
             var e: ()
             set e = ()
-            input (Input.Pico @{GLOBAL} (/e)): ()
+            input (Input.Pico $D{} @{GLOBAL} (/e)): ()
 
         """.trimIndent()) { out }
     }
@@ -333,14 +333,14 @@ class TXInfer {
             call clone Null
         """.trimIndent())
         assert(out == """
-            type Num @{i} = </Num @{i} @i>
-            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
-            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
-            set ret = (new (Num @{l} <.1 (clone @{j,j,l,l} (((arg\)~)!1): @l)>: </Num @{l} @l>): @k)
+            type Num $D{} @{i} = </Num $D{} @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k {
+            set ret = (new (Num $D{} @{l} <.1 (clone @{j,j,l,l} (((arg\)~)!1): @l)>: </Num $D{} @{l} @l>): @k)
             return
             }
             )
-            call (clone @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /Num @{GLOBAL} @GLOBAL: @GLOBAL)
+            call (clone @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /Num $D{} @{GLOBAL} @GLOBAL: @GLOBAL)
             
         """.trimIndent()) { out }
     }
@@ -352,9 +352,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Num @{i} = </Num @{i} @i>
-            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
-            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
+            type Num $D{} @{i} = </Num $D{} @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k {
             
             }
             )
@@ -370,9 +370,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Num @{i} = </Num @{i} @i>
-            var clone: func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k
-            set clone = (func @{i,j,k,l} -> /Num @{j} @i -> /Num @{l} @k {
+            type Num $D{} @{i} = </Num $D{} @{i} @i>
+            var clone: func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k
+            set clone = (func @{i,j,k,l} -> /Num $D{} @{j} @i -> /Num $D{} @{l} @k {
             
             }
             )
@@ -410,12 +410,12 @@ class TXInfer {
             input Pico ()
         """.trimIndent())
         assert(out == """
-            type Error @{} = <Escape=()>
-            type Event @{} = <Kill=(),Task=_uint64_t,Timer=_int>
-            type Output @{} = <Std=_(void*)>
-            type Input @{} = <Std=_>
-            type Input @{} += <Pico=()>
-            input (Input.Pico ()): ()
+            type Error $D{} @{} = <Escape=()>
+            type Event $D{} @{} = <Kill=(),Task=_uint64_t,Timer=_int>
+            type Output $D{} @{} = <Std=_(void*)>
+            type Input $D{} @{} = <Std=_>
+            type Input $D{} @{} += <Pico=()>
+            input (Input.Pico $D{} ()): ()
             
         """.trimIndent()) { out }
     }
@@ -514,10 +514,10 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{x} = </List @{x} @x>
-            var f: func @{i,j} -> /List @{j} @i -> ()
-            set f = (func @{i,j} -> /List @{j} @i -> () {
-            set (((arg\)~)!1) = Null: /List @{j} @j
+            type List $D{} @{x} = </List $D{} @{x} @x>
+            var f: func @{i,j} -> /List $D{} @{j} @i -> ()
+            set f = (func @{i,j} -> /List $D{} @{j} @i -> () {
+            set (((arg\)~)!1) = Null: /List $D{} @{j} @j
             }
             )
 
@@ -532,10 +532,10 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{i,j} -> /List @{j} @i -> ()
-            set f = (func @{i,j} -> /List @{j} @i -> () {
-            set (((arg\)~)!1) = Null: /List @{j} @j
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{i,j} -> /List $D{} @{j} @i -> ()
+            set f = (func @{i,j} -> /List $D{} @{j} @i -> () {
+            set (((arg\)~)!1) = Null: /List $D{} @{j} @j
             }
             )
 
@@ -550,10 +550,10 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{i,j} -> /List @{j} @i -> ()
-            set f = (func @{i,j} -> /List @{j} @i -> () {
-            set (((arg\)~)!1) = (new (List @{j} <.1 Null: /List @{j} @j>: </List @{j} @j>): @j)
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{i,j} -> /List $D{} @{j} @i -> ()
+            set f = (func @{i,j} -> /List $D{} @{j} @i -> () {
+            set (((arg\)~)!1) = (new (List $D{} @{j} <.1 Null: /List $D{} @{j} @j>: </List $D{} @{j} @j>): @j)
             }
             )
 
@@ -573,9 +573,9 @@ class TXInfer {
             var v: /List = Null
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var v: /List @{GLOBAL} @GLOBAL
-            set v = Null: /List @{GLOBAL} @GLOBAL
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var v: /List $D{} @{GLOBAL} @GLOBAL
+            set v = Null: /List $D{} @{GLOBAL} @GLOBAL
 
         """.trimIndent()) { out }
     }
@@ -597,10 +597,10 @@ class TXInfer {
             --output std f v
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
-            var v: /List @{GLOBAL} @GLOBAL
-            set v = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL)
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{i,j,k,l} -> /List $D{} @{j} @i -> /List $D{} @{l} @k
+            var v: /List $D{} @{GLOBAL} @GLOBAL
+            set v = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List $D{} @{GLOBAL} @GLOBAL: @GLOBAL)
 
         """.trimIndent()) { out }
     }
@@ -613,9 +613,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
+            type List $D{} @{i} = </List $D{} @{i} @i>
             { @A
-            var x: /List @{A} @A
+            var x: /List $D{} @{A} @A
             }
 
         """.trimIndent()) { out }
@@ -629,9 +629,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
+            type List $D{} @{i} = </List $D{} @{i} @i>
             { @A
-            var x: /List @{GLOBAL} @GLOBAL
+            var x: /List $D{} @{GLOBAL} @GLOBAL
             }
 
         """.trimIndent()) { out }
@@ -647,10 +647,10 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
+            type List $D{} @{i} = </List $D{} @{i} @i>
             { @A
             { @B
-            var x: /List @{A} @A
+            var x: /List $D{} @{A} @A
             }
             }
 
@@ -663,8 +663,8 @@ class TXInfer {
             var f: func @{a} -> /List @{a} -> ()
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{a} -> /List @{a} @a -> ()
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{a} -> /List $D{} @{a} @a -> ()
 
         """.trimIndent()) { out }
     }
@@ -675,8 +675,8 @@ class TXInfer {
             var f: func @{a} -> /List @a -> ()
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{a} -> /List @{a} @a -> ()
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{a} -> /List $D{} @{a} @a -> ()
 
         """.trimIndent()) { out }
     }
@@ -695,14 +695,14 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{i} -> /List @{i} @i -> ()
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{i} -> /List $D{} @{i} @i -> ()
             { @A
-            var x: /List @{A} @A
+            var x: /List $D{} @{A} @A
             { @B
-            var g: func @{i} -> /List @{i} @i -> ()
-            var y: /List @{A} @A
-            var z: /List @{A} @A
+            var g: func @{i} -> /List $D{} @{i} @i -> ()
+            var y: /List $D{} @{A} @A
+            var z: /List $D{} @{A} @A
             }
             }
 
@@ -748,10 +748,10 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
+            type List $D{} @{i} = </List $D{} @{i} @i>
             {
-            var pa: /List @{LOCAL} @LOCAL
-            set pa = (new (List @{LOCAL} <.1 Null: /List @{LOCAL} @LOCAL>: </List @{LOCAL} @LOCAL>): @LOCAL)
+            var pa: /List $D{} @{LOCAL} @LOCAL
+            set pa = (new (List $D{} @{LOCAL} <.1 Null: /List $D{} @{LOCAL} @LOCAL>: </List $D{} @{LOCAL} @LOCAL>): @LOCAL)
             var f: func @{} -> () -> ()
             set f = (func @{} -> () -> () {
 
@@ -819,17 +819,17 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var clone: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
-            set clone = (func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k {
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var clone: func @{i,j,k,l} -> /List $D{} @{j} @i -> /List $D{} @{l} @k
+            set clone = (func @{i,j,k,l} -> /List $D{} @{j} @i -> /List $D{} @{l} @k {
             if (((arg\)~)?Null)
             {
-            set ret = Null: /List @{l} @k
+            set ret = Null: /List $D{} @{l} @k
             return
             }
             else
             {
-            set ret = (new (List @{l} <.1 (clone @{j,j,l,l} (((arg\)~)!1): @l)>: </List @{l} @l>): @k)
+            set ret = (new (List $D{} @{l} <.1 (clone @{j,j,l,l} (((arg\)~)!1): @l)>: </List $D{} @{l} @l>): @k)
             return
             }
             }
@@ -845,9 +845,9 @@ class TXInfer {
             set _:_int = f (f Null)
         """.trimIndent())
         assert(out == """
-            type List @{i} = </List @{i} @i>
-            var f: func @{i,j,k,l} -> /List @{j} @i -> /List @{l} @k
-            set (_: _int) = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List @{GLOBAL} @GLOBAL: @GLOBAL): @GLOBAL)
+            type List $D{} @{i} = </List $D{} @{i} @i>
+            var f: func @{i,j,k,l} -> /List $D{} @{j} @i -> /List $D{} @{l} @k
+            set (_: _int) = (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} (f @{GLOBAL,GLOBAL,GLOBAL,GLOBAL} Null: /List $D{} @{GLOBAL} @GLOBAL: @GLOBAL): @GLOBAL)
             
         """.trimIndent()) { out }
     }
@@ -902,14 +902,14 @@ class TXInfer {
         //assert(out == "<.1 <.1 Null>>\n") { out }
         //assert(out == "(ln 6, col 13): undeclared variable \"pa\"") { out }
         assert(out == """
-            type List @{i} = </List @{i} @i>
+            type List $D{} @{i} = </List $D{} @{i} @i>
             { @A
-            var pa: /List @{LOCAL} @LOCAL
-            set pa = (new (List @{LOCAL} <.1 Null: /List @{LOCAL} @LOCAL>: </List @{LOCAL} @LOCAL>): @LOCAL)
+            var pa: /List $D{} @{LOCAL} @LOCAL
+            set pa = (new (List $D{} @{LOCAL} <.1 Null: /List $D{} @{LOCAL} @LOCAL>: </List $D{} @{LOCAL} @LOCAL>): @LOCAL)
             var f: func @{} -> () -> ()
             set f = (func @{} -> () -> () {
-            var pf: /List @{A} @A
-            set pf = (new (List @{A} <.1 Null: /List @{A} @A>: </List @{A} @A>): @A)
+            var pf: /List $D{} @{A} @A
+            set pf = (new (List $D{} @{A} <.1 Null: /List $D{} @{A} @A>: </List $D{} @{A} @A>): @A)
             set (((pa\)~)!1) = pf
             }
             )
@@ -1048,14 +1048,14 @@ class TXInfer {
             --output std _3:_int
         """.trimIndent())
         assert(out == """
-            type Xask @{} = task @{} -> () -> _int -> ()
-            var t: Xask
-            set t = (Xask (task @{} -> () -> _int -> () {
+            type Xask $D{} @{} = task @{} -> () -> _int -> ()
+            var t: Xask $D{}
+            set t = (Xask $D{} (task @{} -> () -> _int -> () {
             
             }
             ))
-            var x: active Xask
-            set x = spawn (active Xask ((t~) @{} (): @GLOBAL))
+            var x: active Xask $D{}
+            set x = spawn (active Xask $D{} ((t~) @{} (): @GLOBAL))
             var y: active task @{} -> () -> _int -> ()
             set y = spawn ((t~) @{} ())
             set (_: _int) = ((x~).pub)
@@ -1071,9 +1071,9 @@ class TXInfer {
             spawn t () in xs
         """.trimIndent())
         assert(out == """
-            type Xask @{} = task @{} -> () -> () -> ()
-            var t: Xask
-            var xs: active {} Xask
+            type Xask $D{} @{} = task @{} -> () -> () -> ()
+            var t: Xask $D{}
+            var xs: active {} Xask $D{}
             spawn ((t~) @{} ()) in xs
 
         """.trimIndent()) { out }
@@ -1248,7 +1248,7 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Event @{} = <Kill=(),Task=(),Timer=()>
+            type Event $D{} @{} = <Kill=(),Task=(),Timer=()>
             var sub: func @{} -> [_imt,_int] -> _int
             var lte: func @{} -> [_imt,_int] -> _int
             spawn ((task @{} -> _ -> _ -> _ {
@@ -1290,7 +1290,7 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Event @{} = <Kill=(),Task=(),Timer=()>
+            type Event $D{} @{} = <Kill=(),Task=(),Timer=()>
             var sub: func @{} -> [_imt,_int] -> _int
             var lte: func @{} -> [_imt,_int] -> _int
             spawn ((task @{} -> _ -> _ -> _ {
@@ -1340,9 +1340,9 @@ class TXInfer {
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
         assert(out == """
-            type Point @{} = [_int,_int]
-            var xy: Point
-            set xy = (Point [(_1: _int),(_2: _int)])
+            type Point $D{} @{} = [_int,_int]
+            var xy: Point $D{}
+            set xy = (Point $D{} [(_1: _int),(_2: _int)])
             var x: _int
             set x = ((xy~).1)
             
@@ -1358,11 +1358,11 @@ class TXInfer {
             var h = r.2.2
         """.trimIndent())
         assert(out == """
-            type Point @{} = [_int,_int]
-            type Dims @{} = [_int,_int]
-            type Rect @{} = [Point,Dims]
-            var r: Rect
-            set r = (Rect [(Point [(_1: _int),(_2: _int)]),(Dims [(_1: _int),(_2: _int)])])
+            type Point $D{} @{} = [_int,_int]
+            type Dims $D{} @{} = [_int,_int]
+            type Rect $D{} @{} = [Point $D{},Dims $D{}]
+            var r: Rect $D{}
+            set r = (Rect $D{} [(Point $D{} [(_1: _int),(_2: _int)]),(Dims $D{} [(_1: _int),(_2: _int)])])
             var h: _int
             set h = ((((r~).2)~).2)
             
@@ -1377,9 +1377,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type TPico @{} = <()>
+            type TPico $D{} @{} = <()>
             spawn ((task @{} -> _ -> _ -> _ {
-            set (_: _) = (TPico.1 ())
+            set (_: _) = (TPico.1 $D{} ())
             }
             ) @{} ())
             
@@ -1394,9 +1394,9 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type TPico @{} = <(),[_int,_int]>
+            type TPico $D{} @{} = <(),[_int,_int]>
             spawn ((task @{} -> _ -> _ -> _ {
-            set (_: _) = (TPico.2 [(_1: _int),(_2: _int)])
+            set (_: _) = (TPico.2 $D{} [(_1: _int),(_2: _int)])
             }
             ) @{} ())
             
@@ -1443,9 +1443,9 @@ class TXInfer {
             --output std x
        """.trimIndent())
         assert(out == """
-            type Int2Int @{} = func @{} -> _int -> _int
-            var f: Int2Int
-            set f = (Int2Int (func @{} -> _int -> _int {
+            type Int2Int $D{} @{} = func @{} -> _int -> _int
+            var f: Int2Int $D{}
+            set f = (Int2Int $D{} (func @{} -> _int -> _int {
             set ret = arg
             }
             ))
@@ -1483,7 +1483,7 @@ class TXInfer {
             }
         """.trimIndent())
         assert(out == """
-            type Event @{} = <(),_uint64_t,_int>
+            type Event $D{} @{} = <(),_uint64_t,_int>
             var f: task @{} -> _int -> () -> _int
             set f = (task @{} -> _int -> () -> _int {
             set ret = arg
@@ -1521,9 +1521,9 @@ class TXInfer {
             --output std ()
         """.trimIndent())
         assert(out == """
-            type Xask @{} = task @{} -> () -> () -> ()
-            var t: Xask
-            set t = (Xask (task @{} -> () -> () -> () {
+            type Xask $D{} @{} = task @{} -> () -> () -> ()
+            var t: Xask $D{}
+            set t = (Xask $D{} (task @{} -> () -> () -> () {
             
             }
             ))
@@ -1580,9 +1580,9 @@ class TXInfer {
             var b = Bool.False
         """.trimIndent())
         assert(out == """
-            type Bool @{} = <False=(),True=()>
-            var b: Bool
-            set b = (Bool.False ())
+            type Bool $D{} @{} = <False=(),True=()>
+            var b: Bool $D{}
+            set b = (Bool.False $D{} ())
 
         """.trimIndent()) { out }
     }
@@ -1611,10 +1611,10 @@ class TXInfer {
             set (_:_int) = (c.x)
         """.trimIndent())
         assert(out == """
-            type Point @{} = [x:_int,y:_int]
-            var b: Point
-            set b = (Point [(_10: _int),(_10: _int)])
-            var c: Point
+            type Point $D{} @{} = [x:_int,y:_int]
+            var b: Point $D{}
+            set b = (Point $D{} [(_10: _int),(_10: _int)])
+            var c: Point $D{}
             set c = b
             set (_: _int) = ((c~).x)
 
@@ -1629,10 +1629,10 @@ class TXInfer {
             set (_:_int) = ((c~).x)
         """.trimIndent())
         assert(out == """
-            type Point @{} = [x:_int,y:_int]
-            var b: Point
-            set b = (Point [(_10: _int),(_10: _int)])
-            var c: Point
+            type Point $D{} @{} = [x:_int,y:_int]
+            var b: Point $D{}
+            set b = (Point $D{} [(_10: _int),(_10: _int)])
+            var c: Point $D{}
             set c = b
             set (_: _int) = ((c~).x)
             
@@ -1694,8 +1694,8 @@ class TXInfer {
             type Point += <()>
         """.trimIndent())
         assert(out == """
-            type Point @{} = <()>
-            type Point @{} += <()>
+            type Point $D{} @{} = <()>
+            type Point $D{} @{} += <()>
             
         """.trimIndent()) { out }
     }
@@ -1722,10 +1722,10 @@ class TXInfer {
             var pt = Point.2
         """.trimIndent())
         assert(out == """
-            type Point @{} = <()>
-            type Point @{} += <()>
-            var pt: Point
-            set pt = (Point.2 ())
+            type Point $D{} @{} = <()>
+            type Point $D{} @{} += <()>
+            var pt: Point $D{}
+            set pt = (Point.2 $D{} ())
             
         """.trimIndent()) { out }
     }
@@ -1737,10 +1737,10 @@ class TXInfer {
             var pt = Point.Xxx
         """.trimIndent())
         assert(out == """
-            type Point @{} = <Xxx=()>
-            type Point @{} += <Yyy=()>
-            var pt: Point
-            set pt = (Point.Xxx ())
+            type Point $D{} @{} = <Xxx=()>
+            type Point $D{} @{} += <Yyy=()>
+            var pt: Point $D{}
+            set pt = (Point.Xxx $D{} ())
             
         """.trimIndent()) { out }
     }
@@ -1753,11 +1753,11 @@ class TXInfer {
             type Point += <Zzz = ()>
         """.trimIndent())
         assert(out == """
-            type Point @{} = <Xxx=()>
-            type Point @{} += <Yyy=()>
-            var pt: Point
-            set pt = (Point.Xxx ())
-            type Point @{} += <Zzz=()>
+            type Point $D{} @{} = <Xxx=()>
+            type Point $D{} @{} += <Yyy=()>
+            var pt: Point $D{}
+            set pt = (Point.Xxx $D{} ())
+            type Point $D{} @{} += <Zzz=()>
             
         """.trimIndent()) { out }
     }
@@ -1769,10 +1769,10 @@ class TXInfer {
         var e = Event <.1 [_]>
        """.trimIndent())
         assert(out == """
-            type Point @{} = [_int,_int]
-            type Event @{i} = [/() @i] <[/() @i]>
-            var e: Event @{GLOBAL}
-            set e = (Event @{GLOBAL} <.1 [(_: /() @GLOBAL)]>: [/() @GLOBAL] <[/() @GLOBAL]>)
+            type Point $D{} @{} = [_int,_int]
+            type Event $D{} @{i} = [/() @i] <[/() @i]>
+            var e: Event $D{} @{GLOBAL}
+            set e = (Event $D{} @{GLOBAL} <.1 [(_: /() @GLOBAL)]>: [/() @GLOBAL] <[/() @GLOBAL]>)
 
         """.trimIndent()) { out }
     }
