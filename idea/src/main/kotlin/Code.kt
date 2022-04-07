@@ -13,12 +13,12 @@ fun concrete (str:String, args:List<Type>): String {
 
 fun Type.pos (): String {
     return when (this) {
-        is Type.Named   -> concrete(this.tk.str, this.xargs!!).let { println(it);it }
+        is Type.Named   -> concrete(this.tk.str, this.xargs!!) //.let { println(it);it }
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
         //is Type.Par     -> this.xtype.let { if (it == null) this.tk.str/*.drop(1)*/ else it.pos() }
-        is Type.Par     -> { println(this.xtype) ; this.xtype.let { if (it==null) "TODO" else it.pos() } }//this.tk.str //.drop(1)
+        is Type.Par     -> { /*println(this.xtype) ;*/ this.xtype.let { if (it==null) "TODO" else it.pos() } }//this.tk.str //.drop(1)
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()
@@ -241,6 +241,10 @@ fun code_ft (tp: Type) {
         }
     }.let {
         val ce = tp.toce()
+        //println(">>>")
+        //println(ce)
+        //println(tp.tostr())
+        //println("<<<")
         if (TYPEX.contains(ce)) {
             Code("","", "", "","")
         } else {
@@ -688,11 +692,13 @@ fun code_fs (s: Stmt) {
             } else {
                 // concrete type
                 val name = concrete(s.tk.str, s.args ?: emptyList())
+                //if (name == "CEU_Maybe_Unit") TODO()
+                //println(name + ": " + s.tostr())
                 val unddef = """
-                #undef $name // ${s.tostr()}
-                #define $name ${name}_${s.n}
-                
-            """.trimIndent()
+                    #undef $name // ${s.tostr()}
+                    #define $name ${name}_${s.n}
+                    
+                """.trimIndent()
 
                 fun Type.defs(pre: String): String {
                     return if (this !is Type.Union || this.yids == null) "" else {
@@ -704,11 +710,11 @@ fun code_fs (s: Stmt) {
                 }
 
                 val src = """
-                //#define output_Std_${s.tk.str}_ output_Std_${s.xtype!!.toce()}_
-                //#define output_Std_${s.tk.str}  output_Std_${s.xtype!!.toce()}
-                typedef ${s.xtype!!.pos()} ${name}_${s.n};
-                
-            """.trimIndent()
+                    //#define output_Std_${s.tk.str}_ output_Std_${s.xtype!!.toce()}_
+                    //#define output_Std_${s.tk.str}  output_Std_${s.xtype!!.toce()}
+                    typedef ${s.xtype!!.pos()} ${name}_${s.n};
+                    
+                """.trimIndent()
                 Code(
                     unddef + src + type.type + xtype.type + s.xtype!!.defs(s.tk.str),
                     unddef + type.struct + xtype.struct,

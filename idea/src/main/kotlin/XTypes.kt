@@ -39,8 +39,9 @@ fun Type.xinfTypes (inf: Type?) {
         }
         is Type.Named   -> {
             if (this.xargs == null) {
-                println(this.dump())
-                println(inf)
+                //println(this.dump())
+                //println(inf)
+                // TODO: infer
                 this.xargs = emptyList()
             }
         }
@@ -69,20 +70,20 @@ fun Expr.xinfTypes (inf: Type?) {
             this.type
         }
         is Expr.Pak -> {
-            println("Expr.Pak")
-            println(this.xtype?.toString())
-            println(inf?.toString())
-            println(">>>")
+            //println("Expr.Pak")
+            //println(this.xtype?.toString())
+            //println(inf?.toString())
+            //println(">>>")
             this.xtype?.xinfTypes(null)
-            println("<<<")
+            //println("<<<")
             when {
                 (this.xtype != null) -> {
-                    println("-=-=-")
+                    //println("-=-=-")
                     val tp = this.xtype!!
                     val unpak = tp.react_noalias(this)
                     this.e.xinfTypes(unpak)
-                    print(this.e.tostr() + ": ")
-                    println(this.e.wtype?.tostr())
+                    //print(this.e.tostr() + ": ")
+                    //println(this.e.wtype?.tostr())
                     if (!this.isact!!) tp else {
                         Type.Active(
                             Tk.Fix("active", this.tk.lin, this.tk.col),
@@ -187,10 +188,10 @@ fun Expr.xinfTypes (inf: Type?) {
                 val x = (inf as Type.Union).vec[num-1]
                 this.arg.xinfTypes(x)
                 this.xtype = inf.clone(this.tk,this) as Type.Union
-                print("UCons: " + this.tostr() + ": ")
-                println(this.xtype?.tostr())
-                println(x.tostr())
-                println(this.arg.wtype?.tostr())
+                //print("UCons: " + this.tostr() + ": ")
+                //println(this.xtype?.tostr())
+                //println(x.tostr())
+                //println(this.arg.wtype?.tostr())
                 this.xtype!!
             }
         }

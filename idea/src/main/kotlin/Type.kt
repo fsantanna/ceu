@@ -154,10 +154,11 @@ fun Type.toce (): String {
     return when (this) {
         is Type.Unit    -> "Unit"
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
-        is Type.Named   -> this.tk.str
+        //is Type.Named   -> this.tk.str
+        is Type.Named   -> concrete(this.tk.str, this.xargs!!) //.let { println(it);it }
         is Type.Nat     -> this.tk_.payload().replace('*','_')
         //is Type.Par     -> this.tk.str //.drop(1)
-        is Type.Par     -> { println(this.xtype) ; this.xtype.let { if (it==null) "TODO" else it.toce() } }//this.tk.str //.drop(1)
+        is Type.Par     -> { /*println(this.xtype) ;*/ this.xtype.let { if (it==null) "TODO" else it.toce() } }//this.tk.str //.drop(1)
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
@@ -239,7 +240,7 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
         when (tp) {
             is Type.Par -> {
                 tp.xtype = p2a[tp.tk.str]!!
-                println(tp.tk.str + " = " + tp.xtype!!.tostr())
+                //println(tp.tk.str + " = " + tp.xtype!!.tostr())
             }
         }
     }
@@ -255,7 +256,7 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
     )
     ret.type.visit(::ft, null)
     ret.xtype!!.visit(::ft, null)
-    print(">>> "); println(ret.xtype!!.toce())
+    //print(">>> "); println(ret.xtype!!.toce())
     return ret
 }
 

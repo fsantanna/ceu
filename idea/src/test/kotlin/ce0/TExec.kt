@@ -607,7 +607,7 @@ class TExec {
             set x = input Input $D{} @{} <.1>:<_>: Int $D{} @{}
             ${output0("x","_int")}
         """.trimIndent())
-        assert(out.contains("implicit declaration of function ‘input_1_Int’")) { out }
+        assert(out.contains("implicit declaration of function ‘input_1_CEU_Int’")) { out }
     }
     @Disabled   // needs user input
     @Test
