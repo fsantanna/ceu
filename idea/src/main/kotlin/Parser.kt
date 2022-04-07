@@ -80,7 +80,7 @@ object Parser
             }
             (alls.acceptVar("Par")) -> {
                 val tk0 = alls.tk0 as Tk.Par
-                Type.Par(tk0)
+                Type.Par(tk0, null)
             }
             alls.acceptFix("[") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -1079,7 +1079,7 @@ object Parser
                 if (isinc) {
                     All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
                 }
-                Stmt.Typedef(id, isinc, pars, scps, tp, null, true)
+                Stmt.Typedef(id, isinc, pars, null, scps, tp, null, true)
             }
 
             // CE1

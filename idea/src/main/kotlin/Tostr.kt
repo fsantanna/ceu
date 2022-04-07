@@ -21,7 +21,8 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
     return when (this) {
         is Type.Unit    -> "()"
         is Type.Nat     -> this.tk.str
-        is Type.Par     -> this.tk.str
+        //is Type.Par     -> this.tk.str
+        is Type.Par     -> { println(this.xtype) ; this.xtype.let { if (it==null) "TODO" else it.tostr() } }//this.tk.str //.drop(1)
         is Type.Pointer -> "/" + this.pln.tostr(lc) + this.xscp.let { if (it==null) "" else " @" + it.scp1.str.anon2local() }
         is Type.Named   -> {
             val pak_subs = if (!ispak) "" else {

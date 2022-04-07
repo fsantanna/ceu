@@ -2229,6 +2229,36 @@ class TExec {
         )
         assert(out == "10\n10\n") { out }
     }
+    @Test
+    fun s06_maybe_twice_dif () {
+        val out = test(false, """
+            $Output0
+            type Maybe $D{a} @{} = <(), ${D}a>
+            var x : Maybe $D{_int} @{}
+            set x = Maybe $D{_int} @{} <.2 _10:_int>: <(),_int>
+            var y : Maybe $D{()} @{}
+            set y = Maybe $D{()} @{} <.2 ()>: <(),()>
+            ${output0("x~!2","_int")}
+            ${output0("y~!2","()")}
+           """.trimIndent()
+        )
+        assert(out == "10\n()\n") { out }
+    }
+    @Test
+    fun s07_maybe_twice_equ () {
+        val out = test(false, """
+            $Output0
+            type Maybe $D{a} @{} = <(), ${D}a>
+            var x: Maybe $D{()} @{}
+            set x = Maybe $D{()} @{} <.2 ()>: <(),()>
+            var y: Maybe $D{()} @{}
+            set y = Maybe $D{()} @{} <.2 ()>: <(),()>
+            ${output0("x~!2","()")}
+            ${output0("y~!2","()")}
+           """.trimIndent()
+        )
+        assert(out == "()\n()\n") { out }
+    }
 
     // ALL
 

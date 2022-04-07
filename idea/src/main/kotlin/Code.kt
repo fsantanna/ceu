@@ -7,13 +7,18 @@ fun Any.self_or_null (): String {
     return if (this.ups_first { it is Expr.Func } == null) "NULL" else "(&task1->task0)"
 }
 
+fun concrete (str:String, args:List<Type>): String {
+    return "CEU_"+str+args.map { "_"+it.toce() }.joinToString("")
+}
+
 fun Type.pos (): String {
     return when (this) {
-        is Type.Named   -> "CEU_"+this.tk.str
+        is Type.Named   -> concrete(this.tk.str, this.xargs!!).let { println(it);it }
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
-        is Type.Par     -> this.tk.str //.drop(1)
+        //is Type.Par     -> this.xtype.let { if (it == null) this.tk.str/*.drop(1)*/ else it.pos() }
+        is Type.Par     -> { println(this.xtype) ; this.xtype.let { if (it==null) "TODO" else it.pos() } }//this.tk.str //.drop(1)
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()
@@ -677,12 +682,15 @@ fun code_fs (s: Stmt) {
         is Stmt.Typedef -> {
             val xtype = s.xtype!!.let { CODE.removeFirst() }
             val type  = CODE.removeFirst()
-            if (s.pars.size > 0) {
+            if (s.pars.size>0 && s.args==null) {
+                // generic type: do not generate code
                 Code("", "","","", "")
             } else {
+                // concrete type
+                val name = concrete(s.tk.str, s.args ?: emptyList())
                 val unddef = """
-                #undef CEU_${s.tk.str}
-                #define CEU_${s.tk.str} CEU_${s.tk.str}_${s.n}
+                #undef $name // ${s.tostr()}
+                #define $name ${name}_${s.n}
                 
             """.trimIndent()
 
@@ -698,11 +706,11 @@ fun code_fs (s: Stmt) {
                 val src = """
                 //#define output_Std_${s.tk.str}_ output_Std_${s.xtype!!.toce()}_
                 //#define output_Std_${s.tk.str}  output_Std_${s.xtype!!.toce()}
-                typedef ${s.xtype!!.pos()} CEU_${s.tk.str}_${s.n};
+                typedef ${s.xtype!!.pos()} ${name}_${s.n};
                 
             """.trimIndent()
                 Code(
-                    unddef + src + type.type + xtype!!.type + s.xtype!!.defs(s.tk.str),
+                    unddef + src + type.type + xtype.type + s.xtype!!.defs(s.tk.str),
                     unddef + type.struct + xtype.struct,
                     unddef + type.func + xtype.func,
                     "",

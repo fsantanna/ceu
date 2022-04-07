@@ -77,7 +77,7 @@ fun Expr.setUps (up: Any) {
     }
 }
 
-fun Stmt.setUps (up: Any?) {
+fun Stmt.setUps (up: Any?): Stmt {
     this.wup = up
     when (this) {
         is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn -> {}
@@ -115,4 +115,5 @@ fun Stmt.setUps (up: Any?) {
         is Stmt.Typedef -> { this.type.setUps(this); this.xtype?.setUps(this) }
         else -> TODO(this.toString()) // do not remove this line b/c we may add new cases
     }
+    return this
 }

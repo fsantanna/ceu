@@ -52,7 +52,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
         return when (this) {
             is Type.Unit -> Type.Unit(this.tk.clone() as Tk.Fix)
             is Type.Nat -> Type.Nat(this.tk.clone() as Tk.Nat)
-            is Type.Par -> Type.Par(this.tk.clone() as Tk.Par)
+            is Type.Par -> Type.Par(this.tk.clone() as Tk.Par, this.xtype?.aux(lin,col))
             is Type.Named -> Type.Named (
                 this.tk.clone() as Tk.Id,
                 this.subs.map { it.clone() },
@@ -156,7 +156,8 @@ fun Type.toce (): String {
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
         is Type.Named   -> this.tk.str
         is Type.Nat     -> this.tk_.payload().replace('*','_')
-        is Type.Par     -> this.tk.str //.drop(1)
+        //is Type.Par     -> this.tk.str //.drop(1)
+        is Type.Par     -> { println(this.xtype) ; this.xtype.let { if (it==null) "TODO" else it.toce() } }//this.tk.str //.drop(1)
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
@@ -224,13 +225,43 @@ fun Type.Named.def (): Stmt.Typedef? {
         (this.xdef != null) -> this.xdef!!
         (def==null || this.xargs==null || this.xargs!!.size==0) -> def
         else -> {
-            this.xdef = def.instantiate(this.xargs!!)
+            this.xdef = def.instantiate(this.xargs!!).setUps(this) as Stmt.Typedef
             this.xdef!!
         }
     }
 }
 
 fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
+    val p2a = this.pars.zip(args).map {
+        Pair(it.first.str, it.second)
+    }.toMap()
+    fun ft (tp: Type) {
+        when (tp) {
+            is Type.Par -> {
+                tp.xtype = p2a[tp.tk.str]!!
+                println(tp.tk.str + " = " + tp.xtype!!.tostr())
+            }
+        }
+    }
+    val ret = Stmt.Typedef (
+        this.tk_,
+        this.isinc,
+        this.pars,
+        args.map { it.clone(this.tk,this) },
+        this.xscp1s,
+        this.type.clone(this.tk,this),
+        this.xtype!!.clone(this.tk,this),
+        this.xisact
+    )
+    ret.type.visit(::ft, null)
+    ret.xtype!!.visit(::ft, null)
+    print(">>> "); println(ret.xtype!!.toce())
+    return ret
+}
+
+/*
+fun Stmt.Typedef.instantiate1 (args: List<Type>): Stmt.Typedef {
+    println(args)
     val p2a = this.pars.zip(args).map {
         Pair(it.first.str, it.second)
     }.toMap()
@@ -244,11 +275,13 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
     }
     return Stmt.Typedef (
         this.tk_,
-        false,
-        emptyList(),
+        this.isinc,
+        this.pars,
+        args.map { it.clone(this.tk,this) },
         this.xscp1s,
-        this.type,      // ignore, will use xtype
+        this.type.aux(),
         this.xtype!!.aux(),
-        false
+        this.xisact
     )
 }
+ */

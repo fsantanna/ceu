@@ -27,7 +27,7 @@ sealed class Tk (val str: String, val lin: Int, val col: Int) {
 sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Unit    (val tk_: Tk.Fix): Type(tk_, null, null)
     data class Nat     (val tk_: Tk.Nat): Type(tk_, null, null)
-    data class Par     (val tk_: Tk.Par): Type(tk_, null, null)
+    data class Par     (val tk_: Tk.Par, var xtype: Type?): Type(tk_, null, null)
     data class Tuple   (val tk_: Tk.Fix, val vec: List<Type>, val yids: List<Tk.id>?): Type(tk_, null, null)
     data class Union   (val tk_: Tk.Fix, val common: Type.Tuple?, val vec: List<Type>, val yids: List<Tk.Id>?): Type(tk_, null, null)
     data class Pointer (val tk_: Tk.Fix, var xscp: Scope?, val pln: Type): Type(tk_, null, null)
@@ -105,6 +105,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
         val tk_: Tk.Id,         // List
         val isinc: Boolean,
         val pars: List<Tk.id>,  // {a}
+        var args: List<Type>?,  // {_int}   (only when instantiated)
         var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
         val type: Type,         // = <...>
         var xtype: Type?,       // because of +=
