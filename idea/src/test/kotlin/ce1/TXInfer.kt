@@ -71,8 +71,8 @@ class TXInfer {
             type Output $D{} @{} = <Std=_(void*)>
             type Input $D{} @{} = <Std=_>
             var x: _int
-            set x = input (Input.Std $D{} ()): _int
-            output (Output.Std $D{} ())
+            set x = input (Input.Std $D{} @{} ()): _int
+            output (Output.Std $D{} @{} ())
             
         """.trimIndent()) { out }
     }
@@ -174,9 +174,9 @@ class TXInfer {
             --output std l
         """.trimIndent())
         assert(out == """
-            type List $D{} @{} = </List $D{} @GLOBAL>
-            var l: /List $D{} @GLOBAL
-            set l = Null: /List $D{} @GLOBAL
+            type List $D{} @{} = </List $D{} @{} @GLOBAL>
+            var l: /List $D{} @{} @GLOBAL
+            set l = Null: /List $D{} @{} @GLOBAL
             
         """.trimIndent()) { out }
     }
@@ -415,7 +415,7 @@ class TXInfer {
             type Output $D{} @{} = <Std=_(void*)>
             type Input $D{} @{} = <Std=_>
             type Input $D{} @{} += <Pico=()>
-            input (Input.Pico $D{} ()): ()
+            input (Input.Pico $D{} @{} ()): ()
             
         """.trimIndent()) { out }
     }
@@ -1049,13 +1049,13 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Xask $D{} @{} = task @{} -> () -> _int -> ()
-            var t: Xask $D{}
-            set t = (Xask $D{} (task @{} -> () -> _int -> () {
+            var t: Xask $D{} @{}
+            set t = (Xask $D{} @{} (task @{} -> () -> _int -> () {
             
             }
             ))
-            var x: active Xask $D{}
-            set x = spawn (active Xask $D{} ((t~) @{} (): @GLOBAL))
+            var x: active Xask $D{} @{}
+            set x = spawn (active Xask $D{} @{} ((t~) @{} (): @GLOBAL))
             var y: active task @{} -> () -> _int -> ()
             set y = spawn ((t~) @{} ())
             set (_: _int) = ((x~).pub)
@@ -1072,8 +1072,8 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Xask $D{} @{} = task @{} -> () -> () -> ()
-            var t: Xask $D{}
-            var xs: active {} Xask $D{}
+            var t: Xask $D{} @{}
+            var xs: active {} Xask $D{} @{}
             spawn ((t~) @{} ()) in xs
 
         """.trimIndent()) { out }
@@ -1341,8 +1341,8 @@ class TXInfer {
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
         assert(out == """
             type Point $D{} @{} = [_int,_int]
-            var xy: Point $D{}
-            set xy = (Point $D{} [(_1: _int),(_2: _int)])
+            var xy: Point $D{} @{}
+            set xy = (Point $D{} @{} [(_1: _int),(_2: _int)])
             var x: _int
             set x = ((xy~).1)
             
@@ -1360,9 +1360,9 @@ class TXInfer {
         assert(out == """
             type Point $D{} @{} = [_int,_int]
             type Dims $D{} @{} = [_int,_int]
-            type Rect $D{} @{} = [Point $D{},Dims $D{}]
-            var r: Rect $D{}
-            set r = (Rect $D{} [(Point $D{} [(_1: _int),(_2: _int)]),(Dims $D{} [(_1: _int),(_2: _int)])])
+            type Rect $D{} @{} = [Point $D{} @{},Dims $D{} @{}]
+            var r: Rect $D{} @{}
+            set r = (Rect $D{} @{} [(Point $D{} @{} [(_1: _int),(_2: _int)]),(Dims $D{} @{} [(_1: _int),(_2: _int)])])
             var h: _int
             set h = ((((r~).2)~).2)
             
@@ -1379,7 +1379,7 @@ class TXInfer {
         assert(out == """
             type TPico $D{} @{} = <()>
             spawn ((task @{} -> _ -> _ -> _ {
-            set (_: _) = (TPico.1 $D{} ())
+            set (_: _) = (TPico.1 $D{} @{} ())
             }
             ) @{} ())
             
@@ -1396,7 +1396,7 @@ class TXInfer {
         assert(out == """
             type TPico $D{} @{} = <(),[_int,_int]>
             spawn ((task @{} -> _ -> _ -> _ {
-            set (_: _) = (TPico.2 $D{} [(_1: _int),(_2: _int)])
+            set (_: _) = (TPico.2 $D{} @{} [(_1: _int),(_2: _int)])
             }
             ) @{} ())
             
@@ -1444,8 +1444,8 @@ class TXInfer {
        """.trimIndent())
         assert(out == """
             type Int2Int $D{} @{} = func @{} -> _int -> _int
-            var f: Int2Int $D{}
-            set f = (Int2Int $D{} (func @{} -> _int -> _int {
+            var f: Int2Int $D{} @{}
+            set f = (Int2Int $D{} @{} (func @{} -> _int -> _int {
             set ret = arg
             }
             ))
@@ -1522,8 +1522,8 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Xask $D{} @{} = task @{} -> () -> () -> ()
-            var t: Xask $D{}
-            set t = (Xask $D{} (task @{} -> () -> () -> () {
+            var t: Xask $D{} @{}
+            set t = (Xask $D{} @{} (task @{} -> () -> () -> () {
             
             }
             ))
@@ -1581,8 +1581,8 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Bool $D{} @{} = <False=(),True=()>
-            var b: Bool $D{}
-            set b = (Bool.False $D{} ())
+            var b: Bool $D{} @{}
+            set b = (Bool.False $D{} @{} ())
 
         """.trimIndent()) { out }
     }
@@ -1612,9 +1612,9 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Point $D{} @{} = [x:_int,y:_int]
-            var b: Point $D{}
-            set b = (Point $D{} [(_10: _int),(_10: _int)])
-            var c: Point $D{}
+            var b: Point $D{} @{}
+            set b = (Point $D{} @{} [(_10: _int),(_10: _int)])
+            var c: Point $D{} @{}
             set c = b
             set (_: _int) = ((c~).x)
 
@@ -1630,9 +1630,9 @@ class TXInfer {
         """.trimIndent())
         assert(out == """
             type Point $D{} @{} = [x:_int,y:_int]
-            var b: Point $D{}
-            set b = (Point $D{} [(_10: _int),(_10: _int)])
-            var c: Point $D{}
+            var b: Point $D{} @{}
+            set b = (Point $D{} @{} [(_10: _int),(_10: _int)])
+            var c: Point $D{} @{}
             set c = b
             set (_: _int) = ((c~).x)
             
@@ -1724,8 +1724,8 @@ class TXInfer {
         assert(out == """
             type Point $D{} @{} = <()>
             type Point $D{} @{} += <()>
-            var pt: Point $D{}
-            set pt = (Point.2 $D{} ())
+            var pt: Point $D{} @{}
+            set pt = (Point.2 $D{} @{} ())
             
         """.trimIndent()) { out }
     }
@@ -1739,8 +1739,8 @@ class TXInfer {
         assert(out == """
             type Point $D{} @{} = <Xxx=()>
             type Point $D{} @{} += <Yyy=()>
-            var pt: Point $D{}
-            set pt = (Point.Xxx $D{} ())
+            var pt: Point $D{} @{}
+            set pt = (Point.Xxx $D{} @{} ())
             
         """.trimIndent()) { out }
     }
@@ -1755,8 +1755,8 @@ class TXInfer {
         assert(out == """
             type Point $D{} @{} = <Xxx=()>
             type Point $D{} @{} += <Yyy=()>
-            var pt: Point $D{}
-            set pt = (Point.Xxx $D{} ())
+            var pt: Point $D{} @{}
+            set pt = (Point.Xxx $D{} @{} ())
             type Point $D{} @{} += <Zzz=()>
             
         """.trimIndent()) { out }

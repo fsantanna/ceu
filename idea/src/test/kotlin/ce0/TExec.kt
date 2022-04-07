@@ -2121,7 +2121,7 @@ class TExec {
             set dn = Button $D{} @{} <.2 ()>:<(),()>
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{}\n    Button $D{}") { out }
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{} @{}\n    Button $D{} @{}") { out }
     }
     @Test
     fun q11_type_hier_sub_err () {
@@ -2131,7 +2131,7 @@ class TExec {
             set dn = Button.1 $D{} @{} ()
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{}\n    Button.1 $D{}") { out }
+        assert(out == "(ln 3, col 8): invalid assignment : type mismatch :\n    Button.2 $D{} @{}\n    Button.1 $D{} @{}") { out }
     }
 
     // IF / EXPR
@@ -2190,7 +2190,7 @@ class TExec {
             set x = Maybe $D{[()]} @{} <.2 [()]>: <(),[()]>  -- ERR: incompatible instance
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 7): invalid assignment : type mismatch :\n    Maybe $D{()}\n    Maybe $D{[()]}") { out }
+        assert(out == "(ln 3, col 7): invalid assignment : type mismatch :\n    Maybe $D{()} @{}\n    Maybe $D{[()]} @{}") { out }
     }
     @Test
     fun s04_maybe_err () {
@@ -2211,7 +2211,7 @@ class TExec {
             set x = y   -- ERR: incompatible instances
            """.trimIndent()
         )
-        assert(out == "(ln 4, col 7): invalid assignment : type mismatch :\n    Maybe $D{[()]}\n    Maybe $D{()}") { out }
+        assert(out == "(ln 4, col 7): invalid assignment : type mismatch :\n    Maybe $D{[()]} @{}\n    Maybe $D{()} @{}") { out }
     }
     @Test
     fun s06_maybe_concrete () {

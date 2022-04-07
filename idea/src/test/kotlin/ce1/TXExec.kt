@@ -1207,7 +1207,7 @@ class TXExec {
             output Std h!Bbb!Ccc!Eee.1
            """.trimIndent()
         )
-        assert(out == "(ln 10, col 17): invalid assignment : type mismatch :\n    Hier.Aaa $D{}\n    Hier.Bbb.Ccc.Eee $D{}") { out }
+        assert(out == "(ln 10, col 17): invalid assignment : type mismatch :\n    Hier.Aaa $D{} @{}\n    Hier.Bbb.Ccc.Eee $D{} @{}") { out }
     }
     @Test
     fun p16_type_hier_cast_ok () {

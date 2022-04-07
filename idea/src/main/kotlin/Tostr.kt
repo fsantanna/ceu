@@ -31,7 +31,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
                 " $D{" + this.xargs!!.map { it.tostr(lc) }.joinToString(",") + "}"
             }
             val scps = this.xscps.let { if (it==null) "" else it.let {
-                if (it.size == 0) "" else " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}"
+                " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}"
             }}
             this.tk.str + pak_subs + args + scps
         }
