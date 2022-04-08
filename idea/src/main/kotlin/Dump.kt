@@ -34,7 +34,7 @@ fun Type.dump (spc: Int = 0): String {
             "Named '" + this.tk.str + subs + args
         }
         is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (if (this.pub==null) "" else this.pub?.dump(spc+4)) + this.out.dump(spc+4)
-        is Type.Par -> error("bug found")
+        is Type.Par -> "Par " + this.tk.str + "\n" + this.xtype?.dump(spc+4)
     }
 }
 

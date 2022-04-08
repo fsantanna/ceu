@@ -22,8 +22,21 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
 }
 
 fun Type.xinfTypes (inf: Type?) {
+    /*
+    if (this is Type.Named && this.xargs==null) {
+        this.xargs = emptyList()
+    }
+    return
+
+     */
     when (this) {
         is Type.Unit, is Type.Nat, is Type.Par -> {}
+        /*
+        is Type.Par     -> {
+            assert(inf!! !is Type.Par)
+            this.xtype = inf
+        }
+         */
         is Type.Tuple   -> this.vec.forEach { it.xinfTypes(null) }
         is Type.Union   -> {
             this.common?.xinfTypes(null)
@@ -38,11 +51,24 @@ fun Type.xinfTypes (inf: Type?) {
             this.out.xinfTypes(null)
         }
         is Type.Named   -> {
-            if (this.xargs == null) {
-                //println(this.dump())
-                //println(inf)
-                // TODO: infer
+            if (this.xargs==null) {
                 this.xargs = emptyList()
+            }
+            return
+            val def = this.def()!!
+            when {
+                (this.xargs != null) -> {}
+                def.pars.isEmpty()   -> this.xargs = emptyList()
+                (def.args != null)   -> TODO() // should still use inf or copy def.args?
+                else -> {
+                    println(">>> Type.Named")
+                    println(def.tostr())
+                    //println(this.dump())
+                    println(inf)
+                    println(this.getUp())
+                    println("<<< Type.Named")
+                    this.xargs = null //def.emptyList()
+                }
             }
         }
     }
@@ -70,16 +96,13 @@ fun Expr.xinfTypes (inf: Type?) {
             this.type
         }
         is Expr.Pak -> {
-            //println("Expr.Pak")
-            //println(this.xtype?.toString())
-            //println(inf?.toString())
-            //println(">>>")
-            this.xtype?.xinfTypes(null)
-            //println("<<<")
+            //this.xtype?.xinfTypes(null)
             when {
                 (this.xtype != null) -> {
-                    //println("-=-=-")
-                    val tp = this.xtype!!
+                    val tp = this.xtype!! as Type.Named
+                    if (tp.xargs == null) {
+                        tp.xargs = emptyList()
+                    }
                     val unpak = tp.react_noalias(this)
                     this.e.xinfTypes(unpak)
                     //print(this.e.tostr() + ": ")
@@ -93,6 +116,7 @@ fun Expr.xinfTypes (inf: Type?) {
                 }
                 (inf?.noact() is Type.Named) -> {
                     this.e.xinfTypes(inf.react_noalias(this))
+                    this.xtype?.xinfTypes(null)
                     this.xtype = inf
                     inf
                 }
@@ -101,7 +125,7 @@ fun Expr.xinfTypes (inf: Type?) {
                     this.e.wtype!! //.react_noalias(this)
                 }
             }
-        }
+       }
         is Expr.Unpak -> {
             this.e.xinfTypes(inf)
             this.e.wtype!!.react_noalias(this)
@@ -185,8 +209,11 @@ fun Expr.xinfTypes (inf: Type?) {
                 assert(inf != null)
                     //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
-                val x = (inf as Type.Union).vec[num-1]
-                this.arg.xinfTypes(x)
+                val idx = (inf as Type.Union).vec[num-1]
+                this.arg.xinfTypes(idx)
+                if (idx is Type.Par) {
+                    idx.xtype = this.arg.wtype!!.clone(idx.tk, idx)
+                }
                 this.xtype = inf.clone(this.tk,this) as Type.Union
                 //print("UCons: " + this.tostr() + ": ")
                 //println(this.xtype?.tostr())
