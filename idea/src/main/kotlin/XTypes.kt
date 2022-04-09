@@ -22,6 +22,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
 }
 
 fun Type.xinfTypes (inf: Type?) {
+    //return
     /*
     if (this is Type.Named && this.xargs==null) {
         this.xargs = emptyList()
@@ -73,12 +74,12 @@ fun Type.xinfTypes (inf: Type?) {
     }
 }
 
-fun Expr.xinfTypes (inf: Type?) {
-    /*
-    val inf = if (inf_ !is Type.Named) inf_ else {
-        Type.Named(inf_.tk_, emptyList(), inf_.xisrec, inf_.xscps).setUpEnv(inf_.getUp()!!)
+fun Expr.xinfTypes (inf_: Type?) {
+    val inf = when {
+        (inf_ !is Type.Par) -> inf_
+        (inf_.xtype != null) -> inf_.xtype!!
+        else -> null
     }
-     */
     this.wtype = when (this) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
@@ -95,14 +96,19 @@ fun Expr.xinfTypes (inf: Type?) {
             this.type
         }
         is Expr.Pak -> {
+            val tp = this.xtype as Type.Named?
+            val ok = tp?.xargs==null
+            if (tp?.xargs == null) {
+                tp?.xargs = emptyList()
+            }
             when {
                 (this.xtype != null) -> {
-                    this.xtype?.xinfTypes(null)
                     val tp = this.xtype!! as Type.Named
                     val unpak = tp.react_noalias(this)
                     this.e.xinfTypes(unpak)
-                    //print(this.e.tostr() + ": ")
-                    //println(this.e.wtype?.tostr())
+                    if (ok) {
+                        tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
+                    }
                     if (!this.isact!!) tp else {
                         Type.Active(
                             Tk.Fix("active", this.tk.lin, this.tk.col),
@@ -499,12 +505,8 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             this.xtype?.xinfTypes(null)
         }
         is Stmt.Var -> {
-            //println("STMT.VAR")
-            //println(this.tostr())
             this.xtype = this.xtype ?: inf?.clone(this.tk,this)
             this.xtype?.xinfTypes(null)
-            //println(">>>")
-            //println(this.xtype)
         }
         is Stmt.Set -> {
             this.wup.let {
@@ -518,11 +520,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             }
             try {
                 this.dst.xinfTypes(null)
-                //println("-=-=-")
-                //println(this.tostr())
-                //println(this.dst.dump())
                 this.src.xinfTypes(this.dst.wtype!!)
-                //println("ok")
             } catch (e: Throwable){
                 if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e

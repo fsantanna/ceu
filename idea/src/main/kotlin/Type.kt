@@ -260,6 +260,28 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
     return ret
 }
 
+fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
+    // this = Maybe ${a} = <None=(), Some=a>
+    // tp   = <None=(), Some=_int>
+    // return ${_int}
+    val def = this.type.flattenLeft()
+    val oth = tp.flattenLeft()
+    val grp = def.zip(oth)                          // [ ((),()), (a,a._int) ]
+        .filter    { it.first is Type.Par }         // [ (a,a._int) ]
+        .map       { Pair(it.first.tk.str, (it.second as Type.Par).xtype!!) }  // [ (a,_int) ]
+        //.let { println(it);it }
+        .groupBy   { it.first }                     // { a=[(a,_int)] }
+        .mapValues { it.value.map { it.second } }   // { a=[_int] }
+        .let {
+            assert(it.values.all { it.size==1 }) {
+                "TODO: multiple instances"
+            }
+            it
+        }
+        .mapValues { it.value.first() }                 // { a=_int }
+    return this.pars.map { grp[it.str]!! }
+}
+
 /*
 fun Stmt.Typedef.instantiate1 (args: List<Type>): Stmt.Typedef {
     println(args)

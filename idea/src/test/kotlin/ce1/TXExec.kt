@@ -1621,14 +1621,6 @@ class TXExec {
     // PARAMETRIC TYPES / GENERICS
 
     @Test
-    fun s00_maybe () {
-        val out = test(true, """
-            type Maybe $D{a} = <None=(), Some=${D}a>
-            var x = Maybe.Some _10:_int
-       """.trimIndent(), true)
-        assert(out == "10\n") { out }
-    }
-    @Test
     fun s01_maybe () {
         val out = test(true, """
             type Maybe $D{a} = <None=(), Some=${D}a>
@@ -1646,7 +1638,7 @@ class TXExec {
             output Std x!Some
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 7): invalid assignment : type mismatch :\n    Maybe $D{()}\n    Maybe $D{[()]}") { out }
+        assert(out == "(ln 10, col 20): invalid assignment : type mismatch :\n    Maybe $D{()} @{}\n    Maybe.Some $D{[()]} @{}") { out }
     }
     @Test
     fun s05_maybe_err () {
@@ -1657,6 +1649,6 @@ class TXExec {
             set x = y   -- ERR: incompatible instances
            """.trimIndent()
         )
-        assert(out == "(ln 4, col 7): invalid assignment : type mismatch :\n    Maybe $D{[()]}\n    Maybe $D{()}") { out }
+        assert(out == "(ln 12, col 7): invalid assignment : type mismatch :\n    Maybe.Some $D{[()]} @{}\n    Maybe.Some $D{()} @{}") { out }
     }
 }
