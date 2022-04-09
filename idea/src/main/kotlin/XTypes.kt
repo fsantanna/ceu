@@ -6,6 +6,20 @@ import java.lang.Integer.max
 //  var x: <(),()> = <.1>: ?
 //  var x: _int = _v: ?
 
+fun Stmt.setXargs () {
+    // set Type.Named.xargs=${} when typedef is also empty
+    fun ft (tp: Type) {
+        when (tp) {
+            is Type.Named -> {
+                if (tp.def()!!.pars.isEmpty()) {
+                    tp.xargs = emptyList()
+                }
+            }
+        }
+    }
+    this.visit(null, null, ::ft, null)
+}
+
 fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     fun Type.aux (): Type {
         return when (this) {
@@ -21,59 +35,6 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     return this.aux().clone(this.tk,up)
 }
 
-fun Type.xinfTypes (inf: Type?) {
-    //return
-    /*
-    if (this is Type.Named && this.xargs==null) {
-        this.xargs = emptyList()
-    }
-    return
-
-     */
-    when (this) {
-        is Type.Unit, is Type.Nat -> {}
-        is Type.Par     -> {
-            //assert(inf!! !is Type.Par)
-            this.xtype = inf
-        }
-        is Type.Tuple   -> this.vec.forEach { it.xinfTypes(null) }
-        is Type.Union   -> {
-            this.common?.xinfTypes(null)
-            this.vec.forEach { it.xinfTypes(null) }
-        }
-        is Type.Pointer -> this.pln.xinfTypes(null)
-        is Type.Active  -> this.tsk.xinfTypes(null)
-        is Type.Actives -> this.tsk.xinfTypes(null)
-        is Type.Func    -> {
-            this.inp.xinfTypes(null)
-            this.pub?.xinfTypes(null)
-            this.out.xinfTypes(null)
-        }
-        is Type.Named   -> {
-            if (this.xargs==null) {
-                this.xargs = emptyList()
-            }
-            return
-            val def = this.def()!!
-            when {
-                (this.xargs != null) -> {}
-                def.pars.isEmpty()   -> this.xargs = emptyList()
-                (def.args != null)   -> TODO() // should still use inf or copy def.args?
-                else -> {
-                    println(">>> Type.Named")
-                    println(def.tostr())
-                    //println(this.dump())
-                    println(inf)
-                    println(this.getUp())
-                    println("<<< Type.Named")
-                    this.xargs = null //def.emptyList()
-                }
-            }
-        }
-        else -> TODO()
-    }
-}
-
 fun Expr.xinfTypes (inf_: Type?) {
     val inf = when {
         (inf_ !is Type.Par) -> inf_
@@ -83,7 +44,6 @@ fun Expr.xinfTypes (inf_: Type?) {
     this.wtype = when (this) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
-            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -91,7 +51,6 @@ fun Expr.xinfTypes (inf_: Type?) {
             this.xtype!!
         }
         is Expr.Cast -> {
-            this.type.xinfTypes(null)
             this.e.xinfTypes(inf)
             this.type
         }
@@ -117,13 +76,11 @@ fun Expr.xinfTypes (inf_: Type?) {
                     }
                 }
                 (inf?.noact() is Type.Named) -> {
-                    this.xtype?.xinfTypes(null)
                     this.e.xinfTypes(inf.react_noalias(this))
                     this.xtype = inf
                     inf
                 }
                 else -> {
-                    this.xtype?.xinfTypes(null)
                     this.e.xinfTypes(inf?.react_noalias(this))
                     this.e.wtype!! //.react_noalias(this)
                 }
@@ -198,7 +155,6 @@ fun Expr.xinfTypes (inf_: Type?) {
             Type.Tuple(this.tk_, this.arg.map { it.wtype!! }, null)
         }
         is Expr.UCons -> {
-            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -226,7 +182,6 @@ fun Expr.xinfTypes (inf_: Type?) {
             }
         }
         is Expr.UNull -> {
-            this.xtype?.xinfTypes(null)
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
@@ -253,7 +208,6 @@ fun Expr.xinfTypes (inf_: Type?) {
             )
         }
         is Expr.Func -> {
-            this.xtype?.xinfTypes(null)
             if (this.xtype == null) {
                 assert(inf != null) { "bug found" }
                 All_assert_tk(this.tk, inf is Type.Func) {
@@ -326,10 +280,6 @@ fun Expr.xinfTypes (inf_: Type?) {
             // not possible to infer big (union) from small (disc/pred)
             this.uni.xinfTypes(null)
             val xtp = this.uni.wtype!!
-            //println("-=-=-=-")
-            //println(this.dump())
-            //println(this.uni.dump())
-            //println(this.uni.wtype!!.dump())
             All_assert_tk(this.tk, xtp is Type.Union) {
                 "invalid predicate : not an union"
             }
@@ -499,14 +449,9 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         return Type.Unit(Tk.Fix("()", this.tk.lin, this.tk.col)).setUpEnv(this)
     }
     when (this) {
-        is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn -> {}
-        is Stmt.Typedef -> {
-            this.type.xinfTypes(null)
-            this.xtype?.xinfTypes(null)
-        }
+        is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn, is Stmt.Typedef -> {}
         is Stmt.Var -> {
             this.xtype = this.xtype ?: inf?.clone(this.tk,this)
-            this.xtype?.xinfTypes(null)
         }
         is Stmt.Set -> {
             this.wup.let {
@@ -514,7 +459,6 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                     if (this.src is Expr.Func) {
                         // TODO: remove hack
                         it.s1.xtype = this.src.xtype!!.clone(it.s1.tk, it.s1)
-                        it.s1.xtype!!.xinfTypes(null)
                     }
                 }
             }
@@ -560,7 +504,6 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             //    "invalid inference : undetermined type"
             //}
             // inf is at least Unit
-            this.xtype?.xinfTypes(null)
             this.arg.xinfTypes(null)
             this.dst?.xinfTypes(null)
             this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this.tk,this) ?: unit()

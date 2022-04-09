@@ -286,15 +286,13 @@ class TXExec {
 
     @Test
     fun b09_union () {
-        val out = test(
-            true, """
-                type List = </List>
-                var x: /List = Null
-                var y: <//List> = <.1 /x>
-                output Std /y
-                output Std y!1\
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type List = </List>
+            var x: /List = Null
+            var y: <//List> = <.1 /x>
+            output Std /y
+            output Std y!1\
+        """.trimIndent())
         //assert(out == "(ln 3, col 7): invalid assignment of \"x\" : borrowed in line 2") { out }
         assert(out == "<.1 _>\nNull\n") { out }
     }

@@ -154,11 +154,9 @@ fun Type.toce (): String {
     return when (this) {
         is Type.Unit    -> "Unit"
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
-        //is Type.Named   -> this.tk.str
-        is Type.Named   -> concrete(this.tk.str, this.xargs!!) //.let { println(it);it }
+        is Type.Named   -> concrete(this.tk.str, this.xargs!!)
         is Type.Nat     -> this.tk_.payload().replace('*','_')
-        //is Type.Par     -> this.tk.str //.drop(1)
-        is Type.Par     -> { /*println(this.xtype) ;*/ this.xtype.let { if (it==null) "TODO" else it.toce() } }//this.tk.str //.drop(1)
+        is Type.Par     -> this.xtype.let { if (it==null) "TODO" else it.toce() }
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"
@@ -238,10 +236,7 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
     }.toMap()
     fun ft (tp: Type) {
         when (tp) {
-            is Type.Par -> {
-                tp.xtype = p2a[tp.tk.str]!!
-                //println(tp.tk.str + " = " + tp.xtype!!.tostr())
-            }
+            is Type.Par -> tp.xtype = p2a[tp.tk.str]!!
         }
     }
     val ret = Stmt.Typedef (
@@ -281,30 +276,3 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
         .mapValues { it.value.first() }                 // { a=_int }
     return this.pars.map { grp[it.str]!! }
 }
-
-/*
-fun Stmt.Typedef.instantiate1 (args: List<Type>): Stmt.Typedef {
-    println(args)
-    val p2a = this.pars.zip(args).map {
-        Pair(it.first.str, it.second)
-    }.toMap()
-    fun Type.aux (): Type {
-        return when (this) {
-            is Type.Unit, is Type.Nat -> this
-            is Type.Par -> p2a[this.tk.str]!!
-            is Type.Union -> Type.Union(this.tk_, this.common, this.vec.map { it.aux() }, this.yids)
-            else -> TODO(this.toString())
-        }.clone(this.tk, this)
-    }
-    return Stmt.Typedef (
-        this.tk_,
-        this.isinc,
-        this.pars,
-        args.map { it.clone(this.tk,this) },
-        this.xscp1s,
-        this.type.aux(),
-        this.xtype!!.aux(),
-        this.xisact
-    )
-}
- */

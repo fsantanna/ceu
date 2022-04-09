@@ -13,12 +13,11 @@ fun concrete (str:String, args:List<Type>): String {
 
 fun Type.pos (): String {
     return when (this) {
-        is Type.Named   -> concrete(this.tk.str, this.xargs!!) //.let { println(it);it }
+        is Type.Named   -> concrete(this.tk.str, this.xargs!!)
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
-        //is Type.Par     -> this.xtype.let { if (it == null) this.tk.str/*.drop(1)*/ else it.pos() }
-        is Type.Par     -> { /*println(this.xtype) ;*/ this.xtype.let { if (it==null) "TODO" else it.pos() } }//this.tk.str //.drop(1)
+        is Type.Par     -> this.xtype.let { if (it==null) "TODO" else it.pos() }
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()

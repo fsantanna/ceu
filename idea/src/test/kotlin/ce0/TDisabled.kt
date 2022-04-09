@@ -18,6 +18,7 @@ class TDisabled {
             s.setScp1s()
             s.setEnvs(null)
             check_00_after_envs(s)
+            s.setXargs()
             check_01_before_tps(s)
             //s.setTypes()
             s.setScp2s()
