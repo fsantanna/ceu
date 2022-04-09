@@ -206,9 +206,9 @@ val prelude1 = """
     
 """.trimIndent()
 
-fun test (ce1: Boolean, inp: String): String {
+fun test (ce1: Boolean, inp: String, incpre: Boolean=true): String {
     CE1 = ce1
-    val (ok1,out1) = ce2c(null, (if (ce1) prelude1 else "")+inp)
+    val (ok1,out1) = ce2c(null, (if (ce1&&incpre) prelude1 else "")+inp)
     if (!ok1) {
         return out1
     }

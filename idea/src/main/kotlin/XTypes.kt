@@ -30,13 +30,11 @@ fun Type.xinfTypes (inf: Type?) {
 
      */
     when (this) {
-        is Type.Unit, is Type.Nat, is Type.Par -> {}
-        /*
+        is Type.Unit, is Type.Nat -> {}
         is Type.Par     -> {
-            assert(inf!! !is Type.Par)
+            //assert(inf!! !is Type.Par)
             this.xtype = inf
         }
-         */
         is Type.Tuple   -> this.vec.forEach { it.xinfTypes(null) }
         is Type.Union   -> {
             this.common?.xinfTypes(null)
@@ -71,6 +69,7 @@ fun Type.xinfTypes (inf: Type?) {
                 }
             }
         }
+        else -> TODO()
     }
 }
 
@@ -96,13 +95,10 @@ fun Expr.xinfTypes (inf: Type?) {
             this.type
         }
         is Expr.Pak -> {
-            //this.xtype?.xinfTypes(null)
             when {
                 (this.xtype != null) -> {
+                    this.xtype?.xinfTypes(null)
                     val tp = this.xtype!! as Type.Named
-                    if (tp.xargs == null) {
-                        tp.xargs = emptyList()
-                    }
                     val unpak = tp.react_noalias(this)
                     this.e.xinfTypes(unpak)
                     //print(this.e.tostr() + ": ")
@@ -115,12 +111,13 @@ fun Expr.xinfTypes (inf: Type?) {
                     }
                 }
                 (inf?.noact() is Type.Named) -> {
-                    this.e.xinfTypes(inf.react_noalias(this))
                     this.xtype?.xinfTypes(null)
+                    this.e.xinfTypes(inf.react_noalias(this))
                     this.xtype = inf
                     inf
                 }
                 else -> {
+                    this.xtype?.xinfTypes(null)
                     this.e.xinfTypes(inf?.react_noalias(this))
                     this.e.wtype!! //.react_noalias(this)
                 }

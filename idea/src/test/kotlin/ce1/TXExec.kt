@@ -1621,6 +1621,14 @@ class TXExec {
     // PARAMETRIC TYPES / GENERICS
 
     @Test
+    fun s00_maybe () {
+        val out = test(true, """
+            type Maybe $D{a} = <None=(), Some=${D}a>
+            var x = Maybe.Some _10:_int
+       """.trimIndent(), true)
+        assert(out == "10\n") { out }
+    }
+    @Test
     fun s01_maybe () {
         val out = test(true, """
             type Maybe $D{a} = <None=(), Some=${D}a>

@@ -62,8 +62,8 @@ fun Scope.isNestIn (sub: Scope, up: Any): Boolean {
 
 fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
     return when {
-        (this is Type.Par) -> this.xtype!!.isSupOf(sub)
-        (sub  is Type.Par) -> this.isSupOf(sub.xtype!!)
+        (this is Type.Par) -> this.xtype.let { it==null || it.isSupOf(sub) }
+        (sub  is Type.Par) -> sub.xtype.let { it==null || this.isSupOf(it) }
         (this is Type.Nat || sub is Type.Nat) -> true
         (this is Type.Active && sub is Type.Actives) -> this.tsk.isSupOf(sub.tsk)
         (this is Type.Active && sub is Type.Active)  -> this.tsk.isSupOf(sub.tsk)
