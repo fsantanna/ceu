@@ -70,11 +70,11 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
         is Expr.Var   -> this.tk.str
         is Expr.Nat   -> if (this.xtype==null) this.tk.str else "(" + this.tk.str + ": " + this.xtype!!.tostr(lc) + ")"
         is Expr.Cast  -> this.e.tostr(lc) + " :: " + this.type.tostr(lc)
-        is Expr.Pak   -> {
+        is Expr.Named   -> {
             val hassubs = this.xtype?.noact().let { it!=null && ((it as Type.Named).subs.size > 0) }
             if (this.xtype==null) this.e.tostr(lc) else ("(" + this.xtype!!.tostr(lc,true) + " " + this.e.tostr(lc,hassubs) + ")")
         }
-        is Expr.Unpak -> this.e.wtype.let {
+        is Expr.UNamed -> this.e.wtype.let {
             if (it==null || it.noact() !is Type.Named) {
                 this.e.tostr(lc)
             } else {

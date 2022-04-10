@@ -44,8 +44,8 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Var   -> "Var '" + this.tk.str + "'\n"
         is Expr.Nat   -> "Nat '" + this.tk.str + "'\n" + this.xtype?.dump(spc+4)
         is Expr.Cast  -> "Cast\n" + this.e.dump(spc+4) + this.type.dump(spc+4)
-        is Expr.Pak   -> "Pak\n" + (this.xtype?.dump(spc+4)?:none(spc+4)) + this.e.dump(spc+4)
-        is Expr.Unpak -> "Unpak\n" + this.e.dump(spc+4)
+        is Expr.Named   -> "Pak\n" + (this.xtype?.dump(spc+4)?:none(spc+4)) + this.e.dump(spc+4)
+        is Expr.UNamed -> "Unpak\n" + this.e.dump(spc+4)
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)
         is Expr.TCons -> "TCons\n" + this.arg.map { it.dump(spc+4) }.joinToString("")

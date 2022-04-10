@@ -1,8 +1,17 @@
 - Lines=4879, LoC=2945 (2022-03-10)
+- Lines=5803, LoC=3785 (2022-04-09)
+- DOCS
+    - idea install
+    - binary download
+    - manual
 - emit EVENT_TASK to correct scope (not GLOBAL)
   - can infer from func signature
-- Main.kt: EXPR_WTYPE
+- emit @SELF (birds)
+    - not working
 - bugs
+  - tostr() specify if ce0/ce1 output
+  - Event/Error 32 bytes payloas
+  - Main.kt: EXPR_WTYPE
   - Expr.pre stmt
     - Call, Func, UCons, New, UDisc, New
     - they all may have stmt called before actual expr
@@ -11,14 +20,53 @@
   - atcive currently w/o check scopes (they should be trated as pointers)
   - access to Dyn out of DLoop should require Watching
   - check if recursive type is plain union (not pointer to it)
+  - loop: invert block/catch
+  - func *clone*: bug pointer
+  - test to fail Expr.Ifs
+    - coloca que valor de retorno no else?
+        - copy from [idx-1]
+  - Werror gcc
+    - cast int->void*
 - List @[...].1 doesnt work
-- command to kill task
-- check pause/resume types
-- abstract types -> cannot be in UCons
-  - Event, Error
-  - otherwise, problem with ?
+- toenum List.Cons -> 2
+- PARAMETRIC
+    - simplify when size=1
+        - ${a} -> $a
+        - @{a} -> @a
+- TASKS
+    - command to kill task
+    - check pause/resume types
+- ADTS
+    - abstract types -> cannot be in UCons
+        - Event, Error
+        - otherwise, problem with ?
+    - type stretching
+        - multi-level?
+    - global
+        - input, output
+            - ommit Pico.Output.x -> Pico.x
+        - emit ~Event~.Pico.Draw
+        - input Std: _char
+            - is this working?
+- TYPES
+    - Int, Bool, Maybe, String
+- PICO
+    - tratar Input->Event em Ceu
+- operators
+    - ${ 1 + 1 }
+- a!Mouse if a?Mouse
+    - a?!Mouse -> ...
+- explicit `free`
+- structural *equal* primitive
 - ce1:
-  - func f <-- var f = func
+  - enum { OPT1, OPT2 } --> type <OPT1=(),...>
+  - main w/ implicit spawn?
+  - do { ... }
+    - return @x v
+        - set ret=v; throw Error.Escape @x
+  - remove where/until?
+    - first add do { ... }
+  - optional pub parameter
     - () -> [() ->] ()
   - if/until condition
     - _int -> Bool:<(),()>
@@ -26,10 +74,6 @@
   - defer
   - var [x,y] = arg   (arg is tuple)
   - option, subtyping, generics, typeclass
-  - return -> escape?
-    - cross task
-    - SetBlock
-      - var x: () = { ... escape () }
   - collections:
     - tuples
       x = [1,2,3]
@@ -65,8 +109,8 @@
   - static alloc for clo/task that do not escape
     - should them even have a @clo annotation?
 - catch N, throw N (N = argument)
-- explicit `free`
 - test block pass w/o data (e.g., internal `new` call)
+- remove unpack?
 - reserve `arg`,`pub`,`evt`,`ret`
 - DLoop:
   - cannot await inside dloop, would loose the stack with TASK_POOL at top

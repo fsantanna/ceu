@@ -266,7 +266,7 @@ class TParser {
         All_restart(null, PushbackReader(StringReader("Point \${} @{} ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Pak && e.tk.str=="Point")
+        assert(e is Expr.Named && e.tk.str=="Point")
         /*
         try {
             Parser.expr()

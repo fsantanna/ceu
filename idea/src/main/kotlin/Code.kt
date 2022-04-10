@@ -414,7 +414,7 @@ fun code_fe (e: Expr) {
             }
             Code(ex.type+tp.type, ex.struct+tp.struct, ex.func+tp.func, ex.stmt+tp.stmt+pre, pos)
         }
-        is Expr.Pak   -> {
+        is Expr.Named   -> {
             val tp = if (e.xtype==null) Code("","","","","") else CODE.removeFirst()
             val ex = CODE.removeFirst()
             val v = if (e.xtype==null || e.e.wtype !is Type.Union) ex.expr else {
@@ -423,7 +423,7 @@ fun code_fe (e: Expr) {
             }
             Code(tp.type+ex.type, tp.struct+ex.struct, tp.func+ex.func, tp.stmt+ex.stmt, tp.expr+v)
         }
-        is Expr.Unpak -> CODE.removeFirst().let {
+        is Expr.UNamed -> CODE.removeFirst().let {
             Code(it.type, it.struct, it.func, it.stmt, it.expr)
         }
         is Expr.Field -> CODE.removeFirst().let {

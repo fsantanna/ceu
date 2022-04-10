@@ -39,7 +39,7 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
-            is Expr.Pak   -> {
+            is Expr.Named   -> {
                 e.xtype?.let {
                     val dst = it.noactnoalias()
                     val src = e.e.wtype!!.noact()
@@ -48,7 +48,7 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
-            is Expr.Unpak -> {
+            is Expr.UNamed -> {
                 All_assert_tk(e.tk, e.isinf || e.e.wtype?.noact().let { it is Type.Named || it is Type.Nat }) {
                     "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
@@ -62,7 +62,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New   -> {
-                All_assert_tk(e.tk, ((e.arg as Expr.Pak).xtype!! as Type.Named).xisrec) {
+                All_assert_tk(e.tk, ((e.arg as Expr.Named).xtype!! as Type.Named).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
@@ -171,7 +171,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
                 val dst = (s.dst.wtype!! as Type.Actives).tsk
                 //println("invalid `spawn` : type mismatch : ${dst.str} = ${call.str}")
-                val alias = if (call.f !is Expr.Unpak) ftp else call.f.e.wtype!!
+                val alias = if (call.f !is Expr.UNamed) ftp else call.f.e.wtype!!
                 All_assert_tk(s.tk, dst.isSupOf(alias)) {
                     "invalid `spawn` : ${mismatch(dst,alias)}"
                 }

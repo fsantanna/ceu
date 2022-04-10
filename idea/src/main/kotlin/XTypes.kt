@@ -54,7 +54,7 @@ fun Expr.xinfTypes (inf_: Type?) {
             this.e.xinfTypes(inf)
             this.type
         }
-        is Expr.Pak -> {
+        is Expr.Named -> {
             val tp = this.xtype as Type.Named?
             val ok = tp?.xargs==null
             if (tp?.xargs == null) {
@@ -86,7 +86,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 }
             }
        }
-        is Expr.Unpak -> {
+        is Expr.UNamed -> {
             this.e.xinfTypes(inf)
             this.e.wtype!!.react_noalias(this)
         }

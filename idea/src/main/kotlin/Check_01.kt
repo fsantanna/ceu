@@ -83,7 +83,7 @@ fun check_01_before_tps (s: Stmt) {
             }
 
             is Expr.New  -> {
-                All_assert_tk(e.tk, e.arg is Expr.Pak) {
+                All_assert_tk(e.tk, e.arg is Expr.Named) {
                     "invalid `new` : expected named type"
                 }
                 e.xscp?.check(e)

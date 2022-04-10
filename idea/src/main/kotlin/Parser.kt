@@ -319,7 +319,7 @@ object Parser
                         Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                     }
                 }
-                Expr.Pak(id, e, isact, tp)
+                Expr.Named(id, e, isact, tp)
             }
             alls.acceptFix("[") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -348,7 +348,7 @@ object Parser
                 alls.acceptFix_err("]")
                 val ret = Expr.TCons(tk0, es, ids)
                 if (!CE1) ret else {
-                    Expr.Pak(ret.tk, ret, null, null)
+                    Expr.Named(ret.tk, ret, null, null)
                 }
             }
             alls.acceptFix("<") -> {
@@ -378,13 +378,13 @@ object Parser
                 if (tp != null) {
                     Expr.UCons(dsc, tp as Type.Union?, cons)
                 } else {
-                    Expr.Pak(dsc, Expr.UCons(dsc, tp as Type.Union?, cons), null, null)
+                    Expr.Named(dsc, Expr.UCons(dsc, tp as Type.Union?, cons), null, null)
                 }
             }
             alls.acceptFix("new") -> {
                 val tk0 = alls.tk0
                 val e = this.expr()
-                All_assert_tk(tk0, e is Expr.Pak || (e is Expr.UCons)) {
+                All_assert_tk(tk0, e is Expr.Named || (e is Expr.UCons)) {
                     "invalid `new` : expected constructor"
                 }
 
@@ -501,8 +501,8 @@ object Parser
                 alls.tk0 as Tk.Scp
             }
             e = Expr.Call(e.tk,
-                if (e is Expr.Unpak || !CE1) e else {
-                    Expr.Unpak(Tk.Fix("~",e.tk.lin,e.tk.col), true, e)
+                if (e is Expr.UNamed || !CE1) e else {
+                    Expr.UNamed(Tk.Fix("~",e.tk.lin,e.tk.col), true, e)
                 },
                 arg,
                 Pair(
@@ -511,7 +511,7 @@ object Parser
                 )
             )
             if (CE1) {
-                e = Expr.Pak(e.tk, e, null, null)
+                e = Expr.Named(e.tk, e, null, null)
             }
         }
         return e
@@ -539,7 +539,7 @@ object Parser
                 } else {
                     val str = if (tk0.str == "!") "discriminator" else "predicate"
                     if (alls.tk0.str == "Null") {
-                        All_assert_tk(alls.tk0, tk0.str=="?" && (e is Expr.Dnref || (e is Expr.Unpak && e.e is Expr.Dnref))) {
+                        All_assert_tk(alls.tk0, tk0.str=="?" && (e is Expr.Dnref || (e is Expr.UNamed && e.e is Expr.Dnref))) {
                             "invalid $str : union cannot be null"
                         }
                     }
@@ -551,9 +551,9 @@ object Parser
                 //  pt.x, list!1, list?0
                 e = when {
                     !CE1 -> e
-                    (e is Expr.Unpak) -> e
+                    (e is Expr.UNamed) -> e
                     (e is Expr.UPred) -> e
-                    else -> Expr.Unpak(tk0,true,e)
+                    else -> Expr.UNamed(tk0,true,e)
                 }
             }
 
@@ -571,7 +571,7 @@ object Parser
                     }
                     Expr.Dnref(tk0, e)
                 }
-                "~" -> Expr.Unpak(tk0, false, e)
+                "~" -> Expr.UNamed(tk0, false, e)
                 "?" -> Expr.UPred(alls.tk0, e)
                 "!" -> Expr.UDisc(alls.tk0, e)
                 "." -> {
@@ -848,8 +848,8 @@ object Parser
             alls.acceptFix("output") -> {
                 val tk = alls.tk0 as Tk.Fix
                 val arg1 = this.expr()
-                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
-                arg1 as Expr.Pak
+                All_assert_tk(arg1.tk, arg1 is Expr.Named) { "expected constructor" }
+                arg1 as Expr.Named
                 val arg2 = if (arg1.tk.str == "Output") arg1 else {
                     All_assert_tk(arg1.tk, CE1) {
                         "expected \"Output\" constructor : have \"${arg1.tk.str}\""
@@ -857,7 +857,7 @@ object Parser
                     val nopar = arg1.tostr().removeSurrounding("(",")")
                     All_nest("Output.$nopar\n") {
                         this.expr()
-                    } as Expr.Pak
+                    } as Expr.Named
                 }
                 All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
                 Stmt.Output(tk, arg2)
@@ -867,8 +867,8 @@ object Parser
                 val tk = alls.tk0 as Tk.Fix
 
                 val arg1 = this.expr()
-                All_assert_tk(arg1.tk, arg1 is Expr.Pak) { "expected constructor" }
-                arg1 as Expr.Pak
+                All_assert_tk(arg1.tk, arg1 is Expr.Named) { "expected constructor" }
+                arg1 as Expr.Named
                 val arg2 = if (arg1.tk.str == "Input") arg1 else {
                     All_assert_tk(arg1.tk, CE1) {
                         "expected \"Input\" constructor : have \"${arg1.tk.str}\""
@@ -876,7 +876,7 @@ object Parser
                     val nopar = arg1.tostr().removeSurrounding("(",")")
                     All_nest("Input.$nopar\n") {
                         this.expr()
-                    } as Expr.Pak
+                    } as Expr.Named
                 }
                 All_assert_tk(arg2.e.tk, arg2.e is Expr.UCons) { "expected union constructor" }
 
