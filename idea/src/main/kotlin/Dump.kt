@@ -16,7 +16,10 @@ internal fun none (spc: Int): String {
 }
 
 fun Type.dump (spc: Int = 0): String {
-    return "[${this.tk.lin}] " + " ".repeat(spc) + "Type." + when (this) {
+    fun pre (n:Int): String {
+        return "[${this.tk.lin}] " + " ".repeat(spc+n)
+    }
+    return pre(0) + "Type." + when (this) {
         is Type.Unit -> "Unit\n"
         is Type.Nat  -> "Nat '" + this.tk.str + "'\n"
         is Type.Pointer -> "Pointer " + (this.xscp?.scp1?.str ?: "none") + "\n" + this.pln.dump(spc+4)
@@ -27,24 +30,27 @@ fun Type.dump (spc: Int = 0): String {
         is Type.Named -> {
             val subs = this.subs.map { '.'+it.str }.joinToString("") + "'\n"
             val args = if (this.xargs == null) {
-                " ".repeat(spc+8)+"no args\n"
+                pre(4) + "no args\n"
             } else {
-                this.xargs!!.map {it.dump(spc+4) }?.joinToString("")
+                this.xargs!!.map {it.dump(spc+4) }.joinToString("")
             }
             "Named '" + this.tk.str + subs + args
         }
-        is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (if (this.pub==null) "" else this.pub?.dump(spc+4)) + this.out.dump(spc+4)
-        is Type.Par -> "Par " + this.tk.str + "\n" + this.xtype?.dump(spc+4)
+        is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (this.pub?.dump(spc+4)?:pre(4)+"no pub\n") + this.out.dump(spc+4)
+        is Type.Par -> "Par " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n")
     }
 }
 
 fun Expr.dump (spc: Int = 0): String {
-    return "[${this.tk.lin}] " + " ".repeat(spc) + "Expr." + when (this) {
+    fun pre (n:Int=0): String {
+        return "[${this.tk.lin}] " + " ".repeat(spc+n)
+    }
+    return pre(0) + "Expr." + when (this) {
         is Expr.Unit  -> "Unit\n"
         is Expr.Var   -> "Var '" + this.tk.str + "'\n"
-        is Expr.Nat   -> "Nat '" + this.tk.str + "'\n" + this.xtype?.dump(spc+4)
+        is Expr.Nat   -> "Nat '" + this.tk.str + "'\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n")
         is Expr.Cast  -> "Cast\n" + this.e.dump(spc+4) + this.type.dump(spc+4)
-        is Expr.Named   -> "Pak\n" + (this.xtype?.dump(spc+4)?:none(spc+4)) + this.e.dump(spc+4)
+        is Expr.Named   -> "Pak\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n") + this.e.dump(spc+4)
         is Expr.UNamed -> "Unpak\n" + this.e.dump(spc+4)
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)
@@ -57,23 +63,26 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.UPred -> "UPred ?" + this.tk.str + "\n" + this.uni.dump(spc+4)
         is Expr.New   -> "New\n" + this.arg.dump(spc+4)
         is Expr.Call  -> "Call\n" + this.f.dump(spc+4) + this.arg.dump(spc+4)
-        is Expr.Func  -> "Func\n" + this.xtype?.dump(spc+4) + this.block.dump(spc+4)
+        is Expr.Func  -> "Func\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n") + this.block.dump(spc+4)
         is Expr.If    -> "If\n" + this.tst.dump(spc+4) + this.true_.dump(spc+4) + this.false_.dump(spc+4)
     }
 }
 
 fun Stmt.dump (spc: Int = 0): String {
-    return "[${this.tk.lin}] " + " ".repeat(spc) + "Stmt." + when (this) {
+    fun pre (n:Int=0): String {
+        return "[${this.tk.lin}] " + " ".repeat(spc+n)
+    }
+    return pre() + "Stmt." + when (this) {
         is Stmt.Nop -> "Nop\n"
         is Stmt.Native -> "Native " + this.tk.str + "\n"
-        is Stmt.Var -> "Var " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: " ".repeat(spc+8)+"no type\n")
+        is Stmt.Var -> "Var " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n")
         is Stmt.Set -> "Set\n" + this.dst.dump(spc+4) + this.src.dump(spc+4)
         is Stmt.XBreak -> "Break\n"
         is Stmt.XReturn -> "Return\n"
         is Stmt.Seq -> "Seq\n" + this.s1.dump(spc+4) + this.s2.dump(spc+4)
         is Stmt.SCall -> "SCall\n" + this.e.dump(spc+4)
         is Stmt.Input -> "Input " + "\n" +
-                (this.xtype?.dump(spc+4) ?: "") +
+                (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n") +
                 (if (this.dst == null) none(spc+4) else this.dst.dump(spc+4)) +
                 this.arg.dump(spc+4)
         is Stmt.Output -> "Output " + "\n" + this.arg.dump(spc+4)
