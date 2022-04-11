@@ -16,7 +16,12 @@ object Parser
                     val args = mutableListOf<Type>()
                     if (!alls.checkFix("}")) {
                         while (true) {
-                            val tp = Parser.type()
+                            val id = alls.acceptVar("id")
+                            val tp = if (id) {
+                                Type.Par(Tk.Par(alls.tk0.str,alls.tk0.lin,alls.tk0.col), null)
+                            } else {
+                                Parser.type()
+                            }
                             args.add(tp)
                             if (!alls.acceptFix(",")) {
                                 break

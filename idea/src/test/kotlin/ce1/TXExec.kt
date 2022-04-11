@@ -1649,4 +1649,132 @@ class TXExec {
         )
         assert(out == "(ln 12, col 7): invalid assignment : type mismatch :\n    Maybe.Some $D{[()]} @{}\n    Maybe.Some $D{()} @{}") { out }
     }
+
+    @Test
+    fun s06_list_err () {
+        val out = test(true, """
+            type List $D{a} = <Cons=/List $D{a}>
+            var x = new List.Cons Null
+            output Std x
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun s07_list () {
+        val out = test(true, """
+            type List $D{a} = <Cons=[${D}a,/List $D{a}]>
+            var x = new List.Cons [_10:_int,Null]
+            output Std x
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun s08_list () {
+        val out = test(
+            true, """
+                type List $D{a}= <[(),/List]>
+                var x: /List = new <.1 [(),Null]>
+                var y: [(),/List] = [(), new <.1 [(),Null]>]
+                var z = [(), /x]
+                output Std z.2\\!1.2
+            """.trimIndent()
+        )
+        assert(out == "Null\n") { out }
+    }
+    @Test
+    fun s09_list () {
+        val out = test(
+            true, """
+                type List = <[//List,/List]>
+                var x: /List = new <.1 [_(&printf),Null]>
+                set x\!1.1 = /x
+                output Std x
+                output Std x\!1.1\
+            """.trimIndent()
+        )
+        assert(out == "<.1 [_,Null]>\n<.1 [_,Null]>\n") { out }
+    }
+    @Test
+    fun s10_list () {
+        val out = test(
+            true, """
+                type List = <(),/List>
+                var l: /List = new <.2 new <.1>>
+                var t1 = [l]
+                var t2 = [t1.1]
+                output Std /t2
+            """.trimIndent()
+        )
+        assert(out == "[<.2 <.1>>]\n") { out }
+    }
+    @Test
+    fun s11_list () {
+        val out = test(
+            true, """
+                type List = <(),/List>
+                var l: /List = new <.2 new <.1>>
+                var t1 = [(), l]
+                var t2 = [(), t1.2]
+                output Std /t2
+            """.trimIndent()
+        )
+        assert(out == "[(),<.2 <.1>>]\n") { out }
+    }
+    @Test
+    fun s12_list () {
+        val out = test(
+            true, """
+                type List = <(),/List>
+                var x: /List = new <.2 new <.1>>
+                var y = x
+                output Std x
+                output Std y
+            """.trimIndent()
+        )
+        assert(out == "<.2 <.1>>\n<.2 <.1>>\n") { out }
+    }
+    @Test
+    fun s13_list () {
+        val out = test(
+            true, """
+                type List = <(),[(),/List]>
+                var x: /List = new <.2 [(),new <.1>]>
+                var y = [(), x\!2.2]
+                output Std x
+                output Std /y
+            """.trimIndent()
+        )
+        assert(out == "<.2 [(),<.1>]>\n[(),<.1>]\n") { out }
+    }
+    @Test
+    fun s14_list () {
+        val out = test(
+            true, """
+                type List = </List>
+                var z: /List = Null
+                var one: /List = new <.1 z>
+                var l: /List = new <.1 one>
+                var p: //List
+                {
+                    set p = /l --!1
+                }
+                output Std p\
+            """.trimIndent()
+        )
+        assert(out == "<.1 <.1 Null>>\n") { out }
+    }
+    @Test
+    fun s15_list () {
+        val out = test(
+            true, """
+                type List = </List>
+                var l1: /List = new <.1 Null>
+                var l2 = new List.1 l1
+                var t3 = [(), new List.1 l2\!1]
+                output Std l1
+                output Std /t3
+            """.trimIndent()
+        )
+        assert(out == "<.1 Null>\n[(),<.1 <.1 Null>>]\n") { out }
+    }
 }
