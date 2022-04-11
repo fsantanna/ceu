@@ -263,7 +263,7 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
     val oth = tp.flattenLeft()
     val grp = def.zip(oth)                          // [ ((),()), (a,a._int) ]
         .filter    { it.first is Type.Par }         // [ (a,a._int) ]
-        .map       { Pair(it.first.tk.str, (it.second as Type.Par).xtype!!) }  // [ (a,_int) ]
+        .map       { Pair(it.first.tk.str, (it.second as Type.Par).let { it.xtype ?: it }) }  // [ (a,_int) ]
         //.let { println(it);it }
         .groupBy   { it.first }                     // { a=[(a,_int)] }
         .mapValues { it.value.map { it.second } }   // { a=[_int] }

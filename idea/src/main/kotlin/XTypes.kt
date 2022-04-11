@@ -170,9 +170,6 @@ fun Expr.xinfTypes (inf_: Type?) {
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
                 val idx = (inf as Type.Union).vec[num-1]
                 this.arg.xinfTypes(idx)
-                if (idx is Type.Par) {
-                    idx.xtype = this.arg.wtype!!.clone(idx.tk, idx)
-                }
                 this.xtype = inf.clone(this.tk,this) as Type.Union
                 //print("UCons: " + this.tostr() + ": ")
                 //println(this.xtype?.tostr())
@@ -441,7 +438,13 @@ fun Expr.xinfTypes (inf_: Type?) {
                 }
             }
         }
-    }.clone(this.tk, this)
+    }.let {
+        if (inf_ is Type.Par) {
+            //TODO()
+            inf_.xtype = it.clone(this.tk, this)
+        }
+        it.clone(this.tk, this)
+    }
 }
 
 fun Stmt.xinfTypes (inf: Type? = null) {
