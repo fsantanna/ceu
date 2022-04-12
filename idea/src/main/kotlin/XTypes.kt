@@ -171,6 +171,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 inf as Type.Union
                 val idx = inf.vec[num-1]
                 this.arg.xinfTypes(idx)
+                //this.xtype = inf
                 this.xtype = Type.Union (
                     inf.tk_,
                     inf.common,

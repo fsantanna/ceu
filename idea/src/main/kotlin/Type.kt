@@ -225,13 +225,13 @@ fun Type.Named.def (): Stmt.Typedef? {
         (def==null || this.xargs==null || this.xargs!!.size==0) -> def
         def.isParentOf(this) -> def     // inside type declaration
         else -> {
-            this.xdef = def.instantiate(this.xargs!!).setUps(this) as Stmt.Typedef
+            this.xdef = def.instantiate(this.tk, this.xargs!!)
             this.xdef!!
         }
     }
 }
 
-fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
+fun Stmt.Typedef.instantiate (tk: Tk, args: List<Type>): Stmt.Typedef {
     val p2a = this.pars.zip(args).map {
         //assert(it.second !is Type.Par)
         if (it.second is Type.Par) {
@@ -258,12 +258,13 @@ fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
         this.tk_,
         this.isinc,
         this.pars,
-        args.map { it.clone(this.tk,this) },
+        args.map { it.clone(tk,this.wup!!) },
         this.xscp1s,
-        this.type.clone(this.tk,this),
-        this.xtype!!.clone(this.tk,this),
+        this.type.clone(tk,this.wup!!),
+        this.xtype!!.clone(tk,this.wup!!),
         this.xisact
-    )
+    ).setUps(this.wup!!).setEnvs(this) as Stmt.Typedef
+    ret.wenv = this.wenv
     ret.type.visit(::ft, null)
     ret.xtype!!.visit(::ft, null)
     //print(">>> "); println(ret.xtype!!.toce())
