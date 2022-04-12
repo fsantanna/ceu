@@ -1651,6 +1651,13 @@ class TXExec {
     }
 
     @Test
+    fun sXX_list () {
+        val out = test(true, """
+            type List $D{a} = </List $D{a}>
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
     fun s06_list_err () {
         val out = test(true, """
             type List $D{a} = <Cons=/List $D{a}>
