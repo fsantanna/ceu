@@ -37,7 +37,7 @@ class TXTask {
             var x = spawn f ()
             output Std _2:_int
             --awake x _1:_int
-            emit @GLOBAL Event.2 _1:_int
+            emit @GLOBAL Event.2 _1:_uint64_t
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }

@@ -137,7 +137,7 @@ class TXPar {
                 }
                 output Std _3:_int
             }
-            emit @GLOBAL <.3 ()>
+            emit @GLOBAL <.3 _0>
             output Std _4:_int
             
         """.trimIndent())
@@ -158,7 +158,7 @@ class TXPar {
                 }
                 output Std _3:_int
             }
-            emit @GLOBAL <.3 ()>
+            emit @GLOBAL <.3 _0>
             output Std _4:_int
             
         """.trimIndent())
@@ -174,7 +174,7 @@ class TXPar {
                 }
                 output Std ()
             }
-            emit @GLOBAL <.3 ()>
+            emit @GLOBAL <.3 _0>
             
         """.trimIndent())
         assert(out == "()\n") { out }
