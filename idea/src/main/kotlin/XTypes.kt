@@ -62,7 +62,7 @@ fun Expr.xinfTypes (inf_: Type?) {
             }
             when {
                 (this.xtype != null) -> {
-                    val tp = this.xtype!! as Type.Named
+                    tp as Type.Named
                     val unpak = tp.react_noalias(this)
                     this.e.xinfTypes(unpak)
                     if (ok) {
@@ -168,13 +168,15 @@ fun Expr.xinfTypes (inf_: Type?) {
                 assert(inf != null)
                     //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
                 All_assert_tk(this.tk, inf is Type.Union) { "invalid inference : type mismatch : expected union : have ${inf!!.tostr()}"}
-                val idx = (inf as Type.Union).vec[num-1]
+                inf as Type.Union
+                val idx = inf.vec[num-1]
                 this.arg.xinfTypes(idx)
-                this.xtype = inf.clone(this.tk,this) as Type.Union
-                //print("UCons: " + this.tostr() + ": ")
-                //println(this.xtype?.tostr())
-                //println(x.tostr())
-                //println(this.arg.wtype?.tostr())
+                this.xtype = Type.Union (
+                    inf.tk_,
+                    inf.common,
+                    inf.vec.take(num-1) + this.arg.wtype!! + inf.vec.takeLast(inf.vec.size-num),
+                    inf.yids
+                ).clone(this.tk,this) as Type.Union
                 this.xtype!!
             }
         }
@@ -439,8 +441,8 @@ fun Expr.xinfTypes (inf_: Type?) {
             }
         }
     }.let {
-        if (inf_ is Type.Par) {
-            //TODO()
+        if (inf_ is Type.Par /*&& it !is Type.Par*/) {
+            assert(it !is Type.Par)
             inf_.xtype = it.clone(this.tk, this)
         }
         it.clone(this.tk, this)

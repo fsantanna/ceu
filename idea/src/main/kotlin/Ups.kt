@@ -24,6 +24,10 @@ fun Any.ups_first (me: Boolean=false, f: (Any)->Boolean): Any? {
     }
 }
 
+fun Any.isParentOf (child: Any): Boolean {
+    return (child.ups_first { it==this } != null)
+}
+
 fun Any.ups_first_block (me: Boolean=false): Stmt.Block? {
     return this.ups_first(me) { it is Stmt.Block } as Stmt.Block?
 }

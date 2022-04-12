@@ -1,6 +1,7 @@
 var EXPR_WTYPE = true
 
 fun Type.visit (ft: ((Type) -> Unit)?, fx: ((Any,Scope) -> Unit)?) {
+    //println(this.hashCode().toString() + ", " + this.tostr())
     when (this) {
         is Type.Unit, is Type.Nat, is Type.Par -> {}
         is Type.Tuple   -> this.vec.forEach { it.visit(ft,fx) }

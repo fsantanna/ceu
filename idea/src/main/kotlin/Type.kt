@@ -223,6 +223,7 @@ fun Type.Named.def (): Stmt.Typedef? {
     return when {
         (this.xdef != null) -> this.xdef!!
         (def==null || this.xargs==null || this.xargs!!.size==0) -> def
+        def.isParentOf(this) -> def     // inside type declaration
         else -> {
             this.xdef = def.instantiate(this.xargs!!).setUps(this) as Stmt.Typedef
             this.xdef!!
@@ -232,11 +233,25 @@ fun Type.Named.def (): Stmt.Typedef? {
 
 fun Stmt.Typedef.instantiate (args: List<Type>): Stmt.Typedef {
     val p2a = this.pars.zip(args).map {
+        //assert(it.second !is Type.Par)
+        if (it.second is Type.Par) {
+            assert(it.first.str == it.second.tk.str)
+        }
         Pair(it.first.str, it.second)
     }.toMap()
     fun ft (tp: Type) {
         when (tp) {
-            is Type.Par -> tp.xtype = p2a[tp.tk.str]!!
+            is Type.Par -> {
+                val a = p2a[tp.tk.str]!!
+                if (a is Type.Par) {
+                    assert(a.tk.str == tp.tk.str)
+                    // do not assign par.xtype = par
+                } else {
+                    //println(">>>")
+                    //println(a)
+                    tp.xtype = a
+                }
+            }
         }
     }
     val ret = Stmt.Typedef (
@@ -261,15 +276,25 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
     // return ${_int}
     val def = this.type.flattenLeft()
     val oth = tp.flattenLeft()
+    fun Type.con_ins_par (): Type {
+        return when {
+            this !is Type.Par -> this           // concrete
+            this.xtype != null -> this.xtype!!  // instance
+            else -> this                        // parameter
+        }
+    }
     val grp = def.zip(oth)                          // [ ((),()), (a,a._int) ]
         .filter    { it.first is Type.Par }         // [ (a,a._int) ]
-        .map       { Pair(it.first.tk.str, (it.second as Type.Par).let { it.xtype ?: it }) }  // [ (a,_int) ]
+        .map       { Pair(it.first.tk.str, it.second.con_ins_par()) }  // [ (a,_int) ]
         //.let { println(it);it }
         .groupBy   { it.first }                     // { a=[(a,_int)] }
         .mapValues { it.value.map { it.second } }   // { a=[_int] }
         .let {
-            assert(it.values.all { it.size==1 }) {
-                "TODO: multiple instances"
+            //println(it)
+            assert(it.values.all { lst ->
+                lst.size>=1 && lst.all { lst.first().isSupOf(it) }
+            }) {
+                "TODO: no instance or multiple incompatible instances"
             }
             it
         }
