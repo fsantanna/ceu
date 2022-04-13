@@ -292,10 +292,19 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
         .mapValues { it.value.map { it.second } }   // { a=[_int] }
         .let {
             //println(it)
-            assert(it.values.all { lst ->
-                lst.size>=1 && lst.all { lst.first().isSupOf(it) }
-            }) {
-                "TODO: no instance or multiple incompatible instances"
+            for (lst in it.values) {   // { [_int,a], [x,y], ... }
+                assert(lst.size>=0 && lst.all{ lst.first().isSupOf(it) }) {
+                    "TODO: no instance or multiple incompatible instances"
+                }
+                /*
+                // TODO: apaga, nao faz sentido mexer no typedef generico (solucao foi refazer subarvore qd nao concreto)
+                val inst = lst.first { it !is Type.Par }
+                lst.forEach {
+                    if (it is Type.Par) {
+                        it.xtype = inst  // assign Par.xtype as first concrete type found in lst
+                    }
+                }
+                 */
             }
             it
         }

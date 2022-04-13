@@ -73,6 +73,9 @@ fun Expr.xinfTypes (inf_: Type?) {
                     this.e.xinfTypes(tp.react_noalias(this))
                     if (ok) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
+                        if (!this.e.wtype!!.isConcrete()) {
+                            this.e.xinfTypes(tp.react_noalias(this))
+                        }
                     }
                     if (!this.isact!!) tp else {
                         Type.Active(
@@ -179,14 +182,18 @@ fun Expr.xinfTypes (inf_: Type?) {
                 inf as Type.Union
                 val idx = inf.vec[num-1]
                 this.arg.xinfTypes(idx)
-                //this.xtype = inf
                 val ret = Type.Union (
                     inf.tk_,
                     inf.common,
                     inf.vec.take(num-1) + this.arg.wtype!! + inf.vec.takeLast(inf.vec.size-num),
                     inf.yids
                 ).clone(this.tk,this) as Type.Union
-                this.xtype!!
+                if (ret.isConcrete()) {
+                    this.xtype = ret
+                } else {
+                    // not a concrete type yet
+                }
+                ret
             }
         }
         is Expr.UNull -> {
