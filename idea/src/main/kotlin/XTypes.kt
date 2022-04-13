@@ -36,7 +36,9 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
 }
 
 fun Type.isConcrete (): Boolean {
-    return !this.flattenLeft().any { it is Type.Par && it.xtype==null }
+    return !this.flattenLeft().any {
+        it is Type.Named && it.xargs==null || it is Type.Par && it.xtype==null
+    }
 }
 
 fun Expr.xinfTypes (inf_: Type?) {
@@ -74,6 +76,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                     if (ok) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                         if (!this.e.wtype!!.isConcrete()) {
+                            // reinfer this.e to populate missing parameters
                             this.e.xinfTypes(tp.react_noalias(this))
                         }
                     }
@@ -86,6 +89,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 }
                 (inf?.noact() is Type.Named) -> {
                     this.e.xinfTypes(inf.react_noalias(this))
+                    assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
                     this.xtype = ret
@@ -335,14 +339,16 @@ fun Expr.xinfTypes (inf_: Type?) {
                 (s !is Stmt.Var)  -> s.getType()
                 // TODO: hack to substitute s.xtype if currently "_" (see x18_clone_rec)
                 //(s.xtype.let { it==null || it is Type.Nat && it.tk.str=="_" }) -> {
-                (s.xtype != null) -> s.xtype!!
+                s.xtype.let { it!=null && (it.isConcrete() || inf==null || !inf.isConcrete()) } -> {
+                    s.xtype!!
+                }
                 (inf == null)     -> null
                 else -> {
                     val ret = inf.clone(this.tk, this)
                     All_assert_tk(ret.tk, ret.isConcrete()) {
                         "invalid inference : cannot determine type"
                     }
-                    s.xtype = ret       // set var.xtype=inf if Stmt.Var doesn't know its type yet
+                    s.xtype = ret  // set var.xtype=inf if Stmt.Var doesn't know its type yet
                     ret
                 }
             }
@@ -481,9 +487,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
     }
     when (this) {
         is Stmt.Nop, is Stmt.Native, is Stmt.XBreak, is Stmt.XReturn, is Stmt.Typedef -> {}
-        is Stmt.Var -> {
-            this.xtype = this.xtype ?: inf?.clone(this.tk,this)
-        }
+        is Stmt.Var -> { assert(inf == null) }
         is Stmt.Set -> {
             this.wup.let {
                 if (it is Stmt.Seq && it.s2==this && it.s1 is Stmt.Var && it.s1.xtype==null) {
@@ -496,12 +500,17 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             try {
                 this.dst.xinfTypes(null)
                 this.src.xinfTypes(this.dst.wtype!!)
+                assert(this.src.wtype!!.isConcrete())
+                if (!this.dst.wtype!!.isConcrete()) {
+                    this.dst.xinfTypes(this.src.wtype!!)
+                }
             } catch (e: Throwable){
                 if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e
                 }
                 this.src.xinfTypes(null)
                 this.dst.xinfTypes(this.src.wtype!!)
+                assert(this.dst.wtype!!.isConcrete())
             }
         }
         is Stmt.SCall -> this.e.xinfTypes(unit())

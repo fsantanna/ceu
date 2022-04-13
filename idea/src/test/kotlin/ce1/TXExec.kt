@@ -1651,20 +1651,13 @@ class TXExec {
     }
 
     @Test
-    fun sXX_list () {
-        val out = test(true, """
-            type List $D{a} = </List $D{a}>
-        """.trimIndent())
-        assert(out == "Null\n") { out }
-    }
-    @Test
     fun s06_list_err () {
         val out = test(true, """
             type List $D{a} = <Cons=/List $D{a}>
             var x = new List.Cons Null
             output Std x
         """.trimIndent())
-        assert(out == "(ln 10, col 5): invalid inference : undetermined type") { out }
+        assert(out == "(ln 10, col 5): invalid inference : cannot determine type") { out }
     }
     @Test
     fun s07_list () {
@@ -1676,42 +1669,55 @@ class TXExec {
         assert(out == "<.1 [10,Null]>\n") { out }
     }
     @Test
-    fun s08_list () {
+    fun s07_list2 () {
+        val out = test(true, """
+            type List $D{a} = <Cons=[${D}a,/List $D{a}]>
+            var x: /List = new List.Cons [_10:_int,Null]
+            output Std x
+        """.trimIndent())
+        assert(out == "<.1 [10,Null]>\n") { out }
+    }
+    @Test
+    fun s08_list_err () {
         val out = test(
             true, """
-                type List $D{a}= <[(),/List]>
-                var x: /List = new <.1 [(),Null]>
-                var y: [(),/List] = [(), new <.1 [(),Null]>]
-                var z = [(), /x]
-                output Std z.2\\!1.2
+                type List $D{a} = <[${D}a,/List $D{a}]>
+                var x: /List = new <.1 [_10,Null]>
             """.trimIndent()
         )
+        assert(out == "(ln 10, col 22): invalid inference : cannot determine type") { out }
+    }
+    @Test
+    fun s08_list () {
+        val out = test(true, """
+            type List $D{a} = <[${D}a,/List $D{a}]>
+            var x: /List = new <.1 [(),Null]>
+            --var y: [(),/List] = [(), new <.1 [(),Null]>]
+            --var z = [(), /x]
+            --output Std z.2\\!1.2
+        """.trimIndent())
         assert(out == "Null\n") { out }
     }
     @Test
     fun s09_list () {
-        val out = test(
-            true, """
-                type List = <[//List,/List]>
-                var x: /List = new <.1 [_(&printf),Null]>
-                set x\!1.1 = /x
-                output Std x
-                output Std x\!1.1\
-            """.trimIndent()
-        )
-        assert(out == "<.1 [_,Null]>\n<.1 [_,Null]>\n") { out }
+        val out = test(true, """
+            type List = <[//List$D{a},$D{a},/List $D{a}]>
+            var x: /List = new <.1 [_(&printf),(),Null]>
+            set x\!1.1 = /x
+            output Std x
+            output Std x\!1.1\
+        """.trimIndent())
+        assert(out == "<.1 [_,(),Null]>\n<.1 [_,(),Null]>\n") { out }
     }
     @Test
     fun s10_list () {
-        val out = test(
-            true, """
-                type List = <(),/List>
-                var l: /List = new <.2 new <.1>>
-                var t1 = [l]
-                var t2 = [t1.1]
-                output Std /t2
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type List = <(),/List>
+            var l: /List = new <.2 new <.1>>
+            var t1 = [l]
+            var t2 = [t1.1]
+            output Std /t2
+        """.trimIndent())
         assert(out == "[<.2 <.1>>]\n") { out }
     }
     @Test

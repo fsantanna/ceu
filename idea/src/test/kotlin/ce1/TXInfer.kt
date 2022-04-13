@@ -61,7 +61,7 @@ class TXInfer {
     @Test
     fun a03_var () {
         val out = all("var rct = [_1]")
-        assert(out == "(ln 1, col 12): invalid inference : undetermined type") { out }
+        assert(out == "(ln 1, col 12): invalid inference : cannot determine type") { out }
     }
     @Test   // TODO: Std -> .1
     fun a03_input_output () {
@@ -130,7 +130,7 @@ class TXInfer {
         val out = all("""
             var v = _f ()
         """.trimIndent())
-        //assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
+        //assert(out == "(ln 1, col 9): invalid inference : cannot determine type") { out }
         assert(out == """
             var v: _
             set v = ((_f: _) @{} ())
@@ -493,7 +493,7 @@ class TXInfer {
             }
         """.trimIndent()
         )
-        //assert(out == "(ln 3, col 10): invalid inference : undetermined type") { out }
+        //assert(out == "(ln 3, col 10): invalid inference : cannot determine type") { out }
         //assert(out == "(ln 3, col 15): invalid inference : type mismatch") { out }
         assert(out == """
             var fact: func @{i} -> [/_int @i,_int] -> ()
@@ -565,7 +565,7 @@ class TXInfer {
         val out = all("""
             var v = Null
         """.trimIndent())
-        assert(out == "(ln 1, col 9): invalid inference : undetermined type") { out }
+        assert(out == "(ln 1, col 9): invalid inference : cannot determine type") { out }
     }
     @Test
     fun c08_null () {
