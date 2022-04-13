@@ -156,7 +156,7 @@ fun Type.toce (): String {
         is Type.Pointer -> "P_" + this.pln.toce() + "_P"
         is Type.Named   -> concrete(this.tk.str, this.xargs!!)
         is Type.Nat     -> this.tk_.payload().replace('*','_')
-        is Type.Par     -> this.xtype.let { if (it==null) "TODO" else it.toce() }
+        is Type.Par     -> this.xtype.let { if (it==null) "TODO2" else it.toce() }
         is Type.Tuple   -> "T_" + this.vec.map { it.toce() }.joinToString("_") + "_T"
         is Type.Union   -> "U_" + this.vec.map { it.toce() }.joinToString("_") + "_U"
         is Type.Func    -> "F_" + (if (this.tk.str=="task") "TK_" else "") + this.inp.toce() + "_" + (this.pub?.toce()?:"") + "_" + this.out.toce() + "_F"

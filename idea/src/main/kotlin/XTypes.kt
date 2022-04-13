@@ -35,6 +35,10 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
     return this.aux().clone(this.tk,up)
 }
 
+fun Type.isConcrete (): Boolean {
+    return !this.flattenLeft().any { it is Type.Par && it.xtype==null }
+}
+
 fun Expr.xinfTypes (inf_: Type?) {
     val inf = when {
         (inf_ !is Type.Par) -> inf_
@@ -47,8 +51,11 @@ fun Expr.xinfTypes (inf_: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: inf!!.clone(this.tk, this)
-            this.xtype!!
+            val ret = this.xtype ?: inf!!.clone(this.tk, this)
+            if (this.xtype==null && ret.isConcrete()) {
+                this.xtype = ret
+            }
+            ret
         }
         is Expr.Cast -> {
             this.e.xinfTypes(inf)
@@ -56,15 +63,14 @@ fun Expr.xinfTypes (inf_: Type?) {
         }
         is Expr.Named -> {
             val tp = this.xtype as Type.Named?
-            val ok = tp?.xargs==null
+            val ok = (tp?.xargs == null)
             if (tp?.xargs == null) {
                 tp?.xargs = emptyList()
             }
             when {
                 (this.xtype != null) -> {
                     tp as Type.Named
-                    val unpak = tp.react_noalias(this)
-                    this.e.xinfTypes(unpak)
+                    this.e.xinfTypes(tp.react_noalias(this))
                     if (ok) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                     }
@@ -77,8 +83,10 @@ fun Expr.xinfTypes (inf_: Type?) {
                 }
                 (inf?.noact() is Type.Named) -> {
                     this.e.xinfTypes(inf.react_noalias(this))
-                    this.xtype = inf
-                    inf
+                    val ret = inf.clone(this.tk, this)
+                    assert(ret.isConcrete())
+                    this.xtype = ret
+                    ret
                 }
                 else -> {
                     this.e.xinfTypes(inf?.react_noalias(this))
@@ -172,7 +180,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 val idx = inf.vec[num-1]
                 this.arg.xinfTypes(idx)
                 //this.xtype = inf
-                this.xtype = Type.Union (
+                val ret = Type.Union (
                     inf.tk_,
                     inf.common,
                     inf.vec.take(num-1) + this.arg.wtype!! + inf.vec.takeLast(inf.vec.size-num),
@@ -185,8 +193,11 @@ fun Expr.xinfTypes (inf_: Type?) {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
                 "invalid inference : undetermined type"
             }
-            this.xtype = this.xtype ?: (inf?.clone(this.tk,this) as Type.Pointer)
-            this.xtype!!
+            val ret = this.xtype ?: (inf!!.clone(this.tk,this) as Type.Pointer)
+            if (this.xtype==null && ret.isConcrete()) {
+                this.xtype = ret
+            }
+            ret
                 //.mapScp1(this, Tk.Id(TK.XID, this.tk.lin, this.tk.col,"LOCAL")) // TODO: not always LOCAL
         }
         is Expr.New -> {
@@ -213,7 +224,9 @@ fun Expr.xinfTypes (inf_: Type?) {
                 All_assert_tk(this.tk, inf is Type.Func) {
                     "invalid type : expected function type"
                 }
-                this.xtype = inf as Type.Func
+                inf as Type.Func
+                assert(inf.isConcrete())
+                this.xtype = inf.clone(this.tk, this) as Type.Func
                 this.wtype = this.xtype // must set wtype before b/c block may access arg/ret/etc
             }
             this.block.xinfTypes(null)
@@ -315,11 +328,14 @@ fun Expr.xinfTypes (inf_: Type?) {
                 (s !is Stmt.Var)  -> s.getType()
                 // TODO: hack to substitute s.xtype if currently "_" (see x18_clone_rec)
                 //(s.xtype.let { it==null || it is Type.Nat && it.tk.str=="_" }) -> {
-                (s.xtype == null) -> {
-                    s.xtype = inf       // set var.xtype=inf if Stmt.Var doesn't know its type yet
-                    inf
+                (s.xtype != null) -> s.xtype!!
+                (inf == null)     -> null
+                else -> {
+                    val ret = inf.clone(this.tk, this)
+                    assert(ret.isConcrete())
+                    s.xtype = ret       // set var.xtype=inf if Stmt.Var doesn't know its type yet
+                    ret
                 }
-                else              -> s.xtype!!
             }
             All_assert_tk(this.tk, ret != null) {
                 "invalid inference : undetermined type"

@@ -17,7 +17,7 @@ fun Type.pos (): String {
         is Type.Unit    -> "int"
         is Type.Pointer -> this.pln.pos() + "*"
         is Type.Nat     -> this.tk_.payload().let { if (it == "") "int" else it }
-        is Type.Par     -> this.xtype.let { if (it==null) "TODO" else it.pos() }
+        is Type.Par     -> this.xtype.let { if (it==null) "TODO1" else it.pos() }
         is Type.Tuple   -> "struct " + this.toce()
         is Type.Union   -> "struct " + this.toce()
         is Type.Func    -> "struct " + this.toce()
@@ -68,9 +68,14 @@ fun code_ft (tp: Type) {
             val args = tp.xargs!!.map { CODE.removeFirst() }.reversed()
             val types = args.map { it.type }.joinToString("")
             val structs  = args.map { it.struct  }.joinToString("")
-            tp.def()!!.visit(::code_fs, ::code_fe, ::code_ft, null)
-            val def = CODE.removeFirst()
-            Code(types+def.type,structs+def.struct, def.func, "", "")
+            val def1 = tp.def()!!
+            if (def1.isParentOf(tp)) {
+                Code(types,structs, "", "", "")
+            } else {
+                def1.visit(::code_fs, ::code_fe, ::code_ft, null)
+                val def2 = CODE.removeFirst()
+                Code(types+def2.type,structs+def2.struct, def2.func, "", "")
+            }
         }
         is Type.Func  -> {
             val out = CODE.removeFirst()
