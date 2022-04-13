@@ -1664,7 +1664,7 @@ class TXExec {
             var x = new List.Cons Null
             output Std x
         """.trimIndent())
-        assert(out == "Null\n") { out }
+        assert(out == "(ln 10, col 5): invalid inference : undetermined type") { out }
     }
     @Test
     fun s07_list () {

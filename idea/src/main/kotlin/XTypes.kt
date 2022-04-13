@@ -49,7 +49,7 @@ fun Expr.xinfTypes (inf_: Type?) {
         is Expr.Unit  -> this.wtype!!   //inf ?: this.wtype!!
         is Expr.Nat   -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
-                "invalid inference : undetermined type"
+                "invalid inference : cannot determine type"
             }
             val ret = this.xtype ?: inf!!.clone(this.tk, this)
             if (this.xtype==null && ret.isConcrete()) {
@@ -167,7 +167,7 @@ fun Expr.xinfTypes (inf_: Type?) {
         }
         is Expr.UCons -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
-                "invalid inference : undetermined type"
+                "invalid inference : cannot determine type"
             }
             this.check(this.xtype ?: inf!!)
             val num = ((this.xtype ?: inf) as Type.Union).yids.let { this.tk.field2num(it) }!!
@@ -198,7 +198,7 @@ fun Expr.xinfTypes (inf_: Type?) {
         }
         is Expr.UNull -> {
             All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
-                "invalid inference : undetermined type"
+                "invalid inference : cannot determine type"
             }
             val ret = this.xtype ?: (inf!!.clone(this.tk,this) as Type.Pointer)
             if (this.xtype==null && ret.isConcrete()) {
@@ -339,13 +339,15 @@ fun Expr.xinfTypes (inf_: Type?) {
                 (inf == null)     -> null
                 else -> {
                     val ret = inf.clone(this.tk, this)
-                    assert(ret.isConcrete())
+                    All_assert_tk(ret.tk, ret.isConcrete()) {
+                        "invalid inference : cannot determine type"
+                    }
                     s.xtype = ret       // set var.xtype=inf if Stmt.Var doesn't know its type yet
                     ret
                 }
             }
             All_assert_tk(this.tk, ret != null) {
-                "invalid inference : undetermined type"
+                "invalid inference : cannot determine type"
             }
             ret!!
         }
@@ -530,7 +532,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
         is Stmt.Pause -> this.tsk.xinfTypes(null)
         is Stmt.Input -> {
             //All_assert_tk(this.tk, this.xtype!=null || inf!=null) {
-            //    "invalid inference : undetermined type"
+            //    "invalid inference : cannot determine type"
             //}
             // inf is at least Unit
             this.arg.xinfTypes(null)
