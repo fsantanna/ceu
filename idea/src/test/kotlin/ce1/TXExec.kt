@@ -1673,7 +1673,7 @@ class TXExec {
             var x = new List.Cons [_10:_int,Null]
             output Std x
         """.trimIndent())
-        assert(out == "Null\n") { out }
+        assert(out == "<.1 [10,Null]>\n") { out }
     }
     @Test
     fun s08_list () {

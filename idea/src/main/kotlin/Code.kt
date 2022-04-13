@@ -70,7 +70,7 @@ fun code_ft (tp: Type) {
             val structs  = args.map { it.struct  }.joinToString("")
             val def1 = tp.def()!!
             if (def1.isParentOf(tp)) {
-                Code(types,structs, "", "", "")
+                Code("","", "", "", "")     // TODO: will be ignored on TYPEX
             } else {
                 def1.visit(::code_fs, ::code_fe, ::code_ft, null)
                 val def2 = CODE.removeFirst()
@@ -249,7 +249,7 @@ fun code_ft (tp: Type) {
         //println(ce)
         //println(tp.tostr())
         //println("<<<")
-        if (TYPEX.contains(ce)) {
+        if (TYPEX.contains(ce) || (it.type+it.struct+it.func+it.stmt+it.expr=="")) {
             Code("","", "", "","")
         } else {
             TYPEX.add(ce)
