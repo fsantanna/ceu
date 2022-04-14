@@ -112,20 +112,26 @@ fun Type.isrec (): Boolean {
     return this.flattenLeft().any { it is Type.Named && it.xisrec }
 }
 
+fun Type.noact2 (): Type.Named {
+    return when (this) {
+        is Type.Active  -> this.tsk
+        is Type.Actives -> this.tsk
+        is Type.Named   -> this
+        else -> error("bug found")
+    } as Type.Named
+}
+
 fun Type.noact (): Type {
+    //return this
     return when (this) {
         is Type.Active -> this.tsk
         is Type.Actives -> this.tsk
-        else -> this
+        else -> this //TODO()
     }
 }
 
-fun Type.noactnoalias (): Type {
-    return this.noact().uname()
-}
-
 fun Type.react_noalias (up: Expr): Type {
-    val noalias = this.noactnoalias().clone(up.tk,up)
+    val noalias = this.noact().uname().clone(up.tk,up)
     return when (this) {
         is Type.Active  -> Type.Active(this.tk_, noalias).setUpEnv(this.getUp()!!)
         is Type.Actives -> Type.Actives(this.tk_, this.len, noalias).setUpEnv(this.getUp()!!)
@@ -133,21 +139,21 @@ fun Type.react_noalias (up: Expr): Type {
     }
 }
 
+fun Type.Named.uname2 (): Type {
+    // Original constructor:
+    //      typedef Pair @[a] = [/_int@a,/_int@a]
+    //      var xy: Pair @[LOCAL] = [/x,/y]
+    // Transform typedef -> type
+    //      typedef Pair @[LOCAL] = [/_int@LOCAL,/_int@LOCAL]
+    //      var xy: Pair @[LOCAL] = [/x,/y]
+    val def = this.def()!!
+    return def.getType().mapScps(false,
+        def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
+    ).clone(this.tk,this)
+}
+
 fun Type.uname (): Type {
-    return if (this !is Type.Named) this else {
-        val def = this.def()!!
-
-        // Original constructor:
-        //      typedef Pair @[a] = [/_int@a,/_int@a]
-        //      var xy: Pair @[LOCAL] = [/x,/y]
-        // Transform typedef -> type
-        //      typedef Pair @[LOCAL] = [/_int@LOCAL,/_int@LOCAL]
-        //      var xy: Pair @[LOCAL] = [/x,/y]
-
-        def.getType().mapScps(false,
-            def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
-        ).clone(this.tk,this)
-    }
+    return if (this !is Type.Named) this else this.uname2()
 }
 
 fun Type.toce (): String {
