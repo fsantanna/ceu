@@ -72,12 +72,12 @@ fun Expr.xinfTypes (inf_: Type?) {
             when {
                 (this.xtype != null) -> {
                     tp as Type.Named
-                    this.e.xinfTypes(tp.react_noalias(this))
+                    this.e.xinfTypes(tp.react_uname(this))
                     if (infArgs) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                         if (!this.e.wtype!!.isConcrete()) {
                             // reinfer this.e to populate missing parameters
-                            this.e.xinfTypes(tp.react_noalias(this))
+                            this.e.xinfTypes(tp.react_uname(this))
                         }
                     }
                     if (!this.xtype!!.first) tp else {
@@ -88,7 +88,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                     }
                 }
                 (inf?.noact() is Type.Named) -> {
-                    this.e.xinfTypes(inf.react_noalias(this))
+                    this.e.xinfTypes(inf.react_uname(this))
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
@@ -100,14 +100,14 @@ fun Expr.xinfTypes (inf_: Type?) {
                     ret
                 }
                 else -> {
-                    this.e.xinfTypes(inf?.react_noalias(this))
+                    this.e.xinfTypes(inf?.react_uname(this))
                     this.e.wtype!! //.react_noalias(this)
                 }
             }
        }
         is Expr.UNamed -> {
             this.e.xinfTypes(inf)
-            this.e.wtype!!.react_noalias(this)
+            this.e.wtype!!.react_uname(this)
         }
         is Expr.Upref -> {
             All_assert_tk(this.tk, inf==null || inf is Type.Nat || inf is Type.Pointer) { "invalid inference : type mismatch"}
