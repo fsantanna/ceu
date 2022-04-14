@@ -40,11 +40,12 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.Named   -> {
-                e.xtype?.let {
-                    val dst = it.noactnoalias()
-                    val src = e.e.wtype!!.noact()
+                if (e.xtype != null) {
+                    val tp = e.wtype!!
+                    val dst = tp.uact_uname_act_2(e)
+                    val src = e.e.wtype!!
                     All_assert_tk(e.tk, dst.isSupOf(src)) {
-                        "invalid type pack : ${mismatch(dst,src)}"
+                        "invalid type pack : ${mismatch(dst, src)}"
                     }
                 }
             }
@@ -62,7 +63,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.New   -> {
-                All_assert_tk(e.tk, ((e.arg as Expr.Named).xtype!! as Type.Named).xisrec) {
+                All_assert_tk(e.tk, ((e.arg as Expr.Named).xtype!!.second as Type.Named).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }

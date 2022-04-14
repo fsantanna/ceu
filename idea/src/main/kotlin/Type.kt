@@ -130,6 +130,15 @@ fun Type.noact (): Type {
     }
 }
 
+fun Type.uact_uname_act_2 (up: Expr): Type {
+    val raw = this.noact2().uname2()
+    return when (this) {
+        is Type.Active  -> Type.Active(this.tk_, raw)
+        is Type.Actives -> Type.Actives(this.tk_, this.len, raw)
+        else            -> raw
+    }.clone(up.tk,up)
+}
+
 fun Type.react_uname (up: Expr): Type {
     val noalias = this.noact().uname().clone(up.tk,up)
     return when (this) {

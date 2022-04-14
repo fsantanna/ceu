@@ -93,7 +93,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
                     this.xtype = if (inf is Type.Active || inf is Type.Actives) {
-                        Pair(true, ret.noact())
+                        Pair(true, ret.noact2())
                     } else {
                         Pair(false, ret)
                     }
@@ -270,7 +270,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 All_assert_tk(this.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
-                val ftp = it.noactnoalias() as Type.Func
+                val ftp = it.noact() as Type.Func
                 when (this.tk.str) {
                     "status" -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
                     "pub"   -> ftp.pub!!
