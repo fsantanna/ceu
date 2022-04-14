@@ -787,10 +787,22 @@ class TXTask {
             }
             output Std _1:_int
             var x : active Xask
+            --set x = spawn active Xask t ()
             set x = spawn t ()
             var y = spawn t ()
             output Std x.pub
             output Std _3:_int
+        """.trimIndent())
+        assert(out == "1\n2\n2\n10\n3\n") { out }
+    }
+    @Test
+    fun fxx_xask () {
+        val out = test(true, """
+            type Xask = task ()->_int->()
+            var t : Xask
+            var x : active Xask
+            --set x = spawn active Xask t ()
+            set x = spawn t ()
         """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }

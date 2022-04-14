@@ -324,7 +324,7 @@ object Parser
                         Expr.Unit(Tk.Fix("()", alls.tk1.lin, alls.tk1.col))
                     }
                 }
-                Expr.Named(id, e, isact, tp)
+                Expr.Named(id, e, Pair(isact, tp))
             }
             alls.acceptFix("[") -> {
                 val tk0 = alls.tk0 as Tk.Fix
@@ -353,7 +353,7 @@ object Parser
                 alls.acceptFix_err("]")
                 val ret = Expr.TCons(tk0, es, ids)
                 if (!CE1) ret else {
-                    Expr.Named(ret.tk, ret, null, null)
+                    Expr.Named(ret.tk, ret, null)
                 }
             }
             alls.acceptFix("<") -> {
@@ -383,7 +383,7 @@ object Parser
                 if (tp != null) {
                     Expr.UCons(dsc, tp as Type.Union?, cons)
                 } else {
-                    Expr.Named(dsc, Expr.UCons(dsc, tp as Type.Union?, cons), null, null)
+                    Expr.Named(dsc, Expr.UCons(dsc, tp as Type.Union?, cons), null)
                 }
             }
             alls.acceptFix("new") -> {
@@ -516,7 +516,7 @@ object Parser
                 )
             )
             if (CE1) {
-                e = Expr.Named(e.tk, e, null, null)
+                e = Expr.Named(e.tk, e, null)
             }
         }
         return e

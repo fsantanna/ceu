@@ -94,7 +94,7 @@ class TXParser {
         All_restart(null, PushbackReader(StringReader("List.1 ()"), 2))
         Lexer.lex()
         val e = Parser.expr()
-        assert(e is Expr.Named && e.xtype is Type.Named && e.e is Expr.UCons && !e.xisact!!)
+        assert(e is Expr.Named && e.xtype!!.second is Type.Named && e.e is Expr.UCons && !e.xtype!!.first)
     }
     @Test
     fun d02_pak () {
@@ -102,7 +102,7 @@ class TXParser {
         Lexer.lex()
         val e = Parser.expr()
         //println(e.dump())
-        assert(e is Expr.Named && e.xtype is Type.Named && e.e is Expr.Unit)
+        assert(e is Expr.Named && e.xtype!!.second is Type.Named && e.e is Expr.Unit)
     }
     @Test
     fun d03_typedef () {

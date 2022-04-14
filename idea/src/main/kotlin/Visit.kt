@@ -32,7 +32,7 @@ fun Expr.visit (fs: ((Stmt) -> Unit)?, fe: ((Expr) -> Unit)?, ft: ((Type) -> Uni
         is Expr.Unit, is Expr.Var -> {}
         is Expr.Nat   -> this.xtype?.visit(ft,fx)
         is Expr.Cast  -> { this.e.visit(fs,fe,ft,fx) ; this.type.visit(ft,fx) }
-        is Expr.Named   -> { this.e.visit(fs,fe,ft,fx) ; this.xtype?.visit(ft,fx) }
+        is Expr.Named   -> { this.e.visit(fs,fe,ft,fx) ; this.xtype?.second?.visit(ft,fx) }
         is Expr.UNamed -> this.e.visit(fs,fe,ft,fx)
         is Expr.TCons -> this.arg.forEach { it.visit(fs, fe, ft, fx) }
         is Expr.UCons -> { this.xtype?.visit(ft, fx) ; this.arg.visit(fs, fe, ft, fx) }

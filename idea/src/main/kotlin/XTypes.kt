@@ -64,23 +64,23 @@ fun Expr.xinfTypes (inf_: Type?) {
             this.type
         }
         is Expr.Named -> {
-            val tp = this.xtype as Type.Named?
-            val ok = (tp?.xargs == null)
-            if (tp?.xargs == null) {
+            val tp = this.xtype?.second as Type.Named?
+            val infArgs = (tp?.xargs == null)
+            if (infArgs) {
                 tp?.xargs = emptyList()
             }
             when {
                 (this.xtype != null) -> {
                     tp as Type.Named
                     this.e.xinfTypes(tp.react_noalias(this))
-                    if (ok) {
+                    if (infArgs) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                         if (!this.e.wtype!!.isConcrete()) {
                             // reinfer this.e to populate missing parameters
                             this.e.xinfTypes(tp.react_noalias(this))
                         }
                     }
-                    if (!this.xisact!!) tp else {
+                    if (!this.xtype!!.first) tp else {
                         Type.Active(
                             Tk.Fix("active", this.tk.lin, this.tk.col),
                             tp
@@ -92,7 +92,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
-                    this.xtype = ret
+                    this.xtype = Pair((inf is Type.Active || inf is Type.Actives),ret)
                     ret
                 }
                 else -> {
