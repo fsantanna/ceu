@@ -1989,7 +1989,7 @@ class TExec {
             $Output0
             type Xask $D{} @{} = task @{} -> () -> _int -> ()
             var t: Xask $D{} @{}
-                set t = Xask $D{} @{}(task @{} -> () -> _int -> () {
+            set t = Xask $D{} @{}(task @{} -> () -> _int -> () {
                 ${output0("_2:_int","_int")}
                 set pub = _10:_int
             }

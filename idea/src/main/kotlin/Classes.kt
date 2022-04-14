@@ -58,7 +58,13 @@ sealed class Attr(val tk: Tk) {
     data class Field (val tk_: Tk.id, val tsk: Attr): Attr(tk_)
 }
 
-// Expr.Pak.xtype is Type.Named [except for Type.Active(Type.Named)]
+// Expr.Named.xtype is Type.Named [except for Type.Active(Type.Named)]
+// Expr.Named.isact:
+// spawn f ()                   results in Type.Active(Type.Func)
+// spawn (active Xask) (f ())   results in Type.Active(Type.Named(Type.Func))
+// "active" is required here, otherwise result would only be Type.Named(Type.Func)
+// to better understand, read as
+// (active Xask) spawn (f ())
 
 sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wtype: Type?) {
     data class Unit  (val tk_: Tk.Fix): Expr(N++, tk_, null, null, Type.Unit(tk_))
