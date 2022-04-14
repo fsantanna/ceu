@@ -442,7 +442,7 @@ fun code_fe (e: Expr) {
         }
         is Expr.UDisc -> CODE.removeFirst().let {
             val ee = it.expr
-            val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
+            val num = e.tk.field2num((e.uni.wtype as Type.Union).yids)!!
             val pre = """
                 assert(&$ee != NULL);    // TODO: only if e.uni.wtype!!.isrec()
                 ${if (num == 0) "" else "assert($ee.tag == $num);"}
@@ -455,15 +455,15 @@ fun code_fe (e: Expr) {
             val pos = when {
                 (e.tk.str == "Null")  -> "(&$ee == NULL)"
                 (e.wup is Expr.UPred) -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype as Type.Union).yids)!!
                     "($ee.tag == $num) && $ee._$num"
                 }
                 (e.uni is Expr.UPred) -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype as Type.Union).yids)!!
                     "($ee.tag == $num)"
                 }
                 else -> {
-                    val num = e.tk.field2num((e.uni.wtype!!.unpak() as Type.Union).yids)!!
+                    val num = e.tk.field2num((e.uni.wtype as Type.Union).yids)!!
                     "((&$ee != NULL) && ($ee.tag == $num))"
                 }
             }
