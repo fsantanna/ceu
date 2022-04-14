@@ -778,22 +778,20 @@ class TXTask {
 
     @Test
     fun f10_task_type () {
-        val out = test(
-            true, """
-                type Xask = task ()->_int->()
-                var t : Xask
-                set t = Xask {
-                    set pub = _10:_int
-                    output Std _2:_int
-                }
-                output Std _1:_int
-                var x : active Xask
-                set x = spawn t ()
-                var y = spawn t ()
-                output Std x.pub
-                output Std _3:_int
-            """.trimIndent()
-        )
+        val out = test(true, """
+            type Xask = task ()->_int->()
+            var t : Xask
+            set t = Xask {
+                set pub = _10:_int
+                output Std _2:_int
+            }
+            output Std _1:_int
+            var x : active Xask
+            set x = spawn t ()
+            var y = spawn t ()
+            output Std x.pub
+            output Std _3:_int
+        """.trimIndent())
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
     @Test

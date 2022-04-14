@@ -1084,7 +1084,7 @@ object Parser
                 if (isinc) {
                     All_assert_tk(tp.tk, tp is Type.Union) { "expected union type" }
                 }
-                Stmt.Typedef(id, isinc, pars, null, scps, tp, null, true)
+                Stmt.Typedef(id, isinc, pars, null, scps, tp, null)
             }
 
             // CE1

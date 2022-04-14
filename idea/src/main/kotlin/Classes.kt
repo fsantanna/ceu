@@ -108,8 +108,7 @@ sealed class Stmt (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?) {
         var args: List<Type>?,  // {_int}   (only when instantiated)
         var xscp1s: Pair<List<Tk.Scp>?,List<Pair<String,String>>?>,
         val type: Type,         // = <...>
-        var xtype: Type?,       // because of +=
-        var xisact: Boolean
+        var xtype: Type?       // because of +=
     ) : Stmt(N++, tk_, null, null)
     data class XBreak  (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)
     data class XReturn (val tk_: Tk.Fix) : Stmt(N++, tk_, null, null)

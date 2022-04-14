@@ -261,8 +261,7 @@ fun Stmt.Typedef.instantiate (tk: Tk, args: List<Type>): Stmt.Typedef {
         args.map { it.clone(tk,this.wup!!) },
         this.xscp1s,
         this.type.clone(tk,this.wup!!),
-        this.xtype!!.clone(tk,this.wup!!),
-        this.xisact
+        this.xtype!!.clone(tk,this.wup!!)
     ).setUps(this.wup!!).setEnvs(this) as Stmt.Typedef
     ret.wenv = this.wenv
     ret.type.visit(::ft, null)

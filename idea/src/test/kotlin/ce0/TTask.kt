@@ -850,6 +850,16 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n") { out }
     }
+    @Test
+    fun d02_field () {
+        val out = test(false, """
+            var f : task @{}->()->_int->()
+            var xf: active task @{}->()->_int->()
+            set xf = spawn f @{} ()
+            set _:_ = xf.pub
+        """.trimIndent())
+        assert(out == "1\n2\n3\n4\n") { out }
+    }
 
     // SPAWN / DYNAMIC
 
@@ -1358,7 +1368,7 @@ class TTask {
             type Event $D{} @{} = <(),_uint64_t,()>
             type Bird $D{} @{} = task  @{} -> () -> () -> ()
             
-            var t1: Bird  $D{} @{}
+            var t1 : Bird $D{} @{}
             set t1 = Bird $D{} @{} task  @{} -> () -> () -> () {
                  ${output0("_2:_int","_int")}
             }

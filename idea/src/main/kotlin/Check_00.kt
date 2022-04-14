@@ -95,7 +95,6 @@ fun check_00_after_envs (s: Stmt) {
                         }
 
                         // TODO: check funcs should not mutate the AST
-                        dcl.xisact = false
                         s.xtype = Type.Union(old.tk_, old.common, old.vec+inc.vec, yids).setUpEnv(dcl,dcl)
                     }
                 }
