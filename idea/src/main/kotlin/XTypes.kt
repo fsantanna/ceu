@@ -80,7 +80,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                             this.e.xinfTypes(tp.react_noalias(this))
                         }
                     }
-                    if (!this.isact!!) tp else {
+                    if (!this.xisact!!) tp else {
                         Type.Active(
                             Tk.Fix("active", this.tk.lin, this.tk.col),
                             tp

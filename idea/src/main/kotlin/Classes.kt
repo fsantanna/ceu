@@ -71,7 +71,7 @@ sealed class Expr (val n: Int, val tk: Tk, var wup: Any?, var wenv: Any?, var wt
     data class Var   (val tk_: Tk.id): Expr(N++, tk_, null, null, null)
     data class Nat   (val tk_: Tk.Nat, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class Cast  (val tk_: Tk.Fix, val e: Expr, val type: Type): Expr(N++, tk_, null, null, type)
-    data class Named (val tk_: Tk, val e: Expr, val isact: Boolean?, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
+    data class Named (val tk_: Tk, val e: Expr, var xisact: Boolean?, var xtype: Type?): Expr(N++, tk_, null, null, xtype)
     data class UNamed (val tk_: Tk.Fix, val isinf: Boolean, val e: Expr): Expr(N++, tk_, null, null, null)
     data class TCons (val tk_: Tk.Fix, val arg: List<Expr>, val yids: List<Tk.id>?): Expr(N++, tk_, null, null, null)
     data class UCons (val tk_: Tk, var xtype: Type.Union?, val arg: Expr): Expr(N++, tk_, null, null, xtype)
