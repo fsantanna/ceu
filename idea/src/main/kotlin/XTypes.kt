@@ -92,7 +92,11 @@ fun Expr.xinfTypes (inf_: Type?) {
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
-                    this.xtype = Pair((inf is Type.Active || inf is Type.Actives),ret)
+                    this.xtype = if (inf is Type.Active || inf is Type.Actives) {
+                        Pair(true, ret.noact())
+                    } else {
+                        Pair(false, ret)
+                    }
                     ret
                 }
                 else -> {
