@@ -27,9 +27,9 @@ fun Type.pos (): String {
 }
 
 fun Type.output_Std (c: String, arg: String): String {
-    val pln_from_ptr_to_tup_or_uni: Type? = this.unpak().let {
+    val pln_from_ptr_to_tup_or_uni: Type? = this.uname().let {
         if (it !is Type.Pointer) null else {
-            it.pln.unpak().let {
+            it.pln.uname().let {
                 if (it is Type.Tuple || it is Type.Union) it else null
             }
         }
@@ -52,7 +52,7 @@ fun Type.output_Std (c: String, arg: String): String {
                 
             """.trimIndent()
         }
-        else -> "output_Std_${this.unpak().toce()}$c($arg);\n"
+        else -> "output_Std_${this.uname().toce()}$c($arg);\n"
     }
 }
 
@@ -148,7 +148,7 @@ fun code_ft (tp: Type) {
                     printf("[");
                     ${tp.vec
                         .mapIndexed { i,sub ->
-                            val s = when (sub.unpak()) {
+                            val s = when (sub.uname()) {
                                 is Type.Union, is Type.Tuple -> "&v->_${i + 1}"
                                 else -> "v->_${i + 1}"
                             }
@@ -215,7 +215,7 @@ fun code_ft (tp: Type) {
                     switch (v->tag) {
                         ${tp.vec
                             .mapIndexed { i,sub ->
-                                val s = when (sub.unpak()) {
+                                val s = when (sub.uname()) {
                                     is Type.Unit -> ""
                                     is Type.Union, is Type.Tuple -> "putchar(' ');\n" + sub.output_Std("_", "&v->_${i+1}")
                                     else -> "putchar(' ');\n" + sub.output_Std("_", "v->_${i+1}")
@@ -402,7 +402,7 @@ fun code_fe (e: Expr) {
                     var xxx = e.type
                     var yyy = ex.expr
                     val pre = e.type.subs.map {
-                        val uni = xxx.unpak() as Type.Union
+                        val uni = xxx.uname() as Type.Union
                         val num = it.field2num(uni.yids)!!
                         val pre = """
                             assert(&$yyy != NULL);    // TODO: only if e.uni.wtype!!.isrec()

@@ -164,7 +164,7 @@ fun check_02_after_tps (s: Stmt) {
                 All_assert_tk(s.dst.tk, s.dst.wtype is Type.Actives) {
                     "invalid `spawn` : type mismatch : expected active tasks : have ${s.dst.wtype!!.tostr()}"
                 }
-                val call = s.call.unpak() as Expr.Call
+                val call = s.call.uname() as Expr.Call
                 val ftp = call.f.wtype!!
                 All_assert_tk(s.call.tk, ftp is Type.Func && ftp.tk.str=="task") {
                     "invalid `spawn` : type mismatch : expected task : have ${ftp.tostr()}"

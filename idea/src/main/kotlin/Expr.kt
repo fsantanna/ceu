@@ -45,8 +45,8 @@ fun Expr.toBaseVar (): Expr.Var? {
     }
 }
 
-fun Expr.unpak (): Expr {
-    return if (this !is Expr.Named) this else this.e.unpak()
+fun Expr.uname (): Expr {
+    return if (this !is Expr.Named) this else this.e.uname()
 }
 
 fun Expr.upspawn (): Stmt? {

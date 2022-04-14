@@ -901,8 +901,8 @@ object Parser
             alls.acceptFix("call")   -> {
                 val tk0 = alls.tk0 as Tk.Fix
                 val e = this.expr()
-                All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
-                Stmt.SCall(tk0, e.unpak() as Expr.Call)
+                All_assert_tk(tk0, e.uname() is Expr.Call) { "expected call expression" }
+                Stmt.SCall(tk0, e.uname() as Expr.Call)
             }
 
             // control flow
@@ -986,7 +986,7 @@ object Parser
                     } as Stmt
                 } else {
                     val e = this.expr()
-                    All_assert_tk(tk0, e.unpak() is Expr.Call) { "expected call expression" }
+                    All_assert_tk(tk0, e.uname() is Expr.Call) { "expected call expression" }
                     if (alls.acceptFix("in")) {
                         val tsks = this.expr()
                         Stmt.DSpawn(tk0, tsks, e)
