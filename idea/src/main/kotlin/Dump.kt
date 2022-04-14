@@ -53,7 +53,7 @@ fun Expr.dump (spc: Int = 0): String {
         is Expr.Var   -> "Var '" + this.tk.str + "'\n"
         is Expr.Nat   -> "Nat '" + this.tk.str + "'\n" + this.xtype.x()
         is Expr.Cast  -> "Cast\n" + this.e.dump(spc+4) + this.type.dump(spc+4)
-        is Expr.Named   -> "Named (${this.xtype?.first})\n" + this.xtype?.second?.x() + this.e.dump(spc+4)
+        is Expr.Named  -> "Named (${this.xtype?.first})\n" + (this.xtype.let { if (it==null) null else it.second }).x() + this.e.dump(spc+4)
         is Expr.UNamed -> "Unamed\n" + this.e.dump(spc+4)
         is Expr.Upref -> "Upref\n" + this.pln.dump(spc+4)
         is Expr.Dnref -> "Dnref\n" + this.ptr.dump(spc+4)

@@ -310,7 +310,14 @@ object Parser
                     }
                     // Pair [x,y]
                     alls.checkExpr() -> {
-                        this.expr()
+                        // remove implicit Expr.Named to avoid duplicate
+                        this.expr().let {
+                            if (it is Expr.Named && it.xtype==null) {
+                                it.e
+                            } else {
+                                it
+                            }
+                        }
                     }
                     // TFunc { ... }
                     alls.checkFix("{") -> {
