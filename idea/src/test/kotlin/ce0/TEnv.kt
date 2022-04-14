@@ -2545,10 +2545,18 @@ class TEnv {
     @Test
     fun s03_err () {
         val out = inp2env("""
-            type Tx $D{} @{}= [()]
             set _:_ = ()~
         """.trimIndent())
-        assert(out == "(ln 2, col 13): invalid type unpack : expected type alias : found ()") { out }
+        assert(out == "(ln 1, col 13): invalid type unpack : expected type alias : found ()") { out }
+    }
+    @Test
+    fun s04_err () {
+        val out = inp2env("""
+            var x: ()
+            set x = ()
+            set _:_ = x~
+        """.trimIndent())
+        assert(out == "(ln 3, col 12): invalid type unpack : expected type alias : found ()") { out }
     }
     @Test
     fun s04_union () {
