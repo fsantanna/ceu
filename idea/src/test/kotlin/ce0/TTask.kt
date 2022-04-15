@@ -858,7 +858,7 @@ class TTask {
             set xf = spawn f @{} ()
             set _:_ = xf.pub
         """.trimIndent())
-        assert(out == "1\n2\n3\n4\n") { out }
+        assert(out.contains("error: expected expression before ‘=’ token")) { out }
     }
 
     // SPAWN / DYNAMIC

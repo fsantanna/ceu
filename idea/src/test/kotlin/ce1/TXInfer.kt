@@ -1033,6 +1033,23 @@ class TXInfer {
         """.trimIndent()) { out }
     }
     @Test
+    fun g04_xask () {
+        val out = all("""
+            type Xask = task ()->_int->()
+            var t : Xask
+            var x : active Xask
+            --set x = spawn active Xask t ()
+            set x = spawn t ()
+        """.trimIndent())
+        assert(out == """
+            type Xask $D{} @{} = task @{} -> () -> _int -> ()
+            var t: Xask $D{} @{}
+            var x: active Xask $D{} @{}
+            set x = spawn (active Xask $D{} @{} ((t~) @{} (): @GLOBAL))
+            
+        """.trimIndent()) { out }
+    }
+    @Test
     fun g04_task_type () {
         val out = all("""
             type Xask = task ()->_int->()

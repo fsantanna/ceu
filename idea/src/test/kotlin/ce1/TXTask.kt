@@ -796,17 +796,6 @@ class TXTask {
         assert(out == "1\n2\n2\n10\n3\n") { out }
     }
     @Test
-    fun fxx_xask () {
-        val out = test(true, """
-            type Xask = task ()->_int->()
-            var t : Xask
-            var x : active Xask
-            --set x = spawn active Xask t ()
-            set x = spawn t ()
-        """.trimIndent())
-        assert(out == "1\n2\n2\n10\n3\n") { out }
-    }
-    @Test
     fun fxx_task_type () {
         val out = test(
             true, """
