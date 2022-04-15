@@ -148,7 +148,7 @@ fun Type.Named.nm_uname (): Type {
     val def = this.def()!!
     return def.getType().mapScps(false,
         def.xscp1s.first!!.map { it.str }.zip(this.xscps!!).toMap()
-    ).clone(this.tk,this)
+    )
 }
 
 fun Type.act_uact (): Type {

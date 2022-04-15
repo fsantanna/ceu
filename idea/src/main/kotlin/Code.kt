@@ -28,7 +28,7 @@ fun Type.pos (): String {
 
 // TODO: remove this funcion. only (flawed) output systems needs it
 fun Type.uname (): Type {
-    return if (this !is Type.Named) this else this.nm_uname()
+    return if (this !is Type.Named) this else this.nm_uname().clone(this.tk,this)
 }
 
 fun Type.output_Std (c: String, arg: String): String {
