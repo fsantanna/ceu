@@ -78,7 +78,7 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
             if (this.xtype==null) this.e.tostr(lc) else ("(" + active + tp?.tostr(lc,true) + " " + this.e.tostr(lc,hassubs) + ")")
         }
         is Expr.UNamed -> this.e.wtype.let {
-            if (it==null || it.noact() !is Type.Named) {
+            if (it==null || !it.nm_isActiveNamed()) {
                 this.e.tostr(lc)
             } else {
                 ("(" + this.e.tostr(lc) + "~" + "" + ")")

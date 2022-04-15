@@ -42,7 +42,7 @@ fun check_02_after_tps (s: Stmt) {
             is Expr.Named   -> {
                 if (e.xtype != null) {
                     val tp = e.wtype!!
-                    val dst = tp.uact_uname_act_2(e)
+                    val dst = tp.nm_uact_uname_act(e)
                     val src = e.e.wtype!!
                     All_assert_tk(e.tk, dst.isSupOf(src)) {
                         "invalid type pack : ${mismatch(dst, src)}"
@@ -50,7 +50,7 @@ fun check_02_after_tps (s: Stmt) {
                 }
             }
             is Expr.UNamed -> {
-                All_assert_tk(e.tk, e.isinf || e.e.wtype?.noact().let { it is Type.Named || it is Type.Nat }) {
+                All_assert_tk(e.tk, e.isinf || e.e.wtype!!.let { it.nm_isActiveNamed() || it is Type.Nat }) {
                     "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
             }

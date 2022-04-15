@@ -73,12 +73,12 @@ fun Expr.xinfTypes (inf_: Type?) {
                 // explicit type
                 (this.xtype != null) -> {
                     tp as Type.Named
-                    this.e.xinfTypes(tp.uact_uname_act_2(this))
+                    this.e.xinfTypes(tp.nm_uact_uname_act(this))
                     if (infArgs) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                         if (!this.e.wtype!!.isConcrete()) {
                             // reinfer this.e to populate missing parameters
-                            this.e.xinfTypes(tp.uact_uname_act_2(this))
+                            this.e.xinfTypes(tp.nm_uact_uname_act(this))
                         }
                     }
                     if (!this.xtype!!.first) tp else {
@@ -89,13 +89,13 @@ fun Expr.xinfTypes (inf_: Type?) {
                     }
                 }
                 // no explicit, but inf is Named, so set this.xtype
-                (inf!=null && inf.isActiveNamed()) -> {
-                    this.e.xinfTypes(inf.uact_uname_act_2(this))
+                (inf!=null && inf.nm_isActiveNamed()) -> {
+                    this.e.xinfTypes(inf.nm_uact_uname_act(this))
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
                     this.xtype = if (inf is Type.Active || inf is Type.Actives) {
-                        Pair(true, ret.noact2())
+                        Pair(true, ret.nm_uact())
                     } else {
                         Pair(false, ret)
                     }
@@ -110,7 +110,11 @@ fun Expr.xinfTypes (inf_: Type?) {
        }
         is Expr.UNamed -> {
             this.e.xinfTypes(inf)
-            this.e.wtype!!.react_uname(this)
+            if (this.e.wtype!!.nm_isActiveNamed()) {
+                this.e.wtype!!.nm_uact_uname_act(this)
+            } else {
+                this.e.wtype!!
+            }
         }
         is Expr.Upref -> {
             All_assert_tk(this.tk, inf==null || inf is Type.Nat || inf is Type.Pointer) { "invalid inference : type mismatch"}
@@ -273,7 +277,7 @@ fun Expr.xinfTypes (inf_: Type?) {
                 All_assert_tk(this.tk, it is Type.Active) {
                     "invalid \"pub\" : type mismatch : expected active task"
                 }
-                val ftp = it.noact() as Type.Func
+                val ftp = it.act_uact() as Type.Func
                 when (this.tk.str) {
                     "status" -> Type.Nat(Tk.Nat("_int", this.tk.lin, this.tk.col))
                     "pub"   -> ftp.pub!!

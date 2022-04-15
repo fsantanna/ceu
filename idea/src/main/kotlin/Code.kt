@@ -26,6 +26,11 @@ fun Type.pos (): String {
     }
 }
 
+// TODO: remove this funcion. only (flawed) output systems needs it
+fun Type.uname (): Type {
+    return if (this !is Type.Named) this else this.nm_uname()
+}
+
 fun Type.output_Std (c: String, arg: String): String {
     val pln_from_ptr_to_tup_or_uni: Type? = this.uname().let {
         if (it !is Type.Pointer) null else {
@@ -399,10 +404,10 @@ fun code_fe (e: Expr) {
             val (pre,pos) = when (e.type) {
                 is Type.Nat   -> Pair("", "((${e.type.toce()})${ex.expr})")
                 is Type.Named -> {
-                    var xxx = e.type
+                    var xxx = e.type.nm_uname()
                     var yyy = ex.expr
                     val pre = e.type.subs.map {
-                        val uni = xxx.uname() as Type.Union
+                        val uni = xxx as Type.Union
                         val num = it.field2num(uni.yids)!!
                         val pre = """
                             assert(&$yyy != NULL);    // TODO: only if e.uni.wtype!!.isrec()
@@ -507,7 +512,7 @@ fun code_fe (e: Expr) {
             val arg  = CODE.removeFirst()
             val f    = CODE.removeFirst()
             val blks = e.xscps.first!!.map { it.toce(e) }.joinToString(",")
-            val tpf  = e.f.wtype!!.noact()
+            val tpf  = e.f.wtype!!
             val upspawn = e.upspawn()
             when {
                 (e.f is Expr.Var && e.f.tk.str=="output_Std") -> {

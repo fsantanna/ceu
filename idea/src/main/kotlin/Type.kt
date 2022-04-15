@@ -112,7 +112,7 @@ fun Type.isrec (): Boolean {
     return this.flattenLeft().any { it is Type.Named && it.xisrec }
 }
 
-fun Type.isActiveNamed (): Boolean {
+fun Type.nm_isActiveNamed (): Boolean {
     return this is Type.Named || when (this) {
         is Type.Active  -> this.tsk is Type.Named
         is Type.Actives -> this.tsk is Type.Named
@@ -120,7 +120,7 @@ fun Type.isActiveNamed (): Boolean {
     }
 }
 
-fun Type.noact2 (): Type.Named {
+fun Type.nm_uact (): Type.Named {
     return when (this) {
         is Type.Active  -> this.tsk
         is Type.Actives -> this.tsk
@@ -129,17 +129,8 @@ fun Type.noact2 (): Type.Named {
     } as Type.Named
 }
 
-fun Type.noact (): Type {
-    //return this
-    return when (this) {
-        is Type.Active -> this.tsk
-        is Type.Actives -> this.tsk
-        else -> this //TODO()
-    }
-}
-
-fun Type.uact_uname_act_2 (up: Expr): Type {
-    val raw = this.noact2().uname2()
+fun Type.nm_uact_uname_act (up: Expr): Type {
+    val raw = this.nm_uact().nm_uname()
     return when (this) {
         is Type.Active  -> Type.Active(this.tk_, raw)
         is Type.Actives -> Type.Actives(this.tk_, this.len, raw)
@@ -147,16 +138,7 @@ fun Type.uact_uname_act_2 (up: Expr): Type {
     }.clone(up.tk,up)
 }
 
-fun Type.react_uname (up: Expr): Type {
-    val noalias = this.noact().uname().clone(up.tk,up)
-    return when (this) {
-        is Type.Active  -> Type.Active(this.tk_, noalias).setUpEnv(this.getUp()!!)
-        is Type.Actives -> Type.Actives(this.tk_, this.len, noalias).setUpEnv(this.getUp()!!)
-        else            -> noalias
-    }
-}
-
-fun Type.Named.uname2 (): Type {
+fun Type.Named.nm_uname (): Type {
     // Original constructor:
     //      typedef Pair @[a] = [/_int@a,/_int@a]
     //      var xy: Pair @[LOCAL] = [/x,/y]
@@ -169,8 +151,12 @@ fun Type.Named.uname2 (): Type {
     ).clone(this.tk,this)
 }
 
-fun Type.uname (): Type {
-    return if (this !is Type.Named) this else this.uname2()
+fun Type.act_uact (): Type {
+    return when (this) {
+        is Type.Active -> this.tsk
+        is Type.Actives -> this.tsk
+        else -> error("bug found")
+    }
 }
 
 fun Type.toce (): String {
