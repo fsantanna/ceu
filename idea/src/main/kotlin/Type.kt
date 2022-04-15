@@ -279,6 +279,7 @@ fun Stmt.Typedef.instantiate (tk: Tk, args: List<Type>): Stmt.Typedef {
     return ret
 }
 
+// given a concrete type tp, recover uninstantiated types [a=tp1,b=tp2,...]
 fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
     // this = Maybe ${a} = <None=(), Some=a>
     // tp   = <None=(), Some=_int>

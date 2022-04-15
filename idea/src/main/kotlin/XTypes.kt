@@ -80,6 +80,9 @@ fun Expr.xinfTypes (inf_: Type?) {
                             // reinfer this.e to populate missing parameters
                             this.e.xinfTypes(tp.nm_uact_uname_act(this))
                         }
+                        All_assert_tk(this.tk, this.e.wtype!!.isConcrete()) {
+                            "invalid inference : cannot determine type"
+                        }
                     }
                     if (!this.xtype!!.first) tp else {
                         Type.Active(
@@ -90,7 +93,13 @@ fun Expr.xinfTypes (inf_: Type?) {
                 }
                 // no explicit, but inf is Named, so set this.xtype
                 (inf!=null && inf.nm_isActiveNamed()) -> {
+                    val nm_inf  = inf.nm_uact()
                     this.e.xinfTypes(inf.nm_uact_uname_act(this))
+                    nm_inf.xargs = nm_inf.def()!!.uninstantiate(this.e.wtype!!)
+                    if (!this.e.wtype!!.isConcrete()) {
+                        // reinfer this.e to populate missing parameters
+                        this.e.xinfTypes(inf.nm_uact_uname_act(this))
+                    }
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
