@@ -112,6 +112,14 @@ fun Type.isrec (): Boolean {
     return this.flattenLeft().any { it is Type.Named && it.xisrec }
 }
 
+fun Type.isActiveNamed (): Boolean {
+    return this is Type.Named || when (this) {
+        is Type.Active  -> this.tsk is Type.Named
+        is Type.Actives -> this.tsk is Type.Named
+        else -> false
+    }
+}
+
 fun Type.noact2 (): Type.Named {
     return when (this) {
         is Type.Active  -> this.tsk

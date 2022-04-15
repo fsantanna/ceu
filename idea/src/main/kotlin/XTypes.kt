@@ -70,14 +70,15 @@ fun Expr.xinfTypes (inf_: Type?) {
                 tp?.xargs = emptyList()
             }
             when {
+                // explicit type
                 (this.xtype != null) -> {
                     tp as Type.Named
-                    this.e.xinfTypes(tp.react_uname(this))
+                    this.e.xinfTypes(tp.uact_uname_act_2(this))
                     if (infArgs) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
                         if (!this.e.wtype!!.isConcrete()) {
                             // reinfer this.e to populate missing parameters
-                            this.e.xinfTypes(tp.react_uname(this))
+                            this.e.xinfTypes(tp.uact_uname_act_2(this))
                         }
                     }
                     if (!this.xtype!!.first) tp else {
@@ -87,8 +88,9 @@ fun Expr.xinfTypes (inf_: Type?) {
                         )
                     }
                 }
-                (inf?.noact() is Type.Named) -> {
-                    this.e.xinfTypes(inf.react_uname(this))
+                // no explicit, but inf is Named, so set this.xtype
+                (inf!=null && inf.isActiveNamed()) -> {
+                    this.e.xinfTypes(inf.uact_uname_act_2(this))
                     assert(this.e.wtype!!.isConcrete())
                     val ret = inf.clone(this.tk, this)
                     assert(ret.isConcrete())
@@ -99,9 +101,10 @@ fun Expr.xinfTypes (inf_: Type?) {
                     }
                     ret
                 }
+                // no explicit, not Named, do not set this.xtype
                 else -> {
-                    this.e.xinfTypes(inf?.react_uname(this))
-                    this.e.wtype!! //.react_noalias(this)
+                    this.e.xinfTypes(inf)
+                    this.e.wtype!!
                 }
             }
        }
