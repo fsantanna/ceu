@@ -252,13 +252,10 @@ fun Stmt.Typedef.instantiate (tk: Tk, args: List<Type>): Stmt.Typedef {
         when (tp) {
             is Type.Par -> {
                 val a = p2a[tp.tk.str]!!
-                if (a is Type.Par) {
-                    assert(a.tk.str == tp.tk.str)
-                    // do not assign par.xtype = par
-                } else {
-                    //println(">>>")
-                    //println(a)
-                    tp.xtype = a
+                when {
+                    (a !is Type.Par)  -> { tp.xtype = a }
+                    (a.xtype != null) -> { tp.xtype = a.xtype }
+                    else -> {} // do not assign par.xtype = par
                 }
             }
         }

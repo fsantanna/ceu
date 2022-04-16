@@ -529,6 +529,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.src.xinfTypes(null)
                 this.dst.xinfTypes(this.src.wtype!!)
                 assert(this.dst.wtype!!.isConcrete())
+                //this.src.xinfTypes(this.dst.wtype!!)    // var x: /List = ... -- (make x concrete)
                 //assert(this.src.wtype!!.isConcrete())
             }
         }

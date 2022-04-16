@@ -1697,7 +1697,28 @@ class TXExec {
         assert(out == "<.1 [(),Null]>\n") { out }
     }
     @Test
+    fun s08_list11 () {
+        val out = test(true, """
+            type List $D{a} = <[${D}a,/List $D{a}]>
+            var x: /List = new <.1 [(),Null]>
+            var y = x\!1.2
+            output Std y
+            --output Std x\!1.2
+        """.trimIndent())
+        assert(out == "Null\n") { out }
+    }
+    @Test
     fun s08_list2 () {
+        val out = test(true, """
+            type List $D{a} = <[${D}a,/List $D{a}]>
+            var x: /List = new <.1 [(),Null]>
+            var y: [(),/List] = [(), new <.1 [(),Null]>]
+            output Std /y
+        """.trimIndent())
+        assert(out == "[(),<.1 [(),Null]>]\n") { out }
+    }
+    @Test
+    fun s08_list3 () {
         val out = test(true, """
             type List $D{a} = <[${D}a,/List $D{a}]>
             var x: /List = new <.1 [(),Null]>
@@ -1710,7 +1731,7 @@ class TXExec {
     @Test
     fun s09_list () {
         val out = test(true, """
-            type List = <[//List$D{a},$D{a},/List $D{a}]>
+            type List $D{a} = <[//List$D{a},${D}a,/List $D{a}]>
             var x: /List = new <.1 [_(&printf),(),Null]>
             set x\!1.1 = /x
             output Std x
