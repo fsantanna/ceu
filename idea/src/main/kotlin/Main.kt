@@ -19,7 +19,7 @@ fun ce2c (file: String?, ce: String): Pair<Boolean,String> {
         s.xinfTypes(null)
         s.setScp2s()
         check_02_after_tps(s)
-        //println(s.dump())
+        println(s.dump())
         //TODO()
         return Pair(true, s.code())
     } catch (e: Throwable) {

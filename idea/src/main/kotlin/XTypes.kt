@@ -521,9 +521,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.dst.xinfTypes(null)
                 this.src.xinfTypes(this.dst.wtype!!)
                 assert(this.src.wtype!!.isConcrete())
-                if (!this.dst.wtype!!.isConcrete()) {
-                    this.dst.xinfTypes(this.src.wtype!!)
-                }
+                this.dst.xinfTypes(this.src.wtype!!)    // var x: /List = ... -- (make x concrete)
             } catch (e: Throwable){
                 if (e.message.let { it!=null && !it.contains("invalid inference") }) {
                     throw e
@@ -531,6 +529,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
                 this.src.xinfTypes(null)
                 this.dst.xinfTypes(this.src.wtype!!)
                 assert(this.dst.wtype!!.isConcrete())
+                //assert(this.src.wtype!!.isConcrete())
             }
         }
         is Stmt.SCall -> this.e.xinfTypes(unit())

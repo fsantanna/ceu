@@ -1688,13 +1688,22 @@ class TXExec {
         assert(out == "(ln 10, col 22): invalid inference : cannot determine type") { out }
     }
     @Test
-    fun s08_list () {
+    fun s08_list1 () {
         val out = test(true, """
             type List $D{a} = <[${D}a,/List $D{a}]>
             var x: /List = new <.1 [(),Null]>
-            --var y: [(),/List] = [(), new <.1 [(),Null]>]
-            --var z = [(), /x]
-            --output Std z.2\\!1.2
+            output Std x
+        """.trimIndent())
+        assert(out == "<.1 [(),Null]>\n") { out }
+    }
+    @Test
+    fun s08_list2 () {
+        val out = test(true, """
+            type List $D{a} = <[${D}a,/List $D{a}]>
+            var x: /List = new <.1 [(),Null]>
+            var y: [(),/List] = [(), new <.1 [(),Null]>]
+            var z = [(), /x]
+            output Std z.2\\!1.2
         """.trimIndent())
         assert(out == "Null\n") { out }
     }
