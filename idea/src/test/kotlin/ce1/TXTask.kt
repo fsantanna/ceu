@@ -614,7 +614,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "(ln 11, col 15): invalid `loop` : type mismatch : expected tasks type : have ()") { out }
     }
-
     @Test
     fun f05_loop () {
         val out = test(true, """
@@ -628,7 +627,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
-
     @Test
     fun f06_pub () {
         val out = test(true, """
@@ -649,7 +647,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "1\n3\n") { out }
     }
-
     @Test
     fun f07_kill () {
         val out = test(true, """
@@ -669,7 +666,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "1\n") { out }
     }
-
     @Test
     fun f08_natural () {
         val out = test(true, """
@@ -775,7 +771,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "1\n10\n") { out }
     }
-
     @Test
     fun f10_task_type () {
         val out = test(true, """
@@ -864,7 +859,6 @@ class TXTask {
         )
         assert(out == "1\n2\n3\n") { out }
     }
-
     @Test
     fun f14_task_type () {
         val out = test(
@@ -927,7 +921,6 @@ class TXTask {
         """.trimIndent())
         assert(out == "1\n1\n2\n3\n") { out }
     }
-
     @Test
     fun g02_spawn_abort () {
         val out = test(true, """
@@ -960,6 +953,33 @@ class TXTask {
        """.trimIndent())
         assert(out == "1\n2\n1\n2\n") { out }
     }
+    @Test
+    fun g02_local () {
+        val out = test(true, """
+            --type Event = <(),_uint64_t,_int>
+            var f = task @{}->(_int)->()->() { @SELF
+                output Std _1:_int
+                paror {
+                    loop {
+                        await evt?3
+                        var x = evt!3
+                        if _(${D}x == 1) {
+                            break       -- awake if arg == 1
+                        }
+                    }
+                } with {
+                    emit @SELF Event.3 arg
+                    await _0
+                }
+                output Std _2:_int
+            }
+            var x1 = spawn f _1     -- awakes
+            var x2 = spawn f _0     -- dont awake
+            output Std _3:_int
+        """.trimIndent())
+        assert(out == "1\n2\n1\n3\n") { out }
+    }
+
     // AWAIT / RETURN / SPAWN
 
     @Test

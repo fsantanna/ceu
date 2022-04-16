@@ -94,5 +94,10 @@ fun check_01_before_tps (s: Stmt) {
             }
         }
     }
-    s.visit(null, ::fe, ::ft, null)
+    fun fs (s: Stmt) {
+        when (s) {
+            is Stmt.Emit -> if (s.tgt is Scope) s.tgt.check(s)
+        }
+    }
+    s.visit(::fs, ::fe, ::ft, null)
 }

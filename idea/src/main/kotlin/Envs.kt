@@ -11,10 +11,9 @@ fun Any.getEnv (): Any? {
 
 fun Any.getTk (): Tk {
     return when (this) {
-        is Type         -> this.tk
-        is Stmt.Var     -> this.tk
-        is Stmt.Block   -> this.tk
-        is Stmt.Typedef -> this.tk
+        is Type -> this.tk
+        is Expr -> this.tk
+        is Stmt -> this.tk
         else -> error("bug found")
     }
 }

@@ -995,7 +995,6 @@ class TTask {
         )
         assert(out.startsWith("(ln 2, col 11): invalid `loop` : type mismatch : expected tasks type")) { out }
     }
-
     @Test
     fun f05_loop () {
         val out = test(false, """
@@ -1008,7 +1007,6 @@ class TTask {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
-
     @Test
     fun f06_pub () {
         val out = test(false, """
@@ -1029,7 +1027,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n3\n") { out }
     }
-
     @Test
     fun f07_kill () {
         val out = test(false, """
@@ -1048,7 +1045,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n") { out }
     }
-
     @Test
     fun f07_valgrind () {
         val out = test(false, """
@@ -1065,7 +1061,6 @@ class TTask {
         """.trimIndent())
         assert(out == "()\n") { out }
     }
-
     @Test
     fun f08_natural () {
         val out = test(false, """
@@ -1104,7 +1099,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n2\n1\n2\n2\n()\n") { out }
     }
-
     @Test
     fun f09_dloop_kill () {
         val out = test(false, """
@@ -1126,7 +1120,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n10\n") { out }
     }
-
     @Test
     fun f10_track () {
         val out = test(false, """
@@ -1183,7 +1176,6 @@ class TTask {
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
-
     @Test
     fun g02_kill () {
         val out = test(false, """
@@ -1218,7 +1210,6 @@ class TTask {
        """.trimIndent())
         assert(out == "1\n2\n3\n4\n") { out }
     }
-
     @Test
     fun g03_kill () {
         val out = test(false, """
@@ -1265,7 +1256,6 @@ class TTask {
        """.trimIndent())
         assert(out == "10\n") { out }
     }
-
     @Test
     fun g03_f_kill_err () {
         val out = test(
@@ -1275,7 +1265,6 @@ class TTask {
         )
         assert(out == "(ln 1, col 32): expected \";\"") { out }
     }
-
     @Test
     fun g03_f_kill () {
         val out = test(false, """
@@ -1292,7 +1281,6 @@ class TTask {
        """.trimIndent())
         assert(out == "111\n222\n") { out }
     }
-
     @Test
     fun g04_err () {
         val out = test(false, """
@@ -1325,7 +1313,6 @@ class TTask {
        """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n6\n7\n") { out }
     }
-
     @Test
     fun g05_spawn_abort () {
         val out = test(false, """
@@ -1380,7 +1367,6 @@ class TTask {
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
     }
-
     @Test
     fun h02_task_type () {
         val out = test(false, """
@@ -1399,7 +1385,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n2\n3\n10\n") { out }
     }
-
     @Test
     fun h03_task_type () {
         val out = test(false, """
@@ -1445,7 +1430,6 @@ class TTask {
         """.trimIndent())
         assert(out == "2\n") { out }
     }
-
     @Test
     fun h05_task_type () {
         val out = test(false, """
@@ -1494,7 +1478,6 @@ class TTask {
         """.trimIndent())
         assert(out == "1\n1\n2\n3\n") { out }
     }
-
     @Test
     fun i02_err () {
         val out = test(
@@ -1505,6 +1488,22 @@ class TTask {
             """.trimIndent()
         )
         assert(out == "(ln 3, col 14): invalid call : not a function") { out }
+    }
+    @Test
+    fun i03_err () {
+        val out = test(false, """
+            type Event $D{} @{} = <(),_uint64_t,_int>
+            emit @XXX Event $D{} @{}<.3 _1:_int>:<(),_uint64_t,_int>
+        """.trimIndent())
+        assert(out == "(ln 2, col 6): undeclared scope \"@XXX\"") { out }
+    }
+    @Test
+    fun i04_err () {
+        val out = test(false, """
+            type Event $D{} @{} = <(),_uint64_t,_int>
+            emit @XXX Event $D{} @{}<.3 _1:_int>:<(),_uint64_t,_int>
+        """.trimIndent())
+        assert(out == "(ln 2, col 6): undeclared scope \"@XXX\"") { out }
     }
 
     // PAUSE
