@@ -76,6 +76,9 @@ fun Expr.xinfTypes (inf_: Type?) {
                     this.e.xinfTypes(tp.nm_uact_uname_act(this))
                     if (infArgs) {
                         tp.xargs = tp.def()!!.uninstantiate(this.e.wtype!!)
+                        All_assert_tk(this.tk, tp.xargs != null) {
+                            "invalid inference : cannot determine type"
+                        }
                         if (!this.e.wtype!!.isConcrete()) {
                             // reinfer this.e to populate missing parameters
                             this.e.xinfTypes(tp.nm_uact_uname_act(this))
@@ -95,7 +98,12 @@ fun Expr.xinfTypes (inf_: Type?) {
                 (inf!=null && inf.nm_isActiveNamed()) -> {
                     val nm_inf  = inf.nm_uact()
                     this.e.xinfTypes(inf.nm_uact_uname_act(this))
+                    //println(this.e.wtype?.dump())
                     nm_inf.xargs = nm_inf.def()!!.uninstantiate(this.e.wtype!!)
+                    All_assert_tk(this.tk, nm_inf.xargs != null) {
+                        "invalid inference : cannot determine type"
+                    }
+                    //println(nm_inf.xargs)
                     if (!this.e.wtype!!.isConcrete()) {
                         // reinfer this.e to populate missing parameters
                         this.e.xinfTypes(inf.nm_uact_uname_act(this))

@@ -277,12 +277,14 @@ fun Stmt.Typedef.instantiate (tk: Tk, args: List<Type>): Stmt.Typedef {
 }
 
 // given a concrete type tp, recover uninstantiated types [a=tp1,b=tp2,...]
-fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
+fun Stmt.Typedef.uninstantiate (tp: Type): List<Type>? {
     // this = Maybe ${a} = <None=(), Some=a>
     // tp   = <None=(), Some=_int>
     // return ${_int}
     val def = this.type.flattenLeft()
     val oth = tp.flattenLeft()
+    //println(def.map { it.tostr() })
+    //println(oth.map { it.tostr() })
     fun Type.con_ins_par (): Type {
         return when {
             this !is Type.Par -> this           // concrete
@@ -291,7 +293,7 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
         }
     }
     val grp = def.zip(oth)                          // [ ((),()), (a,a._int) ]
-        .filter    { it.first is Type.Par }         // [ (a,a._int) ]
+        .filter    { it.first is Type.Par && it.second.isConcrete() }  // [ (a,a._int) ]
         .map       { Pair(it.first.tk.str, it.second.con_ins_par()) }  // [ (a,_int) ]
         //.let { println(it);it }
         .groupBy   { it.first }                     // { a=[(a,_int)] }
@@ -315,5 +317,8 @@ fun Stmt.Typedef.uninstantiate (tp: Type): List<Type> {
             it
         }
         .mapValues { it.value.first() }                 // { a=_int }
-    return this.pars.map { grp[it.str]!! }
+    //println(grp)
+    return this.pars.map { grp[it.str] }.let {
+        if (it.any { it==null }) null else it as List<Type>
+    }
 }
