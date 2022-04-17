@@ -2271,6 +2271,35 @@ class TExec {
         )
         assert(out == "(ln 2, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
     }
+    @Test
+    fun t02_ok () {
+        val out = test(false, """
+            var min : ${D}a
+            var min : ()
+            var min : [()]
+           """.trimIndent()
+        )
+        assert(out == "OK") { out }
+    }
+    @Test
+    fun t03_err () {
+        val out = test(false, """
+            var min : ()
+            var min : [()]
+           """.trimIndent()
+        )
+        assert(out == "(ln 2, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
+    }
+    @Test
+    fun t04_err () {
+        val out = test(false, """
+            var min : ${D}a
+            var min : ()
+            var min : ()
+           """.trimIndent()
+        )
+        assert(out == "(ln 3, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
+    }
 
     @Test
     fun t01_f () {

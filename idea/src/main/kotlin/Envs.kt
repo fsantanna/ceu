@@ -64,9 +64,12 @@ fun Type.nonat_ (): Type? {
 fun Any.env (id: String): Any? {
     return this.env_first_map {
         when {
-            (it is Stmt.Typedef && it.tk.str==id)                       -> it
-            (it is Stmt.Var     && it.tk.str==id)                       -> it
-            (it is Stmt.Var     && it.tk.str.toUpperCase()==id)         -> it.ups_first_block()
+            (it is Stmt.Typedef && it.tk.str==id) -> it
+            (it is Stmt.Var     && it.tk.str==id) -> {
+                val fst = it.env(id)    // look first (parametric) declaration
+                fst ?: it
+            }
+            (it is Stmt.Var     && it.tk.str.toUpperCase()==id) -> it.ups_first_block()
             (it is Stmt.Block   && (it.scp1?.str==id || "B"+it.n==id)) -> it
             (it is Expr.Func) -> {
                 when {
@@ -96,6 +99,11 @@ fun Any.env (id: String): Any? {
             else -> null
         }
     }
+}
+fun Any.envs (id: String): List<Stmt.Var> {
+    return this.env_all()
+        .filter { it is Stmt.Var && it.tk.str==id }
+        .let { it as List<Stmt.Var> }
 }
 
 //////////////////////////////////////////////////////////////////////////////

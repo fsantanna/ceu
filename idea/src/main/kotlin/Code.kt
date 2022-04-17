@@ -277,9 +277,9 @@ fun String.loc_mem (up: Any): String {
     }
 }
 
-fun String.out_mem (up: Any): String {
+fun String.out_mem (up: Any, tp: String=""): String {
     val env = up.env(this)!!
-    val str = if (env is Stmt.Block) "B${env.n}" else this
+    val str = if (env is Stmt.Block) "B${env.n}" else this+tp
 
     val upf = env.ups_first(true){ it is Expr.Func }
     if (upf == null) {
@@ -351,7 +351,13 @@ fun Stmt.mem_vars (): String {
         is Stmt.Input, is Stmt.Output, is Stmt.Pause, is Stmt.XReturn, is Stmt.XBreak,
         is Stmt.Typedef -> ""
 
-        is Stmt.Var -> "${this.xtype!!.pos()} ${this.tk.str};\n"
+        is Stmt.Var -> this.xtype!!.let {
+            when {
+                !it.isConcrete() -> ""
+                this.envs(this.tk.str).isEmpty() -> "${this.xtype!!.pos()} ${this.tk.str};\n"
+                else -> "${it.pos()} ${this.tk.str}_${it.toce()};\n"
+            }
+        }
         is Stmt.Loop -> this.block.mem_vars()
         is Stmt.DLoop -> this.block.mem_vars()
 
@@ -394,7 +400,13 @@ fun code_fe (e: Expr) {
     CODE.addFirst(when (e) {
         is Expr.Unit  -> Code("", "", "", "", "0")
         is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk_.payload().native(e, e.tk)) }
-        is Expr.Var   -> Code("", "", "", "", e.tk.str.out_mem(e))
+        is Expr.Var   -> {
+            val dcl = e.env(e.tk.str) as Stmt.Var
+            val tp = dcl.xtype!!.let {
+                if (it.isConcrete()) "" else "_"+e.wtype!!.toce()
+            }
+            Code("", "", "", "", e.tk.str.out_mem(e,tp))
+        }
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
         is Expr.Dnref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(*" + it.expr + ")") }
         is Expr.TDisc -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, it.expr + "._" + e.tk.field2num((e.tup.wtype as Type.Tuple).yids)) }

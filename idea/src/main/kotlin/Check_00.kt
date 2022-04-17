@@ -51,9 +51,20 @@ fun check_00_after_envs (s: Stmt) {
     fun fs (s: Stmt) {
         when (s) {
             is Stmt.Var -> {
-                val dcl = s.env(s.tk.str) as Stmt.Var?
-                All_assert_tk(s.tk, dcl==null || dcl.xtype.let { it!=null && !it.isConcrete() && s.xtype.let { it!=null && it.isConcrete() }}) {
-                    "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl!!.getTk().lin})"
+                val vars = s.envs(s.tk.str)
+                val xtp = s.xtype
+                //println(vars.map { it.tostr() })
+                val ok = when {
+                    vars.isEmpty() -> true                  // no previous declaration, so accept this
+                    (xtp == null) -> vars.isEmpty()         // no current type, must be the first/only
+                    !xtp.isConcrete() -> vars.isEmpty()     // abstract type, must be first
+                    vars.any { it.xtype==null } -> false    // found one untyped, cannot accept another
+                    vars.last().xtype!!.isConcrete() -> false  // first must be abstact
+                    else -> true
+                    //vars.none { it.xtype!!.isSupOf(xtp!!) }
+                }
+                All_assert_tk(s.tk, ok) {
+                    "invalid declaration : \"${s.tk.str}\" is already declared (ln ${vars.first().getTk().lin})"
                 }
             }
             is Stmt.Block -> {

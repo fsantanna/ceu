@@ -1820,4 +1820,26 @@ class TXExec {
         )
         assert(out == "<.1 Null>\n[(),<.1 <.1 Null>>]\n") { out }
     }
+
+    // PARAMETRIC VALS / FUNCS / GENERICS
+
+    @Test
+    fun t01_err () {
+        val out = test(true, """
+            var min : ${D}a
+            var min = _1:_int
+           """.trimIndent()
+        )
+        assert(out == "(ln 10, col 5): invalid declaration : \"min\" is already declared (ln 9)") { out }
+    }
+    @Test
+    fun t02_err () {
+        val out = test(true, """
+            var min = _1:_int
+            var min = _1:_int
+           """.trimIndent()
+        )
+        assert(out == "(ln 10, col 5): invalid declaration : \"min\" is already declared (ln 9)") { out }
+    }
+
 }

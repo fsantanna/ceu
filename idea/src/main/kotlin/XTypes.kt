@@ -40,6 +40,11 @@ fun Type.isConcrete (): Boolean {
         it is Type.Named && it.xargs==null || it is Type.Par && it.xtype==null
     }
 }
+fun Type.hasPar (): Boolean {
+    return !this.flattenLeft().any {
+        it is Type.Par && it.xtype==null
+    }
+}
 
 fun Expr.xinfTypes (inf_: Type?) {
     val inf = when {
@@ -364,19 +369,21 @@ fun Expr.xinfTypes (inf_: Type?) {
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!
             val ret = when {
-                (s !is Stmt.Var)  -> s.getType()
+                (s !is Stmt.Var) -> s.getType()
                 // TODO: hack to substitute s.xtype if currently "_" (see x18_clone_rec)
                 //(s.xtype.let { it==null || it is Type.Nat && it.tk.str=="_" }) -> {
                 s.xtype.let { it!=null && (it.isConcrete() || inf==null || !inf.isConcrete()) } -> {
                     s.xtype!!
                 }
-                (inf == null)     -> null
+                (inf == null) -> null
                 else -> {
                     val ret = inf.clone(this.tk, this)
                     All_assert_tk(ret.tk, ret.isConcrete()) {
                         "invalid inference : cannot determine type"
                     }
-                    s.xtype = ret  // set var.xtype=inf if Stmt.Var doesn't know its type yet
+                    if (s.xtype.let { it==null || it.hasPar() }) {
+                        s.xtype = ret  // set var.xtype=inf if Stmt.Var doesn't know its type yet
+                    }
                     ret
                 }
             }
