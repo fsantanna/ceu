@@ -51,8 +51,8 @@ fun check_00_after_envs (s: Stmt) {
     fun fs (s: Stmt) {
         when (s) {
             is Stmt.Var -> {
-                val dcl = s.env(s.tk.str)
-                All_assert_tk(s.tk, dcl == null) {
+                val dcl = s.env(s.tk.str) as Stmt.Var?
+                All_assert_tk(s.tk, dcl==null || dcl.xtype.let { it!=null && !it.isConcrete() && s.xtype.let { it!=null && it.isConcrete() }}) {
                     "invalid declaration : \"${s.tk.str}\" is already declared (ln ${dcl!!.getTk().lin})"
                 }
             }

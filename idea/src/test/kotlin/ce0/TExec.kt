@@ -2260,6 +2260,48 @@ class TExec {
         assert(out == "()\n()\n") { out }
     }
 
+    // PARAMETRIC VALS / FUNCS / GENERICS
+
+    @Test
+    fun t01_err () {
+        val out = test(false, """
+            var min : ${D}a
+            var min : ${D}a
+           """.trimIndent()
+        )
+        assert(out == "(ln 2, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
+    }
+
+    @Test
+    fun t01_f () {
+        val out = test(false, """
+            $Output0
+            var min : ${D}a
+            var min : ()
+            set min = ()
+            var x: ()
+            set x = min::()
+            ${output0("x","()")}
+           """.trimIndent()
+        )
+        assert(out == "()\n") { out }
+    }
+
+    @Test
+    fun t02_f () {
+        val out = test(false, """
+            $Output0
+            var f : func $D{a}  @{} -> ${D}a -> ()
+            var f : func $D{()} @{} ->   ()  -> ()
+            var f = func $D{()} @{} ->   ()  -> () {
+                return ()
+            }
+            ${output0("f ()","()")}
+           """.trimIndent()
+        )
+        assert(out == "()\n") { out }
+    }
+
     // ALL
 
     @Test

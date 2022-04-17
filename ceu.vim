@@ -17,8 +17,9 @@ syn keyword PreProc     new output pause resume return set throw until var
 syn keyword Statement   active catch defer do else every func if ifs loop
 syn keyword Statement   native par parand paror pauseon spawn type task type
 syn keyword Statement   watching with where
+syn keyword Statement   interface
 syn keyword Identifier  arg pub ret evt status Event Int Null Common
-syn keyword Function    std pico
+#syn keyword Function    std pico
 syn keyword Function    not and or
 syn keyword Function    eq neq gt lt gte lte
 syn keyword Function    umn add sub mul div rem

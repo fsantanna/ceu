@@ -420,7 +420,7 @@ fun code_fe (e: Expr) {
                     }.joinToString("")
                     Pair(pre,ex.expr)
                 }
-                else -> TODO()
+                else -> Pair("", ex.expr)
             }
             Code(ex.type+tp.type, ex.struct+tp.struct, ex.func+tp.func, ex.stmt+tp.stmt+pre, pos)
         }
