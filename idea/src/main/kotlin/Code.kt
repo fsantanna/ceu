@@ -401,10 +401,8 @@ fun code_fe (e: Expr) {
         is Expr.Unit  -> Code("", "", "", "", "0")
         is Expr.Nat   -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, e.tk_.payload().native(e, e.tk)) }
         is Expr.Var   -> {
-            val dcl = e.env(e.tk.str) as Stmt.Var
-            val tp = dcl.xtype!!.let {
-                if (it.isConcrete()) "" else "_"+e.wtype!!.toce()
-            }
+            val dcl = e.env(e.tk.str)!!.getType()!!
+            val tp = if (dcl.isConcrete()) "" else "_"+e.wtype!!.toce()
             Code("", "", "", "", e.tk.str.out_mem(e,tp))
         }
         is Expr.Upref -> CODE.removeFirst().let { Code(it.type, it.struct, it.func, it.stmt, "(&" + it.expr + ")") }
