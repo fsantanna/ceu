@@ -2300,9 +2300,8 @@ class TExec {
         )
         assert(out == "(ln 3, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
     }
-
     @Test
-    fun t01_f () {
+    fun t05_ok () {
         val out = test(false, """
             $Output0
             var min : ${D}a
@@ -2315,7 +2314,17 @@ class TExec {
         )
         assert(out == "()\n") { out }
     }
-
+    @Test
+    fun t06_no () {
+        val out = test(false, """
+            var min : ${D}a
+            var min : ()
+            var x: [()]
+            set x = min::[()]
+           """.trimIndent()
+        )
+        assert(out == "(ln 4, col 9): undeclared variable \"min\"") { out }
+    }
     @Test
     fun t02_f () {
         val out = test(false, """

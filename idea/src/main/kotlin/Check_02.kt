@@ -27,10 +27,9 @@ fun check_02_after_tps (s: Stmt) {
             }
         }
     }
-
     fun fe (e: Expr) {
         when (e) {
-            is Expr.Cast  -> {
+            is Expr.Cast   -> {
                 e.type.let {
                     val dst = e.type
                     val src = e.e.wtype!!
@@ -39,7 +38,7 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
-            is Expr.Named   -> {
+            is Expr.Named  -> {
                 if (e.xtype != null) {
                     val tp = e.wtype!!
                     val dst = tp.nm_uact_uname_act(e)
@@ -54,7 +53,7 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid type unpack : expected type alias : found ${e.e.wtype!!.tostr()}"
                 }
             }
-            is Expr.UCons -> {
+            is Expr.UCons  -> {
                 e.check(e.xtype!!)
                 val sup = e.xtype!!.vec[e.tk.field2num(e.xtype!!.yids)!! - 1]
                 val sub = e.arg.wtype!!
@@ -62,12 +61,12 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid constructor : ${mismatch(sup,sub)}"
                 }
             }
-            is Expr.New   -> {
+            is Expr.New    -> {
                 All_assert_tk(e.tk, ((e.arg as Expr.Named).xtype!!.second as Type.Named).xisrec) {
                     "invalid `new` : expected recursive type : have "
                 }
             }
-            is Expr.Call  -> {
+            is Expr.Call   -> {
                 val func = e.f.wtype
                 val ret1 = e.wtype!!
                 val arg1 = e.arg.wtype!!
@@ -126,7 +125,7 @@ fun check_02_after_tps (s: Stmt) {
                     }
                 }
             }
-            is Expr.If    -> {
+            is Expr.If     -> {
                 All_assert_tk(e.tk, e.tst.wtype is Type.Nat) {
                     "invalid condition : type mismatch : expected _int : have ${e.tst.wtype!!.tostr()}"
                 }
@@ -136,7 +135,15 @@ fun check_02_after_tps (s: Stmt) {
                     "invalid \"if\" : ${mismatch(t,f)}"
                 }
             }
-
+            is Expr.Var    -> {
+                //println(e.wtype?.dump())
+                //println(e.envs(e.tk.str).map { it.tostr() })
+                val tps = e.envs(e.tk.str).map { it.xtype!! }.filter { it.isConcrete() }
+                val ok  = tps.any { it.isSupOf(e.wtype!!) }
+                All_assert_tk(e.tk, ok) {
+                    "undeclared variable \"${e.tk.str}\""
+                }
+            }
         }
     }
     fun fs (s: Stmt) {
