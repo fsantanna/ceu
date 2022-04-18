@@ -66,6 +66,7 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
         (sub  is Type.Par) -> sub.xtype.let { it==null || this.isSupOf(it) }
         (this is Type.Nat || sub is Type.Nat) -> true
         (this is Type.Active && sub is Type.Actives) -> this.tsk.isSupOf(sub.tsk)
+        (this is Type.Actives && sub is Type.Actives) -> this.tsk.isSupOf(sub.tsk)
         (this is Type.Active && sub is Type.Active)  -> this.tsk.isSupOf(sub.tsk)
         (this is Type.Named && sub is Type.Named)    -> {    // TODO: check scopes
             //println(this.dump())

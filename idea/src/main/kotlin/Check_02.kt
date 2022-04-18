@@ -138,10 +138,18 @@ fun check_02_after_tps (s: Stmt) {
             is Expr.Var    -> {
                 //println(e.wtype?.dump())
                 //println(e.envs(e.tk.str).map { it.tostr() })
-                val tps = e.envs(e.tk.str).map { it.xtype!! }.filter { it.isConcrete() }
-                val ok  = tps.any { it.isSupOf(e.wtype!!) }
-                All_assert_tk(e.tk, ok) {
-                    "undeclared variable \"${e.tk.str}\""
+                if (e.tk.str in listOf("arg","pub","ret","evt","err")) {
+                    // ok
+                } else {
+                    val tps = e.envs(e.tk.str).map { it.xtype!! }.filter { it.isConcrete() }
+                    val ok = tps.any {
+                        //println(it.tostr())
+                        //println(e.wtype!!.tostr())
+                        it.isSupOf(e.wtype!!)
+                    }
+                    All_assert_tk(e.tk, ok) {
+                        "undeclared variable \"${e.tk.str}\""
+                    }
                 }
             }
         }
