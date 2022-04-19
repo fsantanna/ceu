@@ -66,6 +66,13 @@ fun check_00_after_envs (s: Stmt) {
                     else -> true
                     //vars.none { it.xtype!!.isSupOf(xtp!!) }
                 }
+                /*
+                println(vars.isEmpty())
+                println(xtp == null)
+                println(xtp?.isConcrete())
+                println(vars.any { it.xtype==null })
+                println(!vars.isEmpty() && (vars.last().xtype?.isConcrete() ?: false))
+                 */
                 All_assert_tk(s.tk, ok) {
                     "invalid declaration : \"${s.tk.str}\" is already declared (ln ${vars.first().getTk().lin})"
                 }

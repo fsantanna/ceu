@@ -2357,6 +2357,25 @@ class TExec {
         )
         assert(out == "()\n") { out }
     }
+    @Test
+    fun t03_f () {
+        val out = test(false, """
+            $Output0
+            var f : func $D{a}  @{} -> ${D}a -> ()
+            var f : func $D{()} @{} ->  [()] -> ()
+            set f = func $D{()} @{} ->  [()] -> () {
+                set ret = arg.1
+            }
+            var f : func $D{()} @{} ->   ()  -> ()
+            set f = func $D{()} @{} ->   ()  -> () {
+                set ret = arg
+            }
+            ${output0("f $D{} @{} [()]","()")}
+            ${output0("f $D{} @{} ()","()")}
+           """.trimIndent()
+        )
+        assert(out == "()\n()\n") { out }
+    }
 
     // ALL
 

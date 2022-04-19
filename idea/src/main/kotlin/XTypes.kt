@@ -36,7 +36,7 @@ fun Type.mapScp1 (up: Any, to: Tk.Scp): Type {
 }
 
 fun Type.isConcrete (): Boolean {
-    return !this.flattenLeft().any {
+    return !this.flattenLeft(true).any {
         it is Type.Named && it.xargs==null || it is Type.Par && it.xtype==null
     }
 }

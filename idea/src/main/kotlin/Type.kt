@@ -11,14 +11,14 @@ fun Type.flattenRight (): List<Type> {
 }
  */
 
-fun Type.flattenLeft (): List<Type> {
+fun Type.flattenLeft (dofunc: Boolean = false): List<Type> {
     // TODO: func/union do not make sense?
     return when (this) {
         is Type.Unit, is Type.Nat, is Type.Par -> listOf(this)
         is Type.Named   -> listOf(this) + (this.xargs?.map { it.flattenLeft() }?.flatten() ?: emptyList())
         is Type.Tuple   -> listOf(this) + this.vec.map { it.flattenLeft() }.flatten()
         is Type.Union   -> listOf(this) + (this.common?.flattenLeft() ?: emptyList()) + this.vec.map { it.flattenLeft() }.flatten()
-        is Type.Func    -> listOf(this) //this.inp.flatten() + this.out.flatten()
+        is Type.Func    -> listOf(this) + (if (!dofunc) emptyList() else (this.inp.flattenLeft() + (this.pub?.flattenLeft() ?: emptyList()) + this.out.flattenLeft()))
         is Type.Active  -> listOf(this) + this.tsk.flattenLeft()
         is Type.Actives -> listOf(this) + this.tsk.flattenLeft()
         is Type.Pointer -> listOf(this) + this.pln.flattenLeft()

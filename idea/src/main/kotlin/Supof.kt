@@ -82,6 +82,8 @@ fun Type.isSupOf (sub: Type, isproto: Boolean=false): Boolean {
         (this is Type.Func && sub is Type.Func) -> {
             val sup2 = this.mapLabels(this.wup!!)
             val sub2 = sub.mapLabels(sub.wup!!)
+            println(sup2.xscps.first.scp2)
+            println(sub2.xscps.first.scp2)
             (
                 sup2.xscps.first.scp2!!.third!! >= sub2.xscps.first.scp2!!.third!! &&
                 sup2.inp.isSupOf(sub2.inp,true) &&

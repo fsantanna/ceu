@@ -36,7 +36,10 @@ fun Type.dump (spc: Int = 0): String {
             }
             "Named '" + this.tk.str + subs + args
         }
-        is Type.Func -> "Func\n" + this.inp.dump(spc+4) + (this.pub?.dump(spc+4)?:pre(4)+"no pub\n") + this.out.dump(spc+4)
+        is Type.Func -> {
+            //val scps
+            "Func\n" + this.inp.dump(spc+4) + (this.pub?.dump(spc+4)?:pre(4)+"no pub\n") + this.out.dump(spc+4)
+        }
         is Type.Par -> "Par " + this.tk.str + "\n" + (this.xtype?.dump(spc+4) ?: pre(4)+"no type\n")
     }
 }
