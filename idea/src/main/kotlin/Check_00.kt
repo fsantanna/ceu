@@ -60,6 +60,9 @@ fun check_00_after_envs (s: Stmt) {
                     !xtp.isConcrete() -> vars.isEmpty()     // abstract type, must be first
                     vars.any { it.xtype==null } -> false    // found one untyped, cannot accept another
                     vars.last().xtype!!.isConcrete() -> false  // first must be abstact
+                    vars.map { it.xtype!! }.filter { it.isConcrete() }.any {
+                        xtp.isSupOf(it) || it.isSupOf(xtp)
+                    } -> false  // instances cannot be sup of one another
                     else -> true
                     //vars.none { it.xtype!!.isSupOf(xtp!!) }
                 }

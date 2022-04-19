@@ -2272,14 +2272,32 @@ class TExec {
         assert(out == "(ln 2, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
     }
     @Test
-    fun t02_ok () {
+    fun t021_ok () {
         val out = test(false, """
+            $Output0
             var min : ${D}a
             var min : ()
             var min : [()]
+            var x: [()]
+            set x = min::[()]
+            ${output0("x.1","()")}
            """.trimIndent()
         )
-        assert(out == "OK") { out }
+        assert(out == "()\n") { out }
+    }
+    @Test
+    fun t022_ok () {
+        val out = test(false, """
+            $Output0
+            var min : ${D}a
+            var min : ()
+            var min : [()]
+            var x: ()
+            set x = min::[()].1
+            ${output0("x","()")}
+           """.trimIndent()
+        )
+        assert(out == "()\n") { out }
     }
     @Test
     fun t03_err () {
@@ -2298,7 +2316,7 @@ class TExec {
             var min : ()
            """.trimIndent()
         )
-        assert(out == "(ln 3, col 5): invalid declaration : \"min\" is already declared (ln 1)") { out }
+        assert(out == "(ln 3, col 5): invalid declaration : \"min\" is already declared (ln 2)") { out }
     }
     @Test
     fun t05_ok () {

@@ -65,7 +65,7 @@ fun Expr.xinfTypes (inf_: Type?) {
             ret
         }
         is Expr.Cast -> {
-            this.e.xinfTypes(inf)
+            this.e.xinfTypes(this.type)
             this.type
         }
         is Expr.Named -> {
@@ -368,6 +368,7 @@ fun Expr.xinfTypes (inf_: Type?) {
         }
         is Expr.Var -> {
             val s = this.env(this.tk.str)!!
+            //println(this.getUp())
             val ret = when {
                 (s !is Stmt.Var) -> s.getType()
                 // TODO: hack to substitute s.xtype if currently "_" (see x18_clone_rec)
