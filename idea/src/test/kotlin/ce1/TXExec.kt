@@ -1075,7 +1075,7 @@ class TXExec {
             output Std e!Common
            """.trimIndent()
         )
-        assert(out == "(ln 11, col 15): invalid discriminator : unknown discriminator \"Common\"") { out }
+        assert(out == "(ln 11, col 19): invalid discriminator : unknown discriminator \"Common\"") { out }
     }
     @Test
     fun p03_hier_name () {

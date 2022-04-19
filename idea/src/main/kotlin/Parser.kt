@@ -516,7 +516,27 @@ object Parser
 
         // call
         if (alls.checkExpr() || alls.checkFix("\${") || alls.checkFix("@{")) {
-            val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+            val hasargs = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+            val args = if (!hasargs) null else {
+                val args = mutableListOf<Type>()
+                if (!alls.checkFix("}")) {
+                    while (true) {
+                        val id = alls.acceptVar("id")
+                        val tp = if (id) {
+                            Type.Par(Tk.Par(alls.tk0.str,alls.tk0.lin,alls.tk0.col), null)
+                        } else {
+                            Parser.type()
+                        }
+                        args.add(tp)
+                        if (!alls.acceptFix(",")) {
+                            break
+                        }
+                    }
+                }
+                alls.acceptFix_err("}")
+                args
+            }
+
             val hasats = if (CE1) alls.acceptFix("@{") else alls.acceptFix_err("@{")
             val iscps = if (!hasats) null else {
                 val ret = this.scp1s { }
@@ -532,6 +552,7 @@ object Parser
                 if (e is Expr.UNamed || !CE1) e else {
                     Expr.UNamed(Tk.Fix("~",e.tk.lin,e.tk.col), true, e)
                 },
+                args,
                 arg,
                 Pair(
                     if (iscps==null) null else iscps.map { Scope(it,null) },

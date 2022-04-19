@@ -37,34 +37,34 @@ val NumR1  = Num(true,  "r1")
 val _NumR1 = Num(false, "r1")
 
 private val clone = """
-    var clone : func @{r1,a1}-> $NumA1 -> $NumR1
-    set clone = func @{r1,a1}-> $NumA1 -> $NumR1 {
+    var clone : func $D{} @{r1,a1}-> $NumA1 -> $NumR1
+    set clone = func $D{} @{r1,a1}-> $NumA1 -> $NumR1 {
         if arg\~?Null {
             set ret = Null:$NumR1
         } else {
-            set ret = new $_NumR1 <.1 clone @{r1,a1} arg\~!1: @r1>:</Num $D{} @{r1} @r1>: @r1
+            set ret = new $_NumR1 <.1 clone $D{} @{r1,a1} arg\~!1: @r1>:</Num $D{} @{r1} @r1>: @r1
         }
     }
 """.trimIndent()
 
 private val add = """
-    var add : func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
-    set add = func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
+    var add : func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
+    set add = func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
         set x = arg.1
         var y: $NumB1
         set y = arg.2
         if y\~?Null {
-            set ret = clone @{r1,a1} x: @r1
+            set ret = clone $D{} @{r1,a1} x: @r1
         } else {
-            set ret = new $_NumR1 <.1 add @{r1,a1,b1} [x,y\~!1]: @r1>:</Num $D{} @{r1} @r1>: @r1
+            set ret = new $_NumR1 <.1 add $D{} @{r1,a1,b1} [x,y\~!1]: @r1>:</Num $D{} @{r1} @r1>: @r1
         }
     }
 """.trimIndent()
 
 private val mul = """
-    var mul : func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
-    set mul = func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
+    var mul : func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
+    set mul = func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
         set x = arg.1
         var y: $NumB1
@@ -73,30 +73,30 @@ private val mul = """
             set ret = Null: $NumR1
         } else {
             var z: $NumTL
-            set z = mul @{r1,a1,b1} [x, y\~!1]
-            set ret = add @{r1,a1,LOCAL} [x,z]: @r1
+            set z = mul $D{} @{r1,a1,b1} [x, y\~!1]
+            set ret = add $D{} @{r1,a1,LOCAL} [x,z]: @r1
         }
     }
 """.trimIndent()
 
 private val lt = """
-    var lt : func @{a1,b1}-> [$NumA1,$NumB1] -> _int
-    set lt = func @{a1,b1}-> [$NumA1,$NumB1] -> _int {
+    var lt : func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int
+    set lt = func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int {
         if arg.2\~?Null {
             set ret = _0:_int
         } else {
             if arg.1\~?Null {
                 set ret = _1:_int
             } else {
-                set ret = lt @{a1,b1} [arg.1\~!1,arg.2\~!1]
+                set ret = lt $D{} @{a1,b1} [arg.1\~!1,arg.2\~!1]
             }
         }
     }
 """.trimIndent()
 
 private val sub = """
-    var sub : func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
-    set sub = func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
+    var sub : func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
+    set sub = func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
         var x: $NumA1
         set x = arg.1
         var y: $NumB1
@@ -105,30 +105,30 @@ private val sub = """
             set ret = Null: $NumR1
         } else {
             if y\~?Null {
-                set ret = clone @{r1,a1} x
+                set ret = clone $D{} @{r1,a1} x
             } else {
-                set ret = sub @{r1,a1,b1} [x\~!1,y\~!1]: @r1
+                set ret = sub $D{} @{r1,a1,b1} [x\~!1,y\~!1]: @r1
             }
         }
     }
 """.trimIndent()
 
 private val mod = """
-    var mod : func @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1
-    set mod = func @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1 {
-        if lt @{a1,b1} arg {
-            set ret = clone @{r1,a1} arg.1: @r1
+    var mod : func $D{} @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1
+    set mod = func $D{} @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1 {
+        if lt $D{} @{a1,b1} arg {
+            set ret = clone $D{} @{r1,a1} arg.1: @r1
         } else {
             var v: $NumTL
-            set v = sub @{LOCAL,a1,b1} arg
-            set ret = mod @{r1,LOCAL,b1} [v,arg.2]: @r1
+            set v = sub $D{} @{LOCAL,a1,b1} arg
+            set ret = mod $D{} @{r1,LOCAL,b1} [v,arg.2]: @r1
         }
     }    
 """.trimIndent()
 
 private val eq = """
-    var eq : func @{a1,b1}-> [$NumA1,$NumB1] -> _int
-    set eq = func @{a1,b1}-> [$NumA1,$NumB1] -> _int {
+    var eq : func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int
+    set eq = func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int {
         var x: $NumA1
         set x = arg.1
         var y: $NumB1
@@ -139,19 +139,19 @@ private val eq = """
             if y\~?Null {
                 set ret = _0:_int
             } else {
-                set ret = eq @{a1,b1} [x\~!1,y\~!1]
+                set ret = eq $D{} @{a1,b1} [x\~!1,y\~!1]
             }
         }
     }
 """.trimIndent()
 
 private val lte = """
-    var lte : func @{a1,b1}-> [$NumA1,$NumB1] -> _int
-    set lte = func @{a1,b1}-> [$NumA1,$NumB1] -> _int {
+    var lte : func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int
+    set lte = func $D{} @{a1,b1}-> [$NumA1,$NumB1] -> _int {
         var islt: _int
-        set islt = lt @{a1,b1} [arg.1\~!1,arg.2\~!1]
+        set islt = lt $D{} @{a1,b1} [arg.1\~!1,arg.2\~!1]
         var iseq: _int
-        set iseq = eq @{a1,b1} [arg.1\~!1,arg.2\~!1]
+        set iseq = eq $D{} @{a1,b1} [arg.1\~!1,arg.2\~!1]
         set ret = _(${D}islt || ${D}iseq): _int
     }
 """.trimIndent()
@@ -213,7 +213,7 @@ class TBook {
             $nums
             $clone
             $add
-            ${output0num("add @{LOCAL,LOCAL,LOCAL} [two,one]: @LOCAL")}
+            ${output0num("add $D{} @{LOCAL,LOCAL,LOCAL} [two,one]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -224,7 +224,7 @@ class TBook {
             """
             $nums
             $clone
-            ${output0num("clone @{LOCAL,LOCAL} two: @LOCAL")}
+            ${output0num("clone $D{} @{LOCAL,LOCAL} two: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 Null>>\n") { out }
@@ -237,7 +237,7 @@ class TBook {
             $clone
             $add
             $mul
-            ${output0num("mul @{LOCAL,LOCAL,LOCAL} [two, add @{LOCAL,LOCAL,LOCAL} [two,one]]")}
+            ${output0num("mul $D{} @{LOCAL,LOCAL,LOCAL} [two, add $D{} @{LOCAL,LOCAL,LOCAL} [two,one]]")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -248,8 +248,8 @@ class TBook {
             """
             $nums
             $lt
-            ${output0("lt @{LOCAL,LOCAL} [two, one]","_int")}
-            ${output0("lt @{LOCAL,LOCAL} [one, two]","_int")}
+            ${output0("lt $D{} @{LOCAL,LOCAL} [two, one]","_int")}
+            ${output0("lt $D{} @{LOCAL,LOCAL} [one, two]","_int")}
         """.trimIndent()
         )
         assert(out == "0\n1\n") { out }
@@ -262,7 +262,7 @@ class TBook {
             $clone
             $add
             $sub
-            ${output0num("sub @{LOCAL,LOCAL,LOCAL} [three, two]")}
+            ${output0num("sub $D{} @{LOCAL,LOCAL,LOCAL} [three, two]")}
         """.trimIndent()
         )
         assert(out == "<.1 Null>\n") { out }
@@ -273,8 +273,8 @@ class TBook {
             """
             $nums
             $eq
-            ${output0("eq @{LOCAL,LOCAL} [three, two]","_int")}
-            ${output0("eq @{LOCAL,LOCAL} [one, one]","_int")}
+            ${output0("eq $D{} @{LOCAL,LOCAL} [three, two]","_int")}
+            ${output0("eq $D{} @{LOCAL,LOCAL} [one, one]","_int")}
         """.trimIndent()
         )
         assert(out == "0\n1\n") { out }
@@ -290,11 +290,11 @@ class TBook {
             $clone
             $add
             $mul
-            var square: func @{r1,a1}-> $NumA1 -> $NumR1
-            set square = func @{r1,a1}-> $NumA1 -> $NumR1 {
-                set ret = mul @{r1,a1,a1} [arg,arg]: @r1
+            var square: func $D{} @{r1,a1}-> $NumA1 -> $NumR1
+            set square = func $D{} @{r1,a1}-> $NumA1 -> $NumR1 {
+                set ret = mul $D{} @{r1,a1,a1} [arg,arg]: @r1
             }
-            ${output0num("square @{LOCAL,LOCAL} two")}
+            ${output0num("square $D{} @{LOCAL,LOCAL} two")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 Null>>>>\n") { out }
@@ -306,16 +306,16 @@ class TBook {
             """
             $nums
             $lt
-            var smaller: func @{a1,a2: a2>a1}-> [$NumA1,$NumA2] -> $NumA2
-            set smaller = func @{a1,a2: a2>a1}-> [$NumA1,$NumA2] -> $NumA2 {
-                if lt @{a1,a2} arg {
+            var smaller: func $D{} @{a1,a2: a2>a1}-> [$NumA1,$NumA2] -> $NumA2
+            set smaller = func $D{} @{a1,a2: a2>a1}-> [$NumA1,$NumA2] -> $NumA2 {
+                if lt $D{} @{a1,a2} arg {
                     set ret = arg.1
                 } else {
                     set ret = arg.2
                 }
             }
-            ${output0num("smaller @{LOCAL,LOCAL} [one,two]: @LOCAL")}
-            ${output0num("smaller @{LOCAL,LOCAL} [two,one]: @LOCAL")}
+            ${output0num("smaller $D{} @{LOCAL,LOCAL} [one,two]: @LOCAL")}
+            ${output0num("smaller $D{} @{LOCAL,LOCAL} [two,one]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 Null>\n<.1 Null>\n") { out }
@@ -333,11 +333,11 @@ class TBook {
         val out = all(
             """
             $nums
-            var f_three: func @{r1}-> $NumR1 -> $NumR1
-            set f_three = func @{r1}-> $NumR1 -> $NumR1 {
+            var f_three: func $D{} @{r1}-> $NumR1 -> $NumR1
+            set f_three = func $D{} @{r1}-> $NumR1 -> $NumR1 {
                 set ret = three
             }
-            ${output0num("f_three @{LOCAL} one")}
+            ${output0num("f_three $D{} @{LOCAL} one")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -347,12 +347,12 @@ class TBook {
     fun ch_01_02_infinity_pg05() {
         val out = all(
             """
-            var infinity: func @{r1}-> () -> $NumR1
-            set infinity = func @{r1}-> () -> $NumR1 {
+            var infinity: func $D{} @{r1}-> () -> $NumR1
+            set infinity = func $D{} @{r1}-> () -> $NumR1 {
                 ${output0num("_10:_int")}
                 set ret = new $_NumR1 @r1 <.1 infinity() @r1>:</Num @{r1} @r1>
             }
-            ${output0num("infinity @{LOCAL} ()")}
+            ${output0num("infinity $D{} @{LOCAL} ()")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 Null>>>\n") { out }
@@ -368,15 +368,15 @@ class TBook {
             $clone
             $add
             $mul
-            var multiply: func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
-            set multiply = func @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
+            var multiply: func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1
+            set multiply = func $D{} @{r1,a1,b1}-> [$NumA1,$NumB1] -> $NumR1 {
                 if arg.1\~?Null {
                     set ret = Null:$NumR1
                 } else {
-                    set ret = mul @{r1,a1,b1} [arg.1,arg.2]: @r1
+                    set ret = mul $D{} @{r1,a1,b1} [arg.1,arg.2]: @r1
                 }
             }
-            ${output0num("multiply @{LOCAL,LOCAL,LOCAL} [two,three]")}
+            ${output0num("multiply $D{} @{LOCAL,LOCAL,LOCAL} [two,three]")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -392,15 +392,15 @@ class TBook {
             $clone
             $add
             $mul
-            var square: func @{r1,a1}-> $NumA1 -> $NumR1
-            set square = func @{r1,a1}-> $NumA1 -> $NumR1 {
-                set ret = mul @{r1,a1,a1} [arg,arg]: @r1
+            var square: func $D{} @{r1,a1}-> $NumA1 -> $NumR1
+            set square = func $D{} @{r1,a1}-> $NumA1 -> $NumR1 {
+                set ret = mul $D{} @{r1,a1,a1} [arg,arg]: @r1
             }
-            var twice: func @{r1,a1}-> [func @{r1,a1}-> $NumA1->$NumR1, $NumA1] -> $NumR1
-            set twice = func @{r1,a1}-> [func @{r1,a1}-> $NumA1->$NumR1, $NumA1] -> $NumR1 {
-                set ret = arg.1 @{r1,r1} (arg.1 @{r1,a1} arg.2: @r1): @r1
+            var twice: func $D{} @{r1,a1}-> [func $D{} @{r1,a1}-> $NumA1->$NumR1, $NumA1] -> $NumR1
+            set twice = func $D{} @{r1,a1}-> [func $D{} @{r1,a1}-> $NumA1->$NumR1, $NumA1] -> $NumR1 {
+                set ret = arg.1 $D{} @{r1,r1} (arg.1 $D{} @{r1,a1} arg.2: @r1): @r1
             }
-            ${output0num("twice @{LOCAL,LOCAL} [square,two]: @LOCAL")}
+            ${output0num("twice $D{} @{LOCAL,LOCAL} [square,two]: @LOCAL")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>>>>>>>>>>>\n") { out }
@@ -417,18 +417,18 @@ class TBook {
             $add
             $mul
             
-            var fact: func @{r1,a1}->$NumA1->$NumR1
-            set fact = func @{r1,a1}->$NumA1->$NumR1 {
+            var fact: func $D{} @{r1,a1}->$NumA1->$NumR1
+            set fact = func $D{} @{r1,a1}->$NumA1->$NumR1 {
                 if arg\~?Null {
                     set ret = new $_NumR1 <.1 Null:$NumR1>:</Num $D{} @{r1} @r1>: @r1
                 } else {
                     var x: $NumTL
-                    set x = fact @{LOCAL,a1} arg\~!1
-                    set ret = mul @{r1,a1,LOCAL} [arg,x]: @r1
+                    set x = fact $D{} @{LOCAL,a1} arg\~!1
+                    set ret = mul $D{} @{r1,a1,LOCAL} [arg,x]: @r1
                 }
             }
             
-            ${output0num("fact @{LOCAL,LOCAL} three")}
+            ${output0num("fact $D{} @{LOCAL,LOCAL} three")}
         """.trimIndent()
         )
         assert(out == "<.1 <.1 <.1 <.1 <.1 <.1 Null>>>>>>\n") { out }
@@ -441,8 +441,8 @@ class TBook {
 
     val B = "<(),()>"
     val and = """
-        var and: func @{} -> [$B,$B] -> $B
-        set and = func @{} -> [$B,$B] -> $B {
+        var and: func $D{} @{} -> [$B,$B] -> $B
+        set and = func $D{} @{} -> [$B,$B] -> $B {
             if arg.1?1 {
                 set ret = <.1()>:<(),()>
             } else {
@@ -451,8 +451,8 @@ class TBook {
         }        
     """.trimIndent()
     val or = """
-        var or: func @{} -> [$B,$B] -> $B
-        set or = func @{} -> [$B,$B] -> $B {
+        var or: func $D{} @{} -> [$B,$B] -> $B
+        set or = func $D{} @{} -> [$B,$B] -> $B {
             if arg.1?2 {
                 set ret = <.2()>:<(),()>
             } else {
@@ -461,8 +461,8 @@ class TBook {
         }        
     """.trimIndent()
     val not = """
-        var not: func @{} -> <(),()> -> <(),()>
-        set not = func @{} -> <(),()> -> <(),()> {
+        var not: func $D{} @{} -> <(),()> -> <(),()>
+        set not = func $D{} @{} -> <(),()> -> <(),()> {
             if arg?1 {
                 set ret = <.2()>:<(),()>
             } else {
@@ -472,19 +472,19 @@ class TBook {
     """.trimIndent()
 
     val beq = """
-        var beq: func @{} -> [$B,$B] -> $B
-        set beq = func @{} -> [$B,$B] -> $B {
-            set ret = or @{} [and @{} arg, and @{} [not @{} arg.1, not @{} arg.2]] 
+        var beq: func $D{} @{} -> [$B,$B] -> $B
+        set beq = func $D{} @{} -> [$B,$B] -> $B {
+            set ret = or $D{} @{} [and $D{} @{} arg, and $D{} @{} [not $D{} @{} arg.1, not $D{} @{} arg.2]] 
         }
-        var bneq: func @{} -> [$B,$B] -> $B
-        set bneq = func @{} -> [$B,$B] -> $B {
-            set ret = not @{} beq @{} arg 
+        var bneq: func $D{} @{} -> [$B,$B] -> $B
+        set bneq = func $D{} @{} -> [$B,$B] -> $B {
+            set ret = not $D{} @{} beq $D{} @{} arg 
         }        
     """.trimIndent()
 
     val ntob = """
-        var ntob: func @{} -> _int -> $B
-        set ntob = func @{} -> _int -> $B {
+        var ntob: func $D{} @{} -> _int -> $B
+        set ntob = func $D{} @{} -> _int -> $B {
             if arg {
                 set ret = <.2()>:$B
             } else {
@@ -494,8 +494,8 @@ class TBook {
     """.trimIndent()
 
     val bton = """
-        var bton: func @{} -> $B -> _int
-        set bton = func @{} -> $B -> _int {
+        var bton: func $D{} @{} -> $B -> _int
+        set bton = func $D{} @{} -> $B -> _int {
             if arg?2 {
                 set ret = _1: _int
             } else {
@@ -509,8 +509,8 @@ class TBook {
         val out = all(
             """
             $Output0
-            var not: func @{} -> <(),()> -> <(),()>
-            set not = func @{} -> <(),()> -> <(),()> {
+            var not: func $D{} @{} -> <(),()> -> <(),()>
+            set not = func $D{} @{} -> <(),()> -> <(),()> {
                 if arg?1 {
                     set ret = <.2()>:<(),()>
                 } else {
@@ -518,7 +518,7 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = not @{} <.1()>:<(),()>
+            set xxx = not $D{} @{} <.1()>:<(),()>
             ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent()
         )
@@ -529,8 +529,8 @@ class TBook {
     fun ch_02_01_and_pg30 () {
         val out = all("""
             $Output0
-            var and: func @{} -> [$B,$B] -> $B
-            set and = func @{} -> [$B,$B] -> $B {
+            var and: func $D{} @{} -> [$B,$B] -> $B
+            set and = func $D{} @{} -> [$B,$B] -> $B {
                 if arg.1?1 {
                     set ret = <.1()>:<(),()>
                 } else {
@@ -538,9 +538,9 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = and @{} [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = and $D{} @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = and @{} [<.2()>:<(),()>,<.2()>:<(),()>]
+            set xxx = and $D{} @{} [<.2()>:<(),()>,<.2()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n") { out }
@@ -549,8 +549,8 @@ class TBook {
     fun ch_02_01_or_pg30 () {
         val out = all("""
             $Output0
-            var or: func @{} -> [$B,$B] -> $B
-            set or = func @{} -> [$B,$B] -> $B {
+            var or: func $D{} @{} -> [$B,$B] -> $B
+            set or = func $D{} @{} -> [$B,$B] -> $B {
                 if arg.1?2 {
                     set ret = <.2()>:<(),()>
                 } else {
@@ -558,11 +558,11 @@ class TBook {
                 }
             }
             var xxx: <(),()>
-            set xxx = or @{} [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = or $D{} @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = or @{} [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = or $D{} @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = or @{} [<.1()>:<(),()>,<.1()>:<(),()>]
+            set xxx = or $D{} @{} [<.1()>:<(),()>,<.1()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent()
         )
@@ -575,22 +575,22 @@ class TBook {
             $not
             $and
             $or
-            var eq: func @{} -> [$B,$B] -> $B
-            set eq = func @{} -> [$B,$B] -> $B {
-                set ret = or @{} [and @{} arg, and @{} [not @{} arg.1, not @{} arg.2]] 
+            var eq: func $D{} @{} -> [$B,$B] -> $B
+            set eq = func $D{} @{} -> [$B,$B] -> $B {
+                set ret = or $D{} @{} [and $D{} @{} arg, and $D{} @{} [not $D{} @{} arg.1, not $D{} @{} arg.2]] 
             }
-            var neq: func @{} -> [$B,$B] -> $B
-            set neq = func @{} -> [$B,$B] -> $B {
-                set ret = not @{} eq @{} arg 
+            var neq: func $D{} @{} -> [$B,$B] -> $B
+            set neq = func $D{} @{} -> [$B,$B] -> $B {
+                set ret = not $D{} @{} eq $D{} @{} arg 
             }
             var xxx: <(),()>
-            set xxx = eq @{} [<.1()>:<(),()>,<.2()>:<(),()>]
+            set xxx = eq $D{} @{} [<.1()>:<(),()>,<.2()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = neq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = neq $D{} @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = eq @{} [<.2()>:<(),()>,<.1()>:<(),()>]
+            set xxx = eq $D{} @{} [<.2()>:<(),()>,<.1()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
-            set xxx = eq @{} [<.1()>:<(),()>,<.1()>:<(),()>]
+            set xxx = eq $D{} @{} [<.1()>:<(),()>,<.1()>:<(),()>]
             ${output0("/xxx","/<(),()>@LOCAL")}
         """.trimIndent())
         assert(out == "<.1>\n<.2>\n<.1>\n<.2>\n") { out }
@@ -604,18 +604,18 @@ class TBook {
             $add
             $lt
             $sub
-            var mod: func @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1
-            set mod = func @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1 {
-                if lt @{a1,b1} arg {
-                    set ret = clone @{r1,a1} arg.1: @r1
+            var mod: func $D{} @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1
+            set mod = func $D{} @{r1,a1,b1} -> [$NumA1,$NumB1] -> $NumR1 {
+                if lt $D{} @{a1,b1} arg {
+                    set ret = clone $D{} @{r1,a1} arg.1: @r1
                 } else {
                     var v: $NumTL
-                    set v = sub @{LOCAL,a1,b1} arg
-                    set ret = mod @{r1,LOCAL,b1} [v,arg.2]: @r1
+                    set v = sub $D{} @{LOCAL,a1,b1} arg
+                    set ret = mod $D{} @{r1,LOCAL,b1} [v,arg.2]: @r1
                 }
             }
             var v: $NumTL
-            set v = mod @{LOCAL,LOCAL,LOCAL} [three,two]
+            set v = mod $D{} @{LOCAL,LOCAL,LOCAL} [three,two]
             ${output0num("v")}
         """.trimIndent()
         )
@@ -641,35 +641,35 @@ class TBook {
             $ntob
 
             var n10: $NumTL
-            set n10 = mul @{LOCAL,LOCAL,LOCAL} [five,two]
+            set n10 = mul $D{} @{LOCAL,LOCAL,LOCAL} [five,two]
             var n100: $NumTL
-            set n100 = mul @{LOCAL,LOCAL,LOCAL} [n10,n10]
+            set n100 = mul $D{} @{LOCAL,LOCAL,LOCAL} [n10,n10]
             var n400: $NumTL
-            set n400 = mul @{LOCAL,LOCAL,LOCAL} [four,n100]
+            set n400 = mul $D{} @{LOCAL,LOCAL,LOCAL} [four,n100]
             
-            var leap: func @{a1} -> $NumA1 -> $B
-            set leap = func @{a1} -> $NumA1 -> $B {
+            var leap: func $D{} @{a1} -> $NumA1 -> $B
+            set leap = func $D{} @{a1} -> $NumA1 -> $B {
                 var mod4: $NumTL
-                set mod4 = mod @{LOCAL,a1,GLOBAL} [arg,four]
+                set mod4 = mod $D{} @{LOCAL,a1,GLOBAL} [arg,four]
                 var mod100: $NumTL
-                set mod100 = mod @{LOCAL,a1,GLOBAL} [arg,n100]
+                set mod100 = mod $D{} @{LOCAL,a1,GLOBAL} [arg,n100]
                 var mod400: $NumTL
-                set mod400 = mod @{LOCAL,a1,GLOBAL} [arg,n400]
+                set mod400 = mod $D{} @{LOCAL,a1,GLOBAL} [arg,n400]
                 set ret = or [ntob mod4\?Null, and [ntob mod100\?1, ntob mod400\?Null]]
             }
             
             var n2000: $NumTL
-            set n2000 = mul @{LOCAL,LOCAL,LOCAL} [n400,five]
+            set n2000 = mul $D{} @{LOCAL,LOCAL,LOCAL} [n400,five]
             var n20: $NumTL
-            set n20 = add @{LOCAL,LOCAL,LOCAL} [n10,n10]
+            set n20 = add $D{} @{LOCAL,LOCAL,LOCAL} [n10,n10]
             var n1980: $NumTL
-            set n1980 = sub @{LOCAL,LOCAL,LOCAL} [n2000,n20]
+            set n1980 = sub $D{} @{LOCAL,LOCAL,LOCAL} [n2000,n20]
             var n1979: $NumTL
-            set n1979 = sub @{LOCAL,LOCAL,LOCAL} [n1980,one]
+            set n1979 = sub $D{} @{LOCAL,LOCAL,LOCAL} [n1980,one]
             var x: $B
-            set x = leap @{LOCAL} n1980
+            set x = leap $D{} @{LOCAL} n1980
             ${output0num("/x")}
-            set x = leap @{LOCAL} n1979
+            set x = leap $D{} @{LOCAL} n1979
             ${output0num("/x")}
         """.trimIndent()
         )
@@ -694,22 +694,22 @@ class TBook {
             $ntob
             $or
             -- 125
-            var analyse: func @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri
-            set analyse = func @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri {
+            var analyse: func $D{} @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri
+            set analyse = func $D{} @{a1,b1,c1} -> [$NumA1,$NumB1,$NumC1] -> $Tri {
                 ${catch0(1)} {
                     var xy: $NumTL
-                    set xy = add @{LOCAL,a1,b1} [arg.1,arg.2]
-                    if lte @{LOCAL,c1} [xy,arg.3] {
+                    set xy = add $D{} @{LOCAL,a1,b1} [arg.1,arg.2]
+                    if lte $D{} @{LOCAL,c1} [xy,arg.3] {
                         set ret = <.1()>:$Tri
                         ${throw0(1)}
                     } else {}
-                    if eq @{a1,c1} [arg.1,arg.3] {
+                    if eq $D{} @{a1,c1} [arg.1,arg.3] {
                         set ret = <.2()>:$Tri
                         ${throw0(1)}
                     } else {}
-                    if bton @{} (or @{} [
-                        ntob @{} (eq @{a1,b1} [arg.1,arg.2]),
-                        ntob @{} (eq @{b1,c1} [arg.2,arg.3])
+                    if bton $D{} @{} (or $D{} @{} [
+                        ntob $D{} @{} (eq $D{} @{a1,b1} [arg.1,arg.2]),
+                        ntob $D{} @{} (eq $D{} @{b1,c1} [arg.2,arg.3])
                     ]) {
                         set ret = <.3()>:$Tri
                         ${throw0(1)}
@@ -718,15 +718,15 @@ class TBook {
                 }
             }
             var n10: $NumTL
-            set n10 = mul @{LOCAL,LOCAL,LOCAL} [five,two]
+            set n10 = mul $D{} @{LOCAL,LOCAL,LOCAL} [five,two]
             var v: $Tri
-            set v = analyse @{LOCAL,LOCAL,LOCAL} [n10,n10,n10]
+            set v = analyse $D{} @{LOCAL,LOCAL,LOCAL} [n10,n10,n10]
             ${output0("/v",'/'+Tri+"@LOCAL")}
-            set v = analyse @{LOCAL,LOCAL,LOCAL} [one,five,five]
+            set v = analyse $D{} @{LOCAL,LOCAL,LOCAL} [one,five,five]
             ${output0("/v",'/'+Tri+"@LOCAL")}
-            set v = analyse @{LOCAL,LOCAL,LOCAL} [one,one,five]
+            set v = analyse $D{} @{LOCAL,LOCAL,LOCAL} [one,one,five]
             ${output0("/v",'/'+Tri+"@LOCAL")}
-            set v = analyse @{LOCAL,LOCAL,LOCAL} [two,four,five]
+            set v = analyse $D{} @{LOCAL,LOCAL,LOCAL} [two,four,five]
             ${output0("/v",'/'+Tri+"@LOCAL")}
         """.trimIndent()
         )

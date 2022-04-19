@@ -28,7 +28,7 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
             val pak_subs = if (!ispak) "" else {
                 this.subs.map { '.' + it.str }.joinToString("")
             }
-            val args = if (this.xargs == null) "" else {
+            val args = if (this.xargs == null) " $D{}" else {
                 " $D{" + this.xargs!!.map { it.tostr(lc) }.joinToString(",") + "}"
             }
             val scps = this.xscps.let { if (it==null) "" else it.let {
@@ -44,12 +44,13 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
         is Type.Active  -> "active " + this.tsk.tostr(lc)
         is Type.Actives -> "active {${this.len?.str ?: ""}} " + this.tsk.tostr(lc)
         is Type.Func    -> {
+            val pars = " $D{" + this.pars.map { it.str }.joinToString(",") + "}"
             val ctrs = this.xscps.third.let {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }
                     .joinToString(",")
             }
             val scps = this.xscps.second.let { if (it==null) "" else "@{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + ctrs + "} -> " }
-            this.tk.str + " " + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
+            this.tk.str + pars + " " + scps + this.inp.tostr(lc) + " -> " + this.pub.let { if (it == null) "" else it.tostr(lc) + " -> " } + this.out.tostr(lc)
         }
     }.let {
         if (!lc) it else {
@@ -101,9 +102,12 @@ fun Expr.tostr (lc: Boolean = false, pakhassubs: Boolean = false): String {
         is Expr.UPred -> "(" + this.uni.tostr(lc) + "?" + this.tk.str + ")"
         is Expr.New -> "(new " + this.arg.tostr(lc) + this.xscp.let { if (it==null) "" else ": @" + this.xscp!!.scp1.str.anon2local() } + ")"
         is Expr.Call -> {
+            val args = if (this.xargs == null) " $D{}" else {
+                " $D{" + this.xargs!!.map { it.tostr(lc) }.joinToString(",") + "}"
+            }
             val inps = this.xscps.first.let { if (it==null) "" else " @{" + it.map { it.scp1.str.anon2local() }.joinToString(",") + "}" }
             val out = this.xscps.second.let { if (it == null) "" else ": @" + it.scp1.str.anon2local() }
-            "(" + this.f.tostr(lc) + inps + " " + this.arg.tostr(lc) + out + ")"
+            "(" + this.f.tostr(lc) + args + inps + " " + this.arg.tostr(lc) + out + ")"
         }
         is Expr.Func -> {
             "("+ (this.ftp()?.tostr(lc) ?: "null") + " " + this.block.tostr(lc) + ")"

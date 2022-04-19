@@ -9,12 +9,12 @@ class TTask {
     fun a01_output () {
         val out = test(false, """
             $Output0
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
             """.trimIndent()
         )
@@ -24,11 +24,11 @@ class TTask {
     fun a01_output_anon () {
         val out = test(false, """
             $Output0
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
             }
-            spawn f @{} ()
+            spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n") { out }
@@ -64,14 +64,14 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_3:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
             --awake x _1:_int
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
@@ -83,14 +83,14 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_3:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
             --awake x _1:_int
             --awake x _1:_int
@@ -105,15 +105,15 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 var x: _int
                 set x = _10:_int
                 await evt~?3
                 ${output0("x","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             --awake x _1:_int
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
@@ -124,8 +124,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 {
                     var x: _int
                     set x = _10:_int
@@ -139,8 +139,8 @@ class TTask {
                     ${output0("y","_int")}
                 }
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             --awake x _1:_int
             --awake x _1:_int
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
@@ -151,28 +151,28 @@ class TTask {
     @Test
     fun a05_args_err () {
         val out = test(false, """
-                var f : task @{}->()->()->()
-                var x : active task @{}->[()]->()->()
-                set x = spawn f @{} ()
+                var f : task $D{} @{}->()->()->()
+                var x : active task $D{} @{}->[()]->()->()
+                set x = spawn f $D{} @{} ()
             """.trimIndent()
         )
-        assert(out == "(ln 3, col 9): invalid `spawn` : type mismatch :\n    active task @{} -> [()] -> () -> ()\n    active task @{} -> () -> () -> ()") { out }
+        assert(out == "(ln 3, col 9): invalid `spawn` : type mismatch :\n    active task $D{} @{} -> [()] -> () -> ()\n    active task $D{} @{} -> () -> () -> ()") { out }
     }
     @Test
     fun a05_args () {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->_(char*)->()->()
-            set f = task @{}->_(char*)->()->() {
+            var f : task $D{} @{}->_(char*)->()->()
+            set f = task $D{} @{}->_(char*)->()->() {
                 ${output0("arg","_(char*)")}
                 await evt~?3
                 ${output0("evt~!3","_int")}
                 await evt~?3
                 ${output0("evt~!3","_int")}
             }
-            var x : active task @{}->_(char*)->()->()
-            set x = spawn f @{} _("hello"):_(char*)
+            var x : active task $D{} @{}->_(char*)->()->()
+            set x = spawn f $D{} @{} _("hello"):_(char*)
             --awake x _10:_int
             --awake x _20:_int
             emit @GLOBAL Event $D{} @{} <.3 _10:_int>:<(),_uint64_t,_int>
@@ -185,13 +185,13 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->_int->()->_int
-            set f = task @{}->_int->()->_int {
+            var f : task $D{} @{}->_int->()->_int
+            set f = task $D{} @{}->_int->()->_int {
                 await evt~?3
                 ${output0("arg","_int")}
             }
-            var x : active task @{}->_int->()->_int
-            set x = spawn f @{} _10:_int
+            var x : active task $D{} @{}->_int->()->_int
+            set x = spawn f $D{} @{} _10:_int
             emit @GLOBAL Event $D{} @{} <.3 _20:_int>:<(),_uint64_t,_int>
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -199,9 +199,9 @@ class TTask {
     @Test
     fun a06_par_err () {
         val out = test(false, """
-            var build : func @{} -> () -> task @{}->()->()->()
-            set build = func @{} -> () -> task @{}->()->()->() {
-                set ret = task @{}->()->()->() {    -- ERR: not the same @LOCAL
+            var build : func $D{} @{} -> () -> task $D{} @{}->()->()->()
+            set build = func $D{} @{} -> () -> task $D{} @{}->()->()->() {
+                set ret = task $D{} @{}->()->()->() {    -- ERR: not the same @LOCAL
                     --${output0("_1:_int","_int")}
                     await _(${D}evt != 0):_int
                     --${output0("_2:_int","_int")}
@@ -215,18 +215,18 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var build : task @{}->()->()->()
-            set build = task @{}->()->()->() {
+            var build : task $D{} @{}->()->()->()
+            set build = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_2:_int","_int")}
             }
             ${output0("_10:_int","_int")}
-            var f : active task @{}->()->()->()
-            set f = spawn build @{} ()
+            var f : active task $D{} @{}->()->()->()
+            set f = spawn build $D{} @{} ()
             ${output0("_11:_int","_int")}
-            var g : active task @{}->()->()->()
-            set g = spawn build @{} ()
+            var g : active task $D{} @{}->()->()->()
+            set g = spawn build $D{} @{} ()
             ${output0("_12:_int","_int")}
             --awake f _1:_int
             --awake g _1:_int
@@ -240,16 +240,16 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 await evt~?3
                 ${output0("evt~!3","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             
-            var g : task @{}->()->()->()
-            set g = task @{}->()->()->() {
+            var g : task $D{} @{}->()->()->()
+            set g = task $D{} @{}->()->()->() {
                 await evt~?3
                 var e: _int
                 set e = evt~!3
@@ -258,8 +258,8 @@ class TTask {
                 set e = evt~!3
                 ${output0("_(\$e+10):_int","_int")}
             }
-            var y : active task @{}->()->()->()
-            set y = spawn g @{} ()
+            var y : active task $D{} @{}->()->()->()
+            set y = spawn g $D{} @{} ()
             
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             emit @GLOBAL Event $D{} @{} <.3 _2:_int>:<(),_uint64_t,_int>
@@ -271,8 +271,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 await _1:_int
                 var iskill: _int
                 var istask: _int
@@ -281,12 +281,12 @@ class TTask {
                 native _(assert(${D}iskill || ${D}istask);)
                 ${output0("_0:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             
             {
-                var g : task @{}->()->()->()
-                set g = task @{}->()->()->() {
+                var g : task $D{} @{}->()->()->()
+                set g = task $D{} @{}->()->()->() {
                     await evt~?3
                     var e: _int
                     set e = evt~!3
@@ -295,8 +295,8 @@ class TTask {
                     set e = evt~!3
                     ${output0("_(\$e+10):_int","_int")}
                 }
-                var y : active task @{}->()->()->()
-                set y = spawn g @{} ()
+                var y : active task $D{} @{}->()->()->()
+                set y = spawn g $D{} @{} ()
                 emit @LOCAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
                 emit @LOCAL Event $D{} @{} <.3 _2:_int>:<(),_uint64_t,_int>
             }            
@@ -309,8 +309,8 @@ class TTask {
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
             {
-                var f : task @{}->()->()->()
-                set f = task @{}->()->()->() {
+                var f : task $D{} @{}->()->()->()
+                set f = task $D{} @{}->()->()->() {
                     await _1:_int
                     var iskill: _int
                     set iskill = evt~?1
@@ -318,12 +318,12 @@ class TTask {
                     --${output0("_0:_int","_int")}    -- only on kill
                     ${output0("_0:_int","_int")}
                 }
-                var x : active task @{}->()->()->()
-                set x = spawn f @{} ()
+                var x : active task $D{} @{}->()->()->()
+                set x = spawn f $D{} @{} ()
                 
                 {
-                    var g : task @{}->()->()->()
-                    set g = task @{}->()->()->() {
+                    var g : task $D{} @{}->()->()->()
+                    set g = task $D{} @{}->()->()->() {
                         var e: _int
                         await evt~?3
                         set e = evt~!3
@@ -332,8 +332,8 @@ class TTask {
                         set e = evt~!3
                         ${output0("_(\$e+10):_int","_int")}
                     }
-                    var y : active task @{}->()->()->()
-                    set y = spawn g @{} ()
+                    var y : active task $D{} @{}->()->()->()
+                    set y = spawn g $D{} @{} ()
                     emit @LOCAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
                     emit @LOCAL Event $D{} @{} <.3 _2:_int>:<(),_uint64_t,_int>
                 }
@@ -346,23 +346,23 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
-                var g : task @{}->()->()->()
-                set g = task @{}->()->()->() {
+                var g : task $D{} @{}->()->()->()
+                set g = task $D{} @{}->()->()->() {
                     ${output0("_2:_int","_int")}
                     await evt~?3
                     ${output0("_3:_int","_int")}
                 }
-                var xg : active task @{}->()->()->()
-                set xg = spawn g @{} ()
+                var xg : active task $D{} @{}->()->()->()
+                set xg = spawn g $D{} @{} ()
                 await evt~?3
                 ${output0("_4:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             ${output0("_10:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_11:_int","_int")}
@@ -376,12 +376,12 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_10:_int","_int")}
                 {
-                    var g : task @{}->()->()->()
-                    set g = task @{}->()->()->() {
+                    var g : task $D{} @{}->()->()->()
+                    set g = task $D{} @{}->()->()->() {
                         ${output0("_20:_int","_int")}
                         await _1:_int
                         ${output0("_21:_int","_int")}
@@ -394,24 +394,24 @@ class TTask {
                             --output std _22:_int     -- can't execute this one
                         }
                     }
-                    var y : active task @{}->()->()->()
-                    set y = spawn g @{} ()
+                    var y : active task $D{} @{}->()->()->()
+                    set y = spawn g $D{} @{} ()
                     await evt~?3
                 }
                 ${output0("_11:_int","_int")}
-                var h : task @{}->()->()->()
-                set h = task @{}->()->()->() {
+                var h : task $D{} @{}->()->()->()
+                set h = task $D{} @{}->()->()->() {
                     ${output0("_30:_int","_int")}
                     await evt~?3
                     ${output0("_31:_int","_int")}
                 }
-                var z : active task @{}->()->()->()
-                set z = spawn h @{} ()
+                var z : active task $D{} @{}->()->()->()
+                set z = spawn h $D{} @{} ()
                 await evt~?3
                 ${output0("_12:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
@@ -422,25 +422,25 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var g : task @{}->()->()->()
-            set g = task @{}->()->()->() {
-                var f : task @{}->()->()->()
-                set f = task @{}->()->()->() {
+            var g : task $D{} @{}->()->()->()
+            set g = task $D{} @{}->()->()->() {
+                var f : task $D{} @{}->()->()->()
+                set f = task $D{} @{}->()->()->() {
                     ${output0("_1:_int","_int")}
                     await evt~?3
                     ${output0("_4:_int","_int")}
                     emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
                     ${output0("_999:_int","_int")}
                 }
-                var x : active task @{}->()->()->()
-                set x = spawn f @{} ()
+                var x : active task $D{} @{}->()->()->()
+                set x = spawn f $D{} @{} ()
                 ${output0("_2:_int","_int")}
                 await evt~?3
                 ${output0("_5:_int","_int")}
             }
             ${output0("_0:_int","_int")}
-            var y : active task @{}->()->()->()
-            set y = spawn g @{} ()
+            var y : active task $D{} @{}->()->()->()
+            set y = spawn g $D{} @{} ()
             ${output0("_3:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_6:_int","_int")}
@@ -452,29 +452,29 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var g : task @{}->()->()->()
-            set g = task @{}->()->()->() {
-                var f : task @{}->()->()->()
-                set f = task @{}->()->()->() {
+            var g : task $D{} @{}->()->()->()
+            set g = task $D{} @{}->()->()->() {
+                var f : task $D{} @{}->()->()->()
+                set f = task $D{} @{}->()->()->() {
                     ${output0("_1:_int","_int")}
                     await evt~?3
                     ${output0("_4:_int","_int")}
-                    var kkk : func @{}->()->()
-                    set kkk = func @{}->()->() {
+                    var kkk : func $D{} @{}->()->()
+                    set kkk = func $D{} @{}->()->() {
                         emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
                     }
-                    call kkk @{} ()
+                    call kkk $D{} @{} ()
                     ${output0("_999:_int","_int")}
                 }
-                var x : active task @{}->()->()->()
-                set x = spawn f @{} ()
+                var x : active task $D{} @{}->()->()->()
+                set x = spawn f $D{} @{} ()
                 ${output0("_2:_int","_int")}
                 await evt~?3
                 ${output0("_5:_int","_int")}
             }
             ${output0("_0:_int","_int")}
-            var y : active task @{}->()->()->()
-            set y = spawn g @{} ()
+            var y : active task $D{} @{}->()->()->()
+            set y = spawn g $D{} @{} ()
             ${output0("_3:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_6:_int","_int")}
@@ -489,21 +489,21 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
-                var defer_ : task @{}->()->()->()
-                set defer_ = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
+                var defer_ : task $D{} @{}->()->()->()
+                set defer_ = task $D{} @{}->()->()->() {
                     await evt~?1
                     ${output0("_2:_int","_int")}
                 }
-                var xdefer : active task @{}->()->()->()
-                set xdefer = spawn defer_ @{} ()
+                var xdefer : active task $D{} @{}->()->()->()
+                set xdefer = spawn defer_ $D{} @{} ()
                 ${output0("_0:_int","_int")}
                 await evt~?3
                 ${output0("_1:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             --awake x _1:_int
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
@@ -514,23 +514,23 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 {
-                    var defer_ : task @{}->()->()->()
-                    set defer_ = task @{}->()->()->() {
+                    var defer_ : task $D{} @{}->()->()->()
+                    set defer_ = task $D{} @{}->()->()->() {
                         await evt~?1
                         ${output0("_2:_int","_int")}
                     }
-                    var xdefer : active task @{}->()->()->()
-                    set xdefer = spawn defer_ @{} ()
+                    var xdefer : active task $D{} @{}->()->()->()
+                    set xdefer = spawn defer_ $D{} @{} ()
                     ${output0("_0:_int","_int")}
                     await evt~?3
                 }
                 ${output0("_1:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             --awake x _1:_int
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
         """.trimIndent())
@@ -563,8 +563,8 @@ class TTask {
     fun c03_catch_err () {
         val out = test(
             false, """
-                var f : task @{}->()->()->()
-                set f = task @{}->()->()->() {
+                var f : task $D{} @{}->()->()->()
+                set f = task $D{} @{}->()->()->() {
                     catch () {
                     }
                 }
@@ -576,9 +576,9 @@ class TTask {
     fun c04_err () {
         val out = test(
             false, """
-                var f : task @{}->()->()->()
-                var x : task @{}->()->()->()
-                set x = spawn f @{} ()
+                var f : task $D{} @{}->()->()->()
+                var x : task $D{} @{}->()->()->()
+                set x = spawn f $D{} @{} ()
             """.trimIndent()
         )
         assert(out.startsWith("(ln 3, col 9): invalid `spawn` : type mismatch : expected active task")) { out }
@@ -616,8 +616,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Error $D{} @{} = <()>
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                 ${output0("_2:_int","_int")}
                 catch err~?1 {
                     ${output0("_3:_int","_int")}
@@ -626,9 +626,9 @@ class TTask {
                 }
                 ${output0("_4:_int","_int")}
            }
-           var z : active task @{}->()->()->()
+           var z : active task $D{} @{}->()->()->()
            ${output0("_1:_int","_int")}
-           set z = spawn h @{} ()
+           set z = spawn h $D{} @{} ()
             ${output0("_5:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n") { out }
@@ -638,8 +638,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Error $D{} @{} = <(),()>
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                 ${output0("_2:_int","_int")}
                 catch err~?2 {
                     ${output0("_3:_int","_int")}
@@ -648,9 +648,9 @@ class TTask {
                 }
                 ${output0("_4:_int","_int")}
            }
-           var z : active task @{}->()->()->()
+           var z : active task $D{} @{}->()->()->()
             ${output0("_1:_int","_int")}
-           set z = spawn h @{} ()
+           set z = spawn h $D{} @{} ()
             ${output0("_5:_int","_int")}
         """.trimIndent())
         assert(out.contains("block_throw: Assertion `0 && \"throw without catch\"' failed.")) { out }
@@ -660,8 +660,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Error $D{} @{} = <(),()>
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                 ${output0("_2:_int","_int")}
                 catch err~?1 {
                     catch err~?2 {
@@ -673,9 +673,9 @@ class TTask {
                 }
                 ${output0("_4:_int","_int")}
            }
-           var z : active task @{}->()->()->()
+           var z : active task $D{} @{}->()->()->()
             ${output0("_1:_int","_int")}
-           set z = spawn h @{} ()
+           set z = spawn h $D{} @{} ()
             ${output0("_5:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n3\n4\n5\n") { out }
@@ -686,22 +686,22 @@ class TTask {
             $Output0
             type Error $D{} @{} = <()>
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                catch _1 {
-                    var f : task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+                    var f : task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await evt~?1
                         ${output0("_1:_int","_int")}
                     }
-                    var x : active task @{}->()->()->()
-                    set x = spawn f @{} ()
+                    var x : active task $D{} @{}->()->()->()
+                    set x = spawn f $D{} @{} ()
                     throw Error.1 $D{} @{} ()
                }
                ${output0("_2:_int","_int")}
            }
-           var z : active task @{}->()->()->()
-           set z = spawn h @{} ()
+           var z : active task $D{} @{}->()->()->()
+           set z = spawn h $D{} @{} ()
            ${output0("_3:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -712,31 +712,31 @@ class TTask {
             $Output0
             type Error $D{} @{} = <()>
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                 catch _1 {
-                    var f : task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+                    var f : task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await evt~?3
                         ${output0("_999:_int","_int")}
                     }
-                    var g : task @{}->()->()->()
-                    set g = task @{}->()->()->() {
+                    var g : task $D{} @{}->()->()->()
+                    set g = task $D{} @{}->()->()->() {
                         await evt~?1
                         ${output0("_1:_int","_int")}
                     }
-                    var x : active task @{}->()->()->()
-                    set x = spawn f @{} ()
-                    var y : active task @{}->()->()->()
-                    set y = spawn g @{} ()
+                    var x : active task $D{} @{}->()->()->()
+                    set x = spawn f $D{} @{} ()
+                    var y : active task $D{} @{}->()->()->()
+                    set y = spawn g $D{} @{} ()
                     ${output0("_0:_int","_int")}
                     throw Error.1 $D{} @{} ()
                     ${output0("_999:_int","_int")}
                 }
                 ${output0("_2:_int","_int")}
            }
-           var z : active task @{}->()->()->()
-           set z = spawn h @{} ()
+           var z : active task $D{} @{}->()->()->()
+           set z = spawn h $D{} @{} ()
            ${output0("_3:_int","_int")}
         """.trimIndent())
         assert(out == "0\n1\n2\n3\n") { out }
@@ -747,43 +747,43 @@ class TTask {
             $Output0
             type Error $D{} @{} = <()>
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var main : task @{}->()->()->()
-            set main = task @{}->()->()->() {
-                var fg : task @{}->()->()->()
-                set fg = task @{}->()->()->() {
-                    var f : task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+            var main : task $D{} @{}->()->()->()
+            set main = task $D{} @{}->()->()->() {
+                var fg : task $D{} @{}->()->()->()
+                set fg = task $D{} @{}->()->()->() {
+                    var f : task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await evt~?3
                         ${output0("_999:_int","_int")}
                     }
-                    var g: task @{}->()->()->()
-                    set g = task @{}->()->()->() {
+                    var g: task $D{} @{}->()->()->()
+                    set g = task $D{} @{}->()->()->() {
                         await evt~?1
                         ${output0("_2:_int","_int")}
                     }
                     await evt~?3
-                    var xf : active task @{}->()->()->()
-                    set xf = spawn f @{} ()
-                    var xg : active task @{}->()->()->()
-                    set xg = spawn g @{} ()
+                    var xf : active task $D{} @{}->()->()->()
+                    set xf = spawn f $D{} @{} ()
+                    var xg : active task $D{} @{}->()->()->()
+                    set xg = spawn g $D{} @{} ()
                     throw Error.1 $D{} @{} ()
                 }
-                var h : task @{}->()->()->()
-                set h = task @{}->()->()->() {
+                var h : task $D{} @{}->()->()->()
+                set h = task $D{} @{}->()->()->() {
                     await evt~?1
                     ${output0("_1:_int","_int")}
                 }
-                var xfg : active task @{}->()->()->()
-                var xh : active task @{}->()->()->()
+                var xfg : active task $D{} @{}->()->()->()
+                var xh : active task $D{} @{}->()->()->()
                 catch _1 {
-                    set xfg = spawn fg @{} ()
-                    set xh = spawn h @{} ()
+                    set xfg = spawn fg $D{} @{} ()
+                    set xh = spawn h $D{} @{} ()
                     emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
                     ${output0("_999:_int","_int")}
                 }
             }
-            var xmain : active task @{}->()->()->()
-            set xmain = spawn main @{} ()
+            var xmain : active task $D{} @{}->()->()->()
+            set xmain = spawn main $D{} @{} ()
             ${output0("_3:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -794,27 +794,27 @@ class TTask {
             $Output0
             type Error $D{} @{} = <()>
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var xxx : func @{}->()->()
-            set xxx = func @{}->()->() {
+            var xxx : func $D{} @{}->()->()
+            set xxx = func $D{} @{}->()->() {
                 throw Error.1 $D{} @{} ()
             }
-            var h : task @{}->()->()->()
-            set h = task @{}->()->()->() {
+            var h : task $D{} @{}->()->()->()
+            set h = task $D{} @{}->()->()->() {
                catch _1 {
-                    var f: task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+                    var f: task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await _1:_int
                         ${output0("_1:_int","_int")}
                     }
-                    var xf: active task @{}->()->()->()
-                    set xf = spawn f @{} ()
-                    call xxx @{} ()
+                    var xf: active task $D{} @{}->()->()->()
+                    set xf = spawn f $D{} @{} ()
+                    call xxx $D{} @{} ()
                     ${output0("_999:_int","_int")}
                }
                ${output0("_2:_int","_int")}
            }
-           var xh : active task @{}->()->()->()
-           set xh = spawn h @{} ()
+           var xh : active task $D{} @{}->()->()->()
+           set xh = spawn h $D{} @{} ()
            ${output0("_3:_int","_int")}
         """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -826,7 +826,7 @@ class TTask {
     fun d00_err () {
         val out = test(
             false, """
-                var f : task @{}->()->_int->()
+                var f : task $D{} @{}->()->_int->()
                 set f.pub = _4:_int
             """.trimIndent()
         )
@@ -836,13 +836,13 @@ class TTask {
     fun d01_field () {
         val out = test(false, """
             $Output0
-            var f : task @{}->()->_int->()
-            set f = task @{}->()->_int->() {
+            var f : task $D{} @{}->()->_int->()
+            set f = task $D{} @{}->()->_int->() {
                 set pub = _3:_int
                 ${output0("_1:_int","_int")}
             }
-            var xf: active task @{}->()->_int->()
-            set xf = spawn f @{} ()
+            var xf: active task $D{} @{}->()->_int->()
+            set xf = spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
             ${output0("xf.pub","_int")}
             set xf.pub = _4:_int
@@ -853,9 +853,9 @@ class TTask {
     @Test
     fun d02_field () {
         val out = test(false, """
-            var f : task @{}->()->_int->()
-            var xf: active task @{}->()->_int->()
-            set xf = spawn f @{} ()
+            var f : task $D{} @{}->()->_int->()
+            var xf: active task $D{} @{}->()->_int->()
+            set xf = spawn f $D{} @{} ()
             set _:_ = xf.pub
         """.trimIndent())
         assert(out.contains("error: expected expression before ‘=’ token")) { out }
@@ -867,9 +867,9 @@ class TTask {
     fun e01_spawn () {
         val out = test(false, """
             $Output0
-            spawn task @{}->()->()->() {
+            spawn task $D{} @{}->()->()->() {
                 ${output0("()","()")}
-            } @{} ()
+            } $D{} @{} ()
         """.trimIndent())
         //assert(out == "(ln 2, col 5): expected `in` : have end of file") { out }
         assert(out == "()\n") { out }
@@ -878,9 +878,9 @@ class TTask {
     fun e01_spawn_err2 () {
         val out = test(
             false, """
-                var f : func @{}->()->()
-                var fs : active {} task @{}->()->()->()
-                spawn f @{} () in fs
+                var f : func $D{} @{}->()->()
+                var fs : active {} task $D{} @{}->()->()->()
+                spawn f $D{} @{} () in fs
             """.trimIndent()
         )
         //assert(out.startsWith("(ln 3, col 7): invalid `spawn` : type mismatch : expected task")) { out }
@@ -890,36 +890,36 @@ class TTask {
     fun e01_spawn_err3 () {
         val out = test(
             false, """
-                var f : task @{}->()->()->()
-                spawn f @{} () in ()
+                var f : task $D{} @{}->()->()->()
+                spawn f $D{} @{} () in ()
             """.trimIndent()
         )
-        assert(out.startsWith("(ln 2, col 19): invalid `spawn` : type mismatch : expected active tasks")) { out }
+        assert(out.startsWith("(ln 2, col 23): invalid `spawn` : type mismatch : expected active tasks")) { out }
     }
     @Test
     fun e01_spawn_err4 () {
         val out = test(
             false, """
-                var f : task @{}->()->()->()
-                var fs : active {} task @{}->[()]->()->()
-                spawn f @{} () in fs
+                var f : task $D{} @{}->()->()->()
+                var fs : active {} task $D{} @{}->[()]->()->()
+                spawn f $D{} @{} () in fs
             """.trimIndent()
         )
-        assert(out == "(ln 3, col 1): invalid `spawn` : type mismatch :\n    task @{} -> [()] -> () -> ()\n    task @{} -> () -> () -> ()") { out }
+        assert(out == "(ln 3, col 1): invalid `spawn` : type mismatch :\n    task $D{} @{} -> [()] -> () -> ()\n    task $D{} @{} -> () -> () -> ()") { out }
     }
     @Test
     fun e02_spawn_free () {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_3:_int","_int")}
             }
-            var fs : active {} task @{}->()->()->()
-            spawn f @{} () in fs
+            var fs : active {} task $D{} @{}->()->()->()
+            spawn f $D{} @{} () in fs
             ${output0("_2:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_4:_int","_int")}
@@ -930,16 +930,16 @@ class TTask {
     fun e03_spawn_anon () {
         val out = test(false, """
             $Output0
-            var t: task @{} -> () -> [_int] -> ()
-            set t = task @{} -> () -> [_int] -> () {
+            var t: task $D{} @{} -> () -> [_int] -> ()
+            set t = task $D{} @{} -> () -> [_int] -> () {
                 var xxx: _int
-                spawn (task @{}->_ -> _ -> _ {
+                spawn (task $D{} @{}->_ -> _ -> _ {
                     set pub = [_10:_int]
                     set xxx = _10:_int
-                } @{} ())
+                } $D{} @{} ())
             }
-            var xt: active task @{} -> () -> [_int] -> ()
-            set xt = spawn (t @{} ())
+            var xt: active task $D{} @{} -> () -> [_int] -> ()
+            set xt = spawn (t $D{} @{} ())
             ${output0("xt.pub.1","_int")}
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -951,8 +951,8 @@ class TTask {
     fun f01_err () {
         val out = test(
             false, """
-                var xs: active {} task @{}->()->_int->()
-                var x:  task @{}->()->_int->()
+                var xs: active {} task $D{} @{}->()->_int->()
+                var x:  task $D{} @{}->()->_int->()
                 loop x in xs {
                 }
             """.trimIndent()
@@ -964,13 +964,13 @@ class TTask {
     fun f02_err () {
         val out = test(
             false, """
-                var xs: active {} task @{}->[()]->_int->()
-                var x:  active task  @{}->()->_int->()
+                var xs: active {} task $D{} @{}->[()]->_int->()
+                var x:  active task  $D{} @{}->()->_int->()
                 loop x in xs {
                 }
             """.trimIndent()
         )
-        assert(out == "(ln 3, col 1): invalid `loop` : type mismatch :\n    active task @{} -> () -> _int -> ()\n    active {} task @{} -> [()] -> _int -> ()") { out }
+        assert(out == "(ln 3, col 1): invalid `loop` : type mismatch :\n    active task $D{} @{} -> () -> _int -> ()\n    active {} task $D{} @{} -> [()] -> _int -> ()") { out }
 
     }
     @Test
@@ -988,7 +988,7 @@ class TTask {
     fun f04_err () {
         val out = test(
             false, """
-                var x: active task @{}->()->_int->()
+                var x: active task $D{} @{}->()->_int->()
                 loop x in () {
                 }
             """.trimIndent()
@@ -999,8 +999,8 @@ class TTask {
     fun f05_loop () {
         val out = test(false, """
             $Output0
-            var fs: active {} task @{}->()->_int->()
-            var f: active task @{}->()->_int->()
+            var fs: active {} task $D{} @{}->()->_int->()
+            var f: active task $D{} @{}->()->_int->()
             loop f in fs {
             }
             ${output0("()","()")}
@@ -1012,15 +1012,15 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->_int->()
-            set f = task @{}->()->_int->() {
+            var f : task $D{} @{}->()->_int->()
+            set f = task $D{} @{}->()->_int->() {
                 set pub = _3:_int
                 ${output0("_1:_int","_int")}
                 await evt~?3
             }
-            var fs: active {} task @{}->()->_int->()
-            spawn f @{} () in fs
-            var x: active task @{}->()->_int->()
+            var fs: active {} task $D{} @{}->()->_int->()
+            spawn f $D{} @{} () in fs
+            var x: active task $D{} @{}->()->_int->()
             loop x in fs {
                 ${output0("x.pub","_int")}
             }
@@ -1031,14 +1031,14 @@ class TTask {
     fun f07_kill () {
         val out = test(false, """
             $Output0
-            var f : task @{}->()->_int->()
-            set f = task @{}->()->_int->() {
+            var f : task $D{} @{}->()->_int->()
+            set f = task $D{} @{}->()->_int->() {
                 set pub = _3:_int
                 ${output0("_1:_int","_int")}
             }
-            var fs: active {} task @{}->()->_int->()
-            spawn f @{} () in fs
-            var x: active task @{}->()->_int->()
+            var fs: active {} task $D{} @{}->()->_int->()
+            spawn f $D{} @{} () in fs
+            var x: active task $D{} @{}->()->_int->()
             loop x in fs {
                 ${output0("x.pub","_int")}
             }
@@ -1050,12 +1050,12 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 await evt~?3
             }
-            var xs: active {} task @{}->_int->_int->()
-            spawn f @{} () in xs
+            var xs: active {} task $D{} @{}->_int->_int->()
+            spawn f $D{} @{} () in xs
             emit @GLOBAL Event $D{} @{} <.3 _10:_int>:<(),_uint64_t,_int>
             ${output0("()","()")}
         """.trimIndent())
@@ -1066,25 +1066,25 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->_int->_int->()
-            set f = task @{}->_int->_int->() {
+            var f : task $D{} @{}->_int->_int->()
+            set f = task $D{} @{}->_int->_int->() {
                 set pub = arg
                 ${output0("pub","_int")}
                 await evt~?3
             }
-            var g : task @{}->_int->_int->()
-            set g = task @{}->_int->_int->() {
+            var g : task $D{} @{}->_int->_int->()
+            set g = task $D{} @{}->_int->_int->() {
                 set pub = arg
                 ${output0("pub","_int")}
                 await evt~?3
                 await evt~?3
             }
 
-            var xs: active {} task @{}->_int->_int->()
-            spawn f @{} _1:_int in xs
-            spawn g @{} _2:_int in xs
+            var xs: active {} task $D{} @{}->_int->_int->()
+            spawn f $D{} @{} _1:_int in xs
+            spawn g $D{} @{} _2:_int in xs
 
-            var x: active task @{}->_int->_int->()
+            var x: active task $D{} @{}->_int->_int->()
             loop x in xs {
                 ${output0("x.pub","_int")}
             }
@@ -1104,15 +1104,15 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->_int->()
-            set f = task @{}->()->_int->() {
+            var f : task $D{} @{}->()->_int->()
+            set f = task $D{} @{}->()->_int->() {
                 set pub = _10:_int
                 ${output0("_1:_int","_int")}
                 await evt~?3
             }
-            var fs: active {} task @{}->()->_int->()
-            spawn f @{} () in fs
-            var x: active task @{}->()->_int->()
+            var fs: active {} task $D{} @{}->()->_int->()
+            spawn f $D{} @{} () in fs
+            var x: active task $D{} @{}->()->_int->()
             loop x in fs {
                 emit @GLOBAL Event $D{} @{} <.3 _10:_int>:<(),_uint64_t,_int>
                 ${output0("x.pub","_int")}
@@ -1125,16 +1125,16 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->_int->()
-            set f = task @{}->()->_int->() {
+            var f : task $D{} @{}->()->_int->()
+            set f = task $D{} @{}->()->_int->() {
                 set pub = _3:_int
                 ${output0("_1:_int","_int")}
                 await evt~?3
             }
-            var fs: active {} task @{}->()->_int->()
-            spawn f @{} () in fs
-            var y: active task @{}->()->_int->()
-            var x: active task @{}->()->_int->()
+            var fs: active {} task $D{} @{}->()->_int->()
+            spawn f $D{} @{} () in fs
+            var y: active task $D{} @{}->()->_int->()
+            var x: active task $D{} @{}->()->_int->()
             loop x in fs {
                 set y = x
             }
@@ -1151,13 +1151,13 @@ class TTask {
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
             type Error $D{} @{} = <_int>
-            var f: task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f: task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 await _1:_int
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
-            spawn (task @{}->()->()->() {
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
+            spawn (task $D{} @{}->()->()->() {
                 ${catch0(1)} {
                     loop {
                         await evt~?2
@@ -1169,7 +1169,7 @@ class TTask {
                     }
                 }
                 ${output0("_2:_int","_int")}
-            }) @{} ()
+            }) $D{} @{} ()
             ${output0("_1:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_3:_int","_int")}
@@ -1182,15 +1182,15 @@ class TTask {
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
             type Error $D{} @{} = <_int>
-            spawn (task @{}->()->()->() {
+            spawn (task $D{} @{}->()->()->() {
                 loop {
-                    var f: task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+                    var f: task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await evt~?3
                         ${output0("_2:_int","_int")}
                     }
-                    var x : active task @{}->()->()->()
-                    set x = spawn f @{} ()
+                    var x : active task $D{} @{}->()->()->()
+                    set x = spawn f $D{} @{} ()
                     ${catch0(1)} {
                         loop {
                             await evt~?2
@@ -1203,7 +1203,7 @@ class TTask {
                     }
                     ${output0("_3:_int","_int")}
                 }
-            }) @{} ()
+            }) $D{} @{} ()
             ${output0("_1:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_4:_int","_int")}
@@ -1215,19 +1215,19 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            spawn (task @{}->()->()->() {
+            spawn (task $D{} @{}->()->()->() {
                 loop {
-                    var f: task @{}->()->()->()
-                    set f = task @{}->()->()->() {
+                    var f: task $D{} @{}->()->()->()
+                    set f = task $D{} @{}->()->()->() {
                         await evt~?3
                         ${output0("_2:_int","_int")}
                     }
-                    var x : active task @{}->()->()->()
-                    set x = spawn f @{} ()
+                    var x : active task $D{} @{}->()->()->()
+                    set x = spawn f $D{} @{} ()
                     await x
                     ${output0("_3:_int","_int")}
                 }
-            }) @{} ()
+            }) $D{} @{} ()
             ${output0("_1:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_4:_int","_int")}
@@ -1239,19 +1239,19 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            spawn (task @{}->()->()->() {
+            spawn (task $D{} @{}->()->()->() {
                 loop {
-                    var f: task @{}->()->()->_int
-                    set f = task @{}->()->()->_int {
+                    var f: task $D{} @{}->()->()->_int
+                    set f = task $D{} @{}->()->()->_int {
                         await evt~?3
                         set ret = _10:_int
                     }
-                    var x : active task @{}->()->()->_int
-                    set x = spawn f @{} ()
+                    var x : active task $D{} @{}->()->()->_int
+                    set x = spawn f $D{} @{} ()
                     await x
                     ${output0("x.ret","_int")}
                 }
-            }) @{} ()
+            }) $D{} @{} ()
             emit @GLOBAL Event $D{} @{} <.3 _1:_int>:<(),_uint64_t,_int>
        """.trimIndent())
         assert(out == "10\n") { out }
@@ -1260,24 +1260,24 @@ class TTask {
     fun g03_f_kill_err () {
         val out = test(
             false, """
-                var fff: func @{}  -> () -> () {}  -- leading block has no effect 
+                var fff: func $D{} @{}  -> () -> () {}  -- leading block has no effect 
            """.trimIndent()
         )
-        assert(out == "(ln 1, col 32): expected \";\"") { out }
+        assert(out == "(ln 1, col 36): expected \";\"") { out }
     }
     @Test
     fun g03_f_kill () {
         val out = test(false, """
             $Output0
-            var fff: func @{} -> () -> ()
-            set fff = func @{} -> () -> () {}
-            spawn (task @{}->()->()->() {
+            var fff: func $D{} @{} -> () -> ()
+            set fff = func $D{} @{} -> () -> () {}
+            spawn (task $D{} @{}->()->()->() {
                 ${output0("_111:_int","_int")}
                 {
-                    call fff @{} ()
+                    call fff $D{} @{} ()
                 }
                 ${output0("_222:_int","_int")}
-            }) @{} ()
+            }) $D{} @{} ()
        """.trimIndent())
         assert(out == "111\n222\n") { out }
     }
@@ -1287,25 +1287,25 @@ class TTask {
             $Output0
             type Event $D{} @{} = <(),_uint64_t,()>
             
-            spawn (task  @{} -> () -> () -> () {
+            spawn (task  $D{} @{} -> () -> () -> () {
                 ${output0("(_1: _int)","_int")}
-                var t1: active task @{} -> () -> () -> ()             
-                set t1 = spawn (task @{} -> () -> () -> () {              
+                var t1: active task $D{} @{} -> () -> () -> ()             
+                set t1 = spawn (task $D{} @{} -> () -> () -> () {              
             
-                    var t2: active task @{} -> () -> () -> ()        
-                    set t2 = spawn (task @{} -> () -> () -> () {
+                    var t2: active task $D{} @{} -> () -> () -> ()        
+                    set t2 = spawn (task $D{} @{} -> () -> () -> () {
                         ${output0("_2:_int","_int")}
                         await (_1: _int)                               
                         ${output0("_4:_int","_int")}               
-                    } @{} ())                          
+                    } $D{} @{} ())                          
             
                     await ((evt~)?2)     
                     ${output0("_5:_int","_int")}    
-                } @{} ())                   
+                } $D{} @{} ())                   
             
                 await (evt~?2)            
                 ${output0("_6:_int","_int")}                    
-            } @{} ())
+            } $D{} @{} ())
             
             ${output0("_3:_int","_int")}
             emit @GLOBAL Event $D{} @{} <.3 ()>: <(),_uint64_t,()>
@@ -1318,8 +1318,8 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,(),()>
-            var t: task @{} -> () -> () -> ()
-            set t = task @{} -> () -> () -> () {
+            var t: task $D{} @{} -> () -> () -> ()
+            set t = task $D{} @{} -> () -> () -> () {
                 var v: _int
                 set v = _1:_int
                 loop {
@@ -1329,14 +1329,14 @@ class TTask {
                 }
             }
             
-            var l: active task  @{} -> () -> () -> ()
-            set l = spawn (task  @{} -> () -> () -> () {
+            var l: active task  $D{} @{} -> () -> () -> ()
+            set l = spawn (task  $D{} @{} -> () -> () -> () {
                 loop {
-                    var x: active task  @{} -> () -> () -> ()
-                    set x = spawn t @{} _1:_int
+                    var x: active task  $D{} @{} -> () -> () -> ()
+                    set x = spawn t $D{} @{} _1:_int
                     await evt~?4
                 }
-            }) @{} ()
+            }) $D{} @{} ()
             
             emit @GLOBAL Event $D{} @{} <.3 ()>: <(),_uint64_t,(),()>
             emit @GLOBAL Event $D{} @{} <.4 ()>: <(),_uint64_t,(),()>
@@ -1353,16 +1353,16 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,()>
-            type Bird $D{} @{} = task  @{} -> () -> () -> ()
+            type Bird $D{} @{} = task  $D{} @{} -> () -> () -> ()
             
             var t1 : Bird $D{} @{}
-            set t1 = Bird $D{} @{} task  @{} -> () -> () -> () {
+            set t1 = Bird $D{} @{} task  $D{} @{} -> () -> () -> () {
                  ${output0("_2:_int","_int")}
             }
             
             var x1: active Bird $D{} @{}
             ${output0("_1:_int","_int")}
-            set x1 = spawn active Bird $D{} @{} (t1~ @{} ())
+            set x1 = spawn active Bird $D{} @{} (t1~ $D{} @{} ())
             ${output0("_3:_int","_int")}
        """.trimIndent())
         assert(out == "1\n2\n3\n") { out }
@@ -1371,15 +1371,15 @@ class TTask {
     fun h02_task_type () {
         val out = test(false, """
             $Output0
-            type Xask  $D{} @{} = task @{}->()->_int->()
+            type Xask  $D{} @{} = task $D{} @{}->()->_int->()
             var t : Xask  $D{} @{}
-            set t = Xask $D{} @{} task @{}->()->_int->() {
+            set t = Xask $D{} @{} task $D{} @{}->()->_int->() {
                 set pub = _10:_int
                 ${output0("_2:_int","_int")}
             }
             var x : active Xask $D{} @{}
             ${output0("_1:_int","_int")}
-            set x = spawn active Xask $D{} @{} (t~ @{} ())
+            set x = spawn active Xask $D{} @{} (t~ $D{} @{} ())
             ${output0("_3:_int","_int")}
             ${output0("(x~).pub","_int")}
         """.trimIndent())
@@ -1390,14 +1390,14 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <()>
-            type Xask $D{} @{} = task @{} -> () -> _int -> ()
+            type Xask $D{} @{} = task $D{} @{} -> () -> _int -> ()
             var t: Xask $D{} @{}
-            set t = Xask $D{} @{} task@{}-> ()->_int->() {
+            set t = Xask $D{} @{} task$D{} @{}-> ()->_int->() {
                 set pub = _10:_int
                 await _0:_int
             }
             var xs: active {} Xask $D{} @{}
-            spawn (t~ @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
             var i: active Xask $D{} @{}
             loop i in xs {
                 ${output0("(i~).pub","_int")}
@@ -1414,18 +1414,18 @@ class TTask {
             var n: _int
             set n = _0:_int
 
-            type Xask $D{} @{} = task @{} -> () -> () -> ()
+            type Xask $D{} @{} = task $D{} @{} -> () -> () -> ()
             var t: Xask $D{} @{}
-            set t = Xask $D{} @{} task @{}->()->()->() {
+            set t = Xask $D{} @{} task $D{} @{}->()->()->() {
                 set n = _(${D}n+1):_int
                 await _0:_int
             }
             
             var xs: active {2} Xask $D{} @{}
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
             ${output0("n","_int")}
         """.trimIndent())
         assert(out == "2\n") { out }
@@ -1439,18 +1439,18 @@ class TTask {
             var n: _int
             set n = _0:_int
 
-            type Xask $D{} @{} = task @{} -> () -> () -> ()
+            type Xask $D{} @{} = task $D{} @{} -> () -> () -> ()
             var t: Xask $D{} @{}
-            set t = Xask $D{} @{} task @{}->()->()->() {
+            set t = Xask $D{} @{} task $D{} @{}->()->()->() {
                 set n = _(${D}n+1):_int
                 --await _0:_int
             }
             
             var xs: active {2} Xask $D{} @{}
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
-            spawn (t~ @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
+            spawn (t~ $D{} @{} ()) in xs
             ${output0("n","_int")}
         """.trimIndent())
         assert(out == "4\n") { out }
@@ -1463,16 +1463,16 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_2:_int","_int")}
             }
-            var x1 : active task @{}->()->()->()
-            set x1 = spawn f @{} ()
-            var x2 : active task @{}->()->()->()
-            set x2 = spawn f @{} ()
+            var x1 : active task $D{} @{}->()->()->()
+            set x1 = spawn f $D{} @{} ()
+            var x2 : active task $D{} @{}->()->()->()
+            set x2 = spawn f $D{} @{} ()
             emit x1 Event $D{} @{}<.3 _1:_int>:<(),_uint64_t,_int>
             ${output0("_3:_int","_int")}
         """.trimIndent())
@@ -1483,8 +1483,8 @@ class TTask {
         val out = test(
             false, """
                 type Event $D{} @{} = <(),_uint64_t,_int>
-                var x1 : active task @{}->()->()->()
-                emit @GLOBAL x1 @{}()
+                var x1 : active task $D{} @{}->()->()->()
+                emit @GLOBAL x1 $D{} @{}()
             """.trimIndent()
         )
         assert(out == "(ln 3, col 14): invalid call : not a function") { out }
@@ -1513,14 +1513,14 @@ class TTask {
         val out = test(false, """
             $Output0
             type Event $D{} @{} = <(),_uint64_t,_int>
-            var f : task @{}->()->()->()
-            set f = task @{}->()->()->() {
+            var f : task $D{} @{}->()->()->()
+            set f = task $D{} @{}->()->()->() {
                 ${output0("_1:_int","_int")}
                 await evt~?3
                 ${output0("_5:_int","_int")}
             }
-            var x : active task @{}->()->()->()
-            set x = spawn f @{} ()
+            var x : active task $D{} @{}->()->()->()
+            set x = spawn f $D{} @{} ()
             ${output0("_2:_int","_int")}
             pause x
             ${output0("_3:_int","_int")}
@@ -1539,12 +1539,12 @@ class TTask {
         val out = test(false, """
             $Output0
             type Error $D{} @{} = <_int>
-            spawn ((task @{} -> _ -> _ -> _ {
+            spawn ((task $D{} @{} -> _ -> _ -> _ {
                 var opt: _int
                 var str: ()
                 set str = (if (_0: _int) { ()}  else { (if opt { ()}  else { () }) })
                 ${output0("()","()")}
-            }) @{} ())
+            }) $D{} @{} ())
         """.trimIndent())
         assert(out == "()\n") { out }
     }

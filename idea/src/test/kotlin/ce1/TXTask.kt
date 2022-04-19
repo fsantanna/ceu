@@ -544,7 +544,7 @@ class TXTask {
                 spawn f () in fs
             """.trimIndent()
         )
-        assert(out == "(ln 11, col 1): invalid `spawn` : type mismatch :\n    task @{} -> [()] -> () -> ()\n    task @{} -> () -> () -> ()") { out }
+        assert(out == "(ln 11, col 1): invalid `spawn` : type mismatch :\n    task $D{} @{} -> [()] -> () -> ()\n    task $D{} @{} -> () -> () -> ()") { out }
     }
     @Test
     fun e02_spawn_free () {
@@ -576,7 +576,7 @@ class TXTask {
                 }
             }
         """.trimIndent())
-        assert(out == "(ln 12, col 10): invalid `loop` : type mismatch : expected task type : have task @{} -> () -> _int -> ()") { out }
+        assert(out == "(ln 12, col 10): invalid `loop` : type mismatch : expected task type : have task $D{} @{} -> () -> _int -> ()") { out }
 
     }
     @Test
@@ -589,7 +589,7 @@ class TXTask {
                 }
             }
         """.trimIndent())
-        assert(out == "(ln 12, col 5): invalid `loop` : type mismatch :\n    active task @{} -> () -> _int -> ()\n    active {} task @{} -> [()] -> _int -> ()") { out }
+        assert(out == "(ln 12, col 5): invalid `loop` : type mismatch :\n    active task $D{} @{} -> () -> _int -> ()\n    active {} task $D{} @{} -> [()] -> _int -> ()") { out }
 
     }
     @Test
