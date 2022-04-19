@@ -57,7 +57,7 @@ class TExec {
         val out = all("""
             $Output0
             var x: _int
-            set x = ((_abs: _) @{} (_(-1): _))
+            set x = ((_abs: _) $D{} @{} (_(-1): _))
             ${output0("x","_int")}            
         """.trimIndent())
         assert(out == "1\n") { out }

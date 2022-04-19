@@ -35,6 +35,7 @@ sealed class Type(val tk: Tk, var wup: Any?, var wenv: Any?) {
     data class Actives (val tk_: Tk.Fix, val len: Tk.Num?, val tsk: Type): Type(tk_, null, null)
     data class Func (
         val tk_: Tk.Fix,
+        val pars: List<Tk.id>,
         var xscps: Triple<Scope,List<Scope>?,List<Pair<String,String>>?>,   // [closure scope, input scopes, input scopes constraints]
         val inp: Type, val pub: Type?, val out: Type
     ): Type(tk_, null, null)

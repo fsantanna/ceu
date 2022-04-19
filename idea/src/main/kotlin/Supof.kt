@@ -29,6 +29,7 @@ fun Type.Func.mapLabels (up: Any): Type.Func {
     }
     return Type.Func (
         this.tk_,
+        this.pars,
         this.xscps,
         this.inp.aux(),
         this.pub?.aux(),

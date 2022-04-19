@@ -44,6 +44,21 @@ object Parser
             (prefunc!=null || alls.acceptFix("func") || alls.acceptFix("task")) -> {
                 val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
+                val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
+                val pars = if (!haspars) emptyList() else {
+                    val pars = mutableListOf<Tk.id>()
+                    if (!alls.checkFix("}")) {
+                        while (alls.acceptVar("id")) {
+                            pars.add(alls.tk0 as Tk.id)
+                            if (!alls.acceptFix(",")) {
+                                break
+                            }
+                        }
+                    }
+                    alls.acceptFix_err("}")
+                    pars
+                }
+
                 val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")
                 val (scps, ctrs) = if (hasats) {
                     val (x, y) = this.scopepars()
@@ -62,7 +77,7 @@ object Parser
                 alls.acceptFix_err("->")
                 val out = this.type() // right associative
 
-                Type.Func(tk0,
+                Type.Func(tk0, pars,
                     Triple(
                         Scope(Tk.Scp("LOCAL", tk0.lin, tk0.col),null),
                         if (scps==null) null else scps.map { Scope(it,null) },
@@ -500,7 +515,8 @@ object Parser
         }
 
         // call
-        if (alls.checkExpr() || alls.checkFix("@{")) {
+        if (alls.checkExpr() || alls.checkFix("\${") || alls.checkFix("@{")) {
+            val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
             val hasats = if (CE1) alls.acceptFix("@{") else alls.acceptFix_err("@{")
             val iscps = if (!hasats) null else {
                 val ret = this.scp1s { }

@@ -74,6 +74,7 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
             )
             is Type.Func -> Type.Func(
                 this.tk.clone() as Tk.Fix,
+                this.pars.map { it.clone() as Tk.id },
                 this.xscps.let {
                     Triple (
                         Scope(it.first.scp1.clone() as Tk.Scp, it.first.scp2),
@@ -214,6 +215,7 @@ fun Type.mapScps (dofunc: Boolean, map: Map<String, Scope>): Type {
         is Type.Func -> if (!dofunc) this else {
             Type.Func(
                 this.tk_,
+                this.pars,
                 Triple (
                     this.xscps.first.idx(),
                     this.xscps.second,
