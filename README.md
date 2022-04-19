@@ -619,7 +619,7 @@ Expr ::= `(´ Expr `)´                               -- group                  
       |  `new´ Expr [`:´ SCOPE]                     -- union allocation         new List.Cons: @LOCAL
       |  `if´ Expr `{´ Expr `}´ `else´ `{´ Expr `}´ -- if expression            if cnd { ... } else { ... }
       |  [`func´ | `task´] Type Block               -- function expression      func ()->() { ... }
-      |  Expr Scopes Expr [`:´ SCOPE]               -- function call            f @[@S] x: @LOCAL
+      |  Expr [Params] [Scopes] Expr [`:´ SCOPE]    -- function call            f ${_int} @[S] x: @LOCAL
       |  `/´ Expr                                   -- upref                    /x
       |  Expr `\´                                   -- dnref                    x\
       |  Expr `::´ Type                             -- cast                     x::_long  x::Super.Sub
@@ -641,7 +641,7 @@ Type ::= `(´ Type `)´                               -- group                  
       |  TYPE { `.´ (NUM | TYPE) } [Params] [Scopes] -- named type              Bool  Bool.1  Bool.False
       |  `[´ [VAR `:´] Type {`,´ [VAR `:´] Type} `]´ -- tuple                   [(),()]  [x:_int,y:_int]
       |  `<´ [TYPE `=´] Type {`,´ [TYPE `=´] Type} `>´ -- union                 </List>  <False=(),True=()>
-      |  [`func´ | `task´] [Scopes `->´] Type [`->´ Type] `->´ Type  -- function  func f : ()->() { return () }
+      |  [`func´ | `task´] [[Params] [Scopes] `->´] Type [`->´ Type] `->´ Type  -- function  func f : ()->() { return () }
       |  Type.Tuple `+´ Type.Union                  -- type inheritance         [...] + <...>
 
 Params ::= `${´ [TYPE {`,´ TYPE}] `}´               -- list of type parameters  ${a,b}

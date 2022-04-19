@@ -45,18 +45,32 @@ object Parser
                 val tk0 = prefunc ?: alls.tk0 as Tk.Fix
 
                 val haspars = if (CE1) alls.acceptFix("\${") else alls.acceptFix_err("\${")
-                val pars = if (!haspars) emptyList() else {
-                    val pars = mutableListOf<Tk.id>()
-                    if (!alls.checkFix("}")) {
-                        while (alls.acceptVar("id")) {
+                val pars: Triple<Boolean, List<Tk.id>?, List<Type>?> = when {
+                    !haspars -> Triple(false, null, emptyList())
+                    alls.checkVar("id") -> {
+                        val pars = mutableListOf<Tk.id>()
+                        while (!alls.checkFix("}")) {
+                            alls.acceptVar("id")
                             pars.add(alls.tk0 as Tk.id)
                             if (!alls.acceptFix(",")) {
                                 break
                             }
                         }
+                        alls.acceptFix_err("}")
+                        Triple(true, pars, null)
                     }
-                    alls.acceptFix_err("}")
-                    pars
+                    else -> {
+                        val args = mutableListOf<Type>()
+                        while (!alls.checkFix("}")) {
+                            val tp = Parser.type()
+                            args.add(tp)
+                            if (!alls.acceptFix(",")) {
+                                break
+                            }
+                        }
+                        alls.acceptFix_err("}")
+                        Triple(false, null, args)
+                    }
                 }
 
                 val hasats = if (CE1) alls.checkFix("@{") else alls.checkFix_err("@{")

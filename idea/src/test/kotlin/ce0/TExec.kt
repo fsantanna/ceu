@@ -2349,10 +2349,10 @@ class TExec {
             $Output0
             var f : func $D{a}  @{} -> ${D}a -> ()
             var f : func $D{()} @{} ->   ()  -> ()
-            var f = func $D{()} @{} ->   ()  -> () {
-                return ()
+            set f = func $D{()} @{} ->   ()  -> () {
+                set ret = ()
             }
-            ${output0("f ()","()")}
+            ${output0("f $D{} @{} ()","()")}
            """.trimIndent()
         )
         assert(out == "()\n") { out }

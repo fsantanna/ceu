@@ -74,7 +74,13 @@ fun Type.clone (tk: Tk, up: Any, env: Any?=null): Type {
             )
             is Type.Func -> Type.Func(
                 this.tk.clone() as Tk.Fix,
-                this.pars.map { it.clone() as Tk.id },
+                this.pars.let {
+                    if (it.first) {
+                        Triple(true, it.second!!.map { it.clone() as Tk.id }, null)
+                    } else {
+                        Triple(false, null, it.third!!.map { it.aux(lin,col) })
+                    }
+                },
                 this.xscps.let {
                     Triple (
                         Scope(it.first.scp1.clone() as Tk.Scp, it.first.scp2),

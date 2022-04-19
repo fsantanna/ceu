@@ -44,7 +44,13 @@ fun Type.tostr (lc: Boolean = false, ispak: Boolean = false): String {
         is Type.Active  -> "active " + this.tsk.tostr(lc)
         is Type.Actives -> "active {${this.len?.str ?: ""}} " + this.tsk.tostr(lc)
         is Type.Func    -> {
-            val pars = " $D{" + this.pars.map { it.str }.joinToString(",") + "}"
+            val pars = " $D{" + this.pars.let {
+                if (it.first) {
+                    it.second!!.map { it.str }
+                } else {
+                    it.third!!.map { it.tostr(lc) }
+                }
+            }.joinToString(",") + "}"
             val ctrs = this.xscps.third.let {
                 if (it == null || it.isEmpty()) "" else ": " + it.map { it.first + ">" + it.second }
                     .joinToString(",")
