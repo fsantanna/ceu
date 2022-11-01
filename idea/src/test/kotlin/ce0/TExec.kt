@@ -576,7 +576,6 @@ class TExec {
     @Test
     fun e04_inp () {
         val out = all("""
-            $Output0
             type Output $D{} @{} = <_>
             type Input  $D{} @{} = <_>
             var x: _int
@@ -592,7 +591,7 @@ class TExec {
             $Output0
             var x: _int
             var y: </_int@LOCAL>
-            set x = input std y: _int
+            set x = input Std $D{} @{} y: _int
             ${output0("x","_int")}
         """.trimIndent())
         assert(out == "10\n") { out }
@@ -616,7 +615,7 @@ class TExec {
             $Output0
             type Int = <_int,()>
             var x: Int
-            set x = input std <.1 _10:_int>: Int: Int
+            set x = input Std $D{} @{} <.1 _10:_int>: Int: Int
             output std x
         """.trimIndent())
         assert(out.contains("XXX")) { out }

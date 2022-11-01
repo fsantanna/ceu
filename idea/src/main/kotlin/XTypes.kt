@@ -581,7 +581,7 @@ fun Stmt.xinfTypes (inf: Type? = null) {
             //}
             // inf is at least Unit
             this.arg.xinfTypes(null)
-            this.dst?.xinfTypes(null)
+            this.dst?.xinfTypes(this.xtype)
             this.xtype = this.xtype ?: (this.dst?.wtype ?: inf)?.clone(this.tk,this) ?: unit()
         }
         is Stmt.Output -> this.arg.xinfTypes(null)  // no inf b/c output always depends on the argument

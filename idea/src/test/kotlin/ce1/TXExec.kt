@@ -27,7 +27,7 @@ class TXExec {
         val out = test(true, """
             --type Input  $D{} @{} = <Std=_>
             --type Output $D{} @{} = <Std=_>
-            var x:_int = input Std ()
+            var x = input Std ():_int
             output Std x
         """.trimIndent())
         assert(out == "()\n") { out }
