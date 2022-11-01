@@ -21,14 +21,13 @@ allocated data structures.
 
 Ceu compiles to C and integrates seamlessly with it at the source level.
 C identifiers can be accessed with the `_` prefix.
-Ceu types and identifiers can also be accessed from C.
+Conversely, Ceu types and identifiers can also be accessed from C.
 
 In summary, Ceu provides structured-reactive concurrency, region-based memory
 management, and source-level integration with C.
 
 Ceu is [free software](LICENSE.md).
 
-<!--
 # INSTALL & RUN
 
 ```
@@ -38,6 +37,10 @@ $ ceu x.ceu
 ()
 $
 ```
+
+# EXAMPLES
+
+`TODO`
 
 # MANUAL
 
@@ -75,6 +78,14 @@ current block:
 var x: ()           -- `x` is of unit type `()`
 var y: _int         -- `y` is a native `int`
 var z: [_int,_int]  -- `z` is a tuple of ints
+```
+
+A declaration may include an [assignment](#Assignment), which may infer the
+type of the variable:
+
+```
+var x = ()           -- `x` holds `()` of type `()`
+var x: () = ()       -- equivalent to above
 ```
 
 ## Assignment
@@ -549,8 +560,6 @@ In this case, a native token can contain any other characters:
 ```
 _(1 + 1)     _{2 * (1+1)}
 ```
--->
-
 # SYNTAX
 
 `TODO: fields`
