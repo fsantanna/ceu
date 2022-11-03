@@ -1,0 +1,8 @@
+-- need to execute ./out.exe again after ceu
+
+type Output = <Std=_>
+type Input  = <Std=_>
+
+var x = input Std (): _int
+--var x: _int = input Std ()
+output Std x
