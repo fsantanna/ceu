@@ -32,10 +32,9 @@ Ceu is [free software](LICENSE.md).
 
 ```
 $ sudo make install
-$ vi x.ceu   # output std ()
-$ ceu x.ceu
-()
-$
+$ ceu idea/src/input-output.ceu
+... (type 10) ...
+10
 ```
 
 # EXAMPLES
@@ -71,7 +70,7 @@ The label `@LOCAL`  corresponds to the current block.
 
 ## Variable Declaration
 
-A variable declaration introduces an identifier of the given type in the
+A declaration introduces an identifier as a variable of the given type in the
 current block:
 
 ```
@@ -100,11 +99,13 @@ set tup.1 = n       -- changes the tuple index value
 set ptr\  = v       -- dereferences pointer `ptr` and assigns `v`
 ```
 
-The value to be assigned can be an `input` statement or any expression.
+The value to be assigned can be any [expression](#Expressions) or statement
+that yields a value ([input](#Input), [spawn](#Spawn), [await](#Await),
+[new](#New)).
 
 ## Call
 
-The `call` statement invoke the respective expression:
+A `call` invokes an expression:
 
 ```
 call f _0           -- calls `f` passing `_0`
@@ -113,21 +114,21 @@ call f _0           -- calls `f` passing `_0`
 ## Input & Output
 
 Input and output statements communicate with external I/O devices.
-They receive a device to communicate, and an argument to pass to the device:
+They receive a [named constructor](#TODO) corresponding to the device and
+parameters to communicate:
 
 ```
-output std [_0,_0]                  -- outputs "[0,0]" to stdio
-var x: _int = input std (): _int    -- reads an `_int` from stdio
+output Std [_0,_0]          -- outputs "[0,0]" to stdio
+var x = input Std (): _int  -- reads an `_int` from stdio
 ```
 
-An `input` can be used in assignments and evaluates to the required explicit
-type.
+An `input` evaluates to a value of the required explicit type.
 
-The special device `std` works for the standard input & output device and
+The special device `Std` works for the standard input & output device and
 accepts any value as argument.
 
 `TODO: input std should only accept :_(char*)`
-`TODO: custom devices`
+`TODO: input/output hierarchy`
 
 *C* declarations for the I/O devices must prefix their identifiers with
 `input_` or `output_`:
@@ -290,6 +291,14 @@ and input and output types separated by an arrow `->`:
 func () -> _int          -- input is unit and output is `_int`
 func [_int,_int] -> ()   -- input is a pair of `_int` and output is unit
 ```
+
+## Special Types
+
+### Error
+
+### Event
+
+### Input & Output
 
 # 3. EXPRESSIONS
 
@@ -569,9 +578,9 @@ Stmt ::= { Stmt [`;´ | `\n´] }                      -- sequence               
       |  `{´ SCOPE Stmt `}´                         -- block                    { @A ... }
 
         // variables
-      |  `var´ VAR [`:´ Type] [`=´ (Expr | VStmt)]  -- variable declaration     var x: _int = f ()
-      |  `set´ Expr `=´ (Expr | VStmt)              -- assignment               set x = _10
-            VStmt ::= (`input` | `spawn` | `await`) ... -- TODO(new,do)
+      |  `var´ VAR [`:´ Type] [`=´ (Expr | EStmt)]  -- variable declaration     var x: _int = f ()
+      |  `set´ Expr `=´ (Expr | EStmt)              -- assignment               set x = _10
+            EStmt ::= (`input` | `spawn` | `await` | `new`) ...
 
         // invocations
       |  `output´ Expr                              -- data output              output Std x
